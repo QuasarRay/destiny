@@ -2,8 +2,8 @@ use vstd::prelude::*;
 
 verus! {
 
-pub const MAX_FORMATION_SLOTS: int = 16;
-pub const TEN_BILLION: int = 10_000_000_000;
+pub open spec fn max_formation_slots() -> int { 16 }
+pub open spec fn ten_billion() -> int { 10_000_000_000 }
 
 pub struct OriginalBallDefaults {
     pub id: int,
@@ -48,9 +48,9 @@ pub open spec fn original_ball_defaults() -> OriginalBallDefaults {
         harmonic: -1,
         corporation_id: -1,
         alliance_id: -1,
-        x: TEN_BILLION,
-        y: TEN_BILLION,
-        z: TEN_BILLION,
+        x: ten_billion(),
+        y: ten_billion(),
+        z: ten_billion(),
         agility: 1,
         speed_fraction: 1,
         mode: 0,
@@ -85,9 +85,9 @@ pub proof fn original_ball_defaults_are_exact()
         original_ball_defaults().harmonic == -1,
         original_ball_defaults().corporation_id == -1,
         original_ball_defaults().alliance_id == -1,
-        original_ball_defaults().x == TEN_BILLION,
-        original_ball_defaults().y == TEN_BILLION,
-        original_ball_defaults().z == TEN_BILLION,
+        original_ball_defaults().x == ten_billion(),
+        original_ball_defaults().y == ten_billion(),
+        original_ball_defaults().z == ten_billion(),
         original_ball_defaults().agility == 1,
         original_ball_defaults().speed_fraction == 1,
         original_ball_defaults().mode == 0,
@@ -166,7 +166,7 @@ pub open spec fn next_sequential_formation_slot(
     if !formation_assigned
         || !park_present
         || !formation_valid
-        || slot_count > MAX_FORMATION_SLOTS
+        || slot_count > max_formation_slots()
         || reserved_prefix >= slot_count
     {
         -1
@@ -183,7 +183,9 @@ pub proof fn unconfigured_ball_has_no_formation_slot(reserved: int, slots: int)
 
 // original-test: python/destiny/test/test_ball.py::test_reserve_formation_slot
 pub proof fn first_valid_formation_slot_is_zero(slots: int)
-    requires 0 < slots <= MAX_FORMATION_SLOTS,
+    requires
+        slots > 0,
+        slots <= max_formation_slots(),
     ensures next_sequential_formation_slot(0, slots, true, true, true) == 0,
 {
 }
@@ -191,8 +193,9 @@ pub proof fn first_valid_formation_slot_is_zero(slots: int)
 // original-test: python/destiny/test/test_ball.py::test_slots_are_reserved_in_incremental_order
 pub proof fn valid_formation_slots_are_incremental(reserved: int, slots: int)
     requires
-        0 <= reserved < slots,
-        slots <= MAX_FORMATION_SLOTS,
+        reserved >= 0,
+        reserved < slots,
+        slots <= max_formation_slots(),
     ensures
         next_sequential_formation_slot(reserved, slots, true, true, true) == reserved,
 {
@@ -200,7 +203,9 @@ pub proof fn valid_formation_slots_are_incremental(reserved: int, slots: int)
 
 // original-test: python/destiny/test/test_ball.py::test_reserving_too_many_formation_slots_fails
 pub proof fn full_formation_has_no_free_slot(slots: int)
-    requires 0 <= slots <= MAX_FORMATION_SLOTS,
+    requires
+        slots >= 0,
+        slots <= max_formation_slots(),
     ensures next_sequential_formation_slot(slots, slots, true, true, true) == -1,
 {
 }
@@ -216,7 +221,7 @@ pub open spec fn slot_reused_after_free(
         || !park_present
         || !formation_valid
         || slot_count <= 0
-        || slot_count > MAX_FORMATION_SLOTS
+        || slot_count > max_formation_slots()
         || freed_slot < 0
         || freed_slot >= slot_count
     {
@@ -229,8 +234,9 @@ pub open spec fn slot_reused_after_free(
 // original-test: python/destiny/test/test_ball.py::test_free_formation_slot
 pub proof fn freed_formation_slot_is_reused(freed: int, slots: int)
     requires
-        0 <= freed < slots,
-        slots <= MAX_FORMATION_SLOTS,
+        freed >= 0,
+        freed < slots,
+        slots <= max_formation_slots(),
     ensures slot_reused_after_free(freed, slots, true, true, true) == freed,
 {
 }
