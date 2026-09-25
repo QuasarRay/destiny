@@ -71,6 +71,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Verus Rust toolchain
+        run: rustup toolchain install 1.98.1-x86_64-unknown-linux-gnu
+
       - name: Download pinned Verus release
         run: |
           curl --fail --location --retry 3 \
