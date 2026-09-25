@@ -92,6 +92,7 @@ jobs:
           "$VERUS_BIN" --crate-type=lib verification/verus/proofs.rs
           "$VERUS_BIN" --crate-type=lib verification/verus/state_contracts.rs
           "$VERUS_BIN" --crate-type=lib verification/verus/lifecycle_contracts.rs
+          "$VERUS_BIN" --crate-type=lib verification/verus/ball_contracts.rs
 
   runtime-parity:
     name: concrete runtime parity regression

@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 
+mod ball_contracts;
 mod contracts;
 mod lifecycle_contracts;
 mod metaverification;
