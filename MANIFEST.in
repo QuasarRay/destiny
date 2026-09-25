@@ -1,9 +1,0 @@
-include Cargo.lock Cargo.toml rust-toolchain.toml CMakeLists.txt LICENSE README.md COMPATIBILITY.md VERIFICATION.md IMPLEMENTATION_STATUS.md REMEDIATION_STATUS.md V3_REMEDIATION_STATUS.md V4_REMEDIATION_STATUS.md RELEASE_GATES.md SECURITY.md ARTIFACT_MANIFEST.md THIRD_PARTY_NOTICES.md deny.toml
-recursive-include src *.rs
-recursive-include include *.h *.hpp
-recursive-include cmake *.cmake
-recursive-include registry *.json
-recursive-include tools *.py
-recursive-include tests *.py *.c *.cpp CMakeLists.txt
-recursive-include python *.py *.yaml
-recursive-include .github *.yml *.yaml
