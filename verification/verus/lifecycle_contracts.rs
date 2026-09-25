@@ -2,12 +2,12 @@ use vstd::prelude::*;
 
 verus! {
 
-pub open spec fn membership_count_after_add(current: nat) -> nat {
+pub open spec fn membership_count_after_add(current: int) -> int {
     current + 1
 }
 
-pub open spec fn membership_count_after_remove(current: nat, was_present: bool) -> nat
-    recommends !was_present || current > 0
+pub open spec fn membership_count_after_remove(current: int, was_present: bool) -> int
+    recommends current >= 0, !was_present || current > 0
 {
     if was_present { current - 1 } else { current }
 }
@@ -30,7 +30,8 @@ pub proof fn removing_only_present_ball_changes_membership_one_to_zero()
 {
 }
 
-pub proof fn removing_absent_ball_preserves_membership(current: nat)
+pub proof fn removing_absent_ball_preserves_membership(current: int)
+    requires current >= 0
     ensures membership_count_after_remove(current, false) == current,
 {
 }
