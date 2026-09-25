@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 
 mod contracts;
+mod geometry_contracts;
 mod lifecycle_contracts;
 mod metaverification;
 mod state_contracts;
