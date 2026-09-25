@@ -10,7 +10,7 @@ import sys
 
 FILE_RE = re.compile(r'file!\("([^"]+)"\s*=>\s*\[(.*?)\]\)', re.S)
 STRING_RE = re.compile(r'"([^"]+)"')
-MARKER_RE = re.compile(r'^\s*//\s*original-test:\s*(.+?)::([^:]+)\s*$', re.M)
+MARKER_PREFIX = "// original-test: "
 
 
 def catalog(root: pathlib.Path) -> set[tuple[str, str]]:
@@ -27,14 +27,31 @@ def markers(root: pathlib.Path, relative: str) -> set[tuple[str, str]]:
     result: set[tuple[str, str]] = set()
     if not base.exists():
         return result
+
     for path in base.rglob("*.rs"):
-        result.update(MARKER_RE.findall(path.read_text(encoding="utf-8")))
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line.startswith(MARKER_PREFIX):
+                continue
+
+            source_test = line[len(MARKER_PREFIX):]
+            source, separator, test = source_test.rpartition("::")
+            if not separator or not source or not test:
+                raise ValueError(
+                    f"malformed original-test marker in {path}: {raw_line!r}"
+                )
+            result.add((source, test))
+
     return result
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=pathlib.Path, default=pathlib.Path(__file__).parents[2])
+    parser.add_argument(
+        "--root",
+        type=pathlib.Path,
+        default=pathlib.Path(__file__).parents[2],
+    )
     parser.add_argument("--strict-both", action="store_true")
     args = parser.parse_args()
 
