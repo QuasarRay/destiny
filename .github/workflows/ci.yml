@@ -91,7 +91,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install pinned audit tools
         run: |
-          cargo install --locked cargo-audit@0.21.2
+          cargo install --locked cargo-audit@0.22.2
           cargo install --locked cargo-deny@0.18.4
       - name: Audit exact lock file
         run: cargo audit --file Cargo.lock

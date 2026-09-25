@@ -84,10 +84,7 @@ fn decode_canonical_inner(
             let mut decoded = Map::new();
             for (key, value) in object {
                 add_string_budget(&key, budget)?;
-                decoded.insert(
-                    key,
-                    decode_canonical_inner(value, depth + 1, budget)?,
-                );
+                decoded.insert(key, decode_canonical_inner(value, depth + 1, budget)?);
             }
             Ok(Value::Object(decoded))
         }
