@@ -1,0 +1,96 @@
+name: formal-verification
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  specification-and-meta:
+    name: specification and metaverification
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Show toolchain
+        run: |
+          rustc --version --verbose
+          cargo --version
+          python --version
+
+      - name: Test engine-independent original-Destiny specification
+        run: cargo test --manifest-path verification/spec/Cargo.toml
+
+      - name: Check procedural macro crate
+        run: cargo check --manifest-path verification/meta/Cargo.toml
+
+      - name: Test declarative metaverification support
+        run: cargo test --manifest-path verification/meta-support/Cargo.toml
+
+      - name: Compile and run non-Kani proof-crate regression tests
+        run: cargo test --manifest-path verification/kani/Cargo.toml
+
+      - name: Validate proof markers against exhaustive original test catalog
+        run: python verification/tools/proof_coverage.py
+
+      - name: Scan repeated implementation and proof patterns
+        run: python verification/tools/pattern_scan.py --json > repetition-patterns.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: formal-repetition-patterns
+          path: repetition-patterns.json
+
+  kani:
+    name: Kani 0.68.0
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned Kani
+        run: |
+          cargo install --locked kani-verifier --version 0.68.0
+          cargo kani setup
+          cargo kani --version
+
+      - name: Verify Kani harnesses
+        run: cargo kani --manifest-path verification/kani/Cargo.toml --output-format=terse
+
+  verus:
+    name: Verus 0.2026.09.20.aef82ed
+    runs-on: ubuntu-24.04
+    env:
+      VERUS_RELEASE: 0.2026.09.20.aef82ed
+      VERUS_SHA256: 7b870fa12bc589015c2fab60a8b3d9f07c7b1adb3444eb0fadffcbf7f0447b33
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download pinned Verus release
+        run: |
+          curl --fail --location --retry 3 \
+            "https://github.com/verus-lang/verus/releases/download/release/$VERUS_RELEASE/verus-$VERUS_RELEASE-x86-linux.zip" \
+            --output verus.zip
+          echo "$VERUS_SHA256  verus.zip" | sha256sum --check -
+          mkdir verus-dist
+          unzip -q verus.zip -d verus-dist
+          VERUS_BIN="$(find verus-dist -type f -name verus -perm -u+x | head -n 1)"
+          test -n "$VERUS_BIN"
+          echo "VERUS_BIN=$VERUS_BIN" >> "$GITHUB_ENV"
+          "$VERUS_BIN" --version
+
+      - name: Verify logical refinement proofs
+        run: "$VERUS_BIN" verification/verus/proofs.rs
+
+  runtime-parity:
+    name: concrete runtime parity regression
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locked root tests
+        run: cargo test --all-features --locked original_ignored_setter_values_leave_existing_ball_unchanged -- --exact
