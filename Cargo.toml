@@ -25,6 +25,7 @@ avian3d = { version = "=0.7.0", default-features = false, features = ["3d", "f64
 base64 = "=0.22.1"
 bevy = { version = "=0.19.1", default-features = false, features = ["std", "bevy_log", "bevy_state", "serialize"] }
 bevy_replicon = { version = "=0.42.3", default-features = false, features = ["client", "server"], optional = true }
+destiny-original-spec = { path = "verification/spec" }
 lightyear_messages = { version = "=0.29.0", default-features = false, features = ["std", "client", "server"], optional = true }
 lightyear_connection = { version = "=0.29.0", default-features = false, features = ["client", "server"], optional = true }
 lightyear_replication = { version = "=0.29.0", default-features = false, features = ["std", "client", "server"], optional = true }

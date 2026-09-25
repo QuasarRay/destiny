@@ -23,13 +23,38 @@ pub open spec fn apply_non_negative_setter(current: int, requested: int) -> int 
     if requested >= 0 { requested } else { current }
 }
 
-// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_ball_mass_to_a_negative_value_is_ineffective
 // original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_ball_radius_to_negative_value_is_ineffective
 // original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_max_speed_to_negative_value_is_ineffective
-// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_agility_to_negative_value_is_ineffective
 pub proof fn negative_setter_is_noop(current: int, requested: int)
     requires requested < 0,
     ensures apply_non_negative_setter(current, requested) == current,
+{
+}
+
+pub open spec fn apply_positive_setter(current: int, requested: int) -> int {
+    if requested > 0 { requested } else { current }
+}
+
+// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_ball_mass_to_a_negative_value_is_ineffective
+// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_agility_to_negative_value_is_ineffective
+pub proof fn non_positive_positive_setter_is_noop(current: int, requested: int)
+    requires requested <= 0,
+    ensures apply_positive_setter(current, requested) == current,
+{
+}
+
+pub open spec fn non_negative_setter_accepts(requested: int) -> bool {
+    requested >= 0
+}
+
+pub open spec fn positive_setter_accepts(requested: int) -> bool {
+    requested > 0
+}
+
+pub proof fn setter_thresholds_are_exact(requested: int)
+    ensures
+        non_negative_setter_accepts(requested) <==> requested >= 0,
+        positive_setter_accepts(requested) <==> requested > 0,
 {
 }
 
