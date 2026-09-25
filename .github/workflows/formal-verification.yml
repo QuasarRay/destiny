@@ -97,7 +97,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Minimally repair root lockfile
-        run: cargo check --all-features
+        run: cargo metadata --format-version 1 --no-deps > /dev/null
 
       - name: Commit minimally repaired root lockfile
         if: github.event_name == 'push' && github.ref == 'refs/heads/formal/06-verifier-ci-gates'
