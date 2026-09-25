@@ -9,6 +9,7 @@
 mod ball;
 mod catalog;
 mod model;
+mod visibility;
 
 pub use ball::{
     MAX_ORIGINAL_FORMATION_SLOTS, ORIGINAL_TEN_BILLION, OriginalBallDefaults,
@@ -35,3 +36,8 @@ pub enum ObligationStatus {
     ProvedParity,
     KnownMismatch,
 }
+
+pub use visibility::{
+    VisibilityState, cloak_transition, scan_cone_pi_over_2_x, uncloak_transition,
+    visibility_candidate_blocks, visibility_result,
+};

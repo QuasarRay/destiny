@@ -3681,16 +3681,6 @@ impl CompatRuntime {
 
     fn uncloak_ball(&mut self, ball_id: i64) -> Result<(), CompatError> {
         self.entity(ball_id)?;
-        if self.metadata(ball_id)?.is_cloaked == 0 {
-            self.metadata_mut(ball_id)?.sensors.retain(|sensor| {
-                !sensor
-                    .get("cloak_sensor")
-                    .and_then(Value::as_bool)
-                    .unwrap_or(false)
-            });
-            return Ok(());
-        }
-        let restore_massive = self.metadata(ball_id)?.massive_before_cloak.unwrap_or(true);
         {
             let mut metadata = self.metadata_mut(ball_id)?;
             metadata.is_cloaked = 0;
@@ -3702,7 +3692,12 @@ impl CompatRuntime {
             });
             metadata.massive_before_cloak = None;
         }
-        self.set_massive(ball_id, restore_massive)?;
+
+        // Original Destiny's Ballpark::UncloakBall always makes a ball
+        // massive when it is not in proper warp, even when the ball was
+        // already uncloaked. This compatibility subset does not implement
+        // Warp, so every representable state is a non-warp state.
+        self.set_massive(ball_id, true)?;
         self.remove_from_sensor_members(ball_id)?;
         Ok(())
     }

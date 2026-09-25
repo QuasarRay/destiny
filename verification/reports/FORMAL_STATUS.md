@@ -31,14 +31,17 @@ The stack currently contains paired Kani/Verus specifications for:
 - original Ball default-state constants;
 - mini-ball/mini-capsule child-count and capsule-radius rules;
 - identity-vector rotation and proximity-sensor acceptance;
-- formation-slot first-free ordering, exhaustion, and freed-slot reuse.
+- formation-slot first-free ordering, exhaustion, and freed-slot reuse;
+- visibility occluder selection predicates and cloak/uncloak transitions;
+- exact pi/2 ScanCone axis examples from the original visibility suite.
 
 The concrete Rust runtime is additionally wired to the formally specified
 setter guard policy and contains original-test regressions for ignored
 mass/radius/max-speed/max-angular-speed/agility requests, time/distance and
 lifecycle membership behavior, plus public-surface Ball regressions for
-mini-ball insertion, mini-capsule insertion/rejection, identity rotation, and
-proximity-sensor state.
+mini-ball insertion, mini-capsule insertion/rejection, identity rotation,
+proximity-sensor state, visibility occlusion filters, non-warp cloak/uncloak,
+and ScanCone axis examples.
 
 ## Explicitly incomplete
 
