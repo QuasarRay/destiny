@@ -27,11 +27,18 @@ The stack currently contains paired Kani/Verus specifications for:
 - proximity eligibility;
 - uncloaking massiveness predicate;
 - stop-mode normalization;
-- missile follow-range construction.
+- missile follow-range construction;
+- original Ball default-state constants;
+- mini-ball/mini-capsule child-count and capsule-radius rules;
+- identity-vector rotation and proximity-sensor acceptance;
+- formation-slot first-free ordering, exhaustion, and freed-slot reuse.
 
 The concrete Rust runtime is additionally wired to the formally specified
-setter guard policy and contains an original-test regression for ignored
-mass/radius/max-speed/max-angular-speed/agility requests.
+setter guard policy and contains original-test regressions for ignored
+mass/radius/max-speed/max-angular-speed/agility requests, time/distance and
+lifecycle membership behavior, plus public-surface Ball regressions for
+mini-ball insertion, mini-capsule insertion/rejection, identity rotation, and
+proximity-sensor state.
 
 ## Explicitly incomplete
 
@@ -39,7 +46,7 @@ Full original-Destiny equivalence is **not** yet established. The original suite
 contains 531 catalog entries (509 unique source/test keys). Major remaining
 areas include exact Goto/Follow/FormationFollow trajectories, Warp, old/new
 Orbit dynamics, missile dynamics, iterative/simple collision behavior,
-mini-shape collision behavior, boxes/bubbles, callbacks, stream serialization,
+mini-shape collision behavior, formation runtime state, boxes/bubbles, callbacks, stream serialization,
 lifecycle edge cases, network client/server history and ticker semantics, and
 the C++ geometry/collision suite.
 
