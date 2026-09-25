@@ -6,9 +6,17 @@
 //! implementation may depend on Bevy/Avian, but the contracts in this crate
 //! must not.
 
+mod ball;
 mod catalog;
 mod model;
 
+pub use ball::{
+    MAX_ORIGINAL_FORMATION_SLOTS, ORIGINAL_TEN_BILLION, OriginalBallDefaults,
+    child_count_after_capsule_attempt, child_count_after_successful_add,
+    identity_rotated_vector, mini_capsule_radius_accepted,
+    next_sequential_formation_slot, original_ball_defaults,
+    proximity_sensor_accepted, slot_reused_after_free,
+};
 pub use catalog::{ORIGINAL_TEST_FILES, OriginalTestFile};
 pub use model::{
     BallState, MotionMode, ParkState, SpecError, Vec3, add_ball_is_permitted, adjust_time,
