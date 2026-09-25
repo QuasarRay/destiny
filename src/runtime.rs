@@ -5976,6 +5976,31 @@ mod tests {
         assert!((observed - 3.7416573867739413).abs() < 1.0e-12);
     }
 
+    // Original Destiny regressions:
+    // test_can_create_ballpark
+    // test_add_ball_adds_ball_to_park
+    // test_remove_ball_from_park
+    #[test]
+    fn original_ballpark_membership_lifecycle_matches() {
+        let mut runtime = runtime(false);
+        assert!(runtime.balls.is_empty());
+
+        add_ball(&mut runtime, 1, true, true);
+        assert_eq!(runtime.balls.len(), 1);
+        assert!(runtime.balls.contains_key(&1));
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.RemoveBall",
+                "call",
+                Some("park:0"),
+                vec![json!(1)],
+            ))
+            .expect("remove");
+        assert!(runtime.balls.is_empty());
+        assert!(!runtime.balls.contains_key(&1));
+    }
+
     #[test]
     fn exact_space_damping_and_pause_contract() {
         let mut runtime = runtime(false);
