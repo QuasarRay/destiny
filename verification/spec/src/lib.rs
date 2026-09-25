@@ -7,9 +7,11 @@
 //! must not.
 
 mod catalog;
+mod geometry;
 mod model;
 
 pub use catalog::{ORIGINAL_TEST_FILES, OriginalTestFile};
+pub use geometry::{Aabb, Plane, Triangle};
 pub use model::{
     BallState, MotionMode, ParkState, SpecError, Vec3, add_ball_is_permitted, adjust_time,
     assign_flag, assign_vec3,
