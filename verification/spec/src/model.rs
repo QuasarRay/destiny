@@ -6,7 +6,11 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    pub const ZERO: Self = Self { x: 0.0, y: 0.0, z: 0.0 };
+    pub const ZERO: Self = Self {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
 
     #[must_use]
     pub fn sub(self, other: Self) -> Self {
@@ -102,11 +106,27 @@ pub const fn add_ball_is_permitted(park: &ParkState) -> bool {
     !park.evolving
 }
 
-/// Shared contract for original setters whose tests require negative requests
-/// to leave the old value unchanged (mass, radius, max speed, agility).
+/// Original Destiny radius/max-speed policy: negative values are ignored,
+/// while zero is accepted.
 #[must_use]
 pub fn apply_non_negative_setter(current: f64, requested: f64) -> f64 {
     if requested >= 0.0 { requested } else { current }
+}
+
+/// Original Destiny mass/agility policy: zero and negative values are ignored.
+#[must_use]
+pub fn apply_positive_setter(current: f64, requested: f64) -> f64 {
+    if requested > 0.0 { requested } else { current }
+}
+
+#[must_use]
+pub const fn non_negative_setter_accepts(requested: f64) -> bool {
+    requested >= 0.0
+}
+
+#[must_use]
+pub const fn positive_setter_accepts(requested: f64) -> bool {
+    requested > 0.0
 }
 
 /// Contract extracted from the speed-fraction setter tests.
@@ -138,7 +158,6 @@ pub fn center_distance(left: &BallState, right: &BallState) -> f64 {
 pub fn surface_distance(left: &BallState, right: &BallState) -> f64 {
     center_distance(left, right) - left.radius - right.radius
 }
-
 
 #[must_use]
 pub const fn follow_allowed(src_id: i64, dst_id: i64, target_moribund: bool) -> bool {
@@ -200,6 +219,13 @@ mod tests {
     #[test]
     fn negative_non_negative_setter_request_is_noop() {
         assert_eq!(apply_non_negative_setter(7.0, -1.0), 7.0);
+    }
+
+    #[test]
+    fn non_positive_positive_setter_request_is_noop() {
+        assert_eq!(apply_positive_setter(7.0, -1.0), 7.0);
+        assert_eq!(apply_positive_setter(7.0, 0.0), 7.0);
+        assert_eq!(apply_positive_setter(7.0, 2.0), 2.0);
     }
 
     #[test]

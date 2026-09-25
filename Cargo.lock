@@ -1838,6 +1838,7 @@ dependencies = [
  "base64",
  "bevy",
  "bevy_replicon",
+ "destiny-original-spec",
  "lightyear_connection",
  "lightyear_messages",
  "lightyear_replication",
@@ -1846,6 +1847,10 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.18",
 ]
+
+[[package]]
+name = "destiny-original-spec"
+version = "0.1.0"
 
 [[package]]
 name = "deterministic-hash"
