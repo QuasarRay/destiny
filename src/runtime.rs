@@ -8,6 +8,7 @@ use std::{
 use avian3d::physics_transform::PhysicsTransformConfig;
 use avian3d::prelude::*;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
+use destiny_original_spec::{non_negative_setter_accepts, positive_setter_accepts};
 use bevy::{
     ecs::system::SystemParam,
     math::{DMat3, DQuat, DVec3, EulerRot},
@@ -4044,31 +4045,35 @@ impl CompatRuntime {
                 Ok(Value::Null)
             }
             "SetBallMass" => {
-                self.set_mass(
-                    value_i64(args.first(), "ball_id")?,
-                    value_f64(args.get(1), "mass")?.max(0.0),
-                )?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let mass = value_f64(args.get(1), "mass")?;
+                if positive_setter_accepts(mass) {
+                    self.set_mass(id, mass)?;
+                }
                 Ok(Value::Null)
             }
             "SetBallRadius" => {
-                self.set_radius(
-                    value_i64(args.first(), "ball_id")?,
-                    value_f64(args.get(1), "radius")?.max(0.0),
-                )?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let radius = value_f64(args.get(1), "radius")?;
+                if non_negative_setter_accepts(radius) {
+                    self.set_radius(id, radius)?;
+                }
                 Ok(Value::Null)
             }
             "SetMaxSpeed" => {
-                self.set_max_velocity(
-                    value_i64(args.first(), "ball_id")?,
-                    value_f64(args.get(1), "speed")?.max(0.0),
-                )?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let speed = value_f64(args.get(1), "speed")?;
+                if non_negative_setter_accepts(speed) {
+                    self.set_max_velocity(id, speed)?;
+                }
                 Ok(Value::Null)
             }
             "SetMaxAngularSpeed" => {
-                self.set_max_angular_velocity(
-                    value_i64(args.first(), "ball_id")?,
-                    value_f64(args.get(1), "speed")?.max(0.0),
-                )?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let speed = value_f64(args.get(1), "speed")?;
+                if non_negative_setter_accepts(speed) {
+                    self.set_max_angular_velocity(id, speed)?;
+                }
                 Ok(Value::Null)
             }
             "SetBallFree" => {
@@ -4104,13 +4109,14 @@ impl CompatRuntime {
             "SetBallAgility" => {
                 let id = value_i64(args.first(), "ball_id")?;
                 let agility = value_f64(args.get(1), "agility")?;
-                let agility = if agility <= 0.0 { 1.0 } else { agility };
-                if agility > MAX_AGILITY {
-                    return Err(CompatError::InvalidRequest(
-                        "agility exceeds the solver-safe limit".into(),
-                    ));
+                if positive_setter_accepts(agility) {
+                    if agility > MAX_AGILITY {
+                        return Err(CompatError::InvalidRequest(
+                            "agility exceeds the solver-safe limit".into(),
+                        ));
+                    }
+                    self.metadata_mut(id)?.agility = agility;
                 }
-                self.metadata_mut(id)?.agility = agility;
                 Ok(Value::Null)
             }
             "Stop" => {
@@ -5592,6 +5598,88 @@ mod tests {
                 ],
             ))
             .expect("add ball");
+    }
+
+    // Original Destiny regression:
+    // python/destiny/test/ballpark/test_getters_and_setters.py
+    #[test]
+    fn original_ignored_setter_values_leave_existing_ball_unchanged() {
+        let mut runtime = runtime(false);
+        add_ball(&mut runtime, 1, true, true);
+        let entity = runtime.entity(1).expect("entity");
+
+        let before_mass = runtime.world().get::<DestinyMass>(entity).expect("mass").0;
+        let before_radius = runtime.metadata(1).expect("metadata").radius;
+        let before_speed = runtime
+            .world()
+            .get::<MaxLinearSpeed>(entity)
+            .expect("max speed")
+            .0;
+        let before_angular_speed = runtime
+            .world()
+            .get::<MaxAngularSpeed>(entity)
+            .expect("max angular speed")
+            .0;
+        let before_agility = runtime.metadata(1).expect("metadata").agility;
+
+        for value in [-1.0, 0.0] {
+            runtime
+                .dispatch(request(
+                    "destiny.Ballpark.SetBallMass",
+                    "call",
+                    Some("park:0"),
+                    vec![json!(1), json!(value)],
+                ))
+                .expect("ignored mass");
+            runtime
+                .dispatch(request(
+                    "destiny.Ballpark.SetBallAgility",
+                    "call",
+                    Some("park:0"),
+                    vec![json!(1), json!(value)],
+                ))
+                .expect("ignored agility");
+        }
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallRadius",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(-1.0)],
+            ))
+            .expect("ignored radius");
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetMaxSpeed",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(-1.0)],
+            ))
+            .expect("ignored max speed");
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetMaxAngularSpeed",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(-1.0)],
+            ))
+            .expect("ignored max angular speed");
+
+        assert_eq!(runtime.world().get::<DestinyMass>(entity).expect("mass").0, before_mass);
+        assert_eq!(runtime.metadata(1).expect("metadata").radius, before_radius);
+        assert_eq!(
+            runtime.world().get::<MaxLinearSpeed>(entity).expect("max speed").0,
+            before_speed
+        );
+        assert_eq!(
+            runtime
+                .world()
+                .get::<MaxAngularSpeed>(entity)
+                .expect("max angular speed")
+                .0,
+            before_angular_speed
+        );
+        assert_eq!(runtime.metadata(1).expect("metadata").agility, before_agility);
     }
 
     #[test]
