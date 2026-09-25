@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "titles": {
+    "destiny.GetBoxCenter": {
+      "status": "implemented-conformant",
+      "note": "The module-level Python function implements and tests both accepted legacy call shapes."
+    },
+    "destiny.Ballpark.GetBoxCenter": {
+      "status": "implemented-conformant",
+      "note": "The Ballpark wrapper and Rust handler implement the tested four-argument legacy partition-cell calculation."
+    },
+    "destiny.Ball.speedFraction": {
+      "status": "implemented-state-only",
+      "note": "The value is validated, mutable, replicated, and snapshotted; it has no steering effect because the corresponding Destiny controllers are intentionally unsupported."
+    },
+    "destiny.Ballpark.SetSpeedFraction": {
+      "status": "implemented-state-only",
+      "note": "The call updates validated replicated state only; it has no steering effect because the corresponding Destiny controllers are intentionally unsupported."
+    },
+    "destiny.Ball.AddProximitySensor": {
+      "status": "implemented-with-accepted-difference",
+      "note": "Implemented by a bounded deterministic compatibility scheduler, not by an Avian Sensor collider or Avian collision events."
+    },
+    "destiny.Ballpark.AddProximitySensor": {
+      "status": "implemented-with-accepted-difference",
+      "note": "Implemented by a bounded deterministic compatibility scheduler, not by an Avian Sensor collider or Avian collision events."
+    },
+    "destiny.ClientBall.ApplyImpulsiveForceAtPosition": {
+      "status": "implemented-with-accepted-difference",
+      "note": "The call updates nonreplicated presentation angular velocity and intentionally leaves authoritative Avian motion unchanged."
+    },
+    "destiny.net.server.NetworkInterface.singlecast": {
+      "status": "implemented-with-accepted-difference",
+      "note": "The Rust bridge resolves an authenticated Carbon ID to one Lightyear link and sends one recipient-redacted ordered-reliable frame; product authentication remains host-owned."
+    },
+    "destiny.net.server.NetworkInterface.narrowcast": {
+      "status": "implemented-with-accepted-difference",
+      "note": "The Rust bridge resolves authenticated Carbon IDs to individual Lightyear links and redacts the other recipient IDs from each ordered-reliable frame; product authentication remains host-owned."
+    }
+  }
+}
