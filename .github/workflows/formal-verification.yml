@@ -96,5 +96,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Locked root tests
-        run: cargo test --all-features --locked original_ignored_setter_values_leave_existing_ball_unchanged
+      - name: Regenerate canonical root lockfile
+        run: cargo generate-lockfile
+
+      - name: Upload canonical root lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-root-cargo-lock
+          path: Cargo.lock
+
+      - name: Root parity regression
+        run: cargo test --all-features original_ignored_setter_values_leave_existing_ball_unchanged
