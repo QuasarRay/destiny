@@ -1,6 +1,7 @@
 use destiny_original_spec::{
     MotionMode, ParkState, add_ball_is_permitted, apply_non_negative_setter,
-    clamp_speed_fraction, follow_allowed, missile_follow_range, orbit_allowed,
+    apply_positive_setter, clamp_speed_fraction, follow_allowed, missile_follow_range,
+    non_negative_setter_accepts, orbit_allowed, positive_setter_accepts,
     proximity_eligible, stopped_mode, uncloak_restores_massive, visibility_occluder,
 };
 
@@ -31,10 +32,8 @@ fn original_add_outside_evolve_contract_permits_every_non_evolving_state() {
     assert!(add_ball_is_permitted(&park));
 }
 
-// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_ball_mass_to_a_negative_value_is_ineffective
 // original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_ball_radius_to_negative_value_is_ineffective
 // original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_max_speed_to_negative_value_is_ineffective
-// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_agility_to_negative_value_is_ineffective
 #[cfg(kani)]
 #[kani::proof]
 fn negative_non_negative_setter_requests_are_bitwise_noops() {
@@ -46,6 +45,30 @@ fn negative_non_negative_setter_requests_are_bitwise_noops() {
 
     let observed = apply_non_negative_setter(previous, requested);
     assert_eq!(observed.to_bits(), previous.to_bits());
+}
+
+// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_ball_mass_to_a_negative_value_is_ineffective
+// original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_agility_to_negative_value_is_ineffective
+#[cfg(kani)]
+#[kani::proof]
+fn non_positive_positive_setter_requests_are_bitwise_noops() {
+    let previous: f64 = kani::any();
+    let requested: f64 = kani::any();
+    kani::assume(previous.is_finite());
+    kani::assume(requested.is_finite());
+    kani::assume(requested <= 0.0);
+
+    let observed = apply_positive_setter(previous, requested);
+    assert_eq!(observed.to_bits(), previous.to_bits());
+}
+
+#[cfg(kani)]
+#[kani::proof]
+fn setter_acceptance_predicates_match_original_thresholds() {
+    let requested: f64 = kani::any();
+    kani::assume(requested.is_finite());
+    assert_eq!(non_negative_setter_accepts(requested), requested >= 0.0);
+    assert_eq!(positive_setter_accepts(requested), requested > 0.0);
 }
 
 #[cfg(kani)]
