@@ -85,7 +85,8 @@ jobs:
           "$VERUS_BIN" --version
 
       - name: Verify logical refinement proofs
-        run: "$VERUS_BIN" verification/verus/proofs.rs
+        run: |
+          "$VERUS_BIN" verification/verus/proofs.rs
 
   runtime-parity:
     name: concrete runtime parity regression
@@ -93,4 +94,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Locked root tests
-        run: cargo test --all-features --locked original_ignored_setter_values_leave_existing_ball_unchanged -- --exact
+        run: cargo test --all-features --locked original_ignored_setter_values_leave_existing_ball_unchanged
