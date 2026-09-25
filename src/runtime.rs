@@ -15,7 +15,10 @@ use bevy::{
     state::app::StatesPlugin,
     time::TimeUpdateStrategy,
 };
-use destiny_original_spec::{non_negative_setter_accepts, positive_setter_accepts};
+use destiny_original_spec::{
+    adjust_time, clamp_speed_fraction, non_negative_setter_accepts, positive_setter_accepts,
+    surface_distance_from_center,
+};
 use serde::{
     Deserialize, Serialize,
     de::{DeserializeOwned, MapAccess, SeqAccess, Visitor},
@@ -3972,13 +3975,11 @@ impl CompatRuntime {
                 Ok(Value::Null)
             }
             "AdjustTimes" => {
-                self.park.time = self
-                    .park
-                    .time
-                    .checked_add(value_i64(args.first(), "time_delta")?)
-                    .ok_or_else(|| {
-                        CompatError::InvalidRequest("time adjustment overflow".into())
-                    })?;
+                self.park.time =
+                    adjust_time(self.park.time, value_i64(args.first(), "time_delta")?)
+                        .ok_or_else(|| {
+                            CompatError::InvalidRequest("time adjustment overflow".into())
+                        })?;
                 Ok(Value::Null)
             }
             "SetBallPosition" => {
@@ -4089,7 +4090,7 @@ impl CompatRuntime {
             "SetSpeedFraction" => {
                 let id = value_i64(args.first(), "ball_id")?;
                 self.metadata_mut(id)?.speed_fraction =
-                    value_f64(args.get(1), "speed_fraction")?.clamp(0.0, 1.0);
+                    clamp_speed_fraction(value_f64(args.get(1), "speed_fraction")?);
                 Ok(Value::Null)
             }
             "SetBallAgility" => {
@@ -4235,9 +4236,12 @@ impl CompatRuntime {
         if !self.balls.contains_key(&first_id) || !self.balls.contains_key(&second_id) {
             return Ok(Value::Null);
         }
-        let distance = stable_vec3_length(self.position(first_id)? - self.position(second_id)?)
-            - self.metadata(first_id)?.radius
-            - self.metadata(second_id)?.radius;
+        let center = stable_vec3_length(self.position(first_id)? - self.position(second_id)?);
+        let distance = surface_distance_from_center(
+            center,
+            self.metadata(first_id)?.radius,
+            self.metadata(second_id)?.radius,
+        );
         json_number(distance)
     }
 
@@ -5663,6 +5667,313 @@ mod tests {
             runtime.metadata(1).expect("metadata").agility,
             before_agility
         );
+    }
+
+    // Original Destiny regressions:
+    // python/destiny/test/ballpark/test_time.py
+    #[test]
+    fn original_time_start_and_pause_contracts_match() {
+        let mut runtime = runtime(false);
+        assert_eq!(runtime.park.time, 0);
+        assert!(runtime.world().resource::<Time<Physics>>().is_paused());
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.AdjustTimes",
+                "call",
+                Some("park:0"),
+                vec![json!(2)],
+            ))
+            .expect("adjust by two");
+        assert_eq!(runtime.park.time, 2);
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.AdjustTimes",
+                "call",
+                Some("park:0"),
+                vec![json!(3)],
+            ))
+            .expect("adjust by three");
+        assert_eq!(runtime.park.time, 5);
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.Start",
+                "call",
+                Some("park:0"),
+                vec![],
+            ))
+            .expect("start");
+        assert!(!runtime.world().resource::<Time<Physics>>().is_paused());
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.Pause",
+                "call",
+                Some("park:0"),
+                vec![],
+            ))
+            .expect("pause");
+        assert!(runtime.world().resource::<Time<Physics>>().is_paused());
+    }
+
+    // Original Destiny regressions:
+    // python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters
+    #[test]
+    fn original_basic_setters_match_observable_state() {
+        let mut runtime = runtime(false);
+        add_ball(&mut runtime, 1, true, true);
+        let entity = runtime.entity(1).expect("entity");
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallMass",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(3.14)],
+            ))
+            .expect("mass");
+        assert_eq!(
+            runtime.world().get::<DestinyMass>(entity).expect("mass").0,
+            3.14
+        );
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallRadius",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(3.14)],
+            ))
+            .expect("radius");
+        assert_eq!(runtime.metadata(1).expect("metadata").radius, 3.14);
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetMaxSpeed",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(3.14)],
+            ))
+            .expect("max speed");
+        assert_eq!(
+            runtime
+                .world()
+                .get::<MaxLinearSpeed>(entity)
+                .expect("max speed")
+                .0,
+            3.14
+        );
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallPosition",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(1.0), json!(2.0), json!(3.0)],
+            ))
+            .expect("position");
+        assert_eq!(
+            runtime.position(1).expect("position"),
+            DVec3::new(1.0, 2.0, 3.0)
+        );
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallVelocity",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(1.0), json!(2.0), json!(3.0)],
+            ))
+            .expect("velocity");
+        assert_eq!(
+            runtime
+                .world()
+                .get::<LinearVelocity>(entity)
+                .expect("velocity")
+                .0,
+            DVec3::new(1.0, 2.0, 3.0)
+        );
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetSpeedFraction",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(0.2)],
+            ))
+            .expect("speed fraction");
+        assert_eq!(runtime.metadata(1).expect("metadata").speed_fraction, 0.2);
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallFree",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(false)],
+            ))
+            .expect("not free");
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallFree",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(true)],
+            ))
+            .expect("free");
+        assert!(runtime.metadata(1).expect("metadata").is_free);
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallMassive",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(false)],
+            ))
+            .expect("not massive");
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallMassive",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(true)],
+            ))
+            .expect("massive");
+        assert!(runtime.metadata(1).expect("metadata").is_massive);
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallGlobal",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(true)],
+            ))
+            .expect("global");
+        assert!(runtime.metadata(1).expect("metadata").is_global);
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallAgility",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(3.14)],
+            ))
+            .expect("agility");
+        assert_eq!(runtime.metadata(1).expect("metadata").agility, 3.14);
+
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallInteractive",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(false)],
+            ))
+            .expect("not interactive");
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.SetBallInteractive",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(true)],
+            ))
+            .expect("interactive");
+        assert!(runtime.metadata(1).expect("metadata").is_interactive);
+    }
+
+    // Original Destiny regressions:
+    // python/destiny/test/ballpark/test_getters_and_setters.py distance cases.
+    #[test]
+    fn original_center_and_surface_distance_cases_match() {
+        let mut runtime = runtime(false);
+        add_ball(&mut runtime, 1, true, true);
+        add_ball(&mut runtime, 2, true, true);
+
+        for id in [1, 2] {
+            runtime
+                .dispatch(request(
+                    "destiny.Ballpark.SetBallRadius",
+                    "call",
+                    Some("park:0"),
+                    vec![json!(id), json!(0.0)],
+                ))
+                .expect("zero radius");
+        }
+
+        let center_same = runtime
+            .dispatch(request(
+                "destiny.Ballpark.GetCenterDist",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(2)],
+            ))
+            .expect("center same");
+        let surface_same = runtime
+            .dispatch(request(
+                "destiny.Ballpark.GetSurfaceDist",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(2)],
+            ))
+            .expect("surface same");
+        assert_eq!(center_same, json!(0.0));
+        assert_eq!(surface_same, json!(0.0));
+
+        runtime
+            .set_position(2, DVec3::new(100.0, 0.0, 0.0))
+            .expect("axis position");
+        assert_eq!(
+            runtime
+                .dispatch(request(
+                    "destiny.Ballpark.GetCenterDist",
+                    "call",
+                    Some("park:0"),
+                    vec![json!(1), json!(2)],
+                ))
+                .expect("center axis"),
+            json!(100.0)
+        );
+        assert_eq!(
+            runtime
+                .dispatch(request(
+                    "destiny.Ballpark.GetSurfaceDist",
+                    "call",
+                    Some("park:0"),
+                    vec![json!(1), json!(2)],
+                ))
+                .expect("surface axis"),
+            json!(100.0)
+        );
+
+        runtime.set_radius(1, 10.0).expect("left radius");
+        runtime.set_radius(2, 5.0).expect("right radius");
+        assert_eq!(
+            runtime
+                .dispatch(request(
+                    "destiny.Ballpark.GetSurfaceDist",
+                    "call",
+                    Some("park:0"),
+                    vec![json!(1), json!(2)],
+                ))
+                .expect("surface radii"),
+            json!(85.0)
+        );
+
+        runtime.set_radius(1, 0.0).expect("left radius zero");
+        runtime.set_radius(2, 0.0).expect("right radius zero");
+        runtime
+            .set_position(2, DVec3::new(1.0, 2.0, 3.0))
+            .expect("3d position");
+        let observed = runtime
+            .dispatch(request(
+                "destiny.Ballpark.GetSurfaceDist",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(2)],
+            ))
+            .expect("3d surface")
+            .as_f64()
+            .expect("number");
+        assert!((observed - 3.7416573867739413).abs() < 1.0e-12);
     }
 
     #[test]

@@ -204,6 +204,40 @@ pub fn missile_follow_range(src_radius: f64, dst_radius: f64) -> f64 {
     -(src_radius + dst_radius)
 }
 
+#[must_use]
+pub fn adjust_time(current: i64, delta: i64) -> Option<i64> {
+    current.checked_add(delta)
+}
+
+#[must_use]
+pub const fn running_after_start() -> bool {
+    true
+}
+
+#[must_use]
+pub const fn running_after_pause() -> bool {
+    false
+}
+
+#[must_use]
+pub const fn assign_flag(requested: bool) -> bool {
+    requested
+}
+
+#[must_use]
+pub const fn assign_vec3(requested: Vec3) -> Vec3 {
+    requested
+}
+
+#[must_use]
+pub fn surface_distance_from_center(
+    center_distance: f64,
+    left_radius: f64,
+    right_radius: f64,
+) -> f64 {
+    center_distance - left_radius - right_radius
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
