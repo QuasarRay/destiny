@@ -236,6 +236,21 @@ pub fn surface_distance_from_center(
     center_distance - left_radius - right_radius
 }
 
+
+#[must_use]
+pub fn membership_count_after_add(current: usize) -> Option<usize> {
+    current.checked_add(1)
+}
+
+#[must_use]
+pub fn membership_count_after_remove(current: usize, was_present: bool) -> usize {
+    if was_present && current > 0 {
+        current - 1
+    } else {
+        current
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
