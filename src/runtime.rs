@@ -460,12 +460,7 @@ struct DestinyBubbleCollisionHooks<'w, 's> {
 }
 
 impl CollisionHooks for DestinyBubbleCollisionHooks<'_, '_> {
-    fn filter_pairs(
-        &self,
-        collider1: Entity,
-        collider2: Entity,
-        _commands: &mut Commands,
-    ) -> bool {
+    fn filter_pairs(&self, collider1: Entity, collider2: Entity, _commands: &mut Commands) -> bool {
         let Ok([(left, left_pending), (right, right_pending)]) =
             self.balls.get_many([collider1, collider2])
         else {
@@ -508,14 +503,10 @@ impl CompatRuntime {
             ));
         }
         let tick_duration = tick_duration(options.tick_interval_ms)?;
-        if options.collision_substeps == 0
-            || options.collision_substeps > MAX_COLLISION_SUBSTEPS
-        {
-            return Err(CompatError::InvalidRequest(
-                format!(
-                    "collision_substeps must be in 1..={MAX_COLLISION_SUBSTEPS}"
-                ),
-            ));
+        if options.collision_substeps == 0 || options.collision_substeps > MAX_COLLISION_SUBSTEPS {
+            return Err(CompatError::InvalidRequest(format!(
+                "collision_substeps must be in 1..={MAX_COLLISION_SUBSTEPS}"
+            )));
         }
         if options.use_dynamical_orientation {
             return Err(CompatError::InvalidRequest(
@@ -887,10 +878,7 @@ impl CompatRuntime {
                 "invalid Carbon network protocol envelope".into(),
             ));
         }
-        validate_queued_network_rows(
-            object.get("updates").unwrap_or(&Value::Null),
-            expected,
-        )?;
+        validate_queued_network_rows(object.get("updates").unwrap_or(&Value::Null), expected)?;
         let mut outbox = self.app.world_mut().resource_mut::<CarbonNetworkOutbox>();
         let batch_id = object
             .get("batch_id")
@@ -1179,10 +1167,7 @@ impl CompatRuntime {
             else {
                 continue;
             };
-            let Some(mass) = world
-                .get::<DestinyMass>(initial.entity)
-                .map(|mass| mass.0)
-            else {
+            let Some(mass) = world.get::<DestinyMass>(initial.entity).map(|mass| mass.0) else {
                 continue;
             };
             let has_contact = world
@@ -1283,10 +1268,8 @@ impl CompatRuntime {
                 return Err(CompatError::Engine("missing Collider".into()));
             }
             let pending_component = world.get::<DestinyPendingRemoval>(*entity);
-            let pending_matches = match (
-                self.park.pending_removals.get(ball_id),
-                pending_component,
-            ) {
+            let pending_matches = match (self.park.pending_removals.get(ball_id), pending_component)
+            {
                 (None, None) => true,
                 (Some(due), Some(component)) => {
                     component.due_tick == *due && component.reason == "delayed"
@@ -1423,12 +1406,7 @@ impl CompatRuntime {
         let mut events = Vec::new();
         let mut work = 0usize;
         let max_events = self.park.limits.max_outbox_messages;
-        let already_queued = self
-            .app
-            .world()
-            .resource::<ProximityEventOutbox>()
-            .0
-            .len();
+        let already_queued = self.app.world().resource::<ProximityEventOutbox>().0.len();
         let available_events = max_events.saturating_sub(already_queued);
 
         for owner_id in ids {
@@ -1457,7 +1435,10 @@ impl CompatRuntime {
                 let prior_elapsed = object.get("elapsed").and_then(Value::as_f64).unwrap_or(0.0);
                 let elapsed = prior_elapsed + dt;
                 if owner_radius + range < 0.0 || period <= 0.0 || elapsed + 1e-12 < period {
-                    object.insert("elapsed".into(), json!(elapsed.min(period.max(f64::EPSILON))));
+                    object.insert(
+                        "elapsed".into(),
+                        json!(elapsed.min(period.max(f64::EPSILON))),
+                    );
                     continue;
                 }
                 if work.saturating_add(candidates.len()) > MAX_PROXIMITY_WORK_PER_TICK {
@@ -1486,17 +1467,19 @@ impl CompatRuntime {
                     .collect::<HashSet<_>>();
                 let new_members = candidates
                     .iter()
-                    .filter(|(id, position, is_cloaked, is_interactive, is_global, bubble, radius)| {
-                        *id != owner_id
-                            && *is_cloaked == 0
-                            && (!only_interactives || *is_interactive)
-                            && (*is_global || *bubble == owner_bubble)
-                            && {
-                                let reach = owner_radius + range + *radius;
-                                reach.is_finite()
-                                    && stable_vec3_length(owner_position - *position) <= reach
-                            }
-                    })
+                    .filter(
+                        |(id, position, is_cloaked, is_interactive, is_global, bubble, radius)| {
+                            *id != owner_id
+                                && *is_cloaked == 0
+                                && (!only_interactives || *is_interactive)
+                                && (*is_global || *bubble == owner_bubble)
+                                && {
+                                    let reach = owner_radius + range + *radius;
+                                    reach.is_finite()
+                                        && stable_vec3_length(owner_position - *position) <= reach
+                                }
+                        },
+                    )
                     .map(|(id, ..)| *id)
                     .collect::<HashSet<_>>();
                 let mut transitions = Vec::new();
@@ -1537,10 +1520,7 @@ impl CompatRuntime {
                 events.extend(transitions);
             }
         }
-        let mut outbox = self
-            .app
-            .world_mut()
-            .resource_mut::<ProximityEventOutbox>();
+        let mut outbox = self.app.world_mut().resource_mut::<ProximityEventOutbox>();
         outbox.0.extend(events);
     }
 
@@ -1584,11 +1564,13 @@ impl CompatRuntime {
         let mut members: HashMap<i64, Vec<i64>> = HashMap::new();
         for bubble_id in bubble_ids {
             let mut row = global_ids.clone();
-            row.extend(eligible.iter().filter_map(
-                |(ball_id, candidate_bubble, _, is_global)| {
-                    (!*is_global && *candidate_bubble == bubble_id).then_some(*ball_id)
-                },
-            ));
+            row.extend(
+                eligible
+                    .iter()
+                    .filter_map(|(ball_id, candidate_bubble, _, is_global)| {
+                        (!*is_global && *candidate_bubble == bubble_id).then_some(*ball_id)
+                    }),
+            );
             row.sort_unstable();
             row.dedup();
             members.insert(bubble_id, row);
@@ -2202,8 +2184,9 @@ impl CompatRuntime {
             },
             balls,
         };
-        let bytes = bounded_json_bytes(&snapshot, self.park.limits.max_snapshot_bytes)
-            .map_err(|error| CompatError::InvalidRequest(format!("snapshot byte limit exceeded: {error}")))?;
+        let bytes = bounded_json_bytes(&snapshot, self.park.limits.max_snapshot_bytes).map_err(
+            |error| CompatError::InvalidRequest(format!("snapshot byte limit exceeded: {error}")),
+        )?;
         Ok(BASE64.encode(bytes))
     }
 
@@ -2331,7 +2314,7 @@ impl CompatRuntime {
         {
             return Err(CompatError::InvalidRequest(
                 "snapshot enables an unsupported orientation, orbit, or missile-orientation mode"
-                .into(),
+                    .into(),
             ));
         }
         if snapshot.park.snapshot_semantics != "logical-authoritative" {
@@ -2393,10 +2376,7 @@ impl CompatRuntime {
                 ));
             }
         }
-        if matches!(partial, 0 | 1)
-            && snapshot.park.ego != 0
-            && !ids.contains(&snapshot.park.ego)
-        {
+        if matches!(partial, 0 | 1) && snapshot.park.ego != 0 && !ids.contains(&snapshot.park.ego) {
             return Err(CompatError::InvalidRequest(
                 "snapshot ego does not reference a snapshot ball".into(),
             ));
@@ -2566,8 +2546,7 @@ impl CompatRuntime {
                         .cloned(),
                 );
                 for sensor in &mut sensors {
-                    if let Some(members) = sensor.get_mut("members").and_then(Value::as_array_mut)
-                    {
+                    if let Some(members) = sensor.get_mut("members").and_then(Value::as_array_mut) {
                         members.retain(|member| {
                             member
                                 .as_i64()
@@ -2653,10 +2632,13 @@ impl CompatRuntime {
             for (ball_id, due_tick) in pending {
                 self.park.pending_removals.insert(ball_id, due_tick);
                 let entity = self.entity(ball_id)?;
-                self.app.world_mut().entity_mut(entity).insert(DestinyPendingRemoval {
-                    due_tick,
-                    reason: "delayed".into(),
-                });
+                self.app
+                    .world_mut()
+                    .entity_mut(entity)
+                    .insert(DestinyPendingRemoval {
+                        due_tick,
+                        reason: "delayed".into(),
+                    });
             }
             self.park.current_time = snapshot.park.current_time;
             self.park.time = snapshot.park.time;
@@ -2687,10 +2669,13 @@ impl CompatRuntime {
             for (ball_id, due_tick) in pending {
                 self.park.pending_removals.insert(ball_id, due_tick);
                 let entity = self.entity(ball_id)?;
-                self.app.world_mut().entity_mut(entity).insert(DestinyPendingRemoval {
-                    due_tick,
-                    reason: "delayed".into(),
-                });
+                self.app
+                    .world_mut()
+                    .entity_mut(entity)
+                    .insert(DestinyPendingRemoval {
+                        due_tick,
+                        reason: "delayed".into(),
+                    });
             }
         }
         self.sync_visual_transforms();
@@ -2810,16 +2795,20 @@ impl CompatRuntime {
         let mut bytes = 0usize;
         for candidate_id in self.balls.keys().copied() {
             let metadata = self.metadata(candidate_id)?;
-            for value in metadata.minis.iter().chain(metadata.sensors.iter().filter(|sensor| {
-                if candidate_id != ball_id {
-                    return true;
-                }
-                let is_cloak = sensor
-                    .get("cloak_sensor")
-                    .and_then(Value::as_bool)
-                    .unwrap_or(false);
-                !((replace_user_sensor && !is_cloak) || (replace_cloak_sensor && is_cloak))
-            })) {
+            for value in metadata
+                .minis
+                .iter()
+                .chain(metadata.sensors.iter().filter(|sensor| {
+                    if candidate_id != ball_id {
+                        return true;
+                    }
+                    let is_cloak = sensor
+                        .get("cloak_sensor")
+                        .and_then(Value::as_bool)
+                        .unwrap_or(false);
+                    !((replace_user_sensor && !is_cloak) || (replace_cloak_sensor && is_cloak))
+                }))
+            {
                 bytes = bytes.checked_add(json_value_len(value)?).ok_or_else(|| {
                     CompatError::InvalidRequest("child descriptor size overflow".into())
                 })?;
@@ -3049,9 +3038,7 @@ impl CompatRuntime {
                 let current = world
                     .get::<DestinyPresentationAngularVelocity>(entity)
                     .ok_or_else(|| {
-                        CompatError::Engine(
-                            "missing DestinyPresentationAngularVelocity".into(),
-                        )
+                        CompatError::Engine("missing DestinyPresentationAngularVelocity".into())
                     })?
                     .0;
                 let inertia = (0.4 * mass * radius * radius).max(f64::MIN_POSITIVE);
@@ -3081,9 +3068,7 @@ impl CompatRuntime {
                     .world_mut()
                     .get_mut::<DestinyPresentationAngularVelocity>(entity)
                     .ok_or_else(|| {
-                        CompatError::Engine(
-                            "missing DestinyPresentationAngularVelocity".into(),
-                        )
+                        CompatError::Engine("missing DestinyPresentationAngularVelocity".into())
                     })?
                     .0 = angular;
                 Ok(Value::Null)
@@ -3108,9 +3093,8 @@ impl CompatRuntime {
                 {
                     return json_number(0.0);
                 }
-                let center = stable_vec3_length(
-                    self.position(ball_id)? - self.position(self.park.ego)?,
-                );
+                let center =
+                    stable_vec3_length(self.position(ball_id)? - self.position(self.park.ego)?);
                 if name == "centerDist" {
                     json_number(center)
                 } else {
@@ -3697,10 +3681,7 @@ impl CompatRuntime {
             });
             return Ok(());
         }
-        let restore_massive = self
-            .metadata(ball_id)?
-            .massive_before_cloak
-            .unwrap_or(true);
+        let restore_massive = self.metadata(ball_id)?.massive_before_cloak.unwrap_or(true);
         {
             let mut metadata = self.metadata_mut(ball_id)?;
             metadata.is_cloaked = 0;
@@ -4243,9 +4224,7 @@ impl CompatRuntime {
         if !self.balls.contains_key(&first_id) || !self.balls.contains_key(&second_id) {
             return Ok(Value::Null);
         }
-        let distance = stable_vec3_length(
-            self.position(first_id)? - self.position(second_id)?,
-        )
+        let distance = stable_vec3_length(self.position(first_id)? - self.position(second_id)?)
             - self.metadata(first_id)?.radius
             - self.metadata(second_id)?.radius;
         json_number(distance)
@@ -4594,8 +4573,7 @@ impl CompatRuntime {
                 let distance = stable_vec3_length(offset);
                 let projection = direction.dot(offset);
                 distance <= range
-                    && (sphere
-                        || (projection >= 0.0 && projection >= cosine * distance))
+                    && (sphere || (projection >= 0.0 && projection >= cosine * distance))
             })
             .map(|id| json!(id))
             .collect();
@@ -4627,9 +4605,7 @@ fn avian_mass(value: f64) -> f32 {
 }
 
 fn visual_vec3(value: DVec3) -> Vec3 {
-    let project = |component: f64| {
-        component.clamp(-(f32::MAX as f64), f32::MAX as f64) as f32
-    };
+    let project = |component: f64| component.clamp(-(f32::MAX as f64), f32::MAX as f64) as f32;
     Vec3::new(project(value.x), project(value.y), project(value.z))
 }
 
@@ -4765,9 +4741,7 @@ fn sphere_intersects_destiny_cone(
         return false;
     }
     let reverse_projection = -axial;
-    !(reverse_projection > 0.0
-        && reverse_projection >= distance * sine.abs()
-        && distance > radius)
+    !(reverse_projection > 0.0 && reverse_projection >= distance * sine.abs() && distance > radius)
 }
 
 fn tick_duration(milliseconds: f64) -> Result<Duration, CompatError> {
@@ -4822,10 +4796,7 @@ fn mini_collider(value: &Value) -> Result<(Position, Rotation, Collider), Compat
             require_exact_object_keys(object, &["kind", "position", "radius"], "mini sphere")?;
             let position = value_vec3(object.get("position"), "mini sphere position")?;
             let radius = value_f64(object.get("radius"), "mini sphere radius")?;
-            if radius <= 0.0
-                || radius > MAX_RADIUS
-                || !solver_safe_vec3(position, MAX_COORDINATE)
-            {
+            if radius <= 0.0 || radius > MAX_RADIUS || !solver_safe_vec3(position, MAX_COORDINATE) {
                 return Err(CompatError::InvalidRequest(
                     "mini sphere exceeds the solver-safe position/radius envelope".into(),
                 ));
@@ -4969,7 +4940,10 @@ fn validate_sensor_descriptor(value: &Value) -> Result<(), CompatError> {
             "sensor period must be positive".into(),
         ));
     }
-    if !object.get("only_interactives").is_some_and(Value::is_boolean) {
+    if !object
+        .get("only_interactives")
+        .is_some_and(Value::is_boolean)
+    {
         return Err(CompatError::InvalidRequest(
             "sensor only_interactives must be boolean".into(),
         ));
@@ -5008,11 +4982,7 @@ fn require_exact_object_keys(
     expected: &[&str],
     name: &str,
 ) -> Result<(), CompatError> {
-    if object.len() == expected.len()
-        && object
-            .keys()
-            .all(|key| expected.contains(&key.as_str()))
-    {
+    if object.len() == expected.len() && object.keys().all(|key| expected.contains(&key.as_str())) {
         return Ok(());
     }
     Err(CompatError::InvalidRequest(format!(
@@ -5098,15 +5068,15 @@ fn validate_ball_snapshot(ball: &BallSnapshot, max_children: usize) -> Result<()
             ball.id
         )));
     }
-    let descriptor_bytes = ball
-        .minis
-        .iter()
-        .chain(&ball.sensors)
-        .try_fold(0usize, |total, value| {
-            total
-                .checked_add(json_value_len(value)?)
-                .ok_or_else(|| CompatError::InvalidRequest("child descriptor size overflow".into()))
-        })?;
+    let descriptor_bytes =
+        ball.minis
+            .iter()
+            .chain(&ball.sensors)
+            .try_fold(0usize, |total, value| {
+                total.checked_add(json_value_len(value)?).ok_or_else(|| {
+                    CompatError::InvalidRequest("child descriptor size overflow".into())
+                })
+            })?;
     if descriptor_bytes > MAX_CHILD_DESCRIPTOR_BYTES {
         return Err(CompatError::InvalidRequest(format!(
             "ball {} exceeds the child descriptor byte limit",
@@ -5134,15 +5104,12 @@ fn validate_ball_snapshot(ball: &BallSnapshot, max_children: usize) -> Result<()
     }
     for sensor in &ball.sensors {
         validate_sensor_descriptor(sensor)?;
-        let sensor_range = sensor
-            .get("range")
-            .and_then(Value::as_f64)
-            .ok_or_else(|| {
-                CompatError::InvalidRequest(format!(
-                    "ball {} has a sensor without a numeric range",
-                    ball.id
-                ))
-            })?;
+        let sensor_range = sensor.get("range").and_then(Value::as_f64).ok_or_else(|| {
+            CompatError::InvalidRequest(format!(
+                "ball {} has a sensor without a numeric range",
+                ball.id
+            ))
+        })?;
         let sensor_reach = ball.radius + sensor_range;
         if !sensor_reach.is_finite() {
             return Err(CompatError::InvalidRequest(format!(
@@ -5204,9 +5171,9 @@ fn validate_queued_network_rows_inner(
             expanded_rows,
         );
     }
-    let rows = value.as_array().ok_or_else(|| {
-        CompatError::InvalidRequest("Carbon updates must be an array".into())
-    })?;
+    let rows = value
+        .as_array()
+        .ok_or_else(|| CompatError::InvalidRequest("Carbon updates must be an array".into()))?;
     if rows.len() > MAX_NETWORK_UPDATE_ROWS {
         return Err(CompatError::InvalidRequest(
             "Carbon update row limit exceeded".into(),
@@ -5221,7 +5188,9 @@ fn validate_queued_network_rows_inner(
                 .get(1)
                 .and_then(Value::as_str)
                 .is_some_and(|action| !action.is_empty())
-            || !row.get(2).is_some_and(|state| encoded_sequence(state).is_some())
+            || !row
+                .get(2)
+                .is_some_and(|state| encoded_sequence(state).is_some())
         {
             return Err(CompatError::InvalidRequest(
                 "Carbon update row has an invalid action or state".into(),
@@ -5243,15 +5212,19 @@ fn validate_queued_network_rows_inner(
                 )
             })?;
             if recipients.len() > MAX_NETWORK_RECIPIENTS_PER_ROW
-                || recipients.iter().any(|recipient| recipient.as_i64().is_none())
+                || recipients
+                    .iter()
+                    .any(|recipient| recipient.as_i64().is_none())
             {
                 return Err(CompatError::InvalidRequest(
                     "Carbon narrowcast recipient list is invalid or oversized".into(),
                 ));
             }
-            *expanded_rows = (*expanded_rows).checked_add(recipients.len()).ok_or_else(|| {
-                CompatError::InvalidRequest("expanded Carbon row count overflowed".into())
-            })?;
+            *expanded_rows = (*expanded_rows)
+                .checked_add(recipients.len())
+                .ok_or_else(|| {
+                    CompatError::InvalidRequest("expanded Carbon row count overflowed".into())
+                })?;
         }
         if *expanded_rows > MAX_NETWORK_EXPANDED_ROWS {
             return Err(CompatError::InvalidRequest(
@@ -5426,9 +5399,7 @@ fn normalized_quat(rotation: DQuat) -> Result<DQuat, CompatError> {
         ));
     }
     let stable_length = scale * scaled.length();
-    if stable_length.is_finite()
-        && (stable_length - 1.0).abs() <= f64::EPSILON * 8.0
-    {
+    if stable_length.is_finite() && (stable_length - 1.0).abs() <= f64::EPSILON * 8.0 {
         // Avoid cumulative one-ulp drift when an already-normalized snapshot
         // quaternion is restored and captured repeatedly.
         return Ok(rotation);
@@ -5455,10 +5426,7 @@ fn get_box_center_value(args: &[Value]) -> Result<Value, CompatError> {
         // from both the supported Destiny domain and the Python adapter, so
         // reject before conversion. The exclusive upper bound avoids the
         // rounded f64 representation of i64::MAX (2^63).
-        if !quotient.is_finite()
-            || quotient < i64::MIN as f64
-            || quotient >= -(i64::MIN as f64)
-        {
+        if !quotient.is_finite() || quotient < i64::MIN as f64 || quotient >= -(i64::MIN as f64) {
             return Err(CompatError::InvalidRequest(
                 "box coordinate maps outside the signed 64-bit grid".into(),
             ));
@@ -5752,13 +5720,9 @@ mod tests {
 
     #[test]
     fn box_center_rejects_out_of_int64_grid_coordinates() {
-        assert!(get_box_center_value(&[
-            json!(7),
-            json!(1.0e100),
-            json!(0.0),
-            json!(0.0),
-        ])
-        .is_err());
+        assert!(
+            get_box_center_value(&[json!(7), json!(1.0e100), json!(0.0), json!(0.0),]).is_err()
+        );
     }
 
     #[test]
@@ -5853,14 +5817,16 @@ mod tests {
         assert_eq!(filtered_payload.park.ego, 0);
 
         let encoded = runtime.serialize_snapshot(None, None).expect("snapshot");
-        assert!(runtime
-            .dispatch(request(
-                "dbc.compat.Ballpark.Deserialize",
-                "call",
-                Some("park:0"),
-                vec![json!(encoded), json!("1")],
-            ))
-            .is_err());
+        assert!(
+            runtime
+                .dispatch(request(
+                    "dbc.compat.Ballpark.Deserialize",
+                    "call",
+                    Some("park:0"),
+                    vec![json!(encoded), json!("1")],
+                ))
+                .is_err()
+        );
 
         let mut invalid = runtime.ball_snapshot(1).expect("ball snapshot");
         invalid.is_cloaked = 1;
@@ -5876,16 +5842,20 @@ mod tests {
                 vec![json!(1.0), json!(0.0), json!(0.0), json!(0.25)],
             ))
             .expect("mini");
-        let encoded = runtime.serialize_snapshot(None, None).expect("snapshot with mini");
+        let encoded = runtime
+            .serialize_snapshot(None, None)
+            .expect("snapshot with mini");
         let raw = String::from_utf8(BASE64.decode(encoded).expect("base64")).expect("UTF-8");
         let duplicate = raw.replacen(
             "\"kind\":\"sphere\"",
             "\"kind\":\"sphere\",\"kind\":\"sphere\"",
             1,
         );
-        assert!(runtime
-            .deserialize_snapshot(&BASE64.encode(duplicate.as_bytes()), 0)
-            .is_err());
+        assert!(
+            runtime
+                .deserialize_snapshot(&BASE64.encode(duplicate.as_bytes()), 0)
+                .is_err()
+        );
     }
 
     #[test]
@@ -5924,37 +5894,59 @@ mod tests {
         add_ball(&mut runtime, 1, true, true);
         add_ball(&mut runtime, 2, true, true);
         add_ball(&mut runtime, 3, true, true);
-        runtime.set_position(2, DVec3::new(5.0e99, 5.0e99, 0.0)).expect("far position");
-        runtime.set_position(3, DVec3::new(5.0, 0.0, 0.0)).expect("near position");
+        runtime
+            .set_position(2, DVec3::new(5.0e99, 5.0e99, 0.0))
+            .expect("far position");
+        runtime
+            .set_position(3, DVec3::new(5.0, 0.0, 0.0))
+            .expect("near position");
         runtime.advance_one_tick(true).expect("assign bubble");
 
         assert_eq!(
             runtime
-                .get_ball_ids_in_cone(&[
-                    json!(1), json!(10.0), json!(0.0), json!(0.0), json!(0.0),
-                ])
+                .get_ball_ids_in_cone(&[json!(1), json!(10.0), json!(0.0), json!(0.0), json!(0.0),])
                 .expect("zero cone"),
             json!([3]),
         );
         assert_eq!(
             runtime
                 .get_ball_ids_in_cone(&[
-                    json!(1), json!(10.0), json!(0.0), json!(0.0), json!(f64::from_bits(1)),
+                    json!(1),
+                    json!(10.0),
+                    json!(0.0),
+                    json!(0.0),
+                    json!(f64::from_bits(1)),
                 ])
                 .expect("subnormal cone"),
             json!([3]),
         );
         let triangle = runtime
             .get_ball_ids_in_triangle(&[
-                json!(1), json!(1.0e100), json!(0.0), json!(0.0),
-                json!(0.0), json!(1.0e100), json!(0.0), json!(0.0),
+                json!(1),
+                json!(1.0e100),
+                json!(0.0),
+                json!(0.0),
+                json!(0.0),
+                json!(1.0e100),
+                json!(0.0),
+                json!(0.0),
             ])
             .expect("extreme triangle");
-        assert!(triangle.as_array().expect("triangle rows").contains(&json!(2)));
+        assert!(
+            triangle
+                .as_array()
+                .expect("triangle rows")
+                .contains(&json!(2))
+        );
 
         runtime.metadata_mut(3).expect("global metadata").is_global = true;
-        runtime.metadata_mut(3).expect("global metadata").new_bubble_id = 99;
-        runtime.set_position(2, DVec3::new(10.0, 0.0, 0.0)).expect("destination");
+        runtime
+            .metadata_mut(3)
+            .expect("global metadata")
+            .new_bubble_id = 99;
+        runtime
+            .set_position(2, DVec3::new(10.0, 0.0, 0.0))
+            .expect("destination");
         assert_eq!(runtime.check_visibility(1, 2).expect("visibility"), 3);
     }
 
@@ -6133,9 +6125,7 @@ mod tests {
             }),
         );
 
-        runtime
-            .schedule_remove_ball(2, 2)
-            .expect("pending removal");
+        runtime.schedule_remove_ball(2, 2).expect("pending removal");
         runtime.metadata_mut(3).expect("metadata").is_cloaked = 2;
         assert_eq!(
             runtime.bubble_membership_value().expect("membership"),

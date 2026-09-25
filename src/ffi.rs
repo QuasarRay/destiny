@@ -76,10 +76,7 @@ pub extern "C" fn dbc_runtime_new(
             ptr::null_mut()
         }
         Err(payload) => {
-            set_out_error(
-                out_error,
-                diagnostic_buffer(panic_message(payload), 2),
-            );
+            set_out_error(out_error, diagnostic_buffer(panic_message(payload), 2));
             ptr::null_mut()
         }
     }
@@ -399,7 +396,11 @@ mod tests {
 
     #[test]
     fn input_pointer_and_empty_buffer_contracts_fail_safely() {
-        assert!(input_bytes(ptr::null(), 0).expect("zero-length null input").is_empty());
+        assert!(
+            input_bytes(ptr::null(), 0)
+                .expect("zero-length null input")
+                .is_empty()
+        );
         assert!(input_bytes(ptr::null(), 1).is_err());
         assert!(input_bytes(ptr::null(), MAX_REQUEST_BYTES + 1).is_err());
 

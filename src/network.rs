@@ -22,17 +22,14 @@ use bevy::prelude::{
 };
 use bevy_replicon::prelude::AppRuleExt;
 use lightyear_connection::prelude::NetworkDirection;
-use lightyear_messages::prelude::{
-    AppMessageExt, MessageReceiver, MessageSender, MessageSystems,
-};
+use lightyear_messages::prelude::{AppMessageExt, MessageReceiver, MessageSender, MessageSystems};
 use lightyear_transport::prelude::{AppChannelExt, ChannelMode, ChannelSettings, ReliableSettings};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use crate::{
+    CarbonNetworkOutbox, DestinyBallId, DestinyBallMetadata, DestinyMass, DestinyPendingRemoval,
     carbon_codec::decode_canonical,
-    CarbonNetworkOutbox, DestinyBallId, DestinyBallMetadata, DestinyMass,
-    DestinyPendingRemoval,
 };
 
 pub use bevy_replicon::prelude::Replicated;
@@ -375,9 +372,13 @@ fn allocate_visibility_room(
     rooms: &CarbonVisibilityRooms,
     allocator: &mut RoomAllocator,
 ) -> Option<RoomId> {
-    let allocated = (if rooms.global.is_some() { 1_usize } else { 0_usize })
-        .saturating_add(rooms.bubbles.len())
-        .saturating_add(rooms.personal.len());
+    let allocated = (if rooms.global.is_some() {
+        1_usize
+    } else {
+        0_usize
+    })
+    .saturating_add(rooms.bubbles.len())
+    .saturating_add(rooms.personal.len());
     if allocated >= MAX_VISIBILITY_ROOMS {
         return None;
     }
@@ -404,8 +405,7 @@ fn sync_client_visibility_rooms(
         if let Some(global) = global {
             replacement.add_room(global);
         } else {
-            metrics.room_allocation_failures =
-                metrics.room_allocation_failures.saturating_add(1);
+            metrics.room_allocation_failures = metrics.room_allocation_failures.saturating_add(1);
         }
         // Personal rooms are allocated lazily only when an owned cloaked ball
         // exists; ordinary authenticated-client churn must not consume the
@@ -417,8 +417,7 @@ fn sync_client_visibility_rooms(
             // The host supplied an invalid interest set. Keep only the
             // fail-closed global/owner rooms already staged above and avoid an
             // attacker-controlled clone/sort on every PostUpdate.
-            metrics.room_allocation_failures =
-                metrics.room_allocation_failures.saturating_add(1);
+            metrics.room_allocation_failures = metrics.room_allocation_failures.saturating_add(1);
             replace_rooms_if_changed(&mut commands, entity, current_rooms, replacement);
             continue;
         }
@@ -478,11 +477,8 @@ fn sync_ball_visibility_rooms(
                     metrics.room_allocation_failures.saturating_add(1);
             }
         } else if metadata.new_bubble_id >= 0 {
-            if let Some(room) = bubble_room(
-                metadata.new_bubble_id,
-                &mut visibility,
-                &mut allocator,
-            ) {
+            if let Some(room) = bubble_room(metadata.new_bubble_id, &mut visibility, &mut allocator)
+            {
                 replacement.add_room(room);
             } else {
                 metrics.room_allocation_failures =
@@ -501,9 +497,7 @@ fn replace_rooms_if_changed(
 ) {
     let unchanged = current.is_some_and(|current| {
         current.rooms().count() == replacement.rooms().count()
-            && replacement
-                .rooms()
-                .all(|room| current.contains_room(room))
+            && replacement.rooms().all(|room| current.contains_room(room))
     });
     if !unchanged {
         // Lightyear deliberately declares `Rooms` as an immutable Bevy
@@ -608,14 +602,19 @@ fn flush_carbon_outbox(
         }
         sent_messages = sent_messages.saturating_add(delivery_count);
         sent_bytes = sent_bytes.saturating_add(frame_bytes);
-        metrics.delivered_frames = metrics.delivered_frames.saturating_add(delivery_count as u64);
+        metrics.delivered_frames = metrics
+            .delivered_frames
+            .saturating_add(delivery_count as u64);
         metrics.delivered_bytes = metrics.delivered_bytes.saturating_add(frame_bytes as u64);
         drop_front(&mut outbox, queue);
     }
 }
 
 fn receive_carbon_frames(
-    mut receivers: Query<(&CarbonClientIdentity, &mut MessageReceiver<CarbonUpdateMessage>)>,
+    mut receivers: Query<(
+        &CarbonClientIdentity,
+        &mut MessageReceiver<CarbonUpdateMessage>,
+    )>,
     limits: Res<CarbonTransportLimits>,
     mut inbox: ResMut<CarbonClientInbox>,
     mut metrics: ResMut<CarbonTransportMetrics>,
@@ -682,9 +681,18 @@ enum OutboxQueue {
 
 fn next_envelope(outbox: &CarbonNetworkOutbox) -> Option<(OutboxQueue, &Value)> {
     let candidates = [
-        outbox.singlecasts.first().map(|value| (OutboxQueue::Singlecast, value)),
-        outbox.narrowcasts.first().map(|value| (OutboxQueue::Narrowcast, value)),
-        outbox.batches.first().map(|value| (OutboxQueue::Batch, value)),
+        outbox
+            .singlecasts
+            .first()
+            .map(|value| (OutboxQueue::Singlecast, value)),
+        outbox
+            .narrowcasts
+            .first()
+            .map(|value| (OutboxQueue::Narrowcast, value)),
+        outbox
+            .batches
+            .first()
+            .map(|value| (OutboxQueue::Batch, value)),
     ];
     candidates.into_iter().flatten().min_by_key(|(_, value)| {
         value
@@ -696,10 +704,12 @@ fn next_envelope(outbox: &CarbonNetworkOutbox) -> Option<(OutboxQueue, &Value)> 
 
 fn drop_front(outbox: &mut CarbonNetworkOutbox, queue: OutboxQueue) {
     let removed = match queue {
-        OutboxQueue::Singlecast => (!outbox.singlecasts.is_empty())
-            .then(|| outbox.singlecasts.remove(0)),
-        OutboxQueue::Narrowcast => (!outbox.narrowcasts.is_empty())
-            .then(|| outbox.narrowcasts.remove(0)),
+        OutboxQueue::Singlecast => {
+            (!outbox.singlecasts.is_empty()).then(|| outbox.singlecasts.remove(0))
+        }
+        OutboxQueue::Narrowcast => {
+            (!outbox.narrowcasts.is_empty()).then(|| outbox.narrowcasts.remove(0))
+        }
         OutboxQueue::Batch => (!outbox.batches.is_empty()).then(|| outbox.batches.remove(0)),
     };
     if let Some(value) = removed {
@@ -714,10 +724,9 @@ fn deliveries_from_envelope(
     let object = envelope
         .as_object()
         .ok_or_else(|| "Carbon envelope must be an object".to_owned())?;
-    let expected: HashSet<&str> =
-        ["protocol", "schema_version", "mode", "batch_id", "updates"]
-            .into_iter()
-            .collect();
+    let expected: HashSet<&str> = ["protocol", "schema_version", "mode", "batch_id", "updates"]
+        .into_iter()
+        .collect();
     if object.keys().map(String::as_str).collect::<HashSet<_>>() != expected
         || object.get("protocol").and_then(Value::as_str) != Some(CARBON_PROTOCOL_NAME)
         || object.get("schema_version").and_then(Value::as_u64)
@@ -742,7 +751,12 @@ fn deliveries_from_envelope(
     let mut rows = Vec::new();
     let mut expanded = ExpandedDeliveryBudget::default();
     match mode {
-        "singlecast" => rows.extend(rows_for_mode(encoded_updates, false, limits, &mut expanded)?),
+        "singlecast" => rows.extend(rows_for_mode(
+            encoded_updates,
+            false,
+            limits,
+            &mut expanded,
+        )?),
         "narrowcast" => rows.extend(rows_for_mode(encoded_updates, true, limits, &mut expanded)?),
         "batch" => {
             let mut object = encoded_updates
@@ -836,9 +850,11 @@ fn rows_for_mode(
                 })
                 .collect::<Result<Vec<_>, _>>()?
         } else {
-            vec![row[0]
-                .as_i64()
-                .ok_or_else(|| "singlecast recipient must be int64".to_owned())?]
+            vec![
+                row[0]
+                    .as_i64()
+                    .ok_or_else(|| "singlecast recipient must be int64".to_owned())?,
+            ]
         };
         let mut unique = recipients;
         unique.sort_unstable();
@@ -977,58 +993,63 @@ mod tests {
         .expect("valid narrowcast envelope");
 
         for recipient in [7, 8] {
-            let decoded = decode_canonical(deliveries[&recipient].updates[0].clone())
-                .expect("canonical row");
-            let row = decoded
-                .as_array()
-                .expect("decoded row");
+            let decoded =
+                decode_canonical(deliveries[&recipient].updates[0].clone()).expect("canonical row");
+            let row = decoded.as_array().expect("decoded row");
             assert_eq!(row[0], json!(recipient));
-            assert!(deliveries[&recipient].updates[0]
-                .get("$destiny_bevy_tuple_v1")
-                .is_some());
-            assert!(deliveries[&recipient].updates[0]["$destiny_bevy_tuple_v1"][2]
-                .get("$destiny_bevy_tuple_v1")
-                .is_some());
+            assert!(
+                deliveries[&recipient].updates[0]
+                    .get("$destiny_bevy_tuple_v1")
+                    .is_some()
+            );
+            assert!(
+                deliveries[&recipient].updates[0]["$destiny_bevy_tuple_v1"][2]
+                    .get("$destiny_bevy_tuple_v1")
+                    .is_some()
+            );
         }
     }
 
     #[test]
     fn malformed_or_unversioned_envelopes_fail_closed() {
-        assert!(deliveries_from_envelope(
-            &json!({
-                "protocol": CARBON_PROTOCOL_NAME,
-                "schema_version": 1,
-                "mode": "singlecast",
-                "batch_id": 17,
-                "updates": [],
-            }),
-            CarbonTransportLimits::default(),
-        )
-        .is_err());
-        assert!(deliveries_from_envelope(
-            &envelope(
-                "singlecast",
-                json!([["not-an-int", "DoDestinyUpdate", []]]),
-            ),
-            CarbonTransportLimits::default(),
-        )
-        .is_err());
+        assert!(
+            deliveries_from_envelope(
+                &json!({
+                    "protocol": CARBON_PROTOCOL_NAME,
+                    "schema_version": 1,
+                    "mode": "singlecast",
+                    "batch_id": 17,
+                    "updates": [],
+                }),
+                CarbonTransportLimits::default(),
+            )
+            .is_err()
+        );
+        assert!(
+            deliveries_from_envelope(
+                &envelope("singlecast", json!([["not-an-int", "DoDestinyUpdate", []]]),),
+                CarbonTransportLimits::default(),
+            )
+            .is_err()
+        );
     }
 
     #[test]
     fn narrowcast_expansion_is_bounded_before_unlimited_cloning() {
         let mut limits = CarbonTransportLimits::default();
         limits.max_wire_bytes_per_flush = 16;
-        assert!(deliveries_from_envelope(
-            &envelope(
-                "narrowcast",
-                json!([
-                    {"$destiny_bevy_tuple_v1": [[1, 2, 3], "DoDestinyUpdate", ["payload"]]},
-                ]),
-            ),
-            limits,
-        )
-        .is_err());
+        assert!(
+            deliveries_from_envelope(
+                &envelope(
+                    "narrowcast",
+                    json!([
+                        {"$destiny_bevy_tuple_v1": [[1, 2, 3], "DoDestinyUpdate", ["payload"]]},
+                    ]),
+                ),
+                limits,
+            )
+            .is_err()
+        );
     }
 
     #[test]
