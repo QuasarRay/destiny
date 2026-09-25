@@ -2016,6 +2016,9 @@ impl CompatRuntime {
             minis: Vec::new(),
             sensors: Vec::new(),
         };
+        // Bevy's tuple Bundle implementations are arity-limited. Keep the
+        // component set identical, but insert it in two batches so this code
+        // does not depend on a particular maximum tuple arity.
         let entity = self
             .app
             .world_mut()
@@ -2031,17 +2034,19 @@ impl CompatRuntime {
                 Rotation(initial_rotation),
                 LinearVelocity(velocity),
                 AngularVelocity::ZERO,
-                LinearDamping(0.0),
-                DestinyMass(mass),
-                DestinyPresentationAngularVelocity::default(),
-                Mass(avian_mass(mass)),
-                MaxLinearSpeed(max_velocity),
-                MaxAngularSpeed(max_angular_speed),
-                GravityScale(0.0),
-                CollidingEntities::default(),
-                ActiveCollisionHooks::FILTER_PAIRS,
             ))
             .id();
+        self.app.world_mut().entity_mut(entity).insert((
+            LinearDamping(0.0),
+            DestinyMass(mass),
+            DestinyPresentationAngularVelocity::default(),
+            Mass(avian_mass(mass)),
+            MaxLinearSpeed(max_velocity),
+            MaxAngularSpeed(max_angular_speed),
+            GravityScale(0.0),
+            CollidingEntities::default(),
+            ActiveCollisionHooks::FILTER_PAIRS,
+        ));
 
         if !is_massive {
             self.app
@@ -5954,7 +5959,7 @@ mod tests {
         invalid.is_cloaked = 1;
         invalid.is_massive = false;
         invalid.massive_before_cloak = None;
-        assert!(validate_ball_snapshot(&invalid, MAX_CHILD_SHAPES_PER_BALL).is_err());
+        assert!(validate_ball_snapshot(&invalid, MAX_CONFIGURED_CHILD_SHAPES_PER_BALL).is_err());
 
         runtime
             .dispatch(request(
