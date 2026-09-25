@@ -96,10 +96,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Regenerate canonical root lockfile
-        run: cargo generate-lockfile
+      - name: Minimally repair root lockfile
+        run: cargo check --all-features
 
-      - name: Upload canonical root lockfile
+      - name: Upload minimally repaired root lockfile
         uses: actions/upload-artifact@v4
         with:
           name: canonical-root-cargo-lock
