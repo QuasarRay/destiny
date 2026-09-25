@@ -107,4 +107,4 @@ jobs:
           path: Cargo.lock
 
       - name: Root parity regression
-        run: cargo test --all-features original_ignored_setter_values_leave_existing_ball_unchanged
+        run: cargo test --all-features original_
