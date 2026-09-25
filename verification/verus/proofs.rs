@@ -179,7 +179,7 @@ pub proof fn proximity_only_interactives_rejects_noninteractive()
 {
 }
 
-pub open spec fn stop_mode(_: int) -> int { 0 }
+pub open spec fn stop_mode(_mode: int) -> int { 0 }
 
 // original-test: python/destiny/test/ballpark/test_movement_controls.py::test_stop_stopped_ball
 // original-test: python/destiny/test/ballpark/test_movement_controls.py::test_stop_following_ball
