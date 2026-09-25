@@ -5,6 +5,7 @@ mod contracts;
 mod lifecycle_contracts;
 mod metaverification;
 mod state_contracts;
+mod visibility_contracts;
 
 use destiny_verification_macros::{DestinyModel, destiny_contract, destiny_delegate, destiny_spec};
 
