@@ -90,6 +90,7 @@ jobs:
       - name: Verify logical refinement proofs
         run: |
           "$VERUS_BIN" --crate-type=lib verification/verus/proofs.rs
+          "$VERUS_BIN" --crate-type=lib verification/verus/state_contracts.rs
 
   runtime-parity:
     name: concrete runtime parity regression
@@ -106,4 +107,4 @@ jobs:
           path: Cargo.lock
 
       - name: Root parity regression
-        run: cargo test --all-features original_ignored_setter_values_leave_existing_ball_unchanged
+        run: cargo test --all-features original_

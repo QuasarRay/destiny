@@ -2,6 +2,7 @@
 
 mod contracts;
 mod metaverification;
+mod state_contracts;
 
 use destiny_verification_macros::{DestinyModel, destiny_contract, destiny_delegate, destiny_spec};
 
