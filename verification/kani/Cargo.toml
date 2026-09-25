@@ -1,0 +1,19 @@
+[package]
+name = "destiny-kani-proofs"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+destiny-original-spec = { path = "../spec" }
+destiny-metaverification = { path = "../meta-support" }
+destiny-verification-macros = { path = "../meta" }
+
+[lints.rust]
+unsafe_code = "forbid"
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(kani)'] }
