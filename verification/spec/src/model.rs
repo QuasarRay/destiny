@@ -139,6 +139,52 @@ pub fn surface_distance(left: &BallState, right: &BallState) -> f64 {
     center_distance(left, right) - left.radius - right.radius
 }
 
+
+#[must_use]
+pub const fn follow_allowed(src_id: i64, dst_id: i64, target_moribund: bool) -> bool {
+    src_id != dst_id && !target_moribund
+}
+
+#[must_use]
+pub fn orbit_allowed(
+    src_id: i64,
+    dst_id: i64,
+    range: f64,
+    target_cloaked: bool,
+    same_bubble: bool,
+) -> bool {
+    src_id != dst_id && range.is_finite() && !target_cloaked && same_bubble
+}
+
+#[must_use]
+pub const fn visibility_occluder(is_massive: bool, is_cloaked: bool) -> bool {
+    is_massive && !is_cloaked
+}
+
+#[must_use]
+pub const fn proximity_eligible(
+    owner_is_free: bool,
+    target_is_interactive: bool,
+    only_interactives: bool,
+) -> bool {
+    owner_is_free && (!only_interactives || target_is_interactive)
+}
+
+#[must_use]
+pub const fn uncloak_restores_massive(in_warp: bool) -> bool {
+    !in_warp
+}
+
+#[must_use]
+pub const fn stopped_mode(_: MotionMode) -> MotionMode {
+    MotionMode::Stop
+}
+
+#[must_use]
+pub fn missile_follow_range(src_radius: f64, dst_radius: f64) -> f64 {
+    -(src_radius + dst_radius)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
