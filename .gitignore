@@ -36,5 +36,3 @@ cmake-build*
 ### Project ###
 # Ignore folder where we copy dependencies to run benchmarks
 /tools/benchmark/bin
-# This one is committed on purpose
-!destinyI.dll
