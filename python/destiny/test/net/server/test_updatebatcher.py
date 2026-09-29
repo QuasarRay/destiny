@@ -115,6 +115,14 @@ class TestUpdateBatcher(DestinyTestCase):
             self._network.singlecasts
         )
 
+    def test_clients_with_character_history_are_returned_as_a_set(self):
+        self._set_up_ball(BALL_ID_1, CHAR_ID_1, CLIENT_ID_1)
+        self._update_batcher.add_to_character_history(CHAR_ID_1, GOTO_ACTION)
+
+        client_ids = self._update_batcher.get_clients_with_character_history()
+
+        self.assertSetEqual({CLIENT_ID_1}, client_ids)
+
     def test_bubble_history_only_has_cast_count_one(self):
         ball = self._set_up_ball(BALL_ID_1, CHAR_ID_1, CLIENT_ID_1)
         self._update_batcher.add_to_bubble_history(ball.newBubbleId, GOTO_ACTION)

@@ -38,15 +38,15 @@ class ParkUpdateBatcher(object):
         who have a pending Destiny update to be sent
         to them specifically.
 
-        :rtype: list
+        :rtype: set
         """
-        client_ids = []
+        client_ids = set()
         for char_id, state in self._character_history.items():
             client_id = self._character_interests.get_client_id_for_character(char_id)
             if client_id is None:
                 continue
             if state:
-                client_ids.append(client_id)
+                client_ids.add(client_id)
         return client_ids
 
     def send_batch(self):
@@ -75,16 +75,8 @@ class ParkUpdateBatcher(object):
                 for ball_id in self._park.bubbleInteractives[bubble_id]:
                     client_ids.update(self._client_interests.get_interested_client_ids_for_ball(ball_id))
                 self._check_state_timestamp(state)
-                dual_update_narrowcast_clients = [
-                    client_id
-                    for client_id in client_ids
-                    if client_id in clients_with_character_history
-                ]
-                single_update_narrowcast_clients = [
-                    client_id
-                    for client_id in client_ids
-                    if client_id not in dual_update_narrowcast_clients
-                ]
+                dual_update_narrowcast_clients = client_ids & clients_with_character_history
+                single_update_narrowcast_clients = client_ids - clients_with_character_history
                 if single_update_narrowcast_clients:
                     single_batch_narrowcasts.append(
                         (
