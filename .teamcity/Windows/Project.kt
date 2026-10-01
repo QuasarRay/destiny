@@ -231,7 +231,7 @@ class CarbonBuildWindows(buildName: String, configType: String, preset: String, 
             requiredSpace = "10gb"
             failBuild = true
         }
-        sssure hAgent {
+        sshAgent {
             teamcitySshKey = "ccpgames-carbon"
         }
         provideAwsCredentials {
