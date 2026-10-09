@@ -4,7 +4,12 @@ all-features = true
 [advisories]
 version = 2
 yanked = "deny"
-ignore = []
+ignore = [
+    # Avian 0.7 -> parry3d-f64 0.27/glamx 0.2 -> simba 0.9.1 requires
+    # paste 1.0.15. This is an archived proc-macro maintenance notice,
+    # not a vulnerability advisory. Remove when upstream moves to simba 0.10.
+    { id = "RUSTSEC-2024-0436", reason = "Transitive build-time paste macro required by the pinned physics stack; no compatible simba 0.9 patch removes it." },
+]
 
 [licenses]
 version = 2
@@ -21,7 +26,11 @@ allow = [
     "Unicode-DFS-2016",
     "Zlib",
 ]
-exceptions = []
+exceptions = [
+    # Required by the pinned Bevy Replicon dependency. Boost is permissive;
+    # keep the allowance scoped to this exact dependency rather than all crates.
+    { name = "xxhash-rust", version = "=0.8.18", allow = ["BSL-1.0"] },
+]
 
 [bans]
 multiple-versions = "warn"

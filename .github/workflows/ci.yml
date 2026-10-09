@@ -92,7 +92,7 @@ jobs:
       - name: Install pinned audit tools
         run: |
           cargo install --locked cargo-audit@0.22.2
-          cargo install --locked cargo-deny@0.18.4
+          cargo install --locked cargo-deny@0.20.2
       - name: Audit exact lock file
         run: cargo audit --file Cargo.lock
       - name: Check advisories, licenses, bans, and sources
