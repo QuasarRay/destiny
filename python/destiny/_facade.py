@@ -394,6 +394,22 @@ class Ball(_BoundObject):
     def AddProximitySensor(self, range_value, period=2.0, shuffle=0, onlyInteractives=False) -> None:
         self._invoke("destiny.Ball.AddProximitySensor", "call", range_value, period, shuffle, onlyInteractives)
 
+    def ReserveFormationSlot(self) -> int:
+        slot = _exact_i64(self._invoke("destiny.Ball.ReserveFormationSlot"), "formation slot")
+        if not -1 <= slot < 16:
+            raise BackendCallError("backend returned an invalid formation slot", code="invalid_backend_response")
+        return slot
+
+    def FreeFormationSlot(self, slot: int) -> None:
+        self._invoke("destiny.Ball.FreeFormationSlot", "call", _input_i64(slot, "slot"))
+
+    @property
+    def formationID(self) -> int:
+        formation = _exact_i64(self._invoke("destiny.Ball.formationID", "get"), "formation ID")
+        if formation != 255 and not 0 <= formation <= 127:
+            raise BackendCallError("backend returned an invalid formation ID", code="invalid_backend_response")
+        return formation
+
     def __getattr__(self, name: str) -> Any:
         canonical_title = f"destiny.Ball.{name}"
         record = RECORDS.get(canonical_title)
@@ -684,6 +700,15 @@ class Ballpark(_BoundObject):
 
     def SetBallMass(self, ball_id, mass) -> None:
         self._invoke("destiny.Ballpark.SetBallMass", "call", ball_id, mass)
+
+    def LoadFormations(self, formations) -> None:
+        self._invoke("destiny.Ballpark.LoadFormations", "call", formations)
+
+    def SetBallFormation(self, ball_id: int, formation_id: int) -> None:
+        self._invoke(
+            "destiny.Ballpark.SetBallFormation", "call",
+            _input_i64(ball_id, "ball_id"), _input_i64(formation_id, "formation_id"),
+        )
 
     def SetMaxSpeed(self, ball_id, speed) -> None:
         self._invoke("destiny.Ballpark.SetMaxSpeed", "call", ball_id, speed)
@@ -1127,7 +1152,7 @@ def _decode_snapshot_response(encoded: Any, *, expected_current_time: int | None
         or type(snapshot.get("schema_version")) is not int
         or snapshot.get("schema_version") != 3
         or not isinstance(snapshot.get("park"), dict)
-        or set(snapshot["park"]) != expected_park
+        or not expected_park <= set(snapshot["park"]) <= expected_park | {"formations"}
         or not isinstance(snapshot.get("balls"), list)
         or len(snapshot["balls"]) > MAX_SNAPSHOT_BALLS
     ):

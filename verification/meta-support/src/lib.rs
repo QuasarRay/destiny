@@ -14,9 +14,10 @@ macro_rules! regression_test {
 
 #[macro_export]
 macro_rules! kani_regression {
-    ($name:ident, $body:block) => {
+    ($(#[$proof_attr:meta])* $name:ident, $body:block) => {
         #[cfg(kani)]
         #[kani::proof]
+        $(#[$proof_attr])*
         fn $name() $body
     };
 }
@@ -55,10 +56,12 @@ macro_rules! non_negative_setter_contract {
 /// Generate both a conventional regression and a Kani harness from one body.
 /// The body must be deterministic for the conventional test; symbolic Kani
 /// cases should use `kani_regression!` directly.
+/// Optional proof attributes (for example `#[kani::unwind(17)]`) apply only
+/// to the generated Kani harness, keeping the ordinary test body shared.
 #[macro_export]
 macro_rules! paired_regression {
-    ($test_name:ident, $kani_name:ident, $body:block) => {
+    ($(#[$proof_attr:meta])* $test_name:ident, $kani_name:ident, $body:block) => {
         $crate::regression_test!($test_name, $body);
-        $crate::kani_regression!($kani_name, $body);
+        $crate::kani_regression!($(#[$proof_attr])* $kani_name, $body);
     };
 }

@@ -123,3 +123,16 @@ jobs:
 
       - name: Root parity regression
         run: cargo test --all-features original_
+
+      - name: Check out the pinned original Destiny tests
+        uses: actions/checkout@v4
+        with:
+          repository: carbonengine/destiny
+          ref: 114e89fa584f0e1a81eb0a679aabf41af8870072
+          path: original-destiny
+
+      - name: Run unchanged original formation tests against both backends
+        run: |
+          cargo build --lib --all-features --locked
+          python verification/tools/run_original_formation_tests.py --original-root original-destiny
+          python verification/tools/run_original_formation_tests.py --original-root original-destiny --library target/debug/libdestiny_bevy_compat.so
