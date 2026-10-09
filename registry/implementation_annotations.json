@@ -36,6 +36,14 @@
     "destiny.net.server.NetworkInterface.narrowcast": {
       "status": "implemented-with-accepted-difference",
       "note": "The Rust bridge resolves authenticated Carbon IDs to individual Lightyear links and redacts the other recipient IDs from each ordered-reliable frame; product authentication remains host-owned."
+    },
+    "destiny.Ballpark.LoadFormations": {
+      "status": "implemented-state-only",
+      "note": "Formation definitions, leader IDs, and reservations match the tested original slot-allocation contract. FormationFollow steering and follower-drop transitions are still unsupported."
+    },
+    "destiny.Ballpark.SetBallFormation": {
+      "status": "implemented-state-only",
+      "note": "Formation definitions, leader IDs, and reservations match the tested original slot-allocation contract. FormationFollow steering and follower-drop transitions are still unsupported."
     }
   }
 }

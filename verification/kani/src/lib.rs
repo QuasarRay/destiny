@@ -2,6 +2,7 @@
 
 mod ball_contracts;
 mod contracts;
+mod formation_contracts;
 mod geometry_contracts;
 mod lifecycle_contracts;
 mod metaverification;

@@ -43,13 +43,25 @@ mini-ball insertion, mini-capsule insertion/rejection, identity rotation,
 proximity-sensor state, visibility occlusion filters, non-warp cloak/uncloak,
 and ScanCone axis examples.
 
+Formation allocation now uses a shared executable 16-bit transition in the
+runtime and the Kani harnesses. Public regressions cover assignment, first-free
+selection, exhaustion, freeing/reuse, the slot-15 boundary, invalid requests,
+and snapshot restoration. Six unchanged upstream tests run through the native
+backend. These new proofs follow AGENTS.MD's Kani invariant focus; the existing
+Verus work is retained, without claiming a new Verus runtime-adapter proof.
+
+The restacked geometry branch retains the original Vector/AABB/Plane/Triangle
+translations and their 36 Kani/Verus obligations. Its five concrete triangle
+Verus goals are discharged by verified computation, with their original
+postconditions intact.
+
 ## Explicitly incomplete
 
 Full original-Destiny equivalence is **not** yet established. The original suite
 contains 531 catalog entries (509 unique source/test keys). Major remaining
 areas include exact Goto/Follow/FormationFollow trajectories, Warp, old/new
 Orbit dynamics, missile dynamics, iterative/simple collision behavior,
-mini-shape collision behavior, formation runtime state, boxes/bubbles, callbacks, stream serialization,
+mini-shape collision behavior, formation follower/controller state, boxes/bubbles, callbacks, stream serialization,
 lifecycle edge cases, network client/server history and ticker semantics, and
 the C++ geometry/collision suite.
 
@@ -65,6 +77,7 @@ python verification/tools/proof_coverage.py
 python verification/tools/pattern_scan.py --json
 ```
 
-The `--strict-both` coverage mode is intentionally available for the final
-completion gate, but is not enabled until every catalog obligation has a real
-Kani and Verus proof.
+Proof markers report source coverage, not successful prover execution or full
+implementation equivalence. `--strict-both` remains available for historical
+paired coverage; the current Kani-focused work does not add a Verus requirement
+to new runtime invariants.

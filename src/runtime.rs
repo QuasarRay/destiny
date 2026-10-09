@@ -16,7 +16,8 @@ use bevy::{
     time::TimeUpdateStrategy,
 };
 use destiny_original_spec::{
-    adjust_time, clamp_speed_fraction, non_negative_setter_accepts, positive_setter_accepts,
+    NO_FORMATION, adjust_time, assign_formation, clamp_speed_fraction, free_formation_slot,
+    non_negative_setter_accepts, positive_setter_accepts, reserve_formation_slot,
     surface_distance_from_center,
 };
 use serde::{
@@ -47,6 +48,12 @@ const MAX_CONFIGURED_SNAPSHOT_BALLS: usize = 100_000;
 const MAX_CONFIGURED_CHILD_SHAPES_PER_BALL: usize = 4_096;
 const MAX_CONFIGURED_OUTBOX_MESSAGES: usize = 10_000;
 const MAX_CONFIGURED_OUTBOX_BYTES: usize = 48 * 1024 * 1024;
+const MAX_FORMATION_DEFINITIONS: usize = 128;
+const MAX_FORMATION_OFFSETS: usize = 100_000;
+
+fn no_formation() -> u8 {
+    NO_FORMATION
+}
 
 /// Parse JSON while rejecting duplicate object members at every depth.
 ///
@@ -303,6 +310,10 @@ pub struct DestinyBallMetadata {
     pub new_bubble_id: i64,
     pub old_bubble_id: i64,
     pub effect_stamp: i64,
+    #[serde(default = "no_formation")]
+    pub formation_id: u8,
+    #[serde(default)]
+    pub formation_slots: u16,
     #[serde(default)]
     pub massive_before_cloak: Option<bool>,
     pub minis: Vec<Value>,
@@ -333,6 +344,10 @@ pub struct BallSnapshot {
     pub new_bubble_id: i64,
     pub old_bubble_id: i64,
     pub effect_stamp: i64,
+    #[serde(default = "no_formation")]
+    pub formation_id: u8,
+    #[serde(default)]
+    pub formation_slots: u16,
     pub massive_before_cloak: Option<bool>,
     pub minis: Vec<Value>,
     pub sensors: Vec<Value>,
@@ -370,6 +385,8 @@ struct ParkSnapshotMetadata {
     use_dynamical_orientation: bool,
     disable_dynamical_orientation_for_missiles: bool,
     use_new_orbit: bool,
+    #[serde(default)]
+    formations: Vec<Vec<[f64; 3]>>,
     pending_removals: Vec<PendingRemovalSnapshot>,
     snapshot_semantics: String,
 }
@@ -414,6 +431,7 @@ struct ParkMetadata {
     use_dynamical_orientation: bool,
     disable_dynamical_orientation_for_missiles: bool,
     use_new_orbit: bool,
+    formations: Vec<Vec<[f64; 3]>>,
     pending_removals: HashMap<i64, i64>,
     limits: CompatLimits,
 }
@@ -627,6 +645,7 @@ impl CompatRuntime {
                 disable_dynamical_orientation_for_missiles: options
                     .disable_dynamical_orientation_for_missiles,
                 use_new_orbit: options.use_new_orbit,
+                formations: Vec::new(),
                 pending_removals: HashMap::new(),
                 limits: CompatLimits {
                     max_snapshot_bytes: options.max_snapshot_bytes,
@@ -683,6 +702,7 @@ impl CompatRuntime {
                     .transpose()?
                     .unwrap_or(false);
                 self.clear_all();
+                self.park.formations.clear();
                 self.park.is_master = is_master;
                 self.park.current_time = 0;
                 self.park.time = 0;
@@ -1994,6 +2014,8 @@ impl CompatRuntime {
             new_bubble_id: -1,
             old_bubble_id: -1,
             effect_stamp: 0,
+            formation_id: NO_FORMATION,
+            formation_slots: 0,
             massive_before_cloak: None,
             minis: Vec::new(),
             sensors: Vec::new(),
@@ -2056,6 +2078,7 @@ impl CompatRuntime {
         selected: Option<&[i64]>,
         source_id: Option<i64>,
     ) -> Result<String, CompatError> {
+        validate_formations(&self.park.formations)?;
         if selected.is_some_and(|ids| ids.len() > self.park.limits.max_snapshot_balls) {
             return Err(CompatError::InvalidRequest(
                 "snapshot selector exceeds the ball-count limit".into(),
@@ -2174,6 +2197,7 @@ impl CompatRuntime {
                     .park
                     .disable_dynamical_orientation_for_missiles,
                 use_new_orbit: self.park.use_new_orbit,
+                formations: self.park.formations.clone(),
                 pending_removals: selected_ids
                     .iter()
                     .filter_map(|ball_id| {
@@ -2252,6 +2276,8 @@ impl CompatRuntime {
             new_bubble_id: metadata.new_bubble_id,
             old_bubble_id: metadata.old_bubble_id,
             effect_stamp: metadata.effect_stamp,
+            formation_id: metadata.formation_id,
+            formation_slots: metadata.formation_slots,
             massive_before_cloak: metadata.massive_before_cloak,
             minis: metadata.minis.clone(),
             sensors: metadata.sensors.clone(),
@@ -2326,6 +2352,12 @@ impl CompatRuntime {
         if snapshot.park.snapshot_semantics != "logical-authoritative" {
             return Err(CompatError::InvalidRequest(
                 "unsupported snapshot semantics".into(),
+            ));
+        }
+        validate_formations(&snapshot.park.formations)?;
+        if partial != 0 && snapshot.park.formations != self.park.formations {
+            return Err(CompatError::InvalidRequest(
+                "partial restore requires the same formation definitions".into(),
             ));
         }
         let mut ids = HashSet::new();
@@ -2498,6 +2530,7 @@ impl CompatRuntime {
             self.park.disable_dynamical_orientation_for_missiles =
                 snapshot.park.disable_dynamical_orientation_for_missiles;
             self.park.use_new_orbit = snapshot.park.use_new_orbit;
+            self.park.formations = snapshot.park.formations.clone();
             self.app
                 .world_mut()
                 .resource_mut::<Time<Fixed>>()
@@ -2618,6 +2651,8 @@ impl CompatRuntime {
                 metadata.new_bubble_id = ball.new_bubble_id;
                 metadata.old_bubble_id = ball.old_bubble_id;
                 metadata.effect_stamp = ball.effect_stamp;
+                metadata.formation_id = ball.formation_id;
+                metadata.formation_slots = ball.formation_slots;
                 metadata.massive_before_cloak = ball.massive_before_cloak;
                 metadata.angular_agility = ball.angular_agility;
                 if let Some(sensors) = partial_one_sensors {
@@ -2867,6 +2902,23 @@ impl CompatRuntime {
             )));
         }
         match name {
+            "ReserveFormationSlot" => {
+                require_arity(args, &[0], title)?;
+                let count = self.formation_slot_count(ball_id)?;
+                let mut metadata = self.metadata_mut(ball_id)?;
+                let (reserved, slot) = reserve_formation_slot(metadata.formation_slots, count);
+                metadata.formation_slots = reserved;
+                Ok(json!(slot))
+            }
+            "FreeFormationSlot" => {
+                require_arity(args, &[1], title)?;
+                let slot = value_i64(args.first(), "slot")?;
+                let count = self.formation_slot_count(ball_id)?;
+                let mut metadata = self.metadata_mut(ball_id)?;
+                metadata.formation_slots =
+                    free_formation_slot(metadata.formation_slots, count, slot);
+                Ok(Value::Null)
+            }
             "GetRotatedVector" => {
                 require_arity(args, &[1], title)?;
                 let vector = value_vec3(args.first(), "vector")?;
@@ -3192,6 +3244,7 @@ impl CompatRuntime {
             "newBubbleId" => Ok(json!(metadata.new_bubble_id)),
             "oldBubbleId" => Ok(json!(metadata.old_bubble_id)),
             "effectStamp" => Ok(json!(metadata.effect_stamp)),
+            "formationID" => Ok(json!(metadata.formation_id)),
             "Agility" => json_number(metadata.agility),
             "speedFraction" => json_number(metadata.speed_fraction),
             _ => Err(CompatError::UnsupportedTitle(format!(
@@ -3342,6 +3395,15 @@ impl CompatRuntime {
             .world_mut()
             .get_mut::<DestinyBallMetadata>(entity)
             .ok_or_else(|| CompatError::Engine("missing DestinyBallMetadata".into()))
+    }
+
+    fn formation_slot_count(&self, ball_id: i64) -> Result<Option<usize>, CompatError> {
+        let id = self.metadata(ball_id)?.formation_id;
+        Ok(if id == NO_FORMATION {
+            None
+        } else {
+            self.park.formations.get(usize::from(id)).map(Vec::len)
+        })
     }
 
     fn set_position(&mut self, ball_id: i64, position: DVec3) -> Result<(), CompatError> {
@@ -3938,6 +4000,49 @@ impl CompatRuntime {
 
         match name {
             "AddBall" => Ok(json!(self.add_ball(args)?)),
+            "LoadFormations" => {
+                let rows = args.first().and_then(Value::as_array).ok_or_else(|| {
+                    CompatError::InvalidRequest("formations must be an array".into())
+                })?;
+                let formations = rows
+                    .iter()
+                    .map(|row| {
+                        let row = row.as_array().filter(|row| row.len() == 2).ok_or_else(|| {
+                            CompatError::InvalidRequest(
+                                "each formation must contain a name and offsets".into(),
+                            )
+                        })?;
+                        let offsets = row[1].as_array().ok_or_else(|| {
+                            CompatError::InvalidRequest("formation offsets must be an array".into())
+                        })?;
+                        offsets
+                            .iter()
+                            .map(|offset| {
+                                let offset = value_vec3(Some(offset), "formation offset")?;
+                                Ok([offset.x, offset.y, offset.z])
+                            })
+                            .collect::<Result<Vec<_>, CompatError>>()
+                    })
+                    .collect::<Result<Vec<_>, _>>()?;
+                validate_formations(&formations)?;
+                self.park.formations = formations;
+                Ok(Value::Null)
+            }
+            "SetBallFormation" => {
+                let ball_id = value_i64(args.first(), "ball_id")?;
+                let requested = value_i64(args.get(1), "formation_id")?;
+                if self.balls.contains_key(&ball_id) {
+                    let count = self.park.formations.len();
+                    let mut metadata = self.metadata_mut(ball_id)?;
+                    (metadata.formation_id, metadata.formation_slots) = assign_formation(
+                        metadata.formation_id,
+                        metadata.formation_slots,
+                        requested,
+                        count,
+                    );
+                }
+                Ok(Value::Null)
+            }
             "ClearAll" => {
                 self.clear_all();
                 Ok(Value::Null)
@@ -4996,7 +5101,37 @@ fn require_exact_object_keys(
     )))
 }
 
+fn validate_formations(formations: &[Vec<[f64; 3]>]) -> Result<(), CompatError> {
+    if formations.len() > MAX_FORMATION_DEFINITIONS {
+        return Err(CompatError::InvalidRequest(
+            "formation definition limit exceeded".into(),
+        ));
+    }
+    let mut offsets = 0usize;
+    for formation in formations {
+        offsets = offsets
+            .checked_add(formation.len())
+            .ok_or_else(|| CompatError::InvalidRequest("formation offset count overflow".into()))?;
+        if offsets > MAX_FORMATION_OFFSETS
+            || formation
+                .iter()
+                .flatten()
+                .any(|value| !value.is_finite() || value.abs() > MAX_COORDINATE)
+        {
+            return Err(CompatError::InvalidRequest(
+                "invalid or oversized formation offsets".into(),
+            ));
+        }
+    }
+    Ok(())
+}
+
 fn validate_ball_snapshot(ball: &BallSnapshot, max_children: usize) -> Result<(), CompatError> {
+    if ball.formation_id > 127 && ball.formation_id != NO_FORMATION {
+        return Err(CompatError::InvalidRequest(
+            "invalid snapshot formation ID".into(),
+        ));
+    }
     let scalars = [
         ball.mass,
         ball.radius,
@@ -5257,6 +5392,12 @@ fn validate_network_request(
 }
 
 fn park_call_arities(name: &str) -> Option<&'static [usize]> {
+    if name == "LoadFormations" {
+        return Some(&[1]);
+    }
+    if name == "SetBallFormation" {
+        return Some(&[2]);
+    }
     match name {
         "ClearAll" | "Pause" | "Start" | "Evolve" | "GetCurrentEgoPos" => Some(&[0]),
         "AdjustTimes" | "Stop" | "RemoveProximitySensor" | "UncloakBall" | "WriteBallsToStream" => {

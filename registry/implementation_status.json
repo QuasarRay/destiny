@@ -18,9 +18,9 @@
   "counts": {
     "facade-only": 209,
     "implemented-conformant": 2,
-    "implemented-state-only": 2,
-    "implemented-with-accepted-difference": 92,
-    "unsupported": 84
+    "implemented-state-only": 4,
+    "implemented-with-accepted-difference": 95,
+    "unsupported": 79
   },
   "records": [
     {
@@ -165,17 +165,25 @@
       "title_id": "destiny-ball-formationid",
       "canonical_title": "destiny.Ball.formationID",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-freeformationslot",
       "canonical_title": "destiny.Ball.FreeFormationSlot",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-getrotatedvector",
@@ -429,9 +437,13 @@
       "title_id": "destiny-ball-reserveformationslot",
       "canonical_title": "destiny.Ball.ReserveFormationSlot",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-roll",
@@ -1165,9 +1177,13 @@
       "title_id": "destiny-ballpark-loadformations",
       "canonical_title": "destiny.Ballpark.LoadFormations",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-state-only",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "Formation definitions, leader IDs, and reservations match the tested original slot-allocation contract. FormationFollow steering and follower-drop transitions are still unsupported."
     },
     {
       "title_id": "destiny-ballpark-missilefollow",
@@ -1353,9 +1369,13 @@
       "title_id": "destiny-ballpark-setballformation",
       "canonical_title": "destiny.Ballpark.SetBallFormation",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-state-only",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "Formation definitions, leader IDs, and reservations match the tested original slot-allocation contract. FormationFollow steering and follower-drop transitions are still unsupported."
     },
     {
       "title_id": "destiny-ballpark-setballfree",

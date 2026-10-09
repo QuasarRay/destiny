@@ -41,8 +41,21 @@ components, so the parity assertion is not tied to Bevy representation details.
 | Original behavior | Status | Reason |
 | --- | --- | --- |
 | standalone Ball construction/default object | ProofMissing | The original Ball default state is specified and proved, but the Rust core primarily represents balls inside CompatRuntime. A concrete retained standalone-Ball adapter still needs equivalence coverage. |
-| ReserveFormationSlot / FreeFormationSlot | ImplementationMissing | The original first-free slot semantics are formally specified and proved, but the Rust runtime has no formation-slot API/state yet. |
-| LoadFormations / SetBallFormation bridge | ImplementationMissing | Required before the formation-slot proofs can be connected to the new implementation. |
+| ReserveFormationSlot / FreeFormationSlot | Proved slot invariants + runtime regressions | The runtime delegates to the 16-bit transitions verified by Kani. Ordering, exhaustion, reuse, and invalid-slot no-ops are exercised through the public API. |
+| LoadFormations / SetBallFormation bridge | Implemented for slot allocation | Definitions, leader ID, reservations, and snapshot restoration are present. FormationFollow motion and dropping followers when changing formation remain implementation-missing. |
+
+The formation fixture is mechanically extracted from upstream
+`python/destiny/test/helpers.py` at
+`114e89fa584f0e1a81eb0a679aabf41af8870072`; its source hash is recorded in
+`tests/fixtures/original_formations.json`. The six supported upstream formation
+tests can be run unchanged through `verification/tools/run_original_formation_tests.py`.
+Detached `destiny.Ball()` construction remains unsupported; the unconfigured
+runtime regression uses an in-park ball and does not claim to close that gap.
+
+New Kani proofs execute the same reservation/free/assignment transitions used
+by the runtime for arbitrary 16-bit occupied sets. The 17-iteration unwind bound
+covers the entire 16-slot scan, including loop termination; unwinding assertions
+remain enabled. No Bevy architecture claims are made.
 
 ## Source-level behavioral mismatches beyond the current tests
 
@@ -55,6 +68,17 @@ full implementation equivalence:
    endpoints; the Rust path additionally rejects coincident endpoints.
 3. Original AddProximitySensor accepts the period value supplied by the Python
    wrapper; the Rust path additionally requires period > 0.
+4. Formation input validation rejects malformed/non-finite definitions and
+   bounds storage to 128 definitions and 100,000 total offsets. IDs outside
+   0..127 and the clearing sentinel (-1/255) are ignored instead of reproducing
+   platform-dependent C++ char narrowing/negative indexing. Freeing a slot
+   beyond bit 15 is a no-op rather than reproducing a bitset exception.
+
+The compatibility snapshot adds optional formation fields with legacy defaults
+(no definitions, ID 255, reservation set zero). Full restore preserves definitions
+and reservations. Partial restores require identical definitions so incoming
+IDs cannot silently refer to a different host formation table. This is an
+explicit compatibility extension, not a claim about original stream bytes.
 
 These stricter Rust checks may be desirable hardening, but they are behavioral
 differences from the original and therefore cannot be called identical until

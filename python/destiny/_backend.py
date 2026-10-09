@@ -417,6 +417,8 @@ class _BallState:
     new_bubble_id: int = -1
     old_bubble_id: int = -1
     effect_stamp: int = 0
+    formation_id: int = 255
+    formation_slots: int = 0
     massive_before_cloak: bool | None = None
     minis: list[dict[str, Any]] = field(default_factory=list)
     sensors: list[dict[str, Any]] = field(default_factory=list)
@@ -438,6 +440,7 @@ class _ParkState:
     use_dynamical_orientation: bool = False
     disable_dynamical_orientation_for_missiles: bool = False
     use_new_orbit: bool = False
+    formations: list[list[list[float]]] = field(default_factory=list)
     pending_removals: dict[int, int] = field(default_factory=dict)
     network_outbox: dict[str, list[dict[str, Any]]] = field(
         default_factory=lambda: {"singlecasts": [], "narrowcasts": [], "batches": []}
@@ -795,6 +798,24 @@ def _validate_sensor_descriptor(row: Any) -> None:
         raise ValueError("sensor members must not contain duplicates")
 
 
+def _validate_formations(formations: Any) -> list[list[list[float]]]:
+    if not isinstance(formations, (list, tuple)) or len(formations) > 128:
+        raise ValueError("formations must be an array with at most 128 definitions")
+    result = []
+    total = 0
+    for offsets in formations:
+        if not isinstance(offsets, (list, tuple)):
+            raise TypeError("formation offsets must be an array")
+        total += len(offsets)
+        if total > 100_000:
+            raise ValueError("formation offset limit exceeded")
+        vectors = [_vector(offset, 3, "formation offset") for offset in offsets]
+        if any(abs(value) > MAX_COORDINATE for vector in vectors for value in vector):
+            raise ValueError("formation offset exceeds the coordinate limit")
+        result.append(vectors)
+    return result
+
+
 def _validate_ball_state(ball: _BallState, *, normalize_api_values: bool = False) -> _BallState:
     ball.id = _integer(ball.id, "id")
     ball.mass = _finite_number(ball.mass, "mass")
@@ -844,6 +865,12 @@ def _validate_ball_state(ball: _BallState, *, normalize_api_values: bool = False
     ball.new_bubble_id = _integer(ball.new_bubble_id, "new_bubble_id")
     ball.old_bubble_id = _integer(ball.old_bubble_id, "old_bubble_id")
     ball.effect_stamp = _integer(ball.effect_stamp, "effect_stamp")
+    ball.formation_id = _integer(ball.formation_id, "formation_id")
+    ball.formation_slots = _integer(ball.formation_slots, "formation_slots")
+    if ball.formation_id != 255 and not 0 <= ball.formation_id <= 127:
+        raise ValueError("invalid formation ID")
+    if not 0 <= ball.formation_slots <= 65535:
+        raise ValueError("formation slots must fit the original 16-bit set")
     for name in ("is_free", "is_global", "is_massive", "is_interactive", "is_space_junk"):
         if not isinstance(getattr(ball, name), bool):
             raise TypeError(f"{name} must be boolean")
@@ -1438,6 +1465,7 @@ class InMemoryBackend:
                     "use_dynamical_orientation": self._park.use_dynamical_orientation,
                     "disable_dynamical_orientation_for_missiles": self._park.disable_dynamical_orientation_for_missiles,
                     "use_new_orbit": self._park.use_new_orbit,
+                    "formations": _validate_formations(self._park.formations),
                     "pending_removals": pending_removals,
                     "snapshot_semantics": "logical-authoritative",
                 },
@@ -1490,7 +1518,9 @@ class InMemoryBackend:
                 for row in rows:
                     if not isinstance(row, dict):
                         raise TypeError("every snapshot ball must be an object")
-                    if set(row) != set(_BallState.__dataclass_fields__):
+                    fields = set(_BallState.__dataclass_fields__)
+                    required = fields - {"formation_id", "formation_slots"}
+                    if not required <= set(row) <= fields:
                         raise ValueError("snapshot ball fields do not match schema v3")
                     ball = _validate_ball_state(_BallState(**row))
                     if ball.id in parsed:
@@ -1576,7 +1606,10 @@ class InMemoryBackend:
                 "pending_removals",
                 "snapshot_semantics",
             }
-            if not isinstance(park_row, dict) or set(park_row) != expected_park_fields:
+            if (
+                not isinstance(park_row, dict)
+                or not expected_park_fields <= set(park_row) <= expected_park_fields | {"formations"}
+            ):
                 raise BackendCallError("snapshot park fields do not match schema v3", code="invalid_snapshot")
             try:
                 staged_park = {
@@ -1599,6 +1632,7 @@ class InMemoryBackend:
                         "disable_dynamical_orientation_for_missiles",
                     ),
                     "use_new_orbit": _strict_boolean(park_row["use_new_orbit"], "use_new_orbit"),
+                    "formations": _validate_formations(park_row.get("formations", [])),
                 }
                 if park_row["snapshot_semantics"] != "logical-authoritative":
                     raise ValueError("unsupported snapshot semantics")
@@ -1640,6 +1674,10 @@ class InMemoryBackend:
                 raise BackendCallError(
                     "partial mode 2 requires a snapshot from the current simulation tick",
                     code="invalid_snapshot",
+                )
+            if partial != 0 and staged_park["formations"] != self._park.formations:
+                raise BackendCallError(
+                    "partial restore requires the same formation definitions", code="invalid_snapshot",
                 )
             if partial in {0, 1} and staged_park["ego"] != 0 and staged_park["ego"] not in parsed:
                 raise BackendCallError(
@@ -1712,6 +1750,29 @@ class InMemoryBackend:
             "Agility": "agility",
             "speedFraction": "speed_fraction",
         }
+        if name == "formationID":
+            self._require_operation(operation, "get", title)
+            self._require_arity(args, 0, title)
+            return ball.formation_id
+        if name in {"ReserveFormationSlot", "FreeFormationSlot"}:
+            self._require_operation(operation, "call", title)
+            self._require_arity(args, 0 if name == "ReserveFormationSlot" else 1, title)
+            count = (
+                len(self._park.formations[ball.formation_id])
+                if ball.formation_id != 255 and ball.formation_id < len(self._park.formations)
+                else None
+            )
+            if name == "ReserveFormationSlot":
+                if count is not None and count <= 16:
+                    for slot in range(count):
+                        if not ball.formation_slots & (1 << slot):
+                            ball.formation_slots |= 1 << slot
+                            return slot
+                return -1
+            slot = _integer(args[0], "slot")
+            if count is not None and 0 <= slot < min(count, 16):
+                ball.formation_slots &= ~(1 << slot)
+            return None
         vector_fields = {
             "x": ("position", 0), "y": ("position", 1), "z": ("position", 2),
             "vx": ("velocity", 0), "vy": ("velocity", 1), "vz": ("velocity", 2),
@@ -1972,6 +2033,30 @@ class InMemoryBackend:
         if name == "AddBall":
             self._require_operation(operation, "call", title)
             return self._add_ball(args)
+        if name == "LoadFormations":
+            self._require_arity(args, 1, title)
+            if not isinstance(args[0], (list, tuple)):
+                raise TypeError("formations must be an array")
+            definitions = []
+            for row in args[0]:
+                if not isinstance(row, (list, tuple)) or len(row) != 2:
+                    raise TypeError("each formation must contain a name and offsets")
+                definitions.append(row[1])
+            self._park.formations = _validate_formations(definitions)
+            return None
+        if name == "SetBallFormation":
+            self._require_arity(args, 2, title)
+            ball_id = _integer(args[0], "ball_id")
+            requested = _integer(args[1], "formation_id")
+            ball = self._park.balls.get(ball_id)
+            if ball is not None:
+                if requested in {-1, 255}:
+                    if ball.formation_id != 255:
+                        ball.formation_slots = 0
+                    ball.formation_id = 255
+                elif 0 <= requested <= 127 and requested < len(self._park.formations):
+                    ball.formation_id = requested
+            return None
         if name == "Pause":
             self._require_operation(operation, "call", title)
             self._require_arity(args, 0, title)

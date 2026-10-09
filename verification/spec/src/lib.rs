@@ -8,6 +8,7 @@
 
 mod ball;
 mod catalog;
+mod formation;
 mod geometry;
 mod model;
 mod visibility;
@@ -19,6 +20,7 @@ pub use ball::{
     proximity_sensor_accepted, slot_reused_after_free,
 };
 pub use catalog::{ORIGINAL_TEST_FILES, OriginalTestFile};
+pub use formation::{NO_FORMATION, assign_formation, free_formation_slot, reserve_formation_slot};
 pub use geometry::{Aabb, Plane, Triangle};
 pub use model::{
     BallState, MotionMode, ParkState, SpecError, Vec3, add_ball_is_permitted, adjust_time,
