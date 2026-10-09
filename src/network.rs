@@ -110,10 +110,10 @@ impl CarbonUpdateMessage {
                 .ok_or_else(|| "Carbon delivery row must be an array".to_owned())?;
             if row.len() < 3
                 || row.first().and_then(Value::as_i64) != Some(self.recipient_id)
-                || !row
+                || row
                     .get(1)
                     .and_then(Value::as_str)
-                    .is_some_and(|action| !action.is_empty())
+                    .is_none_or(|action| action.is_empty())
                 || !row.get(2).is_some_and(Value::is_array)
             {
                 return Err("Carbon delivery row has an invalid recipient or action".into());
@@ -436,14 +436,16 @@ fn sync_client_visibility_rooms(
     }
 }
 
+type BallVisibilityComponents = (
+    Entity,
+    &'static DestinyBallMetadata,
+    Option<&'static CarbonBallOwner>,
+    Option<&'static DestinyPendingRemoval>,
+    Option<&'static Rooms>,
+);
+
 fn sync_ball_visibility_rooms(
-    balls: Query<(
-        Entity,
-        &DestinyBallMetadata,
-        Option<&CarbonBallOwner>,
-        Option<&DestinyPendingRemoval>,
-        Option<&Rooms>,
-    )>,
+    balls: Query<BallVisibilityComponents>,
     bindings: Res<CarbonClientBindings>,
     mut visibility: ResMut<CarbonVisibilityRooms>,
     mut allocator: ResMut<RoomAllocator>,
@@ -517,10 +519,7 @@ fn flush_carbon_outbox(
 ) {
     let mut sent_messages = 0usize;
     let mut sent_bytes = 0usize;
-    loop {
-        let Some((queue, envelope)) = next_envelope(&outbox) else {
-            break;
-        };
+    while let Some((queue, envelope)) = next_envelope(&outbox) {
         let deliveries = match deliveries_from_envelope(envelope, *limits) {
             Ok(deliveries) => deliveries,
             Err(_) => {
@@ -830,10 +829,10 @@ fn rows_for_mode(
         if row.len() < 3 {
             return Err("Carbon update row is too short".into());
         }
-        if !row
+        if row
             .get(1)
             .and_then(Value::as_str)
-            .is_some_and(|action| !action.is_empty())
+            .is_none_or(|action| action.is_empty())
             || !row.get(2).is_some_and(Value::is_array)
         {
             return Err("Carbon update row has an invalid action or state".into());
@@ -1036,8 +1035,10 @@ mod tests {
 
     #[test]
     fn narrowcast_expansion_is_bounded_before_unlimited_cloning() {
-        let mut limits = CarbonTransportLimits::default();
-        limits.max_wire_bytes_per_flush = 16;
+        let limits = CarbonTransportLimits {
+            max_wire_bytes_per_flush: 16,
+            ..Default::default()
+        };
         assert!(
             deliveries_from_envelope(
                 &envelope(

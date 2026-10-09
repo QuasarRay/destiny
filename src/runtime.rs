@@ -560,6 +560,12 @@ impl CompatRuntime {
         // time between calls to App::update.
         app.insert_resource(TimeUpdateStrategy::FixedTimesteps(1));
         app.insert_resource(Time::<Fixed>::from_duration(tick_duration));
+        // This driver advances explicit simulation ticks. Bevy's default
+        // 250 ms virtual-time clamp would otherwise skip fixed physics steps
+        // for the original 1000 ms Destiny tick.
+        app.world_mut()
+            .resource_mut::<Time<Virtual>>()
+            .set_max_delta(Duration::MAX);
         app.insert_resource(SubstepCount(if options.use_iterative_collision {
             options.collision_substeps
         } else {
@@ -772,15 +778,15 @@ impl CompatRuntime {
                 self.validate_authoritative_world(false)
             };
             if let Err(error) = step_result {
-                if let Some(checkpoint) = checkpoint.as_ref() {
-                    if let Err(rollback_error) = self.restore_evolution_checkpoint(checkpoint) {
-                        self.app.world_mut().resource_mut::<Time<Physics>>().pause();
-                        let message = format!(
-                            "physics step failed ({error}); rollback also failed ({rollback_error})"
-                        );
-                        self.terminal_error = Some(message.clone());
-                        return Err(CompatError::Engine(message));
-                    }
+                if let Some(checkpoint) = checkpoint.as_ref()
+                    && let Err(rollback_error) = self.restore_evolution_checkpoint(checkpoint)
+                {
+                    self.app.world_mut().resource_mut::<Time<Physics>>().pause();
+                    let message = format!(
+                        "physics step failed ({error}); rollback also failed ({rollback_error})"
+                    );
+                    self.terminal_error = Some(message.clone());
+                    return Err(CompatError::Engine(message));
                 }
                 self.app.world_mut().resource_mut::<Time<Physics>>().pause();
                 // Avian contact manifolds, sleeping islands, and broad-phase
@@ -862,10 +868,10 @@ impl CompatRuntime {
             || object.get("protocol").and_then(Value::as_str) != Some("destiny-carbon-update")
             || object.get("schema_version").and_then(Value::as_u64) != Some(2)
             || object.get("mode").and_then(Value::as_str) != Some(expected)
-            || !object
+            || object
                 .get("batch_id")
                 .and_then(Value::as_i64)
-                .is_some_and(|batch_id| batch_id > 0)
+                .is_none_or(|batch_id| batch_id <= 0)
             || if expected == "batch" {
                 !object.get("updates").is_some_and(|value| {
                     value.as_object().is_some_and(|batch| {
@@ -1033,43 +1039,36 @@ impl CompatRuntime {
         for entity in self.balls.values().copied() {
             balls.push(EvolutionBallCheckpoint {
                 entity,
-                ball_id: world
+                ball_id: *world
                     .get::<DestinyBallId>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing DestinyBallId".into()))?
-                    .clone(),
+                    .ok_or_else(|| CompatError::Engine("missing DestinyBallId".into()))?,
                 metadata: world
                     .get::<DestinyBallMetadata>(entity)
                     .ok_or_else(|| CompatError::Engine("missing DestinyBallMetadata".into()))?
                     .clone(),
-                destiny_mass: world
+                destiny_mass: *world
                     .get::<DestinyMass>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing DestinyMass".into()))?
-                    .clone(),
-                avian_mass: world
+                    .ok_or_else(|| CompatError::Engine("missing DestinyMass".into()))?,
+                avian_mass: *world
                     .get::<Mass>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing Mass".into()))?
-                    .clone(),
-                max_linear_speed: world
+                    .ok_or_else(|| CompatError::Engine("missing Mass".into()))?,
+                max_linear_speed: *world
                     .get::<MaxLinearSpeed>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?
-                    .clone(),
-                max_angular_speed: world
+                    .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?,
+                max_angular_speed: *world
                     .get::<MaxAngularSpeed>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing MaxAngularSpeed".into()))?
-                    .clone(),
-                rigid_body: world
+                    .ok_or_else(|| CompatError::Engine("missing MaxAngularSpeed".into()))?,
+                rigid_body: *world
                     .get::<RigidBody>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing RigidBody".into()))?
-                    .clone(),
+                    .ok_or_else(|| CompatError::Engine("missing RigidBody".into()))?,
                 collider: world
                     .get::<Collider>(entity)
                     .ok_or_else(|| CompatError::Engine("missing Collider".into()))?
                     .clone(),
                 collider_disabled: world.get::<ColliderDisabled>(entity).is_some(),
-                gravity_scale: world
+                gravity_scale: *world
                     .get::<GravityScale>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing GravityScale".into()))?
-                    .clone(),
+                    .ok_or_else(|| CompatError::Engine("missing GravityScale".into()))?,
                 pending_removal: world.get::<DestinyPendingRemoval>(entity).cloned(),
                 position: *world
                     .get::<Position>(entity)
@@ -1086,19 +1085,18 @@ impl CompatRuntime {
                 linear_damping: *world
                     .get::<LinearDamping>(entity)
                     .ok_or_else(|| CompatError::Engine("missing LinearDamping".into()))?,
-                transform: world
+                transform: *world
                     .get::<Transform>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing Transform".into()))?
-                    .clone(),
+                    .ok_or_else(|| CompatError::Engine("missing Transform".into()))?,
             });
         }
         Ok(EvolutionCheckpoint {
             balls,
             current_time: self.park.current_time,
             time: self.park.time,
-            fixed_time: world.resource::<Time<Fixed>>().clone(),
-            physics_time: world.resource::<Time<Physics>>().clone(),
-            substeps_time: world.resource::<Time<Substeps>>().clone(),
+            fixed_time: *world.resource::<Time<Fixed>>(),
+            physics_time: *world.resource::<Time<Physics>>(),
+            substeps_time: *world.resource::<Time<Substeps>>(),
             proximity_events: world.resource::<ProximityEventOutbox>().clone(),
             network_outbox: world.resource::<CarbonNetworkOutbox>().clone(),
         })
@@ -1109,9 +1107,9 @@ impl CompatRuntime {
         checkpoint: &EvolutionCheckpoint,
     ) -> Result<(), CompatError> {
         let world = self.app.world_mut();
-        *world.resource_mut::<Time<Fixed>>() = checkpoint.fixed_time.clone();
-        *world.resource_mut::<Time<Physics>>() = checkpoint.physics_time.clone();
-        *world.resource_mut::<Time<Substeps>>() = checkpoint.substeps_time.clone();
+        *world.resource_mut::<Time<Fixed>>() = checkpoint.fixed_time;
+        *world.resource_mut::<Time<Physics>>() = checkpoint.physics_time;
+        *world.resource_mut::<Time<Substeps>>() = checkpoint.substeps_time;
         *world.resource_mut::<ProximityEventOutbox>() = checkpoint.proximity_events.clone();
         *world.resource_mut::<CarbonNetworkOutbox>() = checkpoint.network_outbox.clone();
         for ball in &checkpoint.balls {
@@ -1119,21 +1117,21 @@ impl CompatRuntime {
                 CompatError::Engine("physics step changed the authoritative entity set".into())
             })?;
             entity.insert((
-                ball.ball_id.clone(),
+                ball.ball_id,
                 ball.metadata.clone(),
-                ball.destiny_mass.clone(),
-                ball.avian_mass.clone(),
-                ball.max_linear_speed.clone(),
-                ball.max_angular_speed.clone(),
-                ball.rigid_body.clone(),
+                ball.destiny_mass,
+                ball.avian_mass,
+                ball.max_linear_speed,
+                ball.max_angular_speed,
+                ball.rigid_body,
                 ball.collider.clone(),
-                ball.gravity_scale.clone(),
+                ball.gravity_scale,
                 ball.position,
                 ball.rotation,
                 ball.linear_velocity,
                 ball.angular_velocity,
                 ball.linear_damping,
-                ball.transform.clone(),
+                ball.transform,
             ));
             if ball.collider_disabled {
                 entity.insert(ColliderDisabled);
@@ -1956,7 +1954,6 @@ impl CompatRuntime {
             if existing_cloak != 0 {
                 metadata.massive_before_cloak = Some(is_massive);
             }
-            drop(metadata);
             self.park.pending_removals.remove(&id);
             self.app
                 .world_mut()
@@ -3397,10 +3394,9 @@ impl CompatRuntime {
             ));
         }
         if let Some(rotation) = planned_rotation {
-            let mut transform = world
+            let mut transform = *world
                 .get::<Transform>(entity)
-                .ok_or_else(|| CompatError::Engine("missing Transform".into()))?
-                .clone();
+                .ok_or_else(|| CompatError::Engine("missing Transform".into()))?;
             transform.rotation = rotation.as_quat();
             world.entity_mut(entity).insert((
                 LinearVelocity(velocity),
@@ -5194,13 +5190,13 @@ fn validate_queued_network_rows_inner(
             CompatError::InvalidRequest("Carbon update row must be an array or tuple".into())
         })?;
         if row.len() < 3
-            || !row
+            || row
                 .get(1)
                 .and_then(Value::as_str)
-                .is_some_and(|action| !action.is_empty())
-            || !row
+                .is_none_or(|action| action.is_empty())
+            || row
                 .get(2)
-                .is_some_and(|state| encoded_sequence(state).is_some())
+                .is_none_or(|state| encoded_sequence(state).is_none())
         {
             return Err(CompatError::InvalidRequest(
                 "Carbon update row has an invalid action or state".into(),
@@ -5715,6 +5711,10 @@ mod tests {
     // Original Destiny regressions:
     // python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters
     #[test]
+    #[expect(
+        clippy::approx_constant,
+        reason = "3.14 is the exact original Destiny setter fixture, not an approximation of pi"
+    )]
     fn original_basic_setters_match_observable_state() {
         let mut runtime = runtime(false);
         add_ball(&mut runtime, 1, true, true);
