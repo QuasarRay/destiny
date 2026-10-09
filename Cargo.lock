@@ -684,7 +684,6 @@ dependencies = [
  "bevy_a11y",
  "bevy_android",
  "bevy_app",
- "bevy_asset",
  "bevy_color",
  "bevy_derive",
  "bevy_diagnostic",
@@ -2869,56 +2868,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lightyear_frame_interpolation"
-version = "0.29.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc28ccb16b6c15e3b6641808f0161df59f42d13582904f2915746a2f544e610d"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_math",
- "bevy_platform",
- "bevy_reflect",
- "bevy_time",
- "bevy_transform",
- "lightyear_core",
- "lightyear_interpolation",
- "lightyear_replication",
- "serde",
- "smallvec",
- "tracing",
-]
-
-[[package]]
-name = "lightyear_interpolation"
-version = "0.29.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1175562af581cbeec3fe99eadced1793bc3ffc5dc72a00584fec816d077637c"
-dependencies = [
- "bevy_app",
- "bevy_derive",
- "bevy_ecs",
- "bevy_math",
- "bevy_platform",
- "bevy_reflect",
- "bevy_replicon",
- "bevy_time",
- "bevy_utils",
- "indexmap",
- "lightyear_connection",
- "lightyear_core",
- "lightyear_messages",
- "lightyear_replication",
- "lightyear_serde",
- "lightyear_sync",
- "lightyear_transport",
- "lightyear_utils",
- "serde",
- "tracing",
- "variadics_please 2.0.0",
-]
-
-[[package]]
 name = "lightyear_link"
 version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2958,36 +2907,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lightyear_prediction"
-version = "0.29.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a4a0ced6bb4eabafa7ad26c89105ccf9ad2fb7ccf6fb5124596293d01ca5d66"
-dependencies = [
- "bevy_app",
- "bevy_derive",
- "bevy_diagnostic",
- "bevy_ecs",
- "bevy_math",
- "bevy_platform",
- "bevy_reflect",
- "bevy_replicon",
- "bevy_time",
- "bevy_utils",
- "indexmap",
- "lightyear_connection",
- "lightyear_core",
- "lightyear_frame_interpolation",
- "lightyear_interpolation",
- "lightyear_replication",
- "lightyear_sync",
- "lightyear_utils",
- "parking_lot",
- "seahash",
- "serde",
- "tracing",
-]
-
-[[package]]
 name = "lightyear_replication"
 version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3013,6 +2932,7 @@ dependencies = [
  "lightyear_link",
  "lightyear_messages",
  "lightyear_serde",
+ "lightyear_sync",
  "lightyear_transport",
  "lightyear_utils",
  "seahash",
