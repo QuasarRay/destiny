@@ -6,6 +6,8 @@ mod ball_contracts;
 mod add_callback_contracts;
 #[cfg(any(kani, test))]
 mod box_contracts;
+#[cfg(kani)]
+mod bounded_list_contracts;
 #[cfg(any(kani, test))]
 mod bubble_updater_contracts;
 #[cfg(any(kani, test))]

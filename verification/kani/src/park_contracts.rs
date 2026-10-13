@@ -184,7 +184,7 @@ fn getters_and_setters__TestSetters__test_can_set_ball_mass() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetAccuracy__test_accuracy_is_zero_when_ball_targets_itself() {
+fn getters_and_setters__TestGetAccuracy__test_accur__d9e5d6af73c8183700022d9d() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -210,7 +210,7 @@ fn getters_and_setters__TestGetAccuracy__test_accuracy_is_zero_when_ball_targets
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetAccuracy__test_accuracy_is_zero_when_distance_is_zero() {
+fn getters_and_setters__TestGetAccuracy__test_accur__912ea17afc64b9395d4eaeee() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -400,7 +400,7 @@ fn getters_and_setters__TestGetAccuracy__test_no_falloff() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetAccuracy__test_returns_accuracy_and_tracking_speed_that_we_specify()
+fn getters_and_setters__TestGetAccuracy__test_retur__c78ed1e98d187e6ba1f77d87()
 {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -531,7 +531,7 @@ fn getters_and_setters__TestGetCenterDist__test_center_distance_between_two_ball
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetCenterDist__test_center_distance_between_two_balls_in_the_same_place()
+fn getters_and_setters__TestGetCenterDist__test_cen__56fe3d4dceb262c1e9bf6aa8()
  {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -562,7 +562,7 @@ fn getters_and_setters__TestGetCenterDist__test_center_distance_between_two_ball
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetCurrentEgoPos__test_returns_default_initial_ego_value() {
+fn getters_and_setters__TestGetCurrentEgoPos__test___ad222e044f33a7c5e47411fa() {
     let mut park = OriginalParkProjection::default();
     let ego_pos = park.current_ego_position_without_ego();
     // original-assertion: python/destiny/test/ballpark/test_getters_and_setters.py:380
@@ -582,7 +582,7 @@ fn getters_and_setters__TestGetCurrentEgoPos__test_returns_default_initial_ego_v
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetFollowers__test_returns_empty_list_when_there_are_no_followers() {
+fn getters_and_setters__TestGetFollowers__test_retu__66f249b39aea14e81ac3b3df() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -686,7 +686,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_euclidean_distance() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_equals_the_distance_between_the_balls_minus_their_combined_radii()
+fn getters_and_setters__TestGetSurfaceDist__test_su__001e1cc2265b641e8abae70d()
  {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -735,7 +735,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_ba
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_in_the_same_place_with_no_radius_is_zero()
+fn getters_and_setters__TestGetSurfaceDist__test_su__56b9245a7e85ba1146616721()
  {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -766,7 +766,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_ba
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_with_no_radius_equals_the_distance_between_the_balls()
+fn getters_and_setters__TestGetSurfaceDist__test_su__4609e7b60e4e969a265f9fc2()
  {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -803,7 +803,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_ba
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetBallFormation__test_followers_whom_we_no_longer_have_room_for_get_dropped()
+fn getters_and_setters__TestSetBallFormation__test___54c2a023619ec83a0a2a8d10()
  {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -837,7 +837,7 @@ fn getters_and_setters__TestSetBallFormation__test_followers_whom_we_no_longer_h
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetBallFormation__test_formation_out_of_range_does_not_get_set() {
+fn getters_and_setters__TestSetBallFormation__test___cb32eb66747446c02e0a1d63() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -1410,7 +1410,7 @@ fn getters_and_setters__TestSetters__test_set_boid_true() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetters__test_setting_agility_to_negative_value_is_ineffective() {
+fn getters_and_setters__TestSetters__test_setting_a__3172dec0c88aa893b8ae71bb() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -1435,7 +1435,7 @@ fn getters_and_setters__TestSetters__test_setting_agility_to_negative_value_is_i
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetters__test_setting_ball_mass_to_a_negative_value_is_ineffective() {
+fn getters_and_setters__TestSetters__test_setting_b__7ec06b31aaba4422b15009c3() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -1460,7 +1460,7 @@ fn getters_and_setters__TestSetters__test_setting_ball_mass_to_a_negative_value_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetters__test_setting_ball_radius_to_negative_value_is_ineffective() {
+fn getters_and_setters__TestSetters__test_setting_b__7ebf0ead7f49feeed080eaff() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -1485,7 +1485,7 @@ fn getters_and_setters__TestSetters__test_setting_ball_radius_to_negative_value_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetters__test_setting_ball_velocity_updates_yaw_pitch_and_roll() {
+fn getters_and_setters__TestSetters__test_setting_b__4ab618e1dc316f7803a6bc9d() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -1519,7 +1519,7 @@ fn getters_and_setters__TestSetters__test_setting_ball_velocity_updates_yaw_pitc
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetters__test_setting_max_speed_to_negative_value_is_ineffective() {
+fn getters_and_setters__TestSetters__test_setting_m__07398ab01cba6a2340ed33ec() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -1544,7 +1544,7 @@ fn getters_and_setters__TestSetters__test_setting_max_speed_to_negative_value_is
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetters__test_setting_speed_fraction_clamps_lowe_bound_at_zero() {
+fn getters_and_setters__TestSetters__test_setting_s__94c5880a4ff7b108db700899() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -1572,7 +1572,7 @@ fn getters_and_setters__TestSetters__test_setting_speed_fraction_clamps_lowe_bou
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetters__test_setting_speed_fraction_clamps_upper_bound_at_one() {
+fn getters_and_setters__TestSetters__test_setting_s__9b6486626dcd6e84c07dadc2() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -2233,7 +2233,7 @@ fn movement_controls__TestFollow__test_follow_ball_with_range() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestFollow__test_removing_ball_stops_followers_from_following_that_ball() {
+fn movement_controls__TestFollow__test_removing_bal__5a44843ec1591f394b72d2eb() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -2335,7 +2335,7 @@ fn movement_controls__TestMissileFollow__test_can_not_follow_moribund_ball() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestMissileFollow__test_removing_ball_stops_followers_from_following_that_ball()
+fn movement_controls__TestMissileFollow__test_remov__497bf848c2ea7d2788225516()
  {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -2372,7 +2372,7 @@ fn movement_controls__TestMissileFollow__test_removing_ball_stops_followers_from
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestMissileFollow__test_sets_follow_range_as_negative_sum_of_src_and_dst_radii()
+fn movement_controls__TestMissileFollow__test_sets___1c924032185d9e37b3c1b708()
  {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
@@ -2836,7 +2836,7 @@ fn movement_controls__TestWarpTo__test_can_warp() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestWarpTo__test_if_warp_location_is_too_close_we_goto_it_instead() {
+fn movement_controls__TestWarpTo__test_if_warp_loca__d334086901da9bddc3965978() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(src) && !park.scope_error);
@@ -2864,7 +2864,7 @@ fn movement_controls__TestWarpTo__test_if_warp_location_is_too_close_we_goto_it_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestWarpTo__test_minrange_and_warpfactor_are_stored_in_strange_places() {
+fn movement_controls__TestWarpTo__test_minrange_and__51e8b487911f0a81f7f74373() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -3358,7 +3358,7 @@ fn lifecycle_management__TestIdGeneration__test_capsule_ids_get_incremented() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn lifecycle_management__TestIdGeneration__test_ball_and_capsule_ids_share_the_same_id_generator() {
+fn lifecycle_management__TestIdGeneration__test_bal__de396e28aab508d932f7c84d() {
     let mut park = OriginalParkProjection::default();
     let first_id_generated = -(1_i64 << 30) - 1;
     let ball = park.add_ball(OriginalBallInit {
@@ -3852,7 +3852,7 @@ fn lifecycle_management__TestAddMushroom__test_mushroom_gets_created_correctly()
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn lifecycle_management__TestAddMushroom__test_mushroom_can_not_be_created_with_invalid_owner() {
+fn lifecycle_management__TestAddMushroom__test_mush__15b113c160fc13a7ae832c62() {
     let mut park = OriginalParkProjection::default();
     let _range = 10.0_f64;
     let time = 1.0_f64;
@@ -3871,7 +3871,7 @@ fn lifecycle_management__TestAddMushroom__test_mushroom_can_not_be_created_with_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn lifecycle_management__TestAddMushroom__test_mushroom_that_is_not_set_free_does_not_expand() {
+fn lifecycle_management__TestAddMushroom__test_mush__5e33fdb786cb7c731ea25b1a() {
     let mut park = OriginalParkProjection::default();
     let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(owner) && !park.scope_error);
@@ -3987,7 +3987,7 @@ fn boxes_and_bubbles__TestInitialize_bubbles__test_can_initialize_bubbles() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestInitialize_bubbles__test_can_initialize_bubble_for_specific_ball() {
+fn boxes_and_bubbles__TestInitialize_bubbles__test___7a4cbd06ea1e5596e46cc05a() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4038,7 +4038,7 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_ball
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsInRange__test_ball_on_edge_of_range_gets_included() {
+fn boxes_and_bubbles__TestGetBallIdsInRange__test_b__c485877a542b60fb1a867394() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4090,7 +4090,7 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_ignores_out_of_range_balls() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_location() {
+fn boxes_and_bubbles__TestGetBallIdsInRange__test_g__c0db64a80b1456d3ff3275bf() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4114,7 +4114,7 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_loca
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_get_ball_ids_in_range_for_ball_id() {
+fn boxes_and_bubbles__TestGetBallIdsAndDistInRange___6fbf7e70b8d6533cfa362c66() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4216,7 +4216,7 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_ignores_out_of_range_ba
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_get_ball_ids_in_range_for_location() {
+fn boxes_and_bubbles__TestGetBallIdsAndDistInRange___4848e8403e7f5de500ec8916() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4240,7 +4240,7 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_get_ball_ids_in_range_f
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_source_does_not_exist_raises_runtime_error() {
+fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__1b99713e61b1a083fbfcb6b1() {
     let mut park = OriginalParkProjection::default();
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let ballNotInPark = 12345.0_f64;
@@ -4340,7 +4340,7 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_out_of_ran
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_on_edge_of_range() {
+fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__42aaf44ac5e6bc901cd3c65b() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4368,7 +4368,7 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_on_edge_of
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_multiple_balls_in_triangle() {
+fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__c3e40bc5d758b78e81d93eaa() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4402,7 +4402,7 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_multiple_balls_in_tri
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_source_does_not_exist_raises_runtime_error() {
+fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__f4ededdc3b04869f5c446aa3() {
     let mut park = OriginalParkProjection::default();
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let ballNotInPark = 12345.0_f64;
@@ -4470,7 +4470,7 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule_and_on_the_edge_of_one_side() {
+fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__1a5ea967908869e53f3ffbbf() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4500,7 +4500,7 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule_and_on
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_not_in_capsule_too_far_from_the_edge_of_one_side() {
+fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__f9d71474df7ae7eb3a729867() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4643,7 +4643,7 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_no_other_ball() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBallIdsInCone__test_source_does_not_exist_raises_runtime_error() {
+fn boxes_and_bubbles__TestGetBallIdsInCone__test_so__172ffe8446d9d4b77172df0c() {
     let mut park = OriginalParkProjection::default();
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let ballNotInPark = 12345.0_f64;
@@ -4942,7 +4942,7 @@ fn lifecycle_management__TestAdditionsAndDeletions__test_removal() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn lifecycle_management__TestAdditionsAndDeletions__test_addition_of_invalid_ball_id_raises_typeerror() {
+fn lifecycle_management__TestAdditionsAndDeletions___3b33c1cce8349d40612fe2f6() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -4968,7 +4968,7 @@ fn lifecycle_management__TestAdditionsAndDeletions__test_addition_of_invalid_bal
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn lifecycle_management__TestBubbleTransitions__test_empty_bubble_transitions_list_is_sent_as_empty() {
+fn lifecycle_management__TestBubbleTransitions__tes__c7298c73a094e732a56214f9() {
     let mut park = OriginalParkProjection::default();
     let mut additions_per_player = delta_map(&[]);
     let mut deletions_per_player = delta_map(&[]);
@@ -4999,7 +4999,7 @@ fn lifecycle_management__TestBubbleTransitions__test_empty_bubble_transitions_li
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn lifecycle_management__TestBubbleTransitions__test_adding_ball_transitions_it_to_bubble() {
+fn lifecycle_management__TestBubbleTransitions__tes__c736089673b0c1de5f0cc3dc() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -5039,7 +5039,7 @@ fn lifecycle_management__TestBubbleTransitions__test_adding_ball_transitions_it_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn lifecycle_management__TestBubbleTransitions__test_adding_two_balls_transition_them_to_bubble() {
+fn lifecycle_management__TestBubbleTransitions__tes__f4c2197a913206aa13d3b49b() {
     let mut park = OriginalParkProjection::default();
     let ball_1 = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball_1) && !park.scope_error);
@@ -5107,7 +5107,7 @@ fn lifecycle_management__TestClearAll__test_clear_all_removes_ball_from_park() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn callbacks__TestSetBallNotInParkCallback__test_gets_called_when_addminiball_is_called_on_ball_that_is_not_in_park() {
+fn callbacks__TestSetBallNotInParkCallback__test_ge__9ee1afa8ae5fd8cfd6d6d902() {
     let mut park = OriginalParkProjection::default();
     park.ball_not_in_park_callback_called=false; // original self.called fixture initialization
     park.set_ball_not_in_park_callback(true);
@@ -5127,7 +5127,7 @@ fn callbacks__TestSetBallNotInParkCallback__test_gets_called_when_addminiball_is
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn callbacks__TestSetBallNotInParkCallback__test_does_not_get_called_when_addminiball_is_called_on_ball_that_is_in_park() {
+fn callbacks__TestSetBallNotInParkCallback__test_do__40cfebf92111549ea1efe5a7() {
     let mut park = OriginalParkProjection::default();
     park.ball_not_in_park_callback_called=false; // original self.called fixture initialization
     park.set_ball_not_in_park_callback(true);
@@ -5193,7 +5193,7 @@ fn callbacks__TestNotificationRange__test_detects_ball_in_range_when_in_goto_mod
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn callbacks__TestProximitySensors__test_callback_gets_called_when_period_has_passed() {
+fn callbacks__TestProximitySensors__test_callback_g__581fde7c5485e7c9f1d3d542() {
     let mut park = OriginalParkProjection::default();
     let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(proximity_ball) && !park.scope_error);
@@ -5295,7 +5295,7 @@ fn callbacks__TestProximitySensors__test_ignores_balls_that_are_not_free() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn callbacks__TestProximitySensors__test_only_interactives_ignores_non_interactive_balls() {
+fn callbacks__TestProximitySensors__test_only_inter__45d62c0514e13f9dc6e190ca() {
     let mut park = OriginalParkProjection::default();
     let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(proximity_ball) && !park.scope_error);
@@ -5608,7 +5608,7 @@ fn callbacks__TestSetTargetTracking__test_detects_target_on_edge_of_range() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn callbacks__TestSetTargetTracking__test_ignores_target_that_should_be_out_of_range() {
+fn callbacks__TestSetTargetTracking__test_ignores_t__6839b2352c589659e8620b97() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -5685,7 +5685,7 @@ fn getters_and_setters__TestGetRemoteFollowers__test_finds_following_ball() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetRemoteFollowers__test_returns_empty_list_when_there_are_none() {
+fn getters_and_setters__TestGetRemoteFollowers__tes__22c97b39189470afab29bfe3() {
     let mut park = OriginalParkProjection::default();
     let remote_followers_result_0=park.remote_followers();
     assert!(remote_followers_result_0.is_ok()); // original remote follower call must not raise
@@ -5732,7 +5732,7 @@ fn getters_and_setters__TestGetRemoteFollowers__test_ignores_ball_that_is_not_fr
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_not_following() {
+fn getters_and_setters__TestGetRemoteFollowers__tes__daee8d26625110e74073445f() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(src) && !park.scope_error);
@@ -5759,7 +5759,7 @@ fn getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_not_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(65))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_in_the_same_bubble() {
+fn getters_and_setters__TestGetRemoteFollowers__tes__0fc1bd85c43b2ab0fe6f837a() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(src) && !park.scope_error);
@@ -5785,7 +5785,7 @@ fn getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_in_t
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn visibility__TestCheckVisibility__test_returns_the_id_of_the_occluding_ball_when_there_is_an_occlusion() {
+fn visibility__TestCheckVisibility__test_returns_th__426f23f3d1026353ca3ac3ae() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(src) && !park.scope_error);
@@ -5839,7 +5839,7 @@ fn visibility__TestCheckVisibility__test_returns_zero_when_there_is_no_occlusion
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn visibility__TestCheckVisibility__test_ball_that_is_not_massive_is_not_an_occlusion() {
+fn visibility__TestCheckVisibility__test_ball_that___e0c8093aabe84082ed220fd4() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(src) && !park.scope_error);
@@ -5985,7 +5985,7 @@ fn visibility__TestCloaking__test_uncloaking_makes_a_ball_massive() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn visibility__TestScanCone__test_scan_cone_finds_nothing_when_there_is_nothing_to_be_found() {
+fn visibility__TestScanCone__test_scan_cone_finds_n__edb60f9b7f646212b0b14e49() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -6163,7 +6163,7 @@ fn boxes_and_bubbles__TestBallBox__test_box_zero_zero_one() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetActiveBoxes__test_returns_none_when_there_are_no_active_boxes() {
+fn boxes_and_bubbles__TestGetActiveBoxes__test_retu__ba07096bc5678e4d66149aaf() {
     let mut park = OriginalParkProjection::default();
     let level = 0.0_f64;
     let boxes_result_1=park.get_single_active_box((level) as i32);
@@ -6183,7 +6183,7 @@ fn boxes_and_bubbles__TestGetActiveBoxes__test_returns_none_when_there_are_no_ac
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetActiveBoxes__test_returns_list_of_boxes_when_there_are_active_boxes() {
+fn boxes_and_bubbles__TestGetActiveBoxes__test_retu__b0591051042beb7e4a35eb17() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);
@@ -6238,7 +6238,7 @@ fn boxes_and_bubbles__TestGetBoxCenter__test_get_box_on_topmost_level() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetBubbleAtCoordinates__test_get_bubble_where_none_exists_returns_none() {
+fn boxes_and_bubbles__TestGetBubbleAtCoordinates__t__67b1e797cf00e890a0c9b1df() {
     let mut park = OriginalParkProjection::default();
     let x = 0.0_f64;
     let y = 0.0_f64;
@@ -6284,7 +6284,7 @@ fn boxes_and_bubbles__TestGetBubbleAtCoordinates__test_get_existing_bubble() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_existing_box_succeeds() {
+fn boxes_and_bubbles__TestGetAndSetBoxObject__test___f7e6fcaa6815a0eeeec66764() {
     let mut park = OriginalParkProjection::default();
     let x = 0.0_f64;
     let y = 0.0_f64;
@@ -6314,7 +6314,7 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_existing_bo
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_nonexisting_box_fails() {
+fn boxes_and_bubbles__TestGetAndSetBoxObject__test___983492f584f1c79b4b32682a() {
     let mut park = OriginalParkProjection::default();
     let x = 0.0_f64;
     let y = 0.0_f64;
@@ -6336,7 +6336,7 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_nonexisting
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetAndSetBoxObject__test_getting_object_that_has_not_been_set_returns_none() {
+fn boxes_and_bubbles__TestGetAndSetBoxObject__test___d540d83a64224d07a57f1415() {
     let mut park = OriginalParkProjection::default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:621
     let object_get_1=park.get_box_object(Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 });
@@ -6387,7 +6387,7 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test_can_retrieve_stored_object() 
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetStaticCollidableBox__test_capsule_in_box_zero_zero_zero() {
+fn boxes_and_bubbles__TestGetStaticCollidableBox__t__c365d0bd469e19c8e800fea1() {
     let mut park = OriginalParkProjection::default();
     let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(parentBall) && !park.scope_error);
@@ -6453,7 +6453,7 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_capsule_in_box_zero_zero_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_zero_zero() {
+fn boxes_and_bubbles__TestGetStaticCollidableBox__t__74e7e249be8101bcd6fa234e() {
     let mut park = OriginalParkProjection::default();
     let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(parentBall) && !park.scope_error);
@@ -6486,7 +6486,7 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_zero_one() {
+fn boxes_and_bubbles__TestGetStaticCollidableBox__t__10a654df0f219a6cd4ed2ceb() {
     let mut park = OriginalParkProjection::default();
     let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(parentBall) && !park.scope_error);
@@ -6519,7 +6519,7 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_capsule_makes_a_box_active() {
+fn boxes_and_bubbles__TestGetStaticCollidableBox__t__8a5a1ee9c90c5367ecae5e92() {
     let mut park = OriginalParkProjection::default();
     let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(parentBall) && !park.scope_error);
@@ -6545,7 +6545,7 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_capsule_makes_a_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_large_capsule_makes_adjecent_boxes_active() {
+fn boxes_and_bubbles__TestGetStaticCollidableBox__t__5327b1a6bdd7427a3f9b2b0b() {
     let mut park = OriginalParkProjection::default();
     let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(parentBall) && !park.scope_error);
@@ -6571,7 +6571,7 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_large_capsule_ma
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_long_capsule_makes_adjecent_boxes_active() {
+fn boxes_and_bubbles__TestGetStaticCollidableBox__t__532151085bcf0de5e6911225() {
     let mut park = OriginalParkProjection::default();
     let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(parentBall) && !park.scope_error);
@@ -6597,7 +6597,7 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_long_capsule_mak
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_adding_a_box_makes_a_box_active() {
+fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__ab33ace90f2d3108d183c144() {
     let mut park = OriginalParkProjection::default();
     let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { radius: (500.0_f64) as f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
     assert!(park.contains(parentBall) && !park.scope_error);
@@ -6965,7 +6965,7 @@ fn movement_controls__TestLaunchMissile__test_direction_of_non_aimed_missiles() 
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestLaunchMissile__test_additional_velocity_of_missile_is_the_same_as_the_max_velocity_of_its_owner_if_above_limit() {
+fn movement_controls__TestLaunchMissile__test_addit__e644bbb51f63be5235cb007c() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(src) && !park.scope_error);
@@ -6997,7 +6997,7 @@ fn movement_controls__TestLaunchMissile__test_additional_velocity_of_missile_is_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestLaunchMissile__test_initial_velocity_of_owner_has_impact_of_non_aimed_missile_direction_and_speed() {
+fn movement_controls__TestLaunchMissile__test_initi__8b4e8f1177e0ebdf44b7f320() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(src) && !park.scope_error);
@@ -7193,7 +7193,7 @@ fn movement_controls__TestEntityWarpIn__test_ball_in_goto_mode_does_not_warp() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(129))]
 #[cfg_attr(test, test)]
-fn visibility__TestCloaking__test_uncloaking_a_ball_in_warp_does_not_make_it_massive() {
+fn visibility__TestCloaking__test_uncloaking_a_ball__0c28ef41d4ca5862af85cdc4() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
     assert!(park.contains(ball) && !park.scope_error);

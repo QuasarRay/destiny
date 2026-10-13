@@ -28,9 +28,23 @@
       "revision": "245d07a431099232cb6d42c497467d2e7daea097",
       "sha256": "4cf0c70939817854bde8e801c9f95aaefdc67fc04d49a273a59c853c8d72c21c",
       "source_url": "https://github.com/carbonengine/blue/blob/245d07a431099232cb6d42c497467d2e7daea097/LICENSE.md"
+    },
+    {
+      "path": "src/BluePython_Blue.cpp",
+      "revision": "245d07a431099232cb6d42c497467d2e7daea097",
+      "git_blob_sha": "ad05fbf4548fc5ffd27f4a3b926313adcf5a775b",
+      "sha256": "ea903aa39449422d949581953be3bd9d8e543bce715dfc2604725a2153a9bbdb",
+      "source_url": "https://github.com/carbonengine/blue/blob/245d07a431099232cb6d42c497467d2e7daea097/src/BluePython_Blue.cpp"
+    },
+    {
+      "path": "src/BluePython.cpp",
+      "revision": "245d07a431099232cb6d42c497467d2e7daea097",
+      "git_blob_sha": "1193f75f9cfc5c50f14b4ebd550bbaf056dac98b",
+      "sha256": "4936c524f77b98dabd571366ba2a9a267591dd0035d582f7573338d4d8c64a7f",
+      "source_url": "https://github.com/carbonengine/blue/blob/245d07a431099232cb6d42c497467d2e7daea097/src/BluePython.cpp"
     }
   ],
-  "notice": "Read-only retrieval; every artifact matched the actual Git blob ID. Marshal constructor/header/default Save/Load/ref-table paths partially reviewed; complete marshal semantics, Blue memory/lifetime and native correspondence remain unproved. This is provenance, not proof credit.",
+  "notice": "Read-only retrieval of exact pinned Git blobs. Marshal and native module/classes registration paths reviewed for source projections; native object lifetime, interpreter dispatch and complete marshal correspondence remain required. Provenance is not proof credit.",
   "registry_baseline": "2027e0c9d34193f468438589c4e6bb25996e823d",
   "revision": "245d07a431099232cb6d42c497467d2e7daea097",
   "schema": 1

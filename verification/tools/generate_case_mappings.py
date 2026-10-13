@@ -35,7 +35,10 @@ def harness_index():
         for i, marker in enumerate(markers):
             end = markers[i+1].start() if i+1 < len(markers) else len(text)
             function = re.search(r'^fn (\w+)\s*\(', text[marker.end():end], re.M)
-            paired = re.search(r'paired_regression!\(\s*(?:#\[[^\n]+\]\s*)*(\w+)\s*,', text[marker.end():end])
+            # paired_regression!(ordinary_test, kani_harness, body) defines
+            # distinct names. Select the macro's actual Kani name, confirmed
+            # against compiled Kani metadata; the first name is test-only.
+            paired = re.search(r'paired_regression!\(\s*(?:#\[[^\n]+\]\s*)*\w+\s*,\s*(\w+)\s*,', text[marker.end():end])
             if paired is not None and (function is None or paired.start()<function.start()):
                 function=paired
             if function is None:

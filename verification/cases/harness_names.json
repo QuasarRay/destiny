@@ -1,0 +1,534 @@
+{
+  "schema": 1,
+  "kani_version": "0.68.0",
+  "generator_sha256": "60fab06543a69ab3b51e61b0453f330cb79b029762343690d69b89bfd28d9e8b",
+  "compiler_authority": "https://github.com/model-checking/kani/blob/kani-0.68.0/kani-compiler/src/codegen_cprover_gotoc/compiler_interface.rs",
+  "notice": "Naming integration only; bodies, domains, markers, assertions and coverage are unchanged. No proof credit.",
+  "aliases": [
+    {
+      "file": "verification/kani/src/native_object_contracts.rs",
+      "original_case": "python/destiny/test/test_ball.py::BallTest::test_get_rotated_vector_returns_original_vector_if_there_is_no_rotation",
+      "original_entry": "native_object_contracts::BallTest__test_get_rotated_vector_returns_original_vector_if_there_is_no_rotation",
+      "entry": "native_object_contracts::BallTest__test_get_rotated_vector_returns_origin__90862c398b9a663326268936",
+      "proof_source_sha256": "367919eb1aea2296c9dbb54069f11c61af2888a95d1e0a92aad4b0f6137b6708"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_adding_a_box_makes_a_box_active",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_adding_a_box_makes_a_box_active",
+      "entry": "park_contracts::boxes_and_bubbles__TestActiveBoxesForOrientedBox__ab33ace90f2d3108d183c144",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetActiveBoxes::test_returns_list_of_boxes_when_there_are_active_boxes",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_returns_list_of_boxes_when_there_are_active_boxes",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_retu__b0591051042beb7e4a35eb17",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetActiveBoxes::test_returns_none_when_there_are_no_active_boxes",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_returns_none_when_there_are_no_active_boxes",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_retu__ba07096bc5678e4d66149aaf",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetAndSetBoxObject::test_getting_object_that_has_not_been_set_returns_none",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test_getting_object_that_has_not_been_set_returns_none",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test___d540d83a64224d07a57f1415",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetAndSetBoxObject::test_setting_object_on_existing_box_succeeds",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_existing_box_succeeds",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test___f7e6fcaa6815a0eeeec66764",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetAndSetBoxObject::test_setting_object_on_nonexisting_box_fails",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_nonexisting_box_fails",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test___983492f584f1c79b4b32682a",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_multiple_balls_in_triangle",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_multiple_balls_in_triangle",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__c3e40bc5d758b78e81d93eaa",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_other_ball_on_edge_of_range",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_on_edge_of_range",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__42aaf44ac5e6bc901cd3c65b",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_source_does_not_exist_raises_runtime_error",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_source_does_not_exist_raises_runtime_error",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__1b99713e61b1a083fbfcb6b1",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsAndDistInRange::test_get_ball_ids_in_range_for_ball_id",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_get_ball_ids_in_range_for_ball_id",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange___6fbf7e70b8d6533cfa362c66",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsAndDistInRange::test_get_ball_ids_in_range_for_location",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_get_ball_ids_in_range_for_location",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange___4848e8403e7f5de500ec8916",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_other_ball_in_capsule_and_on_the_edge_of_one_side",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule_and_on_the_edge_of_one_side",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test__1a5ea967908869e53f3ffbbf",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_other_ball_not_in_capsule_too_far_from_the_edge_of_one_side",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_not_in_capsule_too_far_from_the_edge_of_one_side",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test__f9d71474df7ae7eb3a729867",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_source_does_not_exist_raises_runtime_error",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test_source_does_not_exist_raises_runtime_error",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test__f4ededdc3b04869f5c446aa3",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_source_does_not_exist_raises_runtime_error",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCone__test_source_does_not_exist_raises_runtime_error",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCone__test_so__172ffe8446d9d4b77172df0c",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInRange::test_ball_on_edge_of_range_gets_included",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_ball_on_edge_of_range_gets_included",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_b__c485877a542b60fb1a867394",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInRange::test_get_ball_ids_in_range_for_location",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_location",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_g__c0db64a80b1456d3ff3275bf",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBubbleAtCoordinates::test_get_bubble_where_none_exists_returns_none",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetBubbleAtCoordinates__test_get_bubble_where_none_exists_returns_none",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetBubbleAtCoordinates__t__67b1e797cf00e890a0c9b1df",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_adding_a_capsule_makes_a_box_active",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_capsule_makes_a_box_active",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__8a5a1ee9c90c5367ecae5e92",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_adding_a_large_capsule_makes_adjecent_boxes_active",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_large_capsule_makes_adjecent_boxes_active",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__5327b1a6bdd7427a3f9b2b0b",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_adding_a_long_capsule_makes_adjecent_boxes_active",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_long_capsule_makes_adjecent_boxes_active",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__532151085bcf0de5e6911225",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_capsule_in_box_zero_zero_zero",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_capsule_in_box_zero_zero_zero",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__c365d0bd469e19c8e800fea1",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_oriented_box_in_box_zero_zero_one",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_zero_one",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__10a654df0f219a6cd4ed2ceb",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_oriented_box_in_box_zero_zero_zero",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_zero_zero",
+      "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__74e7e249be8101bcd6fa234e",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball",
+      "original_entry": "park_contracts::boxes_and_bubbles__TestInitialize_bubbles__test_can_initialize_bubble_for_specific_ball",
+      "entry": "park_contracts::boxes_and_bubbles__TestInitialize_bubbles__test___7a4cbd06ea1e5596e46cc05a",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed",
+      "original_entry": "park_contracts::callbacks__TestProximitySensors__test_callback_gets_called_when_period_has_passed",
+      "entry": "park_contracts::callbacks__TestProximitySensors__test_callback_g__581fde7c5485e7c9f1d3d542",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_only_interactives_ignores_non_interactive_balls",
+      "original_entry": "park_contracts::callbacks__TestProximitySensors__test_only_interactives_ignores_non_interactive_balls",
+      "entry": "park_contracts::callbacks__TestProximitySensors__test_only_inter__45d62c0514e13f9dc6e190ca",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_callbacks.py::TestSetBallNotInParkCallback::test_does_not_get_called_when_addminiball_is_called_on_ball_that_is_in_park",
+      "original_entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_does_not_get_called_when_addminiball_is_called_on_ball_that_is_in_park",
+      "entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_do__40cfebf92111549ea1efe5a7",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_callbacks.py::TestSetBallNotInParkCallback::test_gets_called_when_addminiball_is_called_on_ball_that_is_not_in_park",
+      "original_entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_gets_called_when_addminiball_is_called_on_ball_that_is_not_in_park",
+      "entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_ge__9ee1afa8ae5fd8cfd6d6d902",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_callbacks.py::TestSetTargetTracking::test_ignores_target_that_should_be_out_of_range",
+      "original_entry": "park_contracts::callbacks__TestSetTargetTracking__test_ignores_target_that_should_be_out_of_range",
+      "entry": "park_contracts::callbacks__TestSetTargetTracking__test_ignores_t__6839b2352c589659e8620b97",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetAccuracy::test_accuracy_is_zero_when_ball_targets_itself",
+      "original_entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accuracy_is_zero_when_ball_targets_itself",
+      "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accur__d9e5d6af73c8183700022d9d",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetAccuracy::test_accuracy_is_zero_when_distance_is_zero",
+      "original_entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accuracy_is_zero_when_distance_is_zero",
+      "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accur__912ea17afc64b9395d4eaeee",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetAccuracy::test_returns_accuracy_and_tracking_speed_that_we_specify",
+      "original_entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_returns_accuracy_and_tracking_speed_that_we_specify",
+      "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_retur__c78ed1e98d187e6ba1f77d87",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetCenterDist::test_center_distance_between_two_balls_in_the_same_place",
+      "original_entry": "park_contracts::getters_and_setters__TestGetCenterDist__test_center_distance_between_two_balls_in_the_same_place",
+      "entry": "park_contracts::getters_and_setters__TestGetCenterDist__test_cen__56fe3d4dceb262c1e9bf6aa8",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetCurrentEgoPos::test_returns_default_initial_ego_value",
+      "original_entry": "park_contracts::getters_and_setters__TestGetCurrentEgoPos__test_returns_default_initial_ego_value",
+      "entry": "park_contracts::getters_and_setters__TestGetCurrentEgoPos__test___ad222e044f33a7c5e47411fa",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetFollowers::test_returns_empty_list_when_there_are_no_followers",
+      "original_entry": "park_contracts::getters_and_setters__TestGetFollowers__test_returns_empty_list_when_there_are_no_followers",
+      "entry": "park_contracts::getters_and_setters__TestGetFollowers__test_retu__66f249b39aea14e81ac3b3df",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_ignores_balls_that_are_in_the_same_bubble",
+      "original_entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_in_the_same_bubble",
+      "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__tes__0fc1bd85c43b2ab0fe6f837a",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_ignores_balls_that_are_not_following",
+      "original_entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_not_following",
+      "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__tes__daee8d26625110e74073445f",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_returns_empty_list_when_there_are_none",
+      "original_entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__test_returns_empty_list_when_there_are_none",
+      "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__tes__22c97b39189470afab29bfe3",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetSurfaceDist::test_surface_distance_between_two_balls_equals_the_distance_between_the_balls_minus_their_combined_radii",
+      "original_entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_equals_the_distance_between_the_balls_minus_their_combined_radii",
+      "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_su__001e1cc2265b641e8abae70d",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetSurfaceDist::test_surface_distance_between_two_balls_in_the_same_place_with_no_radius_is_zero",
+      "original_entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_in_the_same_place_with_no_radius_is_zero",
+      "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_su__56b9245a7e85ba1146616721",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestGetSurfaceDist::test_surface_distance_between_two_balls_with_no_radius_equals_the_distance_between_the_balls",
+      "original_entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_with_no_radius_equals_the_distance_between_the_balls",
+      "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_su__4609e7b60e4e969a265f9fc2",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetBallFormation::test_followers_whom_we_no_longer_have_room_for_get_dropped",
+      "original_entry": "park_contracts::getters_and_setters__TestSetBallFormation__test_followers_whom_we_no_longer_have_room_for_get_dropped",
+      "entry": "park_contracts::getters_and_setters__TestSetBallFormation__test___54c2a023619ec83a0a2a8d10",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetBallFormation::test_formation_out_of_range_does_not_get_set",
+      "original_entry": "park_contracts::getters_and_setters__TestSetBallFormation__test_formation_out_of_range_does_not_get_set",
+      "entry": "park_contracts::getters_and_setters__TestSetBallFormation__test___cb32eb66747446c02e0a1d63",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_agility_to_negative_value_is_ineffective",
+      "original_entry": "park_contracts::getters_and_setters__TestSetters__test_setting_agility_to_negative_value_is_ineffective",
+      "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_a__3172dec0c88aa893b8ae71bb",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_mass_to_a_negative_value_is_ineffective",
+      "original_entry": "park_contracts::getters_and_setters__TestSetters__test_setting_ball_mass_to_a_negative_value_is_ineffective",
+      "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_b__7ec06b31aaba4422b15009c3",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_radius_to_negative_value_is_ineffective",
+      "original_entry": "park_contracts::getters_and_setters__TestSetters__test_setting_ball_radius_to_negative_value_is_ineffective",
+      "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_b__7ebf0ead7f49feeed080eaff",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll",
+      "original_entry": "park_contracts::getters_and_setters__TestSetters__test_setting_ball_velocity_updates_yaw_pitch_and_roll",
+      "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_b__4ab618e1dc316f7803a6bc9d",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_max_speed_to_negative_value_is_ineffective",
+      "original_entry": "park_contracts::getters_and_setters__TestSetters__test_setting_max_speed_to_negative_value_is_ineffective",
+      "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_m__07398ab01cba6a2340ed33ec",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_speed_fraction_clamps_lowe_bound_at_zero",
+      "original_entry": "park_contracts::getters_and_setters__TestSetters__test_setting_speed_fraction_clamps_lowe_bound_at_zero",
+      "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_s__94c5880a4ff7b108db700899",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_speed_fraction_clamps_upper_bound_at_one",
+      "original_entry": "park_contracts::getters_and_setters__TestSetters__test_setting_speed_fraction_clamps_upper_bound_at_one",
+      "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_s__9b6486626dcd6e84c07dadc2",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_lifecycle_management.py::TestAddMushroom::test_mushroom_can_not_be_created_with_invalid_owner",
+      "original_entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mushroom_can_not_be_created_with_invalid_owner",
+      "entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mush__15b113c160fc13a7ae832c62",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_lifecycle_management.py::TestAddMushroom::test_mushroom_that_is_not_set_free_does_not_expand",
+      "original_entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mushroom_that_is_not_set_free_does_not_expand",
+      "entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mush__5e33fdb786cb7c731ea25b1a",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_lifecycle_management.py::TestAdditionsAndDeletions::test_addition_of_invalid_ball_id_raises_typeerror",
+      "original_entry": "park_contracts::lifecycle_management__TestAdditionsAndDeletions__test_addition_of_invalid_ball_id_raises_typeerror",
+      "entry": "park_contracts::lifecycle_management__TestAdditionsAndDeletions___3b33c1cce8349d40612fe2f6",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_lifecycle_management.py::TestBubbleTransitions::test_adding_ball_transitions_it_to_bubble",
+      "original_entry": "park_contracts::lifecycle_management__TestBubbleTransitions__test_adding_ball_transitions_it_to_bubble",
+      "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__tes__c736089673b0c1de5f0cc3dc",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_lifecycle_management.py::TestBubbleTransitions::test_adding_two_balls_transition_them_to_bubble",
+      "original_entry": "park_contracts::lifecycle_management__TestBubbleTransitions__test_adding_two_balls_transition_them_to_bubble",
+      "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__tes__f4c2197a913206aa13d3b49b",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_lifecycle_management.py::TestBubbleTransitions::test_empty_bubble_transitions_list_is_sent_as_empty",
+      "original_entry": "park_contracts::lifecycle_management__TestBubbleTransitions__test_empty_bubble_transitions_list_is_sent_as_empty",
+      "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__tes__c7298c73a094e732a56214f9",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_lifecycle_management.py::TestIdGeneration::test_ball_and_capsule_ids_share_the_same_id_generator",
+      "original_entry": "park_contracts::lifecycle_management__TestIdGeneration__test_ball_and_capsule_ids_share_the_same_id_generator",
+      "entry": "park_contracts::lifecycle_management__TestIdGeneration__test_bal__de396e28aab508d932f7c84d",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_movement_controls.py::TestFollow::test_removing_ball_stops_followers_from_following_that_ball",
+      "original_entry": "park_contracts::movement_controls__TestFollow__test_removing_ball_stops_followers_from_following_that_ball",
+      "entry": "park_contracts::movement_controls__TestFollow__test_removing_bal__5a44843ec1591f394b72d2eb",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_additional_velocity_of_missile_is_the_same_as_the_max_velocity_of_its_owner_if_above_limit",
+      "original_entry": "park_contracts::movement_controls__TestLaunchMissile__test_additional_velocity_of_missile_is_the_same_as_the_max_velocity_of_its_owner_if_above_limit",
+      "entry": "park_contracts::movement_controls__TestLaunchMissile__test_addit__e644bbb51f63be5235cb007c",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_initial_velocity_of_owner_has_impact_of_non_aimed_missile_direction_and_speed",
+      "original_entry": "park_contracts::movement_controls__TestLaunchMissile__test_initial_velocity_of_owner_has_impact_of_non_aimed_missile_direction_and_speed",
+      "entry": "park_contracts::movement_controls__TestLaunchMissile__test_initi__8b4e8f1177e0ebdf44b7f320",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_movement_controls.py::TestMissileFollow::test_removing_ball_stops_followers_from_following_that_ball",
+      "original_entry": "park_contracts::movement_controls__TestMissileFollow__test_removing_ball_stops_followers_from_following_that_ball",
+      "entry": "park_contracts::movement_controls__TestMissileFollow__test_remov__497bf848c2ea7d2788225516",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_movement_controls.py::TestMissileFollow::test_sets_follow_range_as_negative_sum_of_src_and_dst_radii",
+      "original_entry": "park_contracts::movement_controls__TestMissileFollow__test_sets_follow_range_as_negative_sum_of_src_and_dst_radii",
+      "entry": "park_contracts::movement_controls__TestMissileFollow__test_sets___1c924032185d9e37b3c1b708",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_movement_controls.py::TestWarpTo::test_if_warp_location_is_too_close_we_goto_it_instead",
+      "original_entry": "park_contracts::movement_controls__TestWarpTo__test_if_warp_location_is_too_close_we_goto_it_instead",
+      "entry": "park_contracts::movement_controls__TestWarpTo__test_if_warp_loca__d334086901da9bddc3965978",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_movement_controls.py::TestWarpTo::test_minrange_and_warpfactor_are_stored_in_strange_places",
+      "original_entry": "park_contracts::movement_controls__TestWarpTo__test_minrange_and_warpfactor_are_stored_in_strange_places",
+      "entry": "park_contracts::movement_controls__TestWarpTo__test_minrange_and__51e8b487911f0a81f7f74373",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_visibility.py::TestCheckVisibility::test_ball_that_is_not_massive_is_not_an_occlusion",
+      "original_entry": "park_contracts::visibility__TestCheckVisibility__test_ball_that_is_not_massive_is_not_an_occlusion",
+      "entry": "park_contracts::visibility__TestCheckVisibility__test_ball_that___e0c8093aabe84082ed220fd4",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_visibility.py::TestCheckVisibility::test_returns_the_id_of_the_occluding_ball_when_there_is_an_occlusion",
+      "original_entry": "park_contracts::visibility__TestCheckVisibility__test_returns_the_id_of_the_occluding_ball_when_there_is_an_occlusion",
+      "entry": "park_contracts::visibility__TestCheckVisibility__test_returns_th__426f23f3d1026353ca3ac3ae",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_visibility.py::TestCloaking::test_uncloaking_a_ball_in_warp_does_not_make_it_massive",
+      "original_entry": "park_contracts::visibility__TestCloaking__test_uncloaking_a_ball_in_warp_does_not_make_it_massive",
+      "entry": "park_contracts::visibility__TestCloaking__test_uncloaking_a_ball__0c28ef41d4ca5862af85cdc4",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/park_contracts.rs",
+      "original_case": "python/destiny/test/ballpark/test_visibility.py::TestScanCone::test_scan_cone_finds_nothing_when_there_is_nothing_to_be_found",
+      "original_entry": "park_contracts::visibility__TestScanCone__test_scan_cone_finds_nothing_when_there_is_nothing_to_be_found",
+      "entry": "park_contracts::visibility__TestScanCone__test_scan_cone_finds_n__edb60f9b7f646212b0b14e49",
+      "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901"
+    },
+    {
+      "file": "verification/kani/src/server_actions_contracts.rs",
+      "original_case": "python/destiny/test/net/server/test_actions.py::TestActions::test_has_pending_set_free_returns_false_when_freedom_not_pending_and_ball_already_free",
+      "original_entry": "server_actions_contracts::has_pending_set_free_returns_false_when_freedom_not_pending_and_ball_already_free",
+      "entry": "server_actions_contracts::has_pending_set_free_returns_false_when_freedom___f6b8db657af44c43924eafbc",
+      "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f"
+    },
+    {
+      "file": "verification/kani/src/server_actions_contracts.rs",
+      "original_case": "python/destiny/test/net/server/test_actions.py::TestActions::test_has_pending_set_not_free_returns_false_when_freedom_removal_not_pending_and_ball_already_not_free",
+      "original_entry": "server_actions_contracts::has_pending_set_not_free_returns_false_when_freedom_removal_not_pending_and_ball_already_not_free",
+      "entry": "server_actions_contracts::has_pending_set_not_free_returns_false_when_free__0eb7dc0d21593f2370d96ad8",
+      "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f"
+    },
+    {
+      "file": "verification/kani/src/server_actions_contracts.rs",
+      "original_case": "python/destiny/test/net/server/test_actions.py::TestActions::test_set_ball_harmonic_on_forcefield_with_all_negative_one_values_makes_field_non_massive",
+      "original_entry": "server_actions_contracts::set_ball_harmonic_on_forcefield_with_all_negative_one_values_makes_field_non_massive",
+      "entry": "server_actions_contracts::set_ball_harmonic_on_forcefield_with_all_negativ__40577063f77880c360cd3d50",
+      "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f"
+    },
+    {
+      "file": "verification/kani/src/server_ticker_contracts.rs",
+      "original_case": "python/destiny/test/net/server/test_ticker.py::TestTicker::test_handle_remove_global_ball_sends_remove_ball_event_to_each_bubble_containing_interactives",
+      "original_entry": "server_ticker_contracts::TestTicker__test_handle_remove_global_ball_sends_remove_ball_event_to_each_bubble_containing_interactives",
+      "entry": "server_ticker_contracts::TestTicker__test_handle_remove_global_ball_sends__0103b72d109740d37735f3cd",
+      "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e"
+    },
+    {
+      "file": "verification/kani/src/server_ticker_contracts.rs",
+      "original_case": "python/destiny/test/net/server/test_ticker.py::TestTicker::test_no_updates_are_sent_out_for_bubbles_not_containing_interactive_balls",
+      "original_entry": "server_ticker_contracts::TestTicker__test_no_updates_are_sent_out_for_bubbles_not_containing_interactive_balls",
+      "entry": "server_ticker_contracts::TestTicker__test_no_updates_are_sent_out_for_bub__cef9c0947d634a94ae58fa01",
+      "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e"
+    }
+  ]
+}

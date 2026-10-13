@@ -675,7 +675,7 @@ fn set_ball_position_not_local_ball() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn set_ball_harmonic_on_forcefield_with_all_negative_one_values_makes_field_non_massive() {
+fn set_ball_harmonic_on_forcefield_with_all_negativ__40577063f77880c360cd3d50() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
     let harmonic_value = V::Integer(-1);
     let corporation_id = V::Integer(-1);
@@ -1493,7 +1493,7 @@ fn get_pending_cloak_mode_returns_pending_cloak_mode_when_no_cloak_pending() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn has_pending_set_free_returns_false_when_freedom_not_pending_and_ball_already_free() {
+fn has_pending_set_free_returns_false_when_freedom___f6b8db657af44c43924eafbc() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
     let mut park=OriginalParkProjection::default();
     park.is_master=true;
@@ -1519,7 +1519,7 @@ fn has_pending_set_free_returns_false_when_freedom_not_pending_and_ball_already_
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn has_pending_set_not_free_returns_false_when_freedom_removal_not_pending_and_ball_already_not_free() {
+fn has_pending_set_not_free_returns_false_when_free__0eb7dc0d21593f2370d96ad8() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
     let mut park=OriginalParkProjection::default();
     park.is_master=true;

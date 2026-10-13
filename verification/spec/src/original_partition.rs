@@ -101,11 +101,11 @@ pub(crate) fn grid_center(position:Vec3,level:u32) -> Option<(f64,f64,f64)> {
 pub(crate) fn add_ancestor_cells<const N:usize>(result:&mut BoundedList<CellKey,64>,keys:&BoundedList<CellKey,N>,level:u32,wanted:u32) -> bool {
     if wanted>level { return true; }
     let mut i=0;
-    while i<keys.len() {
+    while i<keys.capacity() && i<keys.len() {
         if let Some(mut key)=keys.get(i) {
             let mut l=level;while l>wanted { key=key.parent();l-=1; }
             let mut existing=false;let mut j=0;
-            while j<result.len() { existing|=result.get(j)==Some(key);j+=1; }
+            while j<result.capacity() && j<result.len() { existing|=result.get(j)==Some(key);j+=1; }
             if !existing && !result.push(key) { return false; }
         }
         i+=1;
@@ -117,7 +117,7 @@ fn add_top(cells: &mut BoundedList<PartitionCell,64>, mut key: CellKey, level: u
     let mut ancestor=0;
     while ancestor<level { key=key.parent(); ancestor+=1; }
     let mut i=0;
-    while i<cells.len() {
+    while i<cells.capacity() && i<cells.len() {
         if cells.get(i).is_some_and(|cell|cell.key==key) { return true; }
         i+=1;
     }
@@ -134,9 +134,9 @@ impl OriginalBubbleProjection {
         // Deleting this ball's boxes releases a top cell only if no other
         // object/child remains. Static-object scopes are rejected by callers.
         let mut retained=BoundedList::new(); let mut i=0;
-        while i<others.len() {
+        while i<others.capacity() && i<others.len() {
             if let Some(sphere)=others.get(i) { let mut j=0;
-                while j<sphere.keys.len() {
+                while j<sphere.keys.capacity() && j<sphere.keys.len() {
                     if let Some(key)=sphere.keys.get(j) {
                         if !add_top(&mut retained,key,sphere.level) { return None; }
                     }
@@ -146,7 +146,7 @@ impl OriginalBubbleProjection {
             i+=1;
         }
         i=0;
-        while i<retained.len() {
+        while i<retained.capacity() && i<retained.len() {
             if let Some(mut cell)=retained.get(i) {
                 cell.bubble=self.bubble_for(cell.key).unwrap_or(-1);
                 if !retained.set(i,cell) { return None; }
@@ -163,7 +163,7 @@ impl OriginalBubbleProjection {
                     while z<=1 {
                         if x!=0 || y!=0 || z!=0 {
                             let key=primary.offset(x,y,z,1_i64<<23); let mut j=0;
-                            while j<retained.len() {
+                            while j<retained.capacity() && j<retained.len() {
                                 if let Some(cell)=retained.get(j) {
                                     if cell.key==key && cell.bubble!=-1 { bubble=cell.bubble; break 'neighbors; }
                                 }
@@ -179,12 +179,12 @@ impl OriginalBubbleProjection {
             if bubble==-1 { bubble=self.next_bubble; self.next_bubble=self.next_bubble.checked_add(1)?; }
         }
         i=0;
-        while i<new.keys.len() {
+        while i<new.keys.capacity() && i<new.keys.len() {
             if let Some(key)=new.keys.get(i) { if !add_top(&mut retained,key,new.level) { return None; } }
             i+=1;
         }
         i=0;
-        while i<retained.len() {
+        while i<retained.capacity() && i<retained.len() {
             if let Some(mut cell)=retained.get(i) {
                 if cell.key==primary { cell.bubble=bubble; if !retained.set(i,cell) { return None; } }
             }
@@ -219,7 +219,7 @@ impl OriginalBubbleProjection {
             }
             if bubble==-1 { bubble=self.next_bubble; self.next_bubble=self.next_bubble.checked_add(1)?; }
             let mut i=0;
-            while i<self.cells.len() {
+            while i<self.cells.capacity() && i<self.cells.len() {
                 if let Some(mut cell)=self.cells.get(i) {
                     if cell.key==key { cell.bubble=bubble; if !self.cells.set(i,cell) { return None; } }
                 }
@@ -232,7 +232,7 @@ impl OriginalBubbleProjection {
     pub fn insert_sphere(&mut self, position: Vec3, radius: f32, inflated: f64) -> Option<CellKey> {
         let sphere=spherical_cell_keys(position,radius,inflated)?;
         let mut i=0;
-        while i<sphere.keys.len() {
+        while i<sphere.keys.capacity() && i<sphere.keys.len() {
             if let Some(key)=sphere.keys.get(i) {
                 if !add_top(&mut self.cells,key,sphere.level) { return None; }
             }
@@ -246,7 +246,7 @@ impl OriginalBubbleProjection {
     pub fn label_component(&mut self, key: CellKey, bubble: i64) -> bool {
         let mut found=false;
         let mut i=0;
-        while i<self.cells.len() {
+        while i<self.cells.capacity() && i<self.cells.len() {
             if let Some(mut cell)=self.cells.get(i) {
                 if cell.key==key { found=true; cell.bubble=bubble; assert!(self.cells.set(i,cell)); }
             }
@@ -257,14 +257,14 @@ impl OriginalBubbleProjection {
         // finite undirected adjacency graph; all cells remain in the graph.
         let mut changed=true;
         let mut pass=0;
-        while changed && pass<self.cells.len() {
+        while changed && pass<self.cells.capacity() && pass<self.cells.len() {
             changed=false;
             i=0;
-            while i<self.cells.len() {
+            while i<self.cells.capacity() && i<self.cells.len() {
                 if let Some(mut candidate)=self.cells.get(i) {
                     if candidate.bubble==-1 {
                         let mut j=0;
-                        while j<self.cells.len() {
+                        while j<self.cells.capacity() && j<self.cells.len() {
                             if self.cells.get(j).is_some_and(|c|c.bubble==bubble && c.key.adjacent(candidate.key)) {
                                 candidate.bubble=bubble;
                                 assert!(self.cells.set(i,candidate)); changed=true; break;
@@ -282,7 +282,7 @@ impl OriginalBubbleProjection {
 
     pub fn bubble_for(&self, key: CellKey) -> Option<i64> {
         let mut i=0;
-        while i<self.cells.len() {
+        while i<self.cells.capacity() && i<self.cells.len() {
             if let Some(cell)=self.cells.get(i) { if cell.key==key { return Some(cell.bubble); } }
             i+=1;
         }
@@ -364,7 +364,11 @@ fn point_cell_keys(position:Vec3,radius:f32,inflated:f64,allow_large_branch:bool
 
 fn add_sphere_key(sphere:&mut SphericalCellKeys,key:CellKey) -> Option<()> {
     let mut i=0;
-    while i<sphere.keys.len() { if sphere.keys.get(i)==Some(key) { return Some(()); } i+=1; }
+    // SphericalCellKeys owns exactly 27 slots (the original 3x3x3 branch).
+    // len() checks that private representation invariant. The literal guard
+    // retains every admitted key and lets symbolic execution end this loop
+    // independently of unrelated, larger scenario unwind limits.
+    while i<27 && i<sphere.keys.capacity() && i<sphere.keys.len() { if sphere.keys.get(i)==Some(key) { return Some(()); } i+=1; }
     sphere.keys.push(key).then_some(())
 }
 
@@ -373,15 +377,21 @@ pub(crate) fn spherical_candidates(left:SphericalCellKeys,right:SphericalCellKey
 }
 
 pub(crate) fn footprints_touch<const L:usize,const R:usize>(left:&BoundedList<CellKey,L>,left_level:u32,right:&BoundedList<CellKey,R>,right_level:u32) -> bool {
+    // Both producers choose an original partition level in 0..8. Check that
+    // caller obligation rather than assuming it or clipping a level.
+    assert!(left_level<8 && right_level<8);
     let mut i=0;
-    while i<left.len() {
+    while i<L && i<left.capacity() && i<left.len() {
         if let Some(left_key)=left.get(i) { let mut j=0;
-            while j<right.len() {
+            while j<R && j<right.capacity() && j<right.len() {
                 if let Some(mut r)=right.get(j) {
                     let mut l=left_key;
                     let mut ll=left_level; let mut rl=right_level;
-                    while ll>rl { l=l.parent(); ll-=1; }
-                    while rl>ll { r=r.parent(); rl-=1; }
+                    let mut shifts=0;
+                    while shifts<8 && ll>rl { l=l.parent(); ll-=1;shifts+=1; }
+                    shifts=0;
+                    while shifts<8 && rl>ll { r=r.parent(); rl-=1;shifts+=1; }
+                    assert!(ll==rl);
                     if l==r { return true; }
                 }
                 j+=1;

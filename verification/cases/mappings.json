@@ -2,7 +2,7 @@
   "schema": 1,
   "original_commit": "ef738406b61ad06bae2f402857e464735ab106a2",
   "inventory_sha256": "352309f34f4188aefae40d292edf7ac82418e7323840e90bdd8deefc56655be8",
-  "generator_sha256": "527ce7ab2fc7de294c0f5dc3f79b005ba92642d7af60fabf6b4aa3b7541aee52",
+  "generator_sha256": "a67f5a5740cd22c28f949136f0340a5918f1fabc35878701ea9c482d913ffaf0",
   "notice": "Candidacy and reviewed mappings are not current proof credit. Every missing case, helper/dependency and correspondence obligation is retained.",
   "cases": [
     {
@@ -8091,11 +8091,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_adding_a_box_makes_a_box_active",
+          "entry": "park_contracts::boxes_and_bubbles__TestActiveBoxesForOrientedBox__ab33ace90f2d3108d183c144",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6600,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6603,
             6604,
@@ -8167,7 +8167,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6782,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6785,
             6786,
@@ -8239,7 +8239,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6730,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6733,
             6734,
@@ -8311,7 +8311,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6808,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6811,
             6812,
@@ -8383,7 +8383,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6678,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6681,
             6682,
@@ -8455,7 +8455,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6704,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6707,
             6708,
@@ -8527,7 +8527,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6756,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6759,
             6760,
@@ -8599,7 +8599,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6834,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6837,
             6838,
@@ -8671,7 +8671,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6652,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6655,
             6656,
@@ -8743,7 +8743,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6626,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6629,
             6630,
@@ -8834,7 +8834,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6131,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6134,
             6142,
@@ -8927,7 +8927,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6096,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6099,
             6107,
@@ -9006,11 +9006,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_returns_list_of_boxes_when_there_are_active_boxes",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_retu__b0591051042beb7e4a35eb17",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6186,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6189,
             6198,
@@ -9066,11 +9066,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_returns_none_when_there_are_no_active_boxes",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetActiveBoxes__test_retu__ba07096bc5678e4d66149aaf",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6166,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6170,
             6173,
@@ -9143,7 +9143,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6357,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6363,
             6372,
@@ -9198,11 +9198,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test_getting_object_that_has_not_been_set_returns_none",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test___d540d83a64224d07a57f1415",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6339,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6343,
             6344,
@@ -9271,11 +9271,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_existing_box_succeeds",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test___f7e6fcaa6815a0eeeec66764",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6287,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6293,
             6303,
@@ -9329,11 +9329,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test_setting_object_on_nonexisting_box_fails",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetAndSetBoxObject__test___983492f584f1c79b4b32682a",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6317,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6325,
             6326,
@@ -9402,11 +9402,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_multiple_balls_in_triangle",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__c3e40bc5d758b78e81d93eaa",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4371,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4374,
             4376,
@@ -9483,7 +9483,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4261,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4264,
             4265,
@@ -9558,7 +9558,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4283,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4286,
             4288,
@@ -9630,11 +9630,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_on_edge_of_range",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__42aaf44ac5e6bc901cd3c65b",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4343,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4346,
             4348,
@@ -9710,7 +9710,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4313,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4316,
             4318,
@@ -9766,11 +9766,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_source_does_not_exist_raises_runtime_error",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__1b99713e61b1a083fbfcb6b1",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4243,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4245,
             4248,
@@ -9843,7 +9843,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4167,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4170,
             4172,
@@ -9915,11 +9915,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_get_ball_ids_in_range_for_ball_id",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange___6fbf7e70b8d6533cfa362c66",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4117,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4120,
             4122,
@@ -9991,11 +9991,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_get_ball_ids_in_range_for_location",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsAndDistInRange___4848e8403e7f5de500ec8916",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4219,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4222,
             4224,
@@ -10071,7 +10071,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4193,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4196,
             4198,
@@ -10147,7 +10147,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4141,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4144,
             4146,
@@ -10223,7 +10223,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4591,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4594,
             4596,
@@ -10300,7 +10300,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4423,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4426,
             4427,
@@ -10375,7 +10375,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4445,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4448,
             4450,
@@ -10447,11 +10447,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule_and_on_the_edge_of_one_side",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test__1a5ea967908869e53f3ffbbf",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4473,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4476,
             4478,
@@ -10527,7 +10527,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4533,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4536,
             4538,
@@ -10599,11 +10599,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_not_in_capsule_too_far_from_the_edge_of_one_side",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test__f9d71474df7ae7eb3a729867",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4503,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4506,
             4508,
@@ -10679,7 +10679,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4563,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4566,
             4568,
@@ -10735,11 +10735,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test_source_does_not_exist_raises_runtime_error",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCapsule__test__f4ededdc3b04869f5c446aa3",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4405,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4407,
             4410,
@@ -10816,7 +10816,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4777,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4780,
             4782,
@@ -10895,7 +10895,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4664,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4667,
             4669,
@@ -10975,7 +10975,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4747,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4750,
             4752,
@@ -11055,7 +11055,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4719,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4722,
             4724,
@@ -11135,7 +11135,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4692,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4695,
             4697,
@@ -11214,7 +11214,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4625,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4628,
             4630,
@@ -11268,11 +11268,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCone__test_source_does_not_exist_raises_runtime_error",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInCone__test_so__172ffe8446d9d4b77172df0c",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4646,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4648,
             4651,
@@ -11341,11 +11341,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_ball_on_edge_of_range_gets_included",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_b__c485877a542b60fb1a867394",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4041,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4044,
             4046,
@@ -11421,7 +11421,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4017,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4020,
             4022,
@@ -11493,11 +11493,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_location",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBallIdsInRange__test_g__c0db64a80b1456d3ff3275bf",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4093,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4096,
             4098,
@@ -11573,7 +11573,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4067,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4070,
             4072,
@@ -11633,7 +11633,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6218,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6225,
             6228,
@@ -11686,11 +11686,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetBubbleAtCoordinates__test_get_bubble_where_none_exists_returns_none",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetBubbleAtCoordinates__t__67b1e797cf00e890a0c9b1df",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6241,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6247,
             6250,
@@ -11759,7 +11759,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6263,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6269,
             6271,
@@ -11825,11 +11825,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_capsule_makes_a_box_active",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__8a5a1ee9c90c5367ecae5e92",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6522,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6525,
             6526,
@@ -11897,11 +11897,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_large_capsule_makes_adjecent_boxes_active",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__5327b1a6bdd7427a3f9b2b0b",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6548,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6551,
             6552,
@@ -11969,11 +11969,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_adding_a_long_capsule_makes_adjecent_boxes_active",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__532151085bcf0de5e6911225",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6574,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6577,
             6578,
@@ -12060,7 +12060,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6423,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6426,
             6427,
@@ -12147,11 +12147,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_capsule_in_box_zero_zero_zero",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__c365d0bd469e19c8e800fea1",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6390,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6393,
             6394,
@@ -12238,11 +12238,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_zero_one",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__10a654df0f219a6cd4ed2ceb",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6489,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6492,
             6493,
@@ -12329,11 +12329,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__test_oriented_box_in_box_zero_zero_zero",
+          "entry": "park_contracts::boxes_and_bubbles__TestGetStaticCollidableBox__t__74e7e249be8101bcd6fa234e",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6456,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6459,
             6460,
@@ -12424,11 +12424,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::boxes_and_bubbles__TestInitialize_bubbles__test_can_initialize_bubble_for_specific_ball",
+          "entry": "park_contracts::boxes_and_bubbles__TestInitialize_bubbles__test___7a4cbd06ea1e5596e46cc05a",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3990,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3993,
             3995,
@@ -12516,7 +12516,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3967,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3970,
             3972,
@@ -12596,7 +12596,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5172,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5175,
             5178,
@@ -12675,7 +12675,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5538,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5541,
             5545,
@@ -12755,7 +12755,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5515,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5518,
             5521,
@@ -12834,7 +12834,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5467,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5470,
             5473,
@@ -12913,7 +12913,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5491,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5494,
             5497,
@@ -12992,7 +12992,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5398,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5401,
             5411,
@@ -13072,7 +13072,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5365,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5368,
             5378,
@@ -13152,7 +13152,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5232,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5235,
             5245,
@@ -13233,11 +13233,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::callbacks__TestProximitySensors__test_callback_gets_called_when_period_has_passed",
+          "entry": "park_contracts::callbacks__TestProximitySensors__test_callback_g__581fde7c5485e7c9f1d3d542",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5196,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5199,
             5209,
@@ -13319,7 +13319,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5265,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5268,
             5278,
@@ -13399,7 +13399,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5431,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5434,
             5444,
@@ -13476,11 +13476,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::callbacks__TestProximitySensors__test_only_interactives_ignores_non_interactive_balls",
+          "entry": "park_contracts::callbacks__TestProximitySensors__test_only_inter__45d62c0514e13f9dc6e190ca",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5298,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5301,
             5311,
@@ -13560,7 +13560,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5331,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5334,
             5344,
@@ -13640,11 +13640,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_does_not_get_called_when_addminiball_is_called_on_ball_that_is_in_park",
+          "entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_do__40cfebf92111549ea1efe5a7",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5130,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5135,
             5136,
@@ -13706,11 +13706,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_gets_called_when_addminiball_is_called_on_ball_that_is_not_in_park",
+          "entry": "park_contracts::callbacks__TestSetBallNotInParkCallback__test_ge__9ee1afa8ae5fd8cfd6d6d902",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5110,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5115,
             5117,
@@ -13775,7 +13775,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5151,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5157,
             5159,
@@ -13852,7 +13852,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5634,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5637,
             5640,
@@ -13932,7 +13932,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5588,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5591,
             5594,
@@ -14011,7 +14011,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5565,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5568,
             5571,
@@ -14086,11 +14086,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::callbacks__TestSetTargetTracking__test_ignores_target_that_should_be_out_of_range",
+          "entry": "park_contracts::callbacks__TestSetTargetTracking__test_ignores_t__6839b2352c589659e8620b97",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5611,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5614,
             5617,
@@ -14161,11 +14161,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accuracy_is_zero_when_ball_targets_itself",
+          "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accur__d9e5d6af73c8183700022d9d",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 187,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             193,
             197,
@@ -14234,11 +14234,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accuracy_is_zero_when_distance_is_zero",
+          "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_accur__912ea17afc64b9395d4eaeee",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 213,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             219,
             224,
@@ -14312,7 +14312,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 256,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             262,
             267,
@@ -14386,7 +14386,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 305,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             311,
             316,
@@ -14460,7 +14460,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 354,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             360,
             365,
@@ -14535,11 +14535,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_returns_accuracy_and_tracking_speed_that_we_specify",
+          "entry": "park_contracts::getters_and_setters__TestGetAccuracy__test_retur__c78ed1e98d187e6ba1f77d87",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 403,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             410,
             415,
@@ -14614,7 +14614,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 449,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             455,
             460,
@@ -14688,7 +14688,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 498,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             504,
             509,
@@ -14758,11 +14758,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetCenterDist__test_center_distance_between_two_balls_in_the_same_place",
+          "entry": "park_contracts::getters_and_setters__TestGetCenterDist__test_cen__56fe3d4dceb262c1e9bf6aa8",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 534,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             541,
             546,
@@ -14816,11 +14816,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetCurrentEgoPos__test_returns_default_initial_ego_value",
+          "entry": "park_contracts::getters_and_setters__TestGetCurrentEgoPos__test___ad222e044f33a7c5e47411fa",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 565,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             569,
             570,
@@ -14888,11 +14888,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetFollowers__test_returns_empty_list_when_there_are_no_followers",
+          "entry": "park_contracts::getters_and_setters__TestGetFollowers__test_retu__66f249b39aea14e81ac3b3df",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 585,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             591,
             594,
@@ -14965,7 +14965,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 610,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             616,
             621,
@@ -15039,7 +15039,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5660,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5663,
             5665,
@@ -15115,7 +15115,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5707,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5710,
             5712,
@@ -15187,11 +15187,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_in_the_same_bubble",
+          "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__tes__0fc1bd85c43b2ab0fe6f837a",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5762,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5765,
             5767,
@@ -15263,11 +15263,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__test_ignores_balls_that_are_not_following",
+          "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__tes__daee8d26625110e74073445f",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5735,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5738,
             5740,
@@ -15323,11 +15323,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__test_returns_empty_list_when_there_are_none",
+          "entry": "park_contracts::getters_and_setters__TestGetRemoteFollowers__tes__22c97b39189470afab29bfe3",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5688,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5691,
             5694,
@@ -15400,7 +15400,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 641,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             647,
             652,
@@ -15470,11 +15470,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_equals_the_distance_between_the_balls_minus_their_combined_radii",
+          "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_su__001e1cc2265b641e8abae70d",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 689,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             696,
             701,
@@ -15544,11 +15544,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_in_the_same_place_with_no_radius_is_zero",
+          "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_su__56b9245a7e85ba1146616721",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 738,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             745,
             750,
@@ -15618,11 +15618,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_surface_distance_between_two_balls_with_no_radius_equals_the_distance_between_the_balls",
+          "entry": "park_contracts::getters_and_setters__TestGetSurfaceDist__test_su__4609e7b60e4e969a265f9fc2",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 769,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             776,
             781,
@@ -15696,11 +15696,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetBallFormation__test_followers_whom_we_no_longer_have_room_for_get_dropped",
+          "entry": "park_contracts::getters_and_setters__TestSetBallFormation__test___54c2a023619ec83a0a2a8d10",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 806,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             813,
             818,
@@ -15774,11 +15774,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetBallFormation__test_formation_out_of_range_does_not_get_set",
+          "entry": "park_contracts::getters_and_setters__TestSetBallFormation__test___cb32eb66747446c02e0a1d63",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 840,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             846,
             850,
@@ -15855,7 +15855,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 866,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             872,
             876,
@@ -15928,7 +15928,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 892,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             898,
             901,
@@ -16001,7 +16001,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 917,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             923,
             926,
@@ -16074,7 +16074,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 942,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             948,
             951,
@@ -16162,7 +16162,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 967,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             973,
             986,
@@ -16253,7 +16253,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1008,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1014,
             1027,
@@ -16329,7 +16329,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1049,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1055,
             1074,
@@ -16402,7 +16402,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1090,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1096,
             1099,
@@ -16475,7 +16475,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 162,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             168,
             171,
@@ -16548,7 +16548,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1115,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1121,
             1124,
@@ -16631,7 +16631,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1140,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1146,
             1152,
@@ -16706,7 +16706,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1172,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1178,
             1181,
@@ -16789,7 +16789,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1197,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1203,
             1209,
@@ -16864,7 +16864,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1229,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1235,
             1238,
@@ -16937,7 +16937,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1256,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1262,
             1265,
@@ -17010,7 +17010,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1284,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1290,
             1293,
@@ -17083,7 +17083,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1309,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1315,
             1318,
@@ -17161,7 +17161,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1334,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1340,
             1344,
@@ -17235,7 +17235,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1362,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1368,
             1372,
@@ -17308,7 +17308,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1388,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1394,
             1397,
@@ -17377,11 +17377,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_agility_to_negative_value_is_ineffective",
+          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_a__3172dec0c88aa893b8ae71bb",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1413,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1419,
             1422,
@@ -17450,11 +17450,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_ball_mass_to_a_negative_value_is_ineffective",
+          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_b__7ec06b31aaba4422b15009c3",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1438,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1444,
             1447,
@@ -17523,11 +17523,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_ball_radius_to_negative_value_is_ineffective",
+          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_b__7ebf0ead7f49feeed080eaff",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1463,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1469,
             1472,
@@ -17606,11 +17606,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_ball_velocity_updates_yaw_pitch_and_roll",
+          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_b__4ab618e1dc316f7803a6bc9d",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1488,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1494,
             1500,
@@ -17681,11 +17681,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_max_speed_to_negative_value_is_ineffective",
+          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_m__07398ab01cba6a2340ed33ec",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1522,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1528,
             1531,
@@ -17754,11 +17754,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_speed_fraction_clamps_lowe_bound_at_zero",
+          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_s__94c5880a4ff7b108db700899",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1547,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1553,
             1556,
@@ -17827,11 +17827,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_speed_fraction_clamps_upper_bound_at_one",
+          "entry": "park_contracts::getters_and_setters__TestSetters__test_setting_s__9b6486626dcd6e84c07dadc2",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1575,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1581,
             1584,
@@ -17884,11 +17884,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mushroom_can_not_be_created_with_invalid_owner",
+          "entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mush__15b113c160fc13a7ae832c62",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3855,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3861,
             3862,
@@ -17990,7 +17990,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3899,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3902,
             3907,
@@ -18096,7 +18096,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3824,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3827,
             3832,
@@ -18170,11 +18170,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mushroom_that_is_not_set_free_does_not_expand",
+          "entry": "park_contracts::lifecycle_management__TestAddMushroom__test_mush__5e33fdb786cb7c731ea25b1a",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3874,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3877,
             3882,
@@ -18250,7 +18250,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3941,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3944,
             3949,
@@ -18341,7 +18341,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4806,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4809,
             4817,
@@ -18415,11 +18415,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::lifecycle_management__TestAdditionsAndDeletions__test_addition_of_invalid_ball_id_raises_typeerror",
+          "entry": "park_contracts::lifecycle_management__TestAdditionsAndDeletions___3b33c1cce8349d40612fe2f6",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4945,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4948,
             4956,
@@ -18508,7 +18508,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4846,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4849,
             4857,
@@ -18603,7 +18603,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4895,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4898,
             4906,
@@ -18683,7 +18683,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1603,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1609,
             1611,
@@ -18715,7 +18715,7 @@
     {
       "id": "python/destiny/test/ballpark/test_lifecycle_management.py::TestBallpark::test_add_ball_creates_a_client_ball",
       "original_source_sha256": "2fc8a1007583e83d11a9bea8ac2179e624a202684c22813817a32c60c143f086",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -18746,8 +18746,26 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "native_object_contracts::TestBallpark__test_add_ball_creates_a_client_ball",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/native_object_contracts.rs",
+          "line": 43,
+          "proof_source_sha256": "367919eb1aea2296c9dbb54069f11c61af2888a95d1e0a92aad4b0f6137b6708",
+          "candidate_assertion_lines": [
+            46,
+            53,
+            56,
+            58,
+            59,
+            60,
+            61
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -18769,7 +18787,7 @@
     {
       "id": "python/destiny/test/ballpark/test_lifecycle_management.py::TestBallpark::test_can_create_ballpark",
       "original_source_sha256": "2fc8a1007583e83d11a9bea8ac2179e624a202684c22813817a32c60c143f086",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -18788,8 +18806,22 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "native_object_contracts::TestBallpark__test_can_create_ballpark",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/native_object_contracts.rs",
+          "line": 29,
+          "proof_source_sha256": "367919eb1aea2296c9dbb54069f11c61af2888a95d1e0a92aad4b0f6137b6708",
+          "candidate_assertion_lines": [
+            33,
+            34,
+            35
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -18852,7 +18884,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1627,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1633,
             1636,
@@ -18938,11 +18970,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__test_adding_ball_transitions_it_to_bubble",
+          "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__tes__c736089673b0c1de5f0cc3dc",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5002,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5005,
             5015,
@@ -19036,11 +19068,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__test_adding_two_balls_transition_them_to_bubble",
+          "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__tes__f4c2197a913206aa13d3b49b",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5042,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5045,
             5047,
@@ -19110,11 +19142,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__test_empty_bubble_transitions_list_is_sent_as_empty",
+          "entry": "park_contracts::lifecycle_management__TestBubbleTransitions__tes__c7298c73a094e732a56214f9",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 4971,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             4978,
             4980,
@@ -19214,7 +19246,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3209,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3214,
             3215,
@@ -19291,7 +19323,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5089,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5092,
             5096,
@@ -19369,11 +19401,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::lifecycle_management__TestIdGeneration__test_ball_and_capsule_ids_share_the_same_id_generator",
+          "entry": "park_contracts::lifecycle_management__TestIdGeneration__test_bal__de396e28aab508d932f7c84d",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3361,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3387,
             3392,
@@ -19441,7 +19473,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3440,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3466,
             3469,
@@ -19506,7 +19538,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3485,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3511,
             3536,
@@ -19584,7 +19616,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3555,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3561,
             3562,
@@ -19663,7 +19695,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3273,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3279,
             3280,
@@ -19745,7 +19777,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3609,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3615,
             3616,
@@ -19824,7 +19856,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3673,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3679,
             3680,
@@ -19902,7 +19934,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1652,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1658,
             1661,
@@ -19975,7 +20007,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1677,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1683,
             1686,
@@ -20054,7 +20086,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1702,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1713,
             1723,
@@ -20146,7 +20178,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1779,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1790,
             1796,
@@ -20239,7 +20271,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1820,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1831,
             1837,
@@ -20332,7 +20364,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1861,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1872,
             1878,
@@ -20425,7 +20457,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1902,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1913,
             1919,
@@ -20518,7 +20550,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1943,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1954,
             1960,
@@ -20611,7 +20643,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 1984,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             1995,
             2001,
@@ -20694,7 +20726,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2025,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2036,
             2046,
@@ -20785,7 +20817,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2075,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2086,
             2092,
@@ -20862,7 +20894,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7166,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7169,
             7181,
@@ -20940,7 +20972,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7137,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7140,
             7151,
@@ -21014,7 +21046,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7114,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7117,
             7122,
@@ -21088,7 +21120,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2116,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2122,
             2127,
@@ -21158,7 +21190,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2147,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2153,
             2156,
@@ -21236,7 +21268,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2172,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2178,
             2183,
@@ -21316,7 +21348,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2204,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2210,
             2215,
@@ -21387,11 +21419,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::movement_controls__TestFollow__test_removing_ball_stops_followers_from_following_that_ball",
+          "entry": "park_contracts::movement_controls__TestFollow__test_removing_bal__5a44843ec1591f394b72d2eb",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2236,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2242,
             2247,
@@ -21474,7 +21506,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2267,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2273,
             2278,
@@ -21555,11 +21587,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::movement_controls__TestLaunchMissile__test_additional_velocity_of_missile_is_the_same_as_the_max_velocity_of_its_owner_if_above_limit",
+          "entry": "park_contracts::movement_controls__TestLaunchMissile__test_addit__e644bbb51f63be5235cb007c",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6968,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6971,
             6973,
@@ -21637,7 +21669,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7029,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7032,
             7034,
@@ -21723,7 +21755,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6937,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6940,
             6942,
@@ -21797,11 +21829,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::movement_controls__TestLaunchMissile__test_initial_velocity_of_owner_has_impact_of_non_aimed_missile_direction_and_speed",
+          "entry": "park_contracts::movement_controls__TestLaunchMissile__test_initi__8b4e8f1177e0ebdf44b7f320",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7000,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7003,
             7005,
@@ -21877,7 +21909,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6912,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6915,
             6917,
@@ -21953,7 +21985,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6887,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6890,
             6892,
@@ -22034,7 +22066,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6860,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6863,
             6865,
@@ -22111,7 +22143,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2302,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2308,
             2313,
@@ -22182,11 +22214,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::movement_controls__TestMissileFollow__test_removing_ball_stops_followers_from_following_that_ball",
+          "entry": "park_contracts::movement_controls__TestMissileFollow__test_remov__497bf848c2ea7d2788225516",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2338,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2345,
             2350,
@@ -22257,11 +22289,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::movement_controls__TestMissileFollow__test_sets_follow_range_as_negative_sum_of_src_and_dst_radii",
+          "entry": "park_contracts::movement_controls__TestMissileFollow__test_sets___1c924032185d9e37b3c1b708",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2375,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2382,
             2387,
@@ -22341,7 +22373,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2423,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2429,
             2434,
@@ -22417,7 +22449,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2460,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2466,
             2471,
@@ -22507,7 +22539,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2495,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2501,
             2506,
@@ -22604,7 +22636,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7084,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7087,
             7089,
@@ -22698,7 +22730,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7056,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7059,
             7061,
@@ -22791,7 +22823,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2531,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2537,
             2540,
@@ -22882,7 +22914,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2562,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2568,
             2573,
@@ -22959,7 +22991,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2598,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2604,
             2609,
@@ -23052,7 +23084,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2628,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2634,
             2639,
@@ -23149,7 +23181,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2667,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2673,
             2678,
@@ -23242,7 +23274,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2706,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2712,
             2717,
@@ -23340,7 +23372,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2748,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2754,
             2759,
@@ -23418,7 +23450,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2787,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2793,
             2795,
@@ -23506,7 +23538,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2811,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2814,
             2820,
@@ -23589,11 +23621,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::movement_controls__TestWarpTo__test_if_warp_location_is_too_close_we_goto_it_instead",
+          "entry": "park_contracts::movement_controls__TestWarpTo__test_if_warp_loca__d334086901da9bddc3965978",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2839,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2842,
             2848,
@@ -23674,11 +23706,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::movement_controls__TestWarpTo__test_minrange_and_warpfactor_are_stored_in_strange_places",
+          "entry": "park_contracts::movement_controls__TestWarpTo__test_minrange_and__51e8b487911f0a81f7f74373",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2867,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2873,
             2887,
@@ -24990,7 +25022,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2905,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2910,
             2911,
@@ -25046,7 +25078,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2926,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2930,
             2931,
@@ -25102,7 +25134,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2946,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2949,
             2950,
@@ -25163,7 +25195,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2965,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2969,
             2972,
@@ -25220,7 +25252,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 2988,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             2992,
             2993,
@@ -25292,7 +25324,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5873,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5876,
             5878,
@@ -25363,11 +25395,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::visibility__TestCheckVisibility__test_ball_that_is_not_massive_is_not_an_occlusion",
+          "entry": "park_contracts::visibility__TestCheckVisibility__test_ball_that___e0c8093aabe84082ed220fd4",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5842,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5845,
             5847,
@@ -25438,11 +25470,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::visibility__TestCheckVisibility__test_returns_the_id_of_the_occluding_ball_when_there_is_an_occlusion",
+          "entry": "park_contracts::visibility__TestCheckVisibility__test_returns_th__426f23f3d1026353ca3ac3ae",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5788,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5791,
             5793,
@@ -25517,7 +25549,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5819,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5822,
             5824,
@@ -25591,7 +25623,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5906,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5909,
             5910,
@@ -25665,7 +25697,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5925,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5928,
             5931,
@@ -25739,7 +25771,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5946,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5949,
             5954,
@@ -25808,11 +25840,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::visibility__TestCloaking__test_uncloaking_a_ball_in_warp_does_not_make_it_massive",
+          "entry": "park_contracts::visibility__TestCloaking__test_uncloaking_a_ball__0c28ef41d4ca5862af85cdc4",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 7196,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             7199,
             7214,
@@ -25886,7 +25918,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5967,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5970,
             5975,
@@ -25959,7 +25991,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6048,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6051,
             6053,
@@ -26039,7 +26071,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 6016,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             6019,
             6021,
@@ -26111,11 +26143,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "park_contracts::visibility__TestScanCone__test_scan_cone_finds_nothing_when_there_is_nothing_to_be_found",
+          "entry": "park_contracts::visibility__TestScanCone__test_scan_cone_finds_n__edb60f9b7f646212b0b14e49",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 5988,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             5991,
             5998,
@@ -27850,7 +27882,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1389,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1393,
             1395,
@@ -27927,7 +27959,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1118,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1123,
             1125
@@ -27999,7 +28031,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 165,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             170,
             171,
@@ -28073,7 +28105,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 102,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             107,
             108,
@@ -28146,7 +28178,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 128,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             133,
             135,
@@ -28219,7 +28251,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 602,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             608,
             615
@@ -28295,7 +28327,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1025,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1028,
             1035
@@ -28350,7 +28382,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1445,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1449,
             1451,
@@ -28412,7 +28444,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1269,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1273
           ],
@@ -28466,7 +28498,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1470,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1474,
             1476,
@@ -28525,7 +28557,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1548,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1552,
             1554,
@@ -28587,7 +28619,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1356,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1360
           ],
@@ -28641,7 +28673,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1573,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1577,
             1579,
@@ -28700,7 +28732,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1599,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1603,
             1605,
@@ -28762,7 +28794,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1373,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1377
           ],
@@ -28816,7 +28848,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1624,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1628,
             1630,
@@ -28892,7 +28924,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 196,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             201,
             204
@@ -28964,7 +28996,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 78,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             83,
             90
@@ -29023,7 +29055,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1217,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1221
           ],
@@ -29077,7 +29109,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1419,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1423,
             1425,
@@ -29140,7 +29172,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1286,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1290
           ],
@@ -29190,11 +29222,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "server_actions_contracts::has_pending_set_free_returns_false_when_freedom_not_pending_and_ball_already_free",
+          "entry": "server_actions_contracts::has_pending_set_free_returns_false_when_freedom___f6b8db657af44c43924eafbc",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1496,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1500,
             1502,
@@ -29256,7 +29288,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1303,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1305,
             1308
@@ -29315,7 +29347,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1321,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1325
           ],
@@ -29365,11 +29397,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "server_actions_contracts::has_pending_set_not_free_returns_false_when_freedom_removal_not_pending_and_ball_already_not_free",
+          "entry": "server_actions_contracts::has_pending_set_not_free_returns_false_when_free__0eb7dc0d21593f2370d96ad8",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1522,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1526,
             1528,
@@ -29431,7 +29463,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1338,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1340,
             1343
@@ -29490,7 +29522,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1234,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1238
           ],
@@ -29548,7 +29580,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1251,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1253,
             1256
@@ -29628,7 +29660,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1156,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1163,
             1184
@@ -29971,7 +30003,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 217,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             220,
             227
@@ -30242,7 +30274,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 488,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             491,
             494
@@ -30314,7 +30346,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 507,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             511,
             518
@@ -30373,7 +30405,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 531,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             536
           ],
@@ -30431,7 +30463,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1095,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1102
           ],
@@ -30502,7 +30534,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 280,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             286,
             293
@@ -30561,7 +30593,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 306,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             313
           ],
@@ -30632,7 +30664,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 937,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             939,
             946
@@ -30712,7 +30744,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 830,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             835,
             856
@@ -30780,11 +30812,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "server_actions_contracts::set_ball_harmonic_on_forcefield_with_all_negative_one_values_makes_field_non_massive",
+          "entry": "server_actions_contracts::set_ball_harmonic_on_forcefield_with_all_negativ__40577063f77880c360cd3d50",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 678,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             683,
             698
@@ -30860,7 +30892,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 792,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             797,
             812
@@ -30936,7 +30968,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 754,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             759,
             774
@@ -31008,7 +31040,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 716,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             721,
             736
@@ -31088,7 +31120,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 874,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             879,
             900
@@ -31160,7 +31192,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 981,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             983,
             990
@@ -31232,7 +31264,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 469,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             472,
             475
@@ -31304,7 +31336,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 429,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             431,
             438
@@ -31376,7 +31408,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 959,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             961,
             968
@@ -31448,7 +31480,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1003,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1005,
             1012
@@ -31520,7 +31552,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 628,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             633,
             640
@@ -31592,7 +31624,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 653,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             658,
             665
@@ -31664,7 +31696,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 918,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             921,
             924
@@ -31736,7 +31768,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 378,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             385,
             392
@@ -31795,7 +31827,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 405,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             413
           ],
@@ -31866,7 +31898,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 240,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             243,
             246
@@ -31938,7 +31970,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 259,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             264,
             267
@@ -32010,7 +32042,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1071,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1075,
             1082
@@ -32082,7 +32114,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 329,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             335,
             342
@@ -32141,7 +32173,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 355,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             362
           ],
@@ -32212,7 +32244,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1048,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1051,
             1058
@@ -32284,7 +32316,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 552,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             555,
             562
@@ -32356,7 +32388,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 451,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             453,
             456
@@ -32428,7 +32460,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1138,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1140,
             1143
@@ -32492,7 +32524,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1650,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1654,
             1656,
@@ -32568,7 +32600,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1197,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1200,
             1204
@@ -32636,7 +32668,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 1676,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             1680,
             1682,
@@ -32712,7 +32744,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_actions_contracts.rs",
           "line": 575,
-          "proof_source_sha256": "dff3b44b628153349796bd6b83a75b1ced57e4ab08a2c4cb3beae7c2e73f70fa",
+          "proof_source_sha256": "f08cdd518b4fa80fb9097b3ac3ec92e8a2837d5103353479d81c1d005ba17a0f",
           "candidate_assertion_lines": [
             582,
             589
@@ -33162,7 +33194,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 182,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             188,
             189,
@@ -33279,7 +33311,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 209,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             215,
             216,
@@ -33340,7 +33372,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 160,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             165,
             166,
@@ -33459,7 +33491,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 235,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             242,
             243,
@@ -33523,7 +33555,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 265,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             270,
             271,
@@ -33585,7 +33617,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 287,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             294,
             295,
@@ -33688,7 +33720,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 311,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             319,
             320,
@@ -33794,7 +33826,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 336,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             343,
             344,
@@ -33873,7 +33905,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 369,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             375,
             376,
@@ -33995,11 +34027,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "server_ticker_contracts::TestTicker__test_handle_remove_global_ball_sends_remove_ball_event_to_each_bubble_containing_interactives",
+          "entry": "server_ticker_contracts::TestTicker__test_handle_remove_global_ball_sends__0103b72d109740d37735f3cd",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 394,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             401,
             402,
@@ -34096,11 +34128,11 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "server_ticker_contracts::TestTicker__test_no_updates_are_sent_out_for_bubbles_not_containing_interactive_balls",
+          "entry": "server_ticker_contracts::TestTicker__test_no_updates_are_sent_out_for_bub__cef9c0947d634a94ae58fa01",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 426,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             432,
             433,
@@ -34188,7 +34220,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 459,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             467,
             468,
@@ -34281,7 +34313,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 484,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             491,
             492,
@@ -34383,7 +34415,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 508,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             518,
             519,
@@ -34463,7 +34495,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 535,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             543,
             544,
@@ -34540,7 +34572,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 560,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             568,
             569,
@@ -34621,7 +34653,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 588,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             594,
             595,
@@ -34680,7 +34712,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 614,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             618,
             619,
@@ -34770,7 +34802,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/server_ticker_contracts.rs",
           "line": 633,
-          "proof_source_sha256": "ccc79c99392009fb655405fa6040da30092f5f109192f64e5e13be545600efb2",
+          "proof_source_sha256": "2b6f82ef8ae821e9438b2ea133db48fa0abe9cb327830bb57f455cd4ca93db9e",
           "candidate_assertion_lines": [
             639,
             640,
@@ -36045,7 +36077,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3781,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3786,
             3798,
@@ -36114,7 +36146,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3102,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3107,
             3112,
@@ -36184,7 +36216,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3130,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3135,
             3136,
@@ -36217,7 +36249,7 @@
     {
       "id": "python/destiny/test/test_ball.py::BallTest::test_can_construct",
       "original_source_sha256": "eb79d55cf1e8b94b5895b9824f68c6f5d4fee7c61b384212316f9f284fe45d26",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -36236,8 +36268,24 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "native_object_contracts::BallTest__test_can_construct",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/native_object_contracts.rs",
+          "line": 12,
+          "proof_source_sha256": "367919eb1aea2296c9dbb54069f11c61af2888a95d1e0a92aad4b0f6137b6708",
+          "candidate_assertion_lines": [
+            15,
+            17,
+            19,
+            20,
+            21
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -36301,7 +36349,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3169,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3174,
             3176,
@@ -36548,7 +36596,7 @@
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/park_contracts.rs",
           "line": 3008,
-          "proof_source_sha256": "04559b437f9cbc328b0e35f7bd6e95ba4a573bea2107eee169726aaa0004641f",
+          "proof_source_sha256": "41cb1d92788154ef157b72db383df702b4734bd80404c229ea9dd77981e69901",
           "candidate_assertion_lines": [
             3012,
             3014,
@@ -36657,7 +36705,7 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "formation_contracts::original_freed_slot_two_is_reused",
+          "entry": "formation_contracts::formation_reuse",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/formation_contracts.rs",
           "line": 72,
@@ -36704,7 +36752,7 @@
     {
       "id": "python/destiny/test/test_ball.py::BallTest::test_get_rotated_vector_returns_original_vector_if_there_is_no_rotation",
       "original_source_sha256": "eb79d55cf1e8b94b5895b9824f68c6f5d4fee7c61b384212316f9f284fe45d26",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -36737,8 +36785,29 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "native_object_contracts::BallTest__test_get_rotated_vector_returns_origin__90862c398b9a663326268936",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/native_object_contracts.rs",
+          "line": 69,
+          "proof_source_sha256": "367919eb1aea2296c9dbb54069f11c61af2888a95d1e0a92aad4b0f6137b6708",
+          "candidate_assertion_lines": [
+            72,
+            74,
+            78,
+            81,
+            83,
+            87,
+            89,
+            91,
+            92,
+            93
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -36797,7 +36866,7 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "formation_contracts::first_formation_slot_is_zero",
+          "entry": "formation_contracts::formation_first_slot",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/formation_contracts.rs",
           "line": 20,
@@ -36863,7 +36932,7 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "formation_contracts::unconfigured_formation_returns_negative_one",
+          "entry": "formation_contracts::formation_unconfigured",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/formation_contracts.rs",
           "line": 8,
@@ -36933,7 +37002,7 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "formation_contracts::exhausted_formation_returns_negative_one",
+          "entry": "formation_contracts::formation_exhausted",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/formation_contracts.rs",
           "line": 53,
@@ -37016,7 +37085,7 @@
       ],
       "candidate_harnesses": [
         {
-          "entry": "formation_contracts::original_four_slots_are_incremental",
+          "entry": "formation_contracts::formation_incremental",
           "manifest": "verification/kani/Cargo.toml",
           "file": "verification/kani/src/formation_contracts.rs",
           "line": 33,
@@ -37061,7 +37130,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_balls_get_counted",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37098,8 +37167,27 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_balls_get_counted",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 38,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            41,
+            42,
+            45,
+            46,
+            47,
+            48,
+            50,
+            51
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37121,7 +37209,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_clear_all_resets_counts",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37192,8 +37280,31 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_clear_all_resets_counts",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 60,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            63,
+            64,
+            66,
+            67,
+            68,
+            69,
+            70,
+            72,
+            74,
+            76,
+            78,
+            79
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37215,7 +37326,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_clientballs_get_cleared",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37248,8 +37359,26 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_clientballs_get_cleared",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 88,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            91,
+            92,
+            95,
+            96,
+            97,
+            99,
+            100
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37271,7 +37400,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_clientballs_get_counted",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37304,8 +37433,27 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_clientballs_get_counted",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 109,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            112,
+            113,
+            116,
+            118,
+            119,
+            120,
+            122,
+            123
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37327,7 +37475,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_initial_count_is_zero",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37396,8 +37544,26 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_initial_count_is_zero",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 14,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            18,
+            20,
+            22,
+            24,
+            26,
+            28,
+            29
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37419,7 +37585,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_miniballs_get_counted",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37460,8 +37626,28 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_miniballs_get_counted",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 132,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            135,
+            136,
+            138,
+            140,
+            142,
+            143,
+            144,
+            146,
+            147
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37483,7 +37669,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_miniboxes_get_counted",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37524,8 +37710,28 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_miniboxes_get_counted",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 156,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            159,
+            160,
+            162,
+            164,
+            166,
+            167,
+            168,
+            170,
+            171
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37547,7 +37753,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_minicapsules_get_counted",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37588,8 +37794,27 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_minicapsules_get_counted",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 180,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            183,
+            184,
+            186,
+            188,
+            190,
+            191,
+            193,
+            194
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {
@@ -37611,7 +37836,7 @@
     {
       "id": "python/destiny/test/test_cleanup.py::TestLiveCount::test_parks_get_counted",
       "original_source_sha256": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
-      "status": "ImplementationMissing",
+      "status": "ProofMissing",
       "rust_translation_reviewed": false,
       "assertions": [
         {
@@ -37644,8 +37869,24 @@
           "relation": "PENDING_SETUP_AND_ADAPTER_REVIEW"
         }
       ],
-      "candidate_harnesses": [],
-      "candidate_scope": "implementation missing",
+      "candidate_harnesses": [
+        {
+          "entry": "lifetime_contracts::TestLiveCount__test_parks_get_counted",
+          "manifest": "verification/kani/Cargo.toml",
+          "file": "verification/kani/src/lifetime_contracts.rs",
+          "line": 203,
+          "proof_source_sha256": "7b2d7d47414482347732f6699669cd267cd8600702fa8c6a4345939ab23d6412",
+          "candidate_assertion_lines": [
+            206,
+            208,
+            209,
+            211,
+            212
+          ],
+          "scope": "concrete candidate; setup/native/production correspondence must be reviewed"
+        }
+      ],
+      "candidate_scope": "concrete assertion candidate with pending correspondence",
       "execution_review": "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
       "reference_review": "verification/cases/reference_review.json",
       "required_obligations": {

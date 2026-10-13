@@ -391,7 +391,7 @@ fn TestTicker__test_cloaking_and_uncloaking_in_same_tick_does_not_uncloak_ball()
 #[cfg_attr(kani,kani::proof)]
 #[cfg_attr(kani,kani::unwind(1025))]
 #[cfg_attr(test,test)]
-fn TestTicker__test_handle_remove_global_ball_sends_remove_ball_event_to_each_bubble_containing_interactives() {
+fn TestTicker__test_handle_remove_global_ball_sends__0103b72d109740d37735f3cd() {
     let mut park=OriginalParkProjection::default();park.is_master=true;
     {
     let mut ticker=OriginalServerTicker::default();
@@ -423,7 +423,7 @@ fn TestTicker__test_handle_remove_global_ball_sends_remove_ball_event_to_each_bu
 #[cfg_attr(kani,kani::proof)]
 #[cfg_attr(kani,kani::unwind(1025))]
 #[cfg_attr(test,test)]
-fn TestTicker__test_no_updates_are_sent_out_for_bubbles_not_containing_interactive_balls() {
+fn TestTicker__test_no_updates_are_sent_out_for_bub__cef9c0947d634a94ae58fa01() {
     let mut park=OriginalParkProjection::default();park.is_master=true;
     {
     let mut ticker=OriginalServerTicker::default();

@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "registry_baseline": "2027e0c9d34193f468438589c4e6bb25996e823d",
+  "carbon_blueexposure_version": "2.1.1#0",
+  "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+  "port_tree": "ea20bea0b8ed7b4feb63935ff2a757c3e1cd65b3",
+  "files": [
+    {
+      "path": "BlueClasses.cpp",
+      "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+      "git_blob_sha": "4231fab6b9aca7d8e0031567152c1d2c84c58c4d",
+      "sha256": "1d65ab3a12ced0e779d0815f6dd0635ce408921950dbf8640e48a27fd7b61b07",
+      "encoding": "utf-8",
+      "source_url": "https://github.com/carbonengine/blueexposure/blob/c855175f5f261a301a12b63c0337e8eb8d92b081/BlueClasses.cpp"
+    },
+    {
+      "path": "BlueClasses.h",
+      "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+      "git_blob_sha": "d5daa18bf5f41a41e932a1ac4ea0724490bb4ae5",
+      "sha256": "2b6fffef17f7fad47965ca30f53b047d1b2ff59aced0c5cdd08a15a5e726cca2",
+      "encoding": "utf-8",
+      "source_url": "https://github.com/carbonengine/blueexposure/blob/c855175f5f261a301a12b63c0337e8eb8d92b081/BlueClasses.h"
+    },
+    {
+      "path": "BlueClasses_Blue.cpp",
+      "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+      "git_blob_sha": "66732a117362523e462eef289313ebdf8d59133f",
+      "sha256": "5e18886652c8b1cbee28e95441350f2fa34120c9662ad0769688982c52a0192f",
+      "encoding": "utf-8",
+      "source_url": "https://github.com/carbonengine/blueexposure/blob/c855175f5f261a301a12b63c0337e8eb8d92b081/BlueClasses_Blue.cpp"
+    },
+    {
+      "path": "include/BlueClass.h",
+      "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+      "git_blob_sha": "221a7c3c42197c0da358f119075e2b2858d370b1",
+      "sha256": "2bf9e60631ff325855714531e84131b840f197dc509decfe3e4b634667b3025b",
+      "encoding": "cp1252",
+      "source_url": "https://github.com/carbonengine/blueexposure/blob/c855175f5f261a301a12b63c0337e8eb8d92b081/include/BlueClass.h"
+    },
+    {
+      "path": "include/BlueTypes.h",
+      "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+      "git_blob_sha": "408b90b54162c2b48b5da12d05cbc273d8ad1fc1",
+      "sha256": "ae56ef66a1135e1ef113e26c03b5ce649f12b9d3209fe10d5aa33f2e367c9115",
+      "encoding": "utf-8",
+      "source_url": "https://github.com/carbonengine/blueexposure/blob/c855175f5f261a301a12b63c0337e8eb8d92b081/include/BlueTypes.h"
+    },
+    {
+      "path": "include/BlueExposureMacros.h",
+      "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+      "git_blob_sha": "11f6b949e755c8125ec7dceecf21bfb4b001bcb7",
+      "sha256": "923c3cebbb905e26d4330286d0ac3377ec78f4bd8ed63627d72efa5e5f0d2842",
+      "encoding": "utf-8",
+      "source_url": "https://github.com/carbonengine/blueexposure/blob/c855175f5f261a301a12b63c0337e8eb8d92b081/include/BlueExposureMacros.h"
+    },
+    {
+      "path": "LICENSE.md",
+      "revision": "c855175f5f261a301a12b63c0337e8eb8d92b081",
+      "git_blob_sha": "0686e2d0b88dbbc3d5805015da4c8f2a360f2ba0",
+      "sha256": "4cf0c70939817854bde8e801c9f95aaefdc67fc04d49a273a59c853c8d72c21c",
+      "encoding": "utf-8",
+      "source_url": "https://github.com/carbonengine/blueexposure/blob/c855175f5f261a301a12b63c0337e8eb8d92b081/LICENSE.md"
+    }
+  ],
+  "consumed_core_dependency": {
+    "repository": "carbonengine/core",
+    "version": "2.6.0#0",
+    "revision": "250df5221bdbb981a46669ac7a7e72ed33e099e0",
+    "port_tree": "307f546bed79ed6e23a94eae7e736c23d2a2b553",
+    "path": "include/CcpAtomic.h",
+    "git_blob_sha": "1f50e94fb5258df8657f038db5cd9cb363fcc367",
+    "sha256": "3da9bd6b2cf80462a2c135f0a08a259c09b14c86d5d7cf39dbb997ecee574a73",
+    "source_url": "https://github.com/carbonengine/core/blob/250df5221bdbb981a46669ac7a7e72ed33e099e0/include/CcpAtomic.h"
+  },
+  "review": "RootRefLock construction/Lock/Unlock/destruction; class-specific uint32 instance accounting and PyLiveCount C-int/key conversion; class registration macros and atomic target branches inspected. Native global initial counts, compiler/interpreter/plugin state, pointers/wrappers/aliases and atomic concurrency remain separate execution/correspondence requirements. CcpAtomic target selection depends on compiler macros. Default zero projection is the isolated original scenario initial state, not a proof of actual global initialization.",
+  "retrieval_recipe": "Read-only GitHub file retrieval at these exact commits; encode returned UTF-8 text as declared encoding, require SHA1(blob <byte-length>\\0 + actual bytes) == git_blob_sha, then verify SHA256. No Git object fetch or host configuration changes."
+}

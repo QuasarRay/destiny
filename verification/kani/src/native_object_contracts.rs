@@ -66,7 +66,7 @@ fn TestBallpark__test_add_ball_creates_a_client_ball() {
 #[cfg_attr(kani,kani::proof)]
 #[cfg_attr(kani,kani::unwind(129))]
 #[cfg_attr(test,test)]
-fn BallTest__test_get_rotated_vector_returns_original_vector_if_there_is_no_rotation() {
+fn BallTest__test_get_rotated_vector_returns_origin__90862c398b9a663326268936() {
     let mut world=OriginalLifetimeProjection::default();
     world.register_destiny_classes();
     assert!(world.create_park(false)==Ok(()));

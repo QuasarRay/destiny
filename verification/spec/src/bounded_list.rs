@@ -27,8 +27,17 @@ impl<T: Copy, const N: usize> BoundedList<T, N> {
 
     #[must_use]
     pub const fn len(&self) -> usize {
-        self.length
+        // All fields are private. Construction starts at zero; push/insert
+        // grow only after obtaining an in-capacity slot; set/extend preserve
+        // this invariant. Check it here as well, so an invalid representation
+        // cannot silently truncate a claimed original list. The explicit
+        // capacity arm gives the verifier a structural traversal bound.
+        assert!(self.length <= N);
+        if self.length < N { self.length } else { N }
     }
+
+    #[must_use]
+    pub const fn capacity(&self) -> usize { N }
 
     #[must_use]
     pub const fn is_empty(&self) -> bool {
