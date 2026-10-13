@@ -1,0 +1,123 @@
+{
+  "files": [
+    {
+      "github_blob_sha": "fcca287d66a719b233786bd09dbfe4eb5e3d8e5a",
+      "path": "include/Quaternion.h",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "16df2f185866be9fc75d2809e014cf840e637e1e6b7a9972ff5f7d3a7fd2d759",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/include/Quaternion.h"
+    },
+    {
+      "github_blob_sha": "d26dc5ca51b2e88b21b91e9cb542500d6bb78183",
+      "path": "include/Quaternion_inline.h",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "5c1b499601b1f35a39154d9986a56ab206c21b9127304e80a7aeb1d421400b32",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/include/Quaternion_inline.h"
+    },
+    {
+      "github_blob_sha": "21085b8866477c2d62abe68c92e7b1efe5300fdb",
+      "path": "include/Matrix.h",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "6b15d8a08ab89caf0ae1830ea5606851725adde5a1467feebad6ee8e4a0f8e1c",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/include/Matrix.h"
+    },
+    {
+      "github_blob_sha": "dd3d730f5e86b5392556bf4e319728c2622d4a96",
+      "path": "include/Matrix_inline.h",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "61994486b74f52699885b4f221607466e102ade3ddff39b460387790673f5a21",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/include/Matrix_inline.h"
+    },
+    {
+      "github_blob_sha": "4836700cb4bce49ccb3354433c3955ea84ab3c68",
+      "path": "include/Vector3_inline.h",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "741990d6e86c64ae6df2e35a25ba56bdbf0efd0231f3e362594d9df6d8d7270c",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/include/Vector3_inline.h"
+    },
+    {
+      "github_blob_sha": "8d9d2edb60a4f6a5da38a258d7b9b1e0536b64a4",
+      "path": "src/Quaternion.cpp",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "d1628ac912b7369ece630dd3cdf899733ed2be187f1aa52ac9c50b7ba098934a",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/src/Quaternion.cpp"
+    },
+    {
+      "github_blob_sha": "f8a18afa5764cd93aef2e9b321cf2ef82447e89e",
+      "path": "src/Matrix.cpp",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "c58bc8ad377d24d3a3eae9d94aaebc72cfd1fff9a569456ccf9ca7d84a0a5302",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/src/Matrix.cpp"
+    },
+    {
+      "github_blob_sha": "5f11764dc195adec9588c220e794c3a66154374a",
+      "path": "vcpkg.json",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "d1d2be5efdfeaf08a299dec45fc84d23f4aa7f3c7a4bdbe8754a072f866e5ce2",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/vcpkg.json"
+    },
+    {
+      "github_blob_sha": "0686e2d0b88dbbc3d5805015da4c8f2a360f2ba0",
+      "path": "LICENSE.md",
+      "project": "carbon-math",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "50f7c65241b9e22514fdd0a7a159e86322e4d53e",
+      "sha256": "4cf0c70939817854bde8e801c9f95aaefdc67fc04d49a273a59c853c8d72c21c",
+      "source_url": "https://github.com/carbonengine/math/blob/50f7c65241b9e22514fdd0a7a159e86322e4d53e/LICENSE.md"
+    },
+    {
+      "github_blob_sha": "256db662c3e1f22a415674964c95daa717e4b40d",
+      "path": "Inc/DirectXMath.h",
+      "project": "directxmath",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "56206b1916646b29b37e1eac56e96e2008d6c71f",
+      "sha256": "71b7cf095503a42db1d017ffd1c0ffe7a3fb866fc2ae584bad417fc5308d9a2a",
+      "source_url": "https://github.com/microsoft/DirectXMath/blob/56206b1916646b29b37e1eac56e96e2008d6c71f/Inc/DirectXMath.h"
+    },
+    {
+      "github_blob_sha": "be15215fac4eb4cb4f286b6d9132ba34972f1a91",
+      "path": "Inc/DirectXMathVector.inl",
+      "project": "directxmath",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "56206b1916646b29b37e1eac56e96e2008d6c71f",
+      "sha256": "9c7edab7b1e2a17a6380a6e1b0ed5856e697301d979da8619314701b328c01a1",
+      "source_url": "https://github.com/microsoft/DirectXMath/blob/56206b1916646b29b37e1eac56e96e2008d6c71f/Inc/DirectXMathVector.inl"
+    },
+    {
+      "github_blob_sha": "ccd904f334f2dce27e6ddd28e76a6ad851438eb3",
+      "path": "Inc/DirectXMathMisc.inl",
+      "project": "directxmath",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "56206b1916646b29b37e1eac56e96e2008d6c71f",
+      "sha256": "5f24a34c28d50e0bc1746bfff7e661cf7bb5ef7d379ecf369b10b77982fb7ad1",
+      "source_url": "https://github.com/microsoft/DirectXMath/blob/56206b1916646b29b37e1eac56e96e2008d6c71f/Inc/DirectXMathMisc.inl"
+    },
+    {
+      "github_blob_sha": "9e841e7a26e4eb057b24511e7b92d42b257a80e5",
+      "path": "LICENSE",
+      "project": "directxmath",
+      "retrieved_blob_matches_github_sha": true,
+      "revision": "56206b1916646b29b37e1eac56e96e2008d6c71f",
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "source_url": "https://github.com/microsoft/DirectXMath/blob/56206b1916646b29b37e1eac56e96e2008d6c71f/LICENSE"
+    }
+  ],
+  "schema": 1,
+  "scope": "Reviewed exact Carbon math and DirectXMath Linux SSE2 non-FMA branch; all target/compiler/Python/native correspondence remains unproved. Source retrieval is read-only and does not alter Git references. SHA256 refers to retained retrieved artifact bytes; each Git blob identity is independently checked."
+}

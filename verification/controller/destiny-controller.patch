@@ -1,0 +1,850 @@
+diff --git a/infra/agentinfra/catalog.py b/infra/agentinfra/catalog.py
+index 0527754..f43b248 100644
+--- a/infra/agentinfra/catalog.py
++++ b/infra/agentinfra/catalog.py
+@@ -142,19 +142,21 @@ def work_queue(root, profile, args):
+     import shutil
+     snapshot = source_snapshot(root, profile["checks"]["proof-markers"]["read_globs"])
+     rows, marked = qualified_index(root, getattr(args, "original", None)), existing(root)
++    from .coverage import assurance, mappings
++    case_mappings = mappings(root, rows)
+     proof_rows, blockers = formal.proof_inventory(root, profile)
+     output = []
+     for row in rows:
+         mapped, ambiguous = candidates_for(row, marked)
+         proofs = [p for p in proof_rows if row["id"] in p.get("original_cases", [])]
+-        checked = [p for p in proofs if p["status"] == "CHECKED_SCOPED"]
++        reviewed_mapping = case_mappings.get(row["id"])
+         levels = {"mapped_or_marked": bool(mapped or proofs),
+-                  "spec_proved": any(p.get("assurance") == "spec_proved" for p in checked),
+-                  "production_rust_refinement_proved": any(p.get("assurance") == "production_rust_refinement_proved" for p in checked),
++                  **assurance(reviewed_mapping, proofs),
+                   "runtime_differential_evidence": False}
+         output.append({**row, "semantic_family": family(row), "family_basis": "source/name classification, advisory",
+                        "assurance": levels, "uncovered": not levels["production_rust_refinement_proved"],
+                        "existing_proofs": proofs, "marked_candidates": mapped, "ambiguous_candidates": ambiguous,
++                       "assertion_mapping": reviewed_mapping,
+                        "gaps": [level for level, present in levels.items() if not present],
+                        "blockers": (["legacy marker does not identify a unique fixture"] if ambiguous else []) +
+                                    [p.get("blocker") or p["status"] for p in proofs if p["status"] != "CHECKED_SCOPED"]})
+@@ -263,10 +265,24 @@ def python_case(source, name, fixture, read_original, completed=()):
+         snippets.append({"path": path, "start": start, "end": node.end_lineno, "purpose": purpose,
+                          "text": "\n".join(texts[path].splitlines()[start - 1:node.end_lineno])})
+         names = {n.id for n in ast.walk(node) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load)}
++        parents = {child: parent for parent in ast.walk(node) for child in ast.iter_child_nodes(parent)}
+         for candidate in module(path).body:
+             symbols = {candidate.name} if isinstance(candidate, (ast.FunctionDef, ast.ClassDef)) else {
+                 n.id for target in getattr(candidate, "targets", []) for n in ast.walk(target) if isinstance(n, ast.Name)}
+             if symbols & names:
++                if isinstance(candidate, ast.ClassDef) and any(
++                    item["source"] == path and item["class"] == candidate.name for item in fixture_chain
++                ):
++                    references = [n for n in ast.walk(node) if isinstance(n, ast.Name)
++                                  and isinstance(n.ctx, ast.Load) and n.id == candidate.name]
++                    # super(Fixture, self) names the already-resolved fixture
++                    # chain. Copying its entire class would pull unrelated
++                    # cases into this packet and repeat lifecycle/helpers. Keep
++                    # all other class uses (construction/static dispatch) whole.
++                    if references and all(isinstance(parents.get(n), ast.Call)
++                        and isinstance(parents[n].func, ast.Name) and parents[n].func.id == "super"
++                        and parents[n].args and parents[n].args[0] is n for n in references):
++                        continue
+                 queue.append((path, candidate, "local dependency"))
+         for n in ast.walk(node):
+             if not isinstance(n, ast.Attribute) or not isinstance(n.value, ast.Name):
+diff --git a/infra/agentinfra/destiny.py b/infra/agentinfra/destiny.py
+index 34ce86e..8a29b33 100644
+--- a/infra/agentinfra/destiny.py
++++ b/infra/agentinfra/destiny.py
+@@ -15,6 +15,7 @@ from pathlib import Path, PurePosixPath
+ import re
+ import shutil
+ import sys
++import tarfile
+ import time
+ import tomllib
+ import uuid
+@@ -131,13 +132,26 @@ def source_snapshot(root, read_globs=()):
+     if cargo.is_dir():
+         names.update(p.relative_to(root).as_posix() for p in cargo.rglob("*") if not p.is_dir() or p.is_symlink())
+     entries = {}
++    repositories = {}
+     for name in sorted(names):
+         if not name or name.split("/", 1)[0].casefold() in {".aegis", ".git"}:
+             continue
+         name = relative_path(name)
+         path = confined_path(root, name)
+         if path.is_dir():
+-            raise ValueError(f"submodule/directory input requires separate verification: {name}")
++            # Git collapses an embedded repository to its directory in --others.
++            # Bind it separately, including dirty/untracked source and its HEAD;
++            # never omit the controller or vendor inputs from the parent identity.
++            if Path(git(path, "rev-parse", "--show-toplevel").strip()).resolve() != path.resolve():
++                raise ValueError(f"directory input is not a separate Git repository: {name}")
++            nested_globs = [p[len(name) + 1:] for p in read_globs if p.startswith(name + "/")]
++            before_head = git(path, "rev-parse", "--verify", "HEAD^{commit}").strip()
++            nested = source_snapshot(path, nested_globs)
++            if git(path, "rev-parse", "--verify", "HEAD^{commit}").strip() != before_head:
++                raise RuntimeError(f"repository HEAD changed during fingerprint: {name}")
++            repositories[name] = {"commit": before_head, "source": nested}
++            entries[name] = {"repository": repositories[name]}
++            continue
+         if not path.exists():
+             entries[name] = {"missing": True}
+             continue
+@@ -149,7 +163,10 @@ def source_snapshot(root, read_globs=()):
+         if (before.st_size, before.st_mtime_ns, before.st_ctime_ns) != (after.st_size, after.st_mtime_ns, after.st_ctime_ns):
+             raise RuntimeError(f"source changed during fingerprint: {name}")
+         entries[name] = {"sha256": sha, "mode": after.st_mode & 0o777}
+-    return {"digest": digest(entries), "files": len(entries)}
++    result = {"digest": digest(entries), "files": len(entries)}
++    if repositories:
++        result["repositories"] = repositories
++    return result
+ 
+ 
+ def state_path(root, suffix=""):
+@@ -216,6 +233,9 @@ def environment(root, allow_network):
+     # Preserve already installed toolchains while preventing rustup auto-install.
+     for name, directory in (("CARGO_HOME", ".cargo"), ("RUSTUP_HOME", ".rustup")):
+         env.setdefault(name, str(Path.home() / directory))
++    # run_process isolates HOME. Kani's installed bundle must be explicit so a
++    # version probe never starts an implicit download into that temporary HOME.
++    env.setdefault("KANI_HOME", str(Path.home() / ".kani"))
+     env.update({"RUSTUP_AUTO_INSTALL": "0", "CARGO_NET_OFFLINE": "false" if allow_network else "true",
+                 "CARGO_TERM_COLOR": "never", "NO_COLOR": "1", "GIT_TERMINAL_PROMPT": "0"})
+     return env
+@@ -278,6 +298,101 @@ def executable_identities(commands, env):
+     return result
+ 
+ 
++def registry_source_files(root, manifest, env):
++    """Bind actual Cargo registry source consumed by a standalone proof crate.
++
++    Lockfile identities alone do not detect local changes to a cached math or
++    procedural-macro implementation. Missing/ambiguous registry trees fail before
++    a proof; package checksums identify the requested release, and every current
++    extracted file is hashed as part of the payload (including build scripts).
++    """
++    manifest = confined_path(root, manifest, must_exist=True)
++    lock = manifest.parent / "Cargo.lock"
++    if not lock.is_file():
++        raise ValueError("UNAVAILABLE: selected proof manifest requires its Cargo.lock")
++    packages = tomllib.loads(lock.read_text()).get("package", [])
++    home = Path(env["CARGO_HOME"]).resolve(strict=True)
++    paths = {lock}
++    paths.update(p for p in (home / "config", home / "config.toml") if p.is_file())
++    for package in packages:
++        source = package.get("source")
++        if source is None:  # path crates are separately bound by source_snapshot
++            continue
++        if source != "registry+https://github.com/rust-lang/crates.io-index":
++            raise ValueError("UNAVAILABLE: proof registry/git source needs a separately reviewed resolver")
++        name = package["name"] + "-" + package["version"]
++        candidates = [p for p in (home / "registry/src").glob("*/" + name) if p.is_dir()]
++        if len(candidates) != 1:
++            raise ValueError("UNAVAILABLE: missing or ambiguous proof registry source: " + name)
++        directory = candidates[0]
++        # Recent Cargo releases no longer create .cargo-checksum.json. Bind the
++        # locked archive instead and check its actual extracted source bytes.
++        archives = [p for p in (home / "registry/cache").glob("*/" + name + ".crate") if p.is_file()]
++        if len(archives) != 1 or sha256_file(archives[0]) != package.get("checksum"):
++            raise ValueError("UNAVAILABLE: proof registry release checksum differs: " + name)
++        paths.add(archives[0])
++        with tarfile.open(archives[0], "r:gz") as archive:
++            for member in archive:
++                if member.isdir():
++                    continue
++                parts = PurePosixPath(member.name).parts
++                if not member.isfile() or not parts or parts[0] != name or ".." in parts:
++                    raise ValueError("UNAVAILABLE: invalid locked proof registry archive")
++                extracted = directory.joinpath(*parts[1:])
++                if not extracted.is_file() or not extracted.resolve().is_relative_to(directory.resolve()):
++                    raise ValueError("UNAVAILABLE: incomplete proof registry extraction: " + name)
++                data = archive.extractfile(member).read()
++                if digest(data) != sha256_file(extracted):
++                    raise ValueError("UNAVAILABLE: proof registry source differs from locked archive: " + name)
++        paths.update(p for p in directory.rglob("*") if p.is_file())
++    return paths
++
++
++def tool_payload(root, profile, check, commands, env):
++    """Bind compiler/solver payloads behind launchers, including Kani's stdlib.
++
++    Hash real files each time. A rustup shim or a version string alone cannot
++    detect replacement of the compiler, embedded SAT solver or proof libraries.
++    """
++    paths = set()
++    toolchains = []
++    if check == "kani":
++        for argv in commands:
++            if "--manifest-path" in argv:
++                paths.update(registry_source_files(root, argv[argv.index("--manifest-path") + 1], env))
++        bundle = Path(env["KANI_HOME"]) / ("kani-" + profile["project"]["kani"])
++        if not bundle.is_dir():
++            raise ValueError("UNAVAILABLE: installed pinned Kani bundle is missing")
++        for name in ("rust-toolchain-version", "rustc-version"):
++            paths.add(bundle / name)
++        for name in ("cbmc", "goto-analyzer", "goto-cc", "goto-instrument", "kani-compiler", "kani-driver", "kissat"):
++            paths.add(bundle / "bin" / name)
++        paths.update(p for p in (bundle / "lib").rglob("*") if p.is_file())
++        toolchain = (bundle / "toolchain").resolve(strict=True)
++        if toolchain.name != (bundle / "rust-toolchain-version").read_text().strip():
++            raise ValueError("UNAVAILABLE: Kani compiler toolchain differs from bundle pin")
++        toolchains.append(toolchain)
++    if any(Path(argv[0]).name in {"cargo", "rustc"} for argv in commands):
++        result = run_process(["rustup", "which", "--toolchain", profile["project"]["rust"], "rustc"],
++                             cwd=root, env=env, timeout=10, capture_limit=4000)
++        if result.returncode or result.timed_out or result.stdout_truncated:
++            raise ValueError("UNAVAILABLE: pinned Rust compiler path cannot be resolved")
++        toolchains.append(Path(result.stdout.strip()).resolve(strict=True).parents[1])
++    for toolchain in toolchains:
++        paths.update(toolchain / "bin" / name for name in ("rustc", "cargo"))
++        paths.update(p for p in (toolchain / "lib").glob("*") if p.is_file())
++        paths.update((toolchain / "lib" / "rustlib").rglob("*.rlib"))
++    if check == "verus":
++        executable = Path(shutil.which(commands[0][0], path=env.get("PATH"))).resolve(strict=True)
++        directory = executable.parent
++        for name in ("z3", "rust_verify", "version.json", "vstd.vir"):
++            if (directory / name).is_file():
++                paths.add(directory / name)
++        paths.update(directory.glob("*.rlib"))
++        paths.update(directory.glob("*.so"))
++    return {str(p.resolve(strict=True)): sha256_file(p) for p in sorted(paths)}
++
++
+ def run_check(root, profile, args):
+     if args.check not in profile["checks"]:
+         raise ValueError(f"unknown verification check: {args.check}")
+@@ -347,10 +462,12 @@ def run_check(root, profile, args):
+     try:
+         before = source_snapshot(root, spec.get("read_globs", []))
+         tools_before = executable_identities(identity_commands, env)
++        payload_before = tool_payload(root, profile, args.check, commands, env)
+         identity = {"schema": 1, "project": str(root), "source": before, "external": external,
+                     "external_paths": {name: replacements[name] for name in external},
+                     "proof_inputs": {name: sha256_file(confined_path(root, name, must_exist=True)) for name in proof_inputs},
+                     "read_globs": spec["read_globs"], "pinned_versions": spec.get("expect", []),
++                    "tool_payload": payload_before,
+                     "profile": sha256_file(PROFILE), "runner": sha256_file(Path(__file__)),
+                     "python": {"version": sys.version, "executable": sha256_file(Path(sys.executable))},
+                     "environment": digest(env), "allow_network": bool(args.allow_network),
+@@ -407,7 +524,8 @@ def run_check(root, profile, args):
+         after = source_snapshot(root, spec.get("read_globs", []))
+         external_after = {name: sha256_file(Path(replacements[name])) if name == "library" else source_snapshot(Path(replacements[name]))
+                           for name in external}
+-        if before != after or external != external_after or executable_identities(identity_commands, env) != tools_before:
++        if (before != after or external != external_after or executable_identities(identity_commands, env) != tools_before
++                or tool_payload(root, profile, args.check, commands, env) != payload_before):
+             status, returncode = "INPUTS_CHANGED", 1
+         record = {"schema": 1, "id": args.check, "key": key, "identity": identity,
+                   "claim": spec["claim"], "status": status, "returncode": returncode, "probes": observations,
+diff --git a/infra/agentinfra/evidence.py b/infra/agentinfra/evidence.py
+index 1d309b5..d3aac9d 100644
+--- a/infra/agentinfra/evidence.py
++++ b/infra/agentinfra/evidence.py
+@@ -7,17 +7,48 @@ from pathlib import Path
+ import re
+ 
+ from .destiny_reuse import checked_output, digest, require
+-from .security import confined_path
++from .security import SecurityError, confined_path
++
++
++def property_name(value, kind):
++    # Rust demangled property names may contain spaces in traits or generic
++    # arguments. Preserve the exact name; reject line breaks/control bytes.
++    return (isinstance(value, str) and len(value) <= 2048 and value == value.strip()
++            and not any(ord(c) < 32 or ord(c) == 127 for c in value)
++            and re.fullmatch(r'.+\.' + re.escape(kind) + r'\.\d+', value) is not None)
++
++
++def property_location(root, manifest, row):
++    location = re.fullmatch(r'(.+?):(\d+)(?::\d+)?(?: in function .+)?', row.get("location", ""))
++    if location is None:
++        return None
++    actual = Path(location[1])
++    candidates = [actual] if actual.is_absolute() else [root / actual, (root / manifest).parent / actual]
++    for candidate in candidates:
++        try:
++            relative = candidate.resolve().relative_to(root.resolve()).as_posix()
++            source = confined_path(root, relative, must_exist=True)
++            line = int(location[2])
++            if source.is_file() and 1 <= line <= len(source.read_text().splitlines()):
++                return {"file": relative, "line": line}
++        except (ValueError, OSError, SecurityError):
++            continue
++    return None
+ 
+ 
+ def kani_properties(output):
+     rows = {}
+-    for match in re.finditer(r'^Check \d+: (\S+)\s*\n(.*?)(?=^Check \d+:|^SUMMARY:|^VERIFICATION:|\Z)', output, re.M | re.S):
+-        name, body = match.groups()
++    numbers = []
++    for match in re.finditer(r'^Check (\d+): ([^\r\n]+)\r?\n(.*?)(?=^Check \d+:|^SUMMARY:|^VERIFICATION:|\Z)', output, re.M | re.S):
++        number, name, body = match.groups()
++        name = name.strip()
++        numbers.append(int(number))
+         status = re.findall(r'^\s*- Status: ([A-Z_]+)\s*$', body, re.M)
+         location = re.findall(r'^\s*- Location: (.+?)\s*$', body, re.M)
+         require(name not in rows and len(status) == 1, "duplicate or malformed Kani property")
+         rows[name] = {"status": status[0], "location": location[0] if len(location) == 1 else ""}
++    require(len(rows) == len(re.findall(r'^Check \d+:', output, re.M)), "missing or malformed Kani property block")
++    require(numbers == list(range(1, len(numbers) + 1)), "skipped, duplicate or unordered Kani property inventory")
+     return rows
+ 
+ 
+@@ -49,7 +80,7 @@ def proof_identity(root, obligation):
+ 
+ def current_receipt(root, profile, result):
+     """Revalidate actual fresh output and its current identities, not a status label."""
+-    from .destiny import PROFILE, environment, matches_version, sha256_file, source_snapshot, state_path
++    from .destiny import PROFILE, environment, matches_version, sha256_file, source_snapshot, state_path, tool_payload
+     from .formal import unseal
+     require(result.get("executed") is True and result.get("status") == "OBSERVED_SUCCESS", "cached/failed result is not fresh evidence")
+     path = confined_path(root, result["receipt"], must_exist=True)
+@@ -79,6 +110,8 @@ def current_receipt(root, profile, result):
+     for tool in identity["tools"].values():
+         require(Path(tool["path"]).is_file(), "UNAVAILABLE: recorded verifier/tool is missing")
+         require(sha256_file(Path(tool["path"])) == tool["sha256"], "STALE_TOOL")
++    require(identity.get("tool_payload") == tool_payload(root, profile, receipt["id"], identity["commands"], env),
++            "STALE_TOOL_PAYLOAD")
+     probes = receipt["probes"]
+     require(identity.get("pinned_versions") == spec.get("expect", []), "pinned verifier identity differs")
+     require(len(probes) == len(spec.get("expect", [])), "missing pinned version probes")
+@@ -109,8 +142,11 @@ def classified(root, obligation, receipt):
+         location = re.fullmatch(r'(.+?):(\d+)(?::\d+)?(?: in function .+)?', row.get("location", ""))
+         require(location is not None, "reachability witness has no precise source location")
+         actual = Path(location[1])
+-        actual = actual if actual.is_absolute() else root / actual
+-        require(actual.resolve() == (root / witness["file"]).resolve() and int(location[2]) == witness["line"], "reachability witness is in different source")
++        # Cargo's source locations may be relative to the selected manifest.
++        manifest_root = (root / obligation.get("manifest", "verification/kani/Cargo.toml")).parent
++        candidates = [actual] if actual.is_absolute() else [root / actual, manifest_root / actual]
++        require((root / witness["file"]).resolve() in {p.resolve() for p in candidates}
++                and int(location[2]) == witness["line"], "reachability witness is in different source")
+     return scope["kind"]
+ 
+ 
+diff --git a/infra/agentinfra/formal.py b/infra/agentinfra/formal.py
+index 5792ec2..f08f3ee 100644
+--- a/infra/agentinfra/formal.py
++++ b/infra/agentinfra/formal.py
+@@ -21,7 +21,8 @@ RUST_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*\Z")
+ 
+ 
+ def read(path):
+-    require(path.stat().st_size <= 256_000, "contract/receipt exceeds bounded JSON size")
++    # Two captured streams plus receipt identity and nested input inventories.
++    require(path.stat().st_size <= 6_000_000, "contract/receipt exceeds bounded JSON size")
+     return load_json(path.read_text(encoding="utf-8"))
+ 
+ 
+@@ -104,7 +105,8 @@ def validate_plan(root, profile, value):
+             require(type(cases) is list and 1 <= len(cases) <= 32 and all(isinstance(c, str) and c in original_ids for c in cases), "fixture-qualified original identities required")
+             require(len(cases) == len(set(cases)), "duplicate original identity")
+             props = scope["assertion_properties"]
+-            require(type(props) is list and 1 <= len(props) <= 128 and all(isinstance(p, str) and re.fullmatch(r'\S+\.assertion\.\d+', p) for p in props), "exact behavioral assertion properties required")
++            from .evidence import property_name
++            require(type(props) is list and 1 <= len(props) <= 128 and all(property_name(p, "assertion") for p in props), "exact behavioral assertion properties required")
+             require(len(props) == len(set(props)), "duplicate assertion property")
+             for field in ("relation", "review"):
+                 prose(scope[field], field)
+@@ -112,7 +114,7 @@ def validate_plan(root, profile, value):
+             require(type(witnesses) is list and 1 <= len(witnesses) <= 32, "explicit non-vacuity witnesses required")
+             for witness in witnesses:
+                 exact_keys(witness, "property file line", "reachability witness")
+-                require(isinstance(witness["property"], str) and re.fullmatch(r'\S+\.cover\.\d+', witness["property"]), "exact Kani cover property required")
++                require(property_name(witness["property"], "cover"), "exact Kani cover property required")
+                 require(witness["file"] in o["proof_inputs"] + o["implementation"] + o["specification"], "witness must be a bound source")
+                 require(type(witness["line"]) is int and 1 <= witness["line"] <= len(confined_path(root, witness["file"]).read_text().splitlines()), "witness line is outside source")
+             if scope["kind"] == "production_rust_refinement_proved":
+@@ -214,7 +216,7 @@ def verify(root, profile, args):
+ 
+ def audit(root, profile, binding_key=None):
+     from .destiny import state_path
+-    from .evidence import classified, current_receipt, proof_identity, proof_output
++    from .evidence import classified, current_receipt, proof_identity, proof_output, kani_properties, property_location
+     from types import SimpleNamespace
+     lock = FileLock(state_path(root, "formal.lock"), "destiny-formal-cycle")
+     lock.acquire(timeout=0)
+@@ -225,6 +227,7 @@ def audit(root, profile, binding_key=None):
+             path = state_path(root, f"proofs/{key}/{o['id']}.json")
+             status = "NOT_RUN"
+             assurance, blocker, record = "unclassified", None, None
++            assertion_locations = {}
+             if path.exists():
+                 record = unseal(path)
+                 require(record["binding"] == key and record["id"] == o["id"], "observation belongs to another obligation")
+@@ -240,11 +243,20 @@ def audit(root, profile, binding_key=None):
+                         require(receipt["identity"]["obligation"] == expected, "receipt proof scope differs")
+                         require(len(receipt["commands"]) == 1 and proof_output(expected, SimpleNamespace(**receipt["commands"][0])), "vacuous or invalid proof output")
+                         assurance = classified(root, o, receipt)
++                        if o["method"] == "kani" and o.get("evidence"):
++                            properties=kani_properties(receipt["commands"][0]["stdout"]+"\n"+receipt["commands"][0]["stderr"])
++                            assertion_locations={name: property_location(root, o.get("manifest", "verification/kani/Cargo.toml"), properties[name])
++                                                 for name in o["evidence"]["assertion_properties"]}
++                            require(all(location is not None for location in assertion_locations.values()),
++                                    "behavioral assertion has no precise bound project-source location")
+                     except (ValueError, OSError, KeyError) as exc:
+                         blocker = str(exc)
+                         status = blocker if blocker.startswith("STALE_") else "UNAVAILABLE" if blocker.startswith("UNAVAILABLE:") else "INCOMPLETE_EVIDENCE"
+             rows.append({"id": o["id"], "method": o["method"], "status": status,
+-                         "entry": o["entry"], "assurance": assurance, "blocker": blocker or (record or {}).get("blocker"),
++                         "entry": o["entry"], "manifest": o.get("manifest", "verification/kani/Cargo.toml"),
++                         "assertion_properties": o.get("evidence", {}).get("assertion_properties", []),
++                         "assertion_locations": assertion_locations,
++                         "assurance": assurance, "blocker": blocker or (record or {}).get("blocker"),
+                          "proof_identity": proof_identity(root, o),
+                          "pinned_version": profile["checks"][o["method"]]["expect"][0],
+                          "receipt": (record or {}).get("result", {}).get("receipt"),
+@@ -275,6 +287,7 @@ def proof_inventory(root, profile):
+                 binding = unseal(path)
+                 for o in binding["contract"]["obligations"]:
+                     rows.append({"id": o["id"], "method": o["method"], "entry": o["entry"],
++                                 "manifest": o.get("manifest", "verification/kani/Cargo.toml"),
+                                  "original_cases": o.get("evidence", {}).get("original_cases", []),
+                                  "status": "STALE_OR_INVALID_BINDING", "assurance": "unclassified",
+                                  "binding": path.stem, "blocker": str(exc)})
+diff --git a/infra/tests/test_catalog.py b/infra/tests/test_catalog.py
+index 0333ea6..69d214a 100644
+--- a/infra/tests/test_catalog.py
++++ b/infra/tests/test_catalog.py
+@@ -10,6 +10,17 @@ from agentinfra.catalog import candidates_for, cpp_case, inventory, python_case,
+ 
+ 
+ class TestCatalogExtraction(unittest.TestCase):
++    def test_super_fixture_reference_does_not_copy_unrelated_cases(self):
++        sources={"case.py":"from destiny.test import helpers\nclass Selected(helpers.Base):\n def setUp(self):\n  super(Selected,self).setUp()\n  self.check_setup()\n def test_selected(self):\n  self.assertEqual(self.park,7)\n def test_unrelated(self):\n  self.assertTrue(False, 'unrelated sentinel')\n",
++                 "python/destiny/test/helpers.py":"import unittest\nclass Base(unittest.TestCase):\n def setUp(self):\n  self.park=7\n def check_setup(self):\n  self.assertEqual(self.park,7)\n def tearDown(self):\n  del self.park\n"}
++        value=python_case("case.py","test_selected","Selected",sources.__getitem__)
++        text="\n".join(s["text"] for s in value["snippets"])
++        self.assertNotIn("unrelated sentinel",text)
++        for required in ("super(Selected,self).setUp()","self.park=7","def check_setup","def tearDown","self.assertEqual(self.park,7)"):
++            self.assertIn(required,text)
++        self.assertEqual(value["assertion_lines"],[7])
++        self.assertEqual([row["class"] for row in value["fixture_chain"]],["Selected","Base"])
++
+     def test_fixture_and_transitive_setup_are_extracted_from_source(self):
+         sources = {
+             "case.py": "from destiny.test import helpers\nclass Ball(helpers.Base):\n def test_slot(self):\n  ball = helpers.make(self.park)\n  self.assertEqual(ball.slot, helpers.SLOT)\n",
+diff --git a/infra/tests/test_destiny.py b/infra/tests/test_destiny.py
+index 3c9a8d8..2809163 100644
+--- a/infra/tests/test_destiny.py
++++ b/infra/tests/test_destiny.py
+@@ -7,6 +7,8 @@ import subprocess
+ import sys
+ import tempfile
+ import unittest
++from types import SimpleNamespace
++from unittest.mock import patch
+ 
+ FRAMEWORK = Path(__file__).resolve().parents[2]
+ CLI = FRAMEWORK / "bin/destinyctl.py"
+@@ -44,6 +46,31 @@ class DestinyFixture(unittest.TestCase):
+ 
+ 
+ class TestDestiny(DestinyFixture):
++    def test_actual_queue_keeps_fixture_identities_and_independent_lanes(self):
++        sys.path.insert(0,str(FRAMEWORK/"infra"))
++        from agentinfra.catalog import work_queue
++        from agentinfra.destiny import load_profile
++        source="python/test_case.py"
++        first=source+"::FirstFixture::test_a"
++        second=source+"::SecondFixture::test_a"
++        self.write("verification/kani/src/proofs.rs",
++            f"// original-test: {source}::test_a\n// original-case: {first}\nfn scenario() {{ assert!(true); }}\n")
++        rows=[{"id":identity,"source":source,"fixture":fixture,"test":"test_a",
++               "line":1,"original_commit":"0"*40,"original_source_sha256":"1"*64,
++               "legacy_marker":source+"::test_a", "legacy_multiplicity":2}
++              for identity,fixture in ((first,"FirstFixture"),(second,"SecondFixture"))]
++        with patch("agentinfra.catalog.qualified_index",return_value=rows):
++            result=work_queue(self.root,load_profile(),SimpleNamespace(original=None,differential=None,output=None))
++        self.assertEqual(result["qualified_identities"],2)
++        document=json.loads(Path(result["path"]).read_text())
++        entries={r["id"]:r for r in document["obligations"]}
++        self.assertTrue(entries[first]["assurance"]["mapped_or_marked"])
++        self.assertFalse(entries[second]["assurance"]["mapped_or_marked"])
++        for row in entries.values():
++            self.assertFalse(row["assurance"]["spec_proved"])
++            self.assertFalse(row["assurance"]["production_rust_refinement_proved"])
++            self.assertFalse(row["assurance"]["runtime_differential_evidence"])
++
+     def test_runtime_plan_is_ordered_and_deduplicated(self):
+         plan = self.call("plan", "--changed", "src/runtime.rs", "--changed", "src/runtime.rs")
+         ids = [row["id"] for row in plan["checks"]]
+diff --git a/infra/tests/test_destiny_hardening.py b/infra/tests/test_destiny_hardening.py
+index 49116aa..fc01d44 100644
+--- a/infra/tests/test_destiny_hardening.py
++++ b/infra/tests/test_destiny_hardening.py
+@@ -1,7 +1,11 @@
+ """Operational boundaries identified during branch reuse and adversarial review."""
+ from dataclasses import replace
+ import json
++import io
++import tarfile
++import hashlib
+ from pathlib import Path
++import subprocess
+ import sys
+ import unittest
+ 
+@@ -10,6 +14,8 @@ from test_destiny import DestinyFixture
+ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ from agentinfra.destiny_reuse import checked_output
+ from agentinfra.process import run_process
++from agentinfra.destiny import source_snapshot, registry_source_files
++from agentinfra.context_cache import sha256_file
+ 
+ 
+ class TestBranchVerifierReuse(unittest.TestCase):
+@@ -30,6 +36,70 @@ class TestBranchVerifierReuse(unittest.TestCase):
+ 
+ 
+ class TestDestinyHardening(DestinyFixture):
++    def test_proof_registry_payload_binds_actual_math_source_and_build_script(self):
++        self.write("verification/kani/Cargo.toml", "[package]\nname='proof'\nversion='0.1.0'\n")
++        home = self.root / "cargo-home"
++        tree = home / "registry/src/fixture-index/libm-0.2.16"
++        tree.mkdir(parents=True)
++        implementation = tree / "exp.rs"
++        implementation.write_text("original math\n")
++        (tree / "build.rs").write_text("original build\n")
++        archive = home / "registry/cache/fixture-index/libm-0.2.16.crate"
++        archive.parent.mkdir(parents=True)
++        with tarfile.open(archive, "w:gz") as release:
++            for source in (implementation, tree / "build.rs"):
++                data = source.read_bytes()
++                member = tarfile.TarInfo("libm-0.2.16/" + source.name)
++                member.size = len(data)
++                release.addfile(member, io.BytesIO(data))
++        checksum = hashlib.sha256(archive.read_bytes()).hexdigest()
++        self.write("verification/kani/Cargo.lock", "version=4\n[[package]]\nname='libm'\nversion='0.2.16'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nchecksum='" + checksum + "'\n")
++        env = {"CARGO_HOME": str(home)}
++        files = registry_source_files(self.root, "verification/kani/Cargo.toml", env)
++        self.assertIn(implementation, files)
++        self.assertIn(tree / "build.rs", files)
++        implementation.write_text("changed math\n")
++        with self.assertRaisesRegex(ValueError, "source differs from locked archive"):
++            registry_source_files(self.root, "verification/kani/Cargo.toml", env)
++        archive.write_bytes(b"wrong release")
++        with self.assertRaisesRegex(ValueError, "release checksum differs"):
++            registry_source_files(self.root, "verification/kani/Cargo.toml", env)
++
++    def test_embedded_repositories_bind_controller_and_vendor_source_separately(self):
++        for name in (".agents", "vendor/dependency"):
++            directory = self.root / name
++            directory.mkdir(parents=True)
++            subprocess.run(["git", "init", "-q", str(directory)], check=True)
++            (directory / "source.rs").write_text("original source\n")
++            (directory / ".gitignore").write_text(".aegis/\n.cargo/\n")
++            subprocess.run(["git", "-C", str(directory), "add", "."], check=True)
++            subprocess.run(["git", "-C", str(directory), "-c", "user.name=Fixture",
++                            "-c", "user.email=fixture@example.invalid", "commit", "-qm", "fixture"], check=True)
++        before = source_snapshot(self.root)
++        self.assertEqual(set(before["repositories"]), {".agents", "vendor/dependency"})
++        for name in (".agents", "vendor/dependency"):
++            directory = self.root / name
++            (directory / "source.rs").write_text("edited source\n")
++            edited = source_snapshot(self.root)
++            self.assertNotEqual(edited["digest"], before["digest"])
++            self.assertNotEqual(edited["repositories"][name]["source"], before["repositories"][name]["source"])
++            before = edited
++            (directory / "untracked.rs").write_text("new source\n")
++            self.assertNotEqual(source_snapshot(self.root)["digest"], before["digest"])
++            before = source_snapshot(self.root)
++            (directory / ".cargo").mkdir()
++            (directory / ".cargo/config.toml").write_text("[net]\noffline = true\n")
++            self.assertNotEqual(source_snapshot(self.root)["digest"], before["digest"])
++            before = source_snapshot(self.root)
++            (directory / ".aegis").mkdir()
++            (directory / ".aegis/receipt.json").write_text("{}\n")
++            self.assertEqual(source_snapshot(self.root), before)
++
++    def test_directory_glob_is_not_silently_ignored(self):
++        (self.root / "ordinary").mkdir()
++        with self.assertRaisesRegex(ValueError, "not a separate Git repository"):
++            source_snapshot(self.root, ["ordinary"])
++
+     def test_ignored_marker_inputs_are_fingerprinted(self):
+         self.write(".gitignore", ".aegis/\nverification/kani/ignored.rs\n.cargo/\n")
+         path = self.write("verification/kani/ignored.rs", "// original-test: example::first\n")
+diff --git a/infra/tests/test_evidence.py b/infra/tests/test_evidence.py
+index cedfabc..53f85eb 100644
+--- a/infra/tests/test_evidence.py
++++ b/infra/tests/test_evidence.py
+@@ -11,7 +11,7 @@ from unittest.mock import patch
+ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ from agentinfra.destiny import load_profile, matches_version
+ from agentinfra.destiny_reuse import digest
+-from agentinfra.evidence import classified, current_receipt, differential_cases, proof_identity, proof_output
++from agentinfra.evidence import classified, current_receipt, differential_cases, kani_properties, proof_identity, proof_output, property_name, property_location
+ from agentinfra.formal import AUTHORITY, validate_plan
+ 
+ CASE = "case.py::OriginalFixture::test_value"
+@@ -30,6 +30,35 @@ Complete - 1 successfully verified harnesses, 0 failures, 1 total.
+ 
+ 
+ class TestEvidence(unittest.TestCase):
++    def test_exact_helper_and_trait_property_names_preserve_spaces(self):
++        for name in ("proofs::compare::<f64, 8>.assertion.1", "<f64 as std::cmp::PartialEq>::eq.assertion.1"):
++            self.assertTrue(property_name(name,"assertion"))
++        for name in ("x.assertion.1\n", " x.assertion.1", "x\t.assertion.1", "x.cover.1"):
++            self.assertFalse(property_name(name,"assertion"))
++
++    def test_assertion_location_is_bound_to_the_actual_manifest_source(self):
++        (self.root/"verification/kani/src/proofs.rs").write_text("assert!(true);\n")
++        self.assertEqual(property_location(self.root,"verification/kani/Cargo.toml",
++            {"location":"src/proofs.rs:1:5 in function proofs::compare::<f64, 8>"}),
++            {"file":"verification/kani/src/proofs.rs","line":1})
++        self.assertIsNone(property_location(self.root,"verification/kani/Cargo.toml",
++            {"location":"src/proofs.rs:2:5 in function proofs::compare::<f64, 8>"}))
++
++    def test_property_names_with_rust_type_spaces_are_never_dropped(self):
++        name = "std::cmp::<impl PartialEq for i8>::eq.pointer_dereference.1"
++        output = OUTPUT.replace("SUMMARY:", f"Check 3: {name}\n - Status: FAILURE\nSUMMARY:")
++        self.assertEqual(kani_properties(output)[name]["status"], "FAILURE")
++        self.assertFalse(proof_output(self.obligation, self.output(output)))
++
++    def test_incomplete_property_inventory_is_rejected(self):
++        for output in (OUTPUT.replace("Check 2:", "Check 3:"),
++                       OUTPUT.replace(" - Status: SATISFIED\n", "")):
++            self.assertFalse(proof_output(self.obligation, self.output(output)))
++
++    def test_manifest_relative_cover_locations_resolve_to_the_bound_source(self):
++        self.obligation["evidence"] = self.scope
++        receipt = {"commands": [{"stdout": OUTPUT.replace("src/runtime.rs:1:1", "src/../../../src/runtime.rs:1:1"), "stderr": ""}]}
++        self.assertEqual(classified(self.root, self.obligation, receipt), "production_rust_refinement_proved")
+     def setUp(self):
+         self.temp = tempfile.TemporaryDirectory()
+         self.addCleanup(self.temp.cleanup)
+diff --git a/infra/tests/test_formal_workflow.py b/infra/tests/test_formal_workflow.py
+index c8a2578..9b051ab 100644
+--- a/infra/tests/test_formal_workflow.py
++++ b/infra/tests/test_formal_workflow.py
+@@ -88,6 +88,15 @@ class TestFormalWorkflow(DestinyFixture):
+         self.assertEqual(self.call("verify", "formation-slot", "--verus", tool, ok=False)["status"], "UNAVAILABLE")
+         self.assertEqual(self.call("audit", ok=False)["status"], "INCOMPLETE")
+ 
++    def test_changed_solver_behind_unchanged_verifier_is_stale(self):
++        tool = self.verifier()
++        solver = Path(tool).parent / "z3"
++        solver.write_text("synthetic solver payload one")
++        self.bind()
++        self.call("verify", "formation-slot", "--verus", tool)
++        solver.write_text("synthetic solver payload two")
++        self.assertEqual(self.call("audit", ok=False)["obligations"][0]["status"], "STALE_TOOL_PAYLOAD")
++
+     def test_ignored_declared_proof_changes_invalidate_binding(self):
+         self.write(".gitignore", ".aegis/\nverification/verus/proofs.rs\n")
+         self.bind()
+diff --git a/modules/destiny/profile.toml b/modules/destiny/profile.toml
+index a1a3200..f5dedb6 100644
+--- a/modules/destiny/profile.toml
++++ b/modules/destiny/profile.toml
+@@ -13,7 +13,10 @@ verus = "0.2026.09.20.aef82ed"
+ [economy]
+ context_bytes = 12000
+ max_context_bytes = 64000
+-output_bytes = 16000
++# Regular Kani property inventories must be retained in full for review.
++# Evolve's observed regular inventory is 884222 bytes. Keep a bounded full
++# inventory without disabling safety/reachability checks or discarding entries.
++output_bytes = 2000000
+ default_budget_seconds = 900
+ max_attempts_per_input = 2
+ 
+diff --git a/infra/agentinfra/coverage.py b/infra/agentinfra/coverage.py
+new file mode 100644
+index 0000000..9eb7494
+--- /dev/null
++++ b/infra/agentinfra/coverage.py
+@@ -0,0 +1,110 @@
++"""Conjoin assertion-level case obligations; a partial proof is never a full case."""
++import re
++from .evidence import property_name
++from .destiny_reuse import load_json, require
++from .security import confined_path
++from .context_cache import sha256_file
++
++LANES = ("spec_proved", "production_rust_refinement_proved")
++
++
++def mappings(root, rows):
++    path = confined_path(root, "verification/cases/mappings.json")
++    if not path.exists():
++        return {}
++    require(path.stat().st_size <= 4_000_000, "assertion mapping exceeds bounded input size")
++    document = load_json(path.read_text())
++    require(document.get("schema") == 1 and document.get("original_commit") == rows[0]["original_commit"],
++            "assertion mapping authority differs")
++    require(type(document.get("cases")) is list, "assertion mapping cases must be a list")
++    index = {r["id"]: r for r in rows}
++    inventory_path = confined_path(root, "verification/cases/inventory.json", must_exist=True)
++    require(inventory_path.stat().st_size <= 2_000_000, "case inventory exceeds bounded input size")
++    inventory = load_json(inventory_path.read_text())
++    require(inventory.get("original_commit") == rows[0]["original_commit"] and
++            inventory.get("catalog_sha256") == sha256_file(confined_path(root, "verification/spec/src/catalog.rs")),
++            "assertion inventory authority differs")
++    original_cases = {c["id"]: c for c in inventory["cases"]}
++    require(len(original_cases) == len(inventory["cases"]) and set(original_cases) == set(index),
++            "assertion inventory omitted or merged a fixture-qualified original")
++    found = {}
++    for record in document["cases"]:
++        identity = record.get("id")
++        require(identity in index and identity not in found, "unknown/ambiguous/duplicate assertion mapping identity")
++        require(record.get("original_source_sha256") == index[identity]["original_source_sha256"], "assertion mapping original source differs")
++        require(record.get("status") in {"Specified", "ImplementationMissing", "ProofMissing", "KnownMismatch"},
++                "assertion mapping must retain an unproved Destiny obligation status")
++        original = original_cases[identity]
++        require(original["original_source_sha256"] == record["original_source_sha256"], "case inventory source differs")
++        if record.get("rust_translation_reviewed") is True:
++            require(original["extraction_status"] != "BLOCKED", "blocked source extraction cannot discharge assertion review")
++            require(type(record.get("assertions")) is list and
++                    len(record["assertions"]) == len({a["original_id"] for a in record["assertions"]}) and
++                    {a["original_id"] for a in record["assertions"]} == set(original["assertion_ids"]),
++                    "every original assertion/helper site needs a distinct reviewed mapping")
++            require(type(record.get("dependency_mappings")) is list and
++                    {d["original_id"] for d in record["dependency_mappings"]} == set(original["dependency_ids"]) and
++                    len(record["dependency_mappings"]) == len(original["dependency_ids"]),
++                    "every setup/helper dependency needs a reviewed mapping")
++            require(isinstance(record.get("execution_review"), str) and bool(record["execution_review"].strip()),
++                    "no-unexpected-exception, ordering and teardown review required")
++            require(isinstance(record.get("reference_review"), str) and bool(record["reference_review"].strip()),
++                    "implementation dependency reference review required")
++            for assertion in record["assertions"]:
++                require(isinstance(assertion.get("rule"), str) and bool(assertion["rule"].strip()), "original-backed rule required")
++                require(type(assertion.get("rust_assertions")) is list and assertion["rust_assertions"], "Rust assertion locations required")
++                for rust in assertion["rust_assertions"]:
++                    source = confined_path(root, rust["file"], must_exist=True)
++                    lines = source.read_text().splitlines()
++                    require(type(rust["line"]) is int and 1 <= rust["line"] <= len(lines) and
++                            "assert" in lines[rust["line"] - 1], "mapped Rust assertion location differs")
++                    require(isinstance(rust.get("entry"), str) and isinstance(rust.get("manifest"), str) and
++                            isinstance(rust.get("property"), str) and
++                            property_name(rust["property"], "assertion"),
++                            "mapped assertion must name its exact selected harness and observed property")
++            for dependency in record["dependency_mappings"]:
++                require(isinstance(dependency.get("relation"), str) and bool(dependency["relation"].strip()), "dependency relation required")
++        require(type(record.get("required_obligations")) is dict and set(record["required_obligations"]) == set(LANES),
++                "declare both independent proof lanes")
++        for lane in LANES:
++            requirements = record["required_obligations"][lane]
++            require(type(requirements) is list and all(
++                type(r) is dict and set(r) == {"entry", "manifest", "assertion_properties"} and
++                isinstance(r["entry"], str) and isinstance(r["manifest"], str) and
++                type(r["assertion_properties"]) is list and r["assertion_properties"] and
++                all(property_name(p, "assertion") for p in r["assertion_properties"]) for r in requirements),
++                "exact required manifest/harness declarations needed")
++            require(len(requirements) == len({(r["manifest"], r["entry"]) for r in requirements}), "duplicate case proof requirement")
++        if record.get("rust_translation_reviewed") is True:
++            declared = {(r["entry"], r["manifest"], p) for requirements in record["required_obligations"].values()
++                        for r in requirements for p in r["assertion_properties"]}
++            require(all((r["entry"], r["manifest"], r["property"]) in declared for a in record["assertions"]
++                        for r in a["rust_assertions"]), "mapped assertion is absent from required obligations")
++        residual = record.get("residual_correspondence", [])
++        require(type(residual) is list and all(type(r) is dict and set(r) == {"lane", "relation"} and
++                r["lane"] in LANES and isinstance(r["relation"], str) and bool(r["relation"].strip()) for r in residual),
++                "residual correspondence obligations need an exact lane and concrete relation")
++        found[identity] = record
++    return found
++
++
++def assurance(record, proofs):
++    if record is None:
++        return {lane: False for lane in LANES}
++    levels = {}
++    for lane in LANES:
++        requirements = record["required_obligations"][lane]
++        # Unmapped assertions/setup or a missing required proof keeps this false.
++        reviewed = record.get("rust_translation_reviewed") is True
++        residual = any(r["lane"] == lane for r in record.get("residual_correspondence", []))
++        levels[lane] = reviewed and not residual and bool(requirements) and all(any(
++            p.get("status") == "CHECKED_SCOPED" and p.get("assurance") == lane and
++            p.get("entry") == r["entry"] and p.get("manifest", "verification/kani/Cargo.toml") == r["manifest"] and
++            set(r["assertion_properties"]).issubset(p.get("assertion_properties", []))
++            and all(p.get("assertion_locations", {}).get(a["property"]) ==
++                    {"file": a["file"], "line": a["line"]}
++                    for assertion in record.get("assertions", [])
++                    for a in assertion.get("rust_assertions", [])
++                    if a["entry"] == r["entry"] and a["manifest"] == r["manifest"])
++            for p in proofs) for r in requirements)
++    return levels
+diff --git a/infra/tests/test_coverage.py b/infra/tests/test_coverage.py
+new file mode 100644
+index 0000000..4053a45
+--- /dev/null
++++ b/infra/tests/test_coverage.py
+@@ -0,0 +1,71 @@
++"""Synthetic union tests; these establish no Destiny behavioral proof."""
++from pathlib import Path
++import sys
++import unittest
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
++from agentinfra.coverage import assurance
++
++
++class TestCaseConjunction(unittest.TestCase):
++    def setUp(self):
++        self.record = {"rust_translation_reviewed": True, "required_obligations": {
++            "spec_proved": [{"entry": "proofs::a", "manifest": "verification/kani/Cargo.toml", "assertion_properties": ["a.assertion.1"]},
++                            {"entry": "proofs::b", "manifest": "verification/kani/Cargo.toml", "assertion_properties": ["b.assertion.1", "b.assertion.2"]}],
++            "production_rust_refinement_proved": [{"entry": "proofs::c", "manifest": "other/Cargo.toml", "assertion_properties": ["c.assertion.1"]}]}}
++
++    def proof(self, entry, kind="spec_proved", manifest="verification/kani/Cargo.toml", status="CHECKED_SCOPED"):
++        name = entry.split("::")[-1]
++        return {"entry": entry, "assurance": kind, "manifest": manifest, "status": status,
++                "assertion_properties": [f"{name}.assertion.1", f"{name}.assertion.2"]}
++
++    def test_partial_assertion_list_does_not_discharge_a_whole_harness_requirement(self):
++        proof = self.proof("proofs::b")
++        proof["assertion_properties"] = ["b.assertion.1"]
++        self.assertFalse(assurance(self.record, [self.proof("proofs::a"), proof])["spec_proved"])
++
++    def test_one_success_does_not_discharge_two_assertion_obligations(self):
++        self.assertFalse(assurance(self.record, [self.proof("proofs::a")])["spec_proved"])
++
++    def test_proved_kernel_retains_unproved_wrapper_correspondence(self):
++        proof = self.proof("proofs::c", kind="production_rust_refinement_proved", manifest="other/Cargo.toml")
++        self.assertTrue(assurance(self.record, [proof])["production_rust_refinement_proved"])
++        self.record["residual_correspondence"] = [{"lane": "production_rust_refinement_proved",
++            "relation": "Native attachment and input conversion remain unproved"}]
++        levels = assurance(self.record, [self.proof("proofs::a"), self.proof("proofs::b"), proof])
++        self.assertTrue(levels["spec_proved"])
++        self.assertFalse(levels["production_rust_refinement_proved"])
++        self.assertTrue(assurance(self.record, [self.proof("proofs::a"), self.proof("proofs::b")])["spec_proved"])
++
++    def test_stale_wrong_manifest_or_wrong_lane_does_not_discharge_requirement(self):
++        for proof in (self.proof("proofs::b", status="STALE_SOURCE"),
++                      self.proof("proofs::b", manifest="other/Cargo.toml"),
++                      self.proof("proofs::b", kind="production_rust_refinement_proved")):
++            self.assertFalse(assurance(self.record, [self.proof("proofs::a"), proof])["spec_proved"])
++
++    def test_review_and_nonempty_requirements_are_required(self):
++        self.assertFalse(any(assurance(None, [self.proof("proofs::a")]).values()))
++        self.record["rust_translation_reviewed"] = False
++        self.assertFalse(any(assurance(self.record, [self.proof("proofs::a"), self.proof("proofs::b")]).values()))
++        self.record["rust_translation_reviewed"] = True
++        self.record["required_obligations"]["spec_proved"] = []
++        self.assertFalse(assurance(self.record, [self.proof("proofs::a")])["spec_proved"])
++
++    def test_shared_helper_property_needs_its_exact_observed_location(self):
++        helper="proofs::compare::<f64, 8>.assertion.1"
++        self.record["required_obligations"]["spec_proved"][1]["assertion_properties"].append(helper)
++        self.record["assertions"]=[{"rust_assertions":[{"entry":"proofs::b",
++            "manifest":"verification/kani/Cargo.toml", "property":helper,
++            "file":"verification/kani/src/helpers.rs", "line":7}]}]
++        proof=self.proof("proofs::b")
++        proof["assertion_properties"].append(helper)
++        proofs=[self.proof("proofs::a"),proof]
++        self.assertFalse(assurance(self.record,proofs)["spec_proved"])
++        proof["assertion_locations"]={helper:{"file":"verification/kani/src/helpers.rs","line":7}}
++        self.assertTrue(assurance(self.record,proofs)["spec_proved"])
++        proof["assertion_locations"][helper]["line"]=8
++        self.assertFalse(assurance(self.record,proofs)["spec_proved"])
++
++
++if __name__ == "__main__":
++    unittest.main()

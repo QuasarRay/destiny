@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "repository": "https://github.com/QuasarRay/Aegis.git",
+  "base_commit": "46f90f7dbc4f3db8a1a74ef9d8aa91fb4b679460",
+  "patch_sha256": "28a0f036e5bbba179aaeb699a040ef13fee625355c8940286c88fb2d5bfd6f8b",
+  "postimages": {
+    "infra/agentinfra/catalog.py": "79a47d8f688bc678381d3bd65fb295fed184fe714a875603cce0b9e5ca37eddf",
+    "infra/agentinfra/coverage.py": "71d85843d044a167a75a08acf924ff0c1518ad7e74be5b9a35ae7d2a2b7de703",
+    "infra/agentinfra/destiny.py": "eee16f2921fa77f5a94d1a943745ba811a4f40d40f60c9f46ec2f5adaf64901c",
+    "infra/agentinfra/evidence.py": "da3b36acf7d984ad6a305b334e8cbd782465171e9c6654dd2310183e1f53cbc9",
+    "infra/agentinfra/formal.py": "7d15702f87a90a93922eb216eb446cea7eb0b1178550a34a0c4507a22782257b",
+    "infra/tests/test_catalog.py": "1e43ae24435d60a9e15d7f25563411a00d535ee6e1542a2cb0f739cb78b1023f",
+    "infra/tests/test_coverage.py": "215de8aa97ee3e6235e2ef7d6754e096c8ce813d567bff6c6572eeb9d24be5f6",
+    "infra/tests/test_destiny.py": "1c42437b398c5a614f811b89b6ffc84c646ae04dec38efe5009dd5bc639ccb74",
+    "infra/tests/test_destiny_hardening.py": "445d01c475caa86d2b8b764410d0c85b7db850f731c3097afe37c36d16156b8c",
+    "infra/tests/test_evidence.py": "5ee13688dd0c821b82de05abd455014ee941d47ac74376a241edb7555806b308",
+    "infra/tests/test_formal_workflow.py": "772f51cd659df366d0da7c15ea2ab2ac9317146d6624c029446404aea6660c42",
+    "modules/destiny/profile.toml": "f962a5c5f240891d252e2df65e6c0f38d5fdd9fcd34cc728e8d2fd73fbfdb3d3"
+  },
+  "upstream_license": "No LICENSE or COPYING file is present at this supplied controller pin. Preserve any upstream notices; this patch does not declare a license for upstream Aegis.",
+  "scope": "Existing catalog/provenance/strict evidence/fixture-qualified conjunction hardening and focused regressions only; no proof result is exported."
+}

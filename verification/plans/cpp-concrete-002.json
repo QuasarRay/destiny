@@ -1,0 +1,1432 @@
+{
+  "schema": 1,
+  "objective": "Verify the complete reviewed C++ concrete assertion scenarios represented by this bounded plan.",
+  "authority_sha256": "e5f0221696f05823a88ee83123d6be3d774da21e7eb284306090c42d405a1376",
+  "reference_review": "Behavioral authority ef738406b61ad06bae2f402857e464735ab106a2; formation CI authority 114e89fa584f0e1a81eb0a679aabf41af8870072. These test/geometry/collision definition hashes match across pins; exact reviewed paths and any other differences are retained in verification/cases/reference_review.json.",
+  "reuse": {
+    "strategy": "reuse",
+    "sources": [
+      "Original C++ test and geometry/collision definitions at ef738406b61ad06bae2f402857e464735ab106a2",
+      "Reviewed existing engine-independent Rust specification and concrete Kani counterparts",
+      "Real complete Kani 0.68.0 property discovery recorded in mappings.json; no status imported as fresh proof"
+    ],
+    "license": "MIT: original Destiny notices retained in source; existing verification and controller notices preserved.",
+    "reason": "Reuse the reviewed concrete counterparts and existing strict controller; no new prover or unproved replacement operation.",
+    "generator": [
+      "python3",
+      "verification/tools/generate_formal_plans.py"
+    ]
+  },
+  "obligations": [
+    {
+      "id": "cpp-b9fa1e2648ea9297",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::GetClosestPoint::PointBelowTriangle satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_closest_point_below_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::GetClosestPoint::PointBelowTriangle"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_closest_point_below_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_closest_point_below_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 348
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-e7a6b68673e30a8d",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::GetClosestPoint::PointBottomOfTriangle satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_closest_point_bottom_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::GetClosestPoint::PointBottomOfTriangle"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_closest_point_bottom_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_closest_point_bottom_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 370
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-89e526f12a8e33ea",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::GetClosestPoint::PointLeftOfTriangle satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_closest_point_left_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::GetClosestPoint::PointLeftOfTriangle"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_closest_point_left_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_closest_point_left_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 359
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-0ce742b0facb145f",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::GetClosestPoint::PointOffTheLongSide satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_closest_point_long_side_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::GetClosestPoint::PointOffTheLongSide"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_closest_point_long_side_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_closest_point_long_side_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 403
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-7cf0e65fab736a4f",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::GetClosestPoint::PointRightOfTriangle satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_closest_point_right_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::GetClosestPoint::PointRightOfTriangle"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_closest_point_right_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_closest_point_right_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 381
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-633c308e26bcf2e9",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::GetClosestPoint::PointTopOfTriangle satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_closest_point_top_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::GetClosestPoint::PointTopOfTriangle"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_closest_point_top_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_closest_point_top_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 392
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-651a76a262fe230e",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::PointInTriangle::CenterOfTriangle satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_contains_center_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::PointInTriangle::CenterOfTriangle"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_contains_center_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_contains_center_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 296
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-089a3f6e3febfb58",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::PointInTriangle::OutsideAB satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_rejects_outside_ab_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::PointInTriangle::OutsideAB"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_rejects_outside_ab_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_rejects_outside_ab_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 306
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-11ff7e87526e7a97",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::PointInTriangle::OutsideAC satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_rejects_outside_ac_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::PointInTriangle::OutsideAC"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_rejects_outside_ac_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_rejects_outside_ac_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 316
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-a984aacd15342dfd",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::PointInTriangle::OutsideBC satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_rejects_outside_bc_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::PointInTriangle::OutsideBC"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_rejects_outside_bc_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_rejects_outside_bc_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 326
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-9d06c2fa2f671249",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::Triangle::CanCreate satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_constructor_preserves_vertices",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::Triangle::CanCreate"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_constructor_preserves_vertices.assertion.1",
+          "geometry_contracts::triangle_constructor_preserves_vertices.assertion.2",
+          "geometry_contracts::triangle_constructor_preserves_vertices.assertion.3"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_constructor_preserves_vertices.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 276
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-08a448feb1ad0f5e",
+      "invariant": "The concrete pinned scenario tests/TestTriangle.cpp::Triangle::GetNormal satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::triangle_normal_matches_original_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestTriangle.cpp::Triangle::GetNormal"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::triangle_normal_matches_original_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::triangle_normal_matches_original_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 286
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-8358da33a8cb5ec8",
+      "invariant": "The concrete pinned scenario tests/TestVector3d.cpp::Vector3d::InitializesToZero satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::vector_initializes_to_zero",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestVector3d.cpp::Vector3d::InitializesToZero"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::vector_initializes_to_zero.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::vector_initializes_to_zero.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 14
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-6895415c62f13714",
+      "invariant": "The concrete pinned scenario tests/TestVector3d.cpp::Vector3d::Subtraction satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::vector_subtraction_matches_original_case",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestVector3d.cpp::Vector3d::Subtraction"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::vector_subtraction_matches_original_case.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::vector_subtraction_matches_original_case.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 24
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-f117f5f0145fbda7",
+      "invariant": "The concrete pinned scenario tests/TestVector3d.cpp::Vector3dCrossProduct::OrthogonalVectors satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::orthogonal_vector_cross_product_is_positive_z",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestVector3d.cpp::Vector3dCrossProduct::OrthogonalVectors"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::orthogonal_vector_cross_product_is_positive_z.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::orthogonal_vector_cross_product_is_positive_z.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 44
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    },
+    {
+      "id": "cpp-62f8544848a25316",
+      "invariant": "The concrete pinned scenario tests/TestVector3d.cpp::Vector3dCrossProduct::ParallelVectors satisfies the entire recorded original assertion conjunction after its exact construction and operation sequence.",
+      "method": "kani",
+      "entry": "geometry_contracts::parallel_vector_cross_product_is_zero",
+      "manifest": "verification/kani/Cargo.toml",
+      "expected_checks": 1,
+      "specification": [
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/ball.rs",
+        "verification/spec/src/bounded_list.rs",
+        "verification/spec/src/box_shape.rs",
+        "verification/spec/src/catalog.rs",
+        "verification/spec/src/client_history.rs",
+        "verification/spec/src/collision.rs",
+        "verification/spec/src/formation.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/lib.rs",
+        "verification/spec/src/model.rs",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_park.rs",
+        "verification/spec/src/python_assertions.rs",
+        "verification/spec/src/server_actions.rs",
+        "verification/spec/src/settings.rs",
+        "verification/spec/src/update_batcher.rs",
+        "verification/spec/src/visibility.rs"
+      ],
+      "implementation": [
+        "verification/spec/src/model.rs",
+        "verification/spec/src/geometry.rs",
+        "verification/spec/src/collision.rs"
+      ],
+      "proof_inputs": [
+        "rust-toolchain.toml",
+        "src/formation.rs",
+        "verification/cases/inventory.json",
+        "verification/cases/mappings.json",
+        "verification/cases/reference_review.json",
+        "verification/kani/Cargo.lock",
+        "verification/kani/Cargo.toml",
+        "verification/kani/src/ball_contracts.rs",
+        "verification/kani/src/box_contracts.rs",
+        "verification/kani/src/client_history_contracts.rs",
+        "verification/kani/src/collision_contracts.rs",
+        "verification/kani/src/contracts.rs",
+        "verification/kani/src/formation_contracts.rs",
+        "verification/kani/src/formation_refinement.rs",
+        "verification/kani/src/geometry_contracts.rs",
+        "verification/kani/src/lib.rs",
+        "verification/kani/src/lifecycle_contracts.rs",
+        "verification/kani/src/metaverification.rs",
+        "verification/kani/src/park_contracts.rs",
+        "verification/kani/src/server_actions_contracts.rs",
+        "verification/kani/src/settings_contracts.rs",
+        "verification/kani/src/state_contracts.rs",
+        "verification/kani/src/update_batcher_contracts.rs",
+        "verification/kani/src/visibility_contracts.rs",
+        "verification/meta-support/Cargo.lock",
+        "verification/meta-support/Cargo.toml",
+        "verification/meta-support/src/lib.rs",
+        "verification/meta/Cargo.lock",
+        "verification/meta/Cargo.toml",
+        "verification/meta/src/lib.rs",
+        "verification/tools/generate_case_mappings.py",
+        "verification/tools/generate_formal_plans.py"
+      ],
+      "assumptions": "Concrete original literals, reviewed C++ fixture initialization and macro semantics; f64 IEEE arithmetic and the pinned Kani builtin model for supported operations. No kani::assume in these concrete C++ harnesses. Preserve all source-declared unwind limits; no safety or reachability checks disabled.",
+      "limits": "Specification scenario only. It does not establish arbitrary input-domain parity, native C++ compiler/GTest execution, platform ABI, Python loading, engine wrapper behavior or production refinement. Every production correspondence requirement remains in mappings.json.",
+      "evidence": {
+        "kind": "spec_proved",
+        "original_cases": [
+          "tests/TestVector3d.cpp::Vector3dCrossProduct::ParallelVectors"
+        ],
+        "assertion_properties": [
+          "geometry_contracts::parallel_vector_cross_product_is_zero.assertion.1"
+        ],
+        "reachability": [
+          {
+            "property": "geometry_contracts::parallel_vector_cross_product_is_zero.cover.1",
+            "file": "verification/kani/src/geometry_contracts.rs",
+            "line": 34
+          }
+        ],
+        "relation": "All original assertion sites are mapped to the complete Rust assertion conjunction in verification/kani/src/geometry_contracts.rs; vector equality expands to all three exact coordinates and floating comparisons preserve the original four-ULP rule where used.",
+        "review": "Original fixture/test definitions and consumed geometry/collision definitions were read at the behavioral pin. Their per-file hashes and revision differences are in reference_review.json. Assertion/dependency locations, exact manifest/harness and observed regular-output properties are in mappings.json. Discovery is historical; fresh classified verification and source-location matching are required for credit."
+      }
+    }
+  ]
+}

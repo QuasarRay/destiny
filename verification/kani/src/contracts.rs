@@ -1,11 +1,14 @@
 use destiny_original_spec::{
-    MotionMode, ParkState, add_ball_is_permitted, apply_non_negative_setter,
-    apply_positive_setter, clamp_speed_fraction, follow_allowed, missile_follow_range,
-    non_negative_setter_accepts, orbit_allowed, positive_setter_accepts,
-    proximity_eligible, stopped_mode, uncloak_restores_massive, visibility_occluder,
+    MotionMode, ParkState, add_ball_is_permitted, apply_non_negative_setter, apply_positive_setter,
+    clamp_speed_fraction, follow_allowed, missile_follow_range, non_negative_setter_accepts,
+    orbit_allowed, positive_setter_accepts, proximity_eligible, stopped_mode,
+    uncloak_restores_massive, visibility_occluder,
 };
 
 // original-test: python/destiny/test/ballpark/evolve/test_add.py::test_balls_can_not_be_added_during_evolve
+// original-case: python/destiny/test/ballpark/evolve/test_add.py::TestAdd::test_balls_can_not_be_added_during_evolve
+// Partial rule only: the original also requires Warp completion, DoModeChange
+// dispatch, helper AddBall returning None, and termination of its Evolve loop.
 #[cfg(kani)]
 #[kani::proof]
 fn original_add_during_evolve_contract_rejects_every_evolving_state() {
@@ -17,6 +20,7 @@ fn original_add_during_evolve_contract_rejects_every_evolving_state() {
         time,
     };
     assert!(!add_ball_is_permitted(&park));
+    kani::cover!(park.evolving && !add_ball_is_permitted(&park));
 }
 
 #[cfg(kani)]
@@ -30,6 +34,7 @@ fn original_add_outside_evolve_contract_permits_every_non_evolving_state() {
         time,
     };
     assert!(add_ball_is_permitted(&park));
+    kani::cover!(!park.evolving && add_ball_is_permitted(&park));
 }
 
 // original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_setting_ball_radius_to_negative_value_is_ineffective
@@ -116,7 +121,6 @@ fn speed_fraction_inside_closed_unit_interval_is_unchanged() {
         requested.to_bits()
     );
 }
-
 
 // original-test: python/destiny/test/ballpark/test_movement_controls.py::test_ball_can_not_follow_self
 #[cfg(kani)]
@@ -216,7 +220,11 @@ fn uncloak_does_not_restore_massive_in_warp() {
 fn proximity_rejects_non_free_owners() {
     let target_interactive: bool = kani::any();
     let only_interactives: bool = kani::any();
-    assert!(!proximity_eligible(false, target_interactive, only_interactives));
+    assert!(!proximity_eligible(
+        false,
+        target_interactive,
+        only_interactives
+    ));
 }
 
 // original-test: python/destiny/test/ballpark/test_callbacks.py::test_only_interactives_ignores_non_interactive_balls

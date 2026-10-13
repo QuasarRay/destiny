@@ -9,5 +9,11 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
+[dependencies]
+# Kani 0.68.0 rejects the platform foreign atan2 call. Use an actual portable
+# implementation in both normal and proof builds; preserve its full checks.
+# Correspondence to the original C atan2 remains a numerical obligation.
+libm = { version = "=0.2.16", default-features = false }
+
 [lints.rust]
 unsafe_code = "forbid"

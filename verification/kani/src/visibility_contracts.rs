@@ -1,6 +1,6 @@
 use destiny_original_spec::{
-    VisibilityState, cloak_transition, scan_cone_pi_over_2_x,
-    uncloak_transition, visibility_candidate_blocks, visibility_result,
+    VisibilityState, cloak_transition, scan_cone_pi_over_2_x, uncloak_transition,
+    visibility_candidate_blocks, visibility_result,
 };
 
 // original-test: python/destiny/test/ballpark/test_visibility.py::test_returns_zero_when_there_is_no_occlusion

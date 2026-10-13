@@ -1,0 +1,1368 @@
+{
+  "catalog_source_files": 34,
+  "files": [
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_add.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "8fa54f5dd3910918f1cf9ddf658f8b8b86699b4f165d95cedca957580c0c409f",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "8fa54f5dd3910918f1cf9ddf658f8b8b86699b4f165d95cedca957580c0c409f"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_follow.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "c343e312ca36a9b7ecc3d162889086cc965803fc4d364e38a82eb4da80e5b1b9",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "c343e312ca36a9b7ecc3d162889086cc965803fc4d364e38a82eb4da80e5b1b9"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_goto.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "db09fe76bbe6f2f888e54d54ddbc59a58e4a319a60736a0faeaa7fc0eb79b172",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "db09fe76bbe6f2f888e54d54ddbc59a58e4a319a60736a0faeaa7fc0eb79b172"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_iterative_collision.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "024b1dd360c1d92562e175640559cd4d8284c9a10b8c87c8f372f53f2a69c831",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "024b1dd360c1d92562e175640559cd4d8284c9a10b8c87c8f372f53f2a69c831"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_minis.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "c26676e43f9557c49b25ed404895c0ba0bfd5ab5d25b4b34b7d2037c527d4ebe",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "c26676e43f9557c49b25ed404895c0ba0bfd5ab5d25b4b34b7d2037c527d4ebe"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_missile.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_orbit.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "813029bedae13ff9928a9055c6f4e59334924c1048d28074be134e8b1b242466",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "813029bedae13ff9928a9055c6f4e59334924c1048d28074be134e8b1b242466"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_simple_collision.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "7a19dd4c81f42fec1888207329bff1cd63a748d9bcc22c2f1ae83e4cd1c294f5",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "7a19dd4c81f42fec1888207329bff1cd63a748d9bcc22c2f1ae83e4cd1c294f5"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_stop.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "85a31d0d1ec984a5ae1dc2feef72b73d1eff97616f6599911787e58db20e89de",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "85a31d0d1ec984a5ae1dc2feef72b73d1eff97616f6599911787e58db20e89de"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/evolve/test_warp.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "7e7fd14f284fdc576b1f83ff1a2fa79545908a1edde5176b7145193676e72c01",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "7e7fd14f284fdc576b1f83ff1a2fa79545908a1edde5176b7145193676e72c01"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_boxes_and_bubbles.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_callbacks.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_getters_and_setters.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "14437b607ecf4a97471762b5f448147f75f70d7ab264a962f8110f30506d2596",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "14437b607ecf4a97471762b5f448147f75f70d7ab264a962f8110f30506d2596"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_lifecycle_management.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "2fc8a1007583e83d11a9bea8ac2179e624a202684c22813817a32c60c143f086",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "2fc8a1007583e83d11a9bea8ac2179e624a202684c22813817a32c60c143f086"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_movement_controls.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "8e91759d6ab143adcb64e4889bd597eb48ff2a69ae6ce6dbdd53477f23f2fcf7",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "8e91759d6ab143adcb64e4889bd597eb48ff2a69ae6ce6dbdd53477f23f2fcf7"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_stream_read_write.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "1484eadfd21e991a5cb85bcd2b07097c2f959aa14b264cd9b3219fc36cbf0e86",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "1484eadfd21e991a5cb85bcd2b07097c2f959aa14b264cd9b3219fc36cbf0e86"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_time.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "358ad2c8e9b28cf71b0ece55591cea8499b308a8bc0cf28a0717a898c3d58f4f",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "358ad2c8e9b28cf71b0ece55591cea8499b308a8bc0cf28a0717a898c3d58f4f"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/ballpark/test_visibility.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "cce3f8bea2aba26789c89a00675dfa698d90d906f7d87af784900d69fbb0bc66",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "cce3f8bea2aba26789c89a00675dfa698d90d906f7d87af784900d69fbb0bc66"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/net/client/test_mergestateintohistory.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "3814908c5e3be1e12bf4d628321bb32629603748bd6372e1e4996d1e7e010a78",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "3814908c5e3be1e12bf4d628321bb32629603748bd6372e1e4996d1e7e010a78"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/net/client/test_ticker.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/net/server/test_actions.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "f1b53d5a4a63fd73df4a0e0770c0bd8e713577278e97657d7c4151230bb2212b",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "f1b53d5a4a63fd73df4a0e0770c0bd8e713577278e97657d7c4151230bb2212b"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/net/server/test_bubbleupdater.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "891a852dad3942dcaad384460cb448c2576d49d8e94a0c35ca75c1c0aed139b0",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "891a852dad3942dcaad384460cb448c2576d49d8e94a0c35ca75c1c0aed139b0"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/net/server/test_ticker.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "e3ca9496603f83467a5fd808551dbaf959e6c10d4206a332d2e2f3ca612ad790",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "e3ca9496603f83467a5fd808551dbaf959e6c10d4206a332d2e2f3ca612ad790"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/net/server/test_updatebatcher.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "7fd21a9587140ea97736480b9355400b29f7798d5504f799b4f32de543d6cb36",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "7fd21a9587140ea97736480b9355400b29f7798d5504f799b4f32de543d6cb36"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/test_ball.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "eb79d55cf1e8b94b5895b9824f68c6f5d4fee7c61b384212316f9f284fe45d26",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "eb79d55cf1e8b94b5895b9824f68c6f5d4fee7c61b384212316f9f284fe45d26"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/test_cleanup.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/test_configure.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "ca729fa93441c368f48b8cddc469bd5f1ca3bf32bc193a402ff5b5fa383637e7",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "ca729fa93441c368f48b8cddc469bd5f1ca3bf32bc193a402ff5b5fa383637e7"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/test_using_correct_module.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "225b9acf56052c50cf1a79ba387ee826691d03f200af96b1a06be648cc2ae562",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "225b9acf56052c50cf1a79ba387ee826691d03f200af96b1a06be648cc2ae562"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "tests/TestAABB.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "f7c7b5333819824115fe4016c6a1cc68204bf2dc40ab063f273c8b13865e991e",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "f7c7b5333819824115fe4016c6a1cc68204bf2dc40ab063f273c8b13865e991e"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "tests/TestBoxShape.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "1dbc77986657b9aea70714f3c402ccb1106c2b76e7cc720ee50b472642241090",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "1dbc77986657b9aea70714f3c402ccb1106c2b76e7cc720ee50b472642241090"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "tests/TestCollision.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "67e2fb2f820eaaedc3ec033db2f2f2c8eb59cdf44dd87787b6e821faec7960d7",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "67e2fb2f820eaaedc3ec033db2f2f2c8eb59cdf44dd87787b6e821faec7960d7"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "tests/TestPlane.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "9db5d1d3abb21b8704bbcebc267b8f6e75933dcba8d359f7f8978cfd94f92417",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "9db5d1d3abb21b8704bbcebc267b8f6e75933dcba8d359f7f8978cfd94f92417"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "tests/TestTriangle.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "d83861fc6b46824f3ff5d59196e1e1188c7909a140ad751003949ee28e1c1d92",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "d83861fc6b46824f3ff5d59196e1e1188c7909a140ad751003949ee28e1c1d92"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "tests/TestVector3d.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "7bf10ccf4a0d05daf45aed07c75de958b4c146f6bb1d1704d3164a02a28e6a7f",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "7bf10ccf4a0d05daf45aed07c75de958b4c146f6bb1d1704d3164a02a28e6a7f"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/helpers.py",
+      "region_hashes": [
+        {
+          "end": 288,
+          "sha256": "d949e6103b7321ca39a7876ceff25c15868137b867fa5895c76fd86a2c2dd66a",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          288
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "d949e6103b7321ca39a7876ceff25c15868137b867fa5895c76fd86a2c2dd66a",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "d949e6103b7321ca39a7876ceff25c15868137b867fa5895c76fd86a2c2dd66a"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Ball.cpp",
+      "region_hashes": [
+        {
+          "end": 160,
+          "sha256": "eef05cc878dbbbbac833e7c02f0adf7d026e6999e65d5a231e7f1d2f7bf000d9",
+          "start": 22
+        },
+        {
+          "end": 296,
+          "sha256": "309d14323ebe00a371fdff1eac388e0cd825027cd40138574433aaa650f28a83",
+          "start": 244
+        },
+        {
+          "end": 815,
+          "sha256": "79da9d58f473d2f08150d9350967520558abae18a18b7cc322f78603a1e1ce92",
+          "start": 335
+        },
+        {
+          "end": 881,
+          "sha256": "3b9acb924890cf806b6dab19528bb4adbaa87e1394e52c91d784735bf37fe5aa",
+          "start": 812
+        },
+        {
+          "end": 1632,
+          "sha256": "fe1bf90a15ed8896752d0d6ce1a846b0be1fd0c644d36a9828bb63b1d750fb18",
+          "start": 1499
+        },
+        {
+          "end": 1728,
+          "sha256": "43bfc03c78ca1cb62ce4802cca8976631f083e2779cbe91f026eba1de0c80c6c",
+          "start": 1663
+        },
+        {
+          "end": 1923,
+          "sha256": "bdfe8799481ba8198b57008ffc081e1d16ba88e11dd9d01d48a5861cf0b04a4d",
+          "start": 1876
+        },
+        {
+          "end": 2238,
+          "sha256": "86e96a95f0caf058d0b3c3acfab75ed9a9a5d01f9b123b6ad9d0b5c644127b30",
+          "start": 2098
+        },
+        {
+          "end": 2548,
+          "sha256": "eee6069bd9873bf5477bab72322d06a7448adb3154a0eb50a395702ff8f545f5",
+          "start": 2354
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          22,
+          160
+        ],
+        [
+          244,
+          296
+        ],
+        [
+          335,
+          815
+        ],
+        [
+          812,
+          881
+        ],
+        [
+          1499,
+          1632
+        ],
+        [
+          1663,
+          1728
+        ],
+        [
+          1876,
+          1923
+        ],
+        [
+          2098,
+          2238
+        ],
+        [
+          2354,
+          2548
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Ballpark.cpp",
+      "region_hashes": [
+        {
+          "end": 66,
+          "sha256": "76e1de5c0d122d626fd9c2c9a913f1c89201191f10596e90fd493f1bbc89d073",
+          "start": 59
+        },
+        {
+          "end": 150,
+          "sha256": "6556e3d1b6f637eedd52840149e10056baa08ce14f2671646839d360f6dadbf8",
+          "start": 85
+        },
+        {
+          "end": 1022,
+          "sha256": "207156812e86b971850a5671fabe4c02de0e2ad27f2ceb9c83dd7178a9208182",
+          "start": 421
+        },
+        {
+          "end": 1350,
+          "sha256": "cf357a522a46aa1dcc00f164b941064fe26c8fa563f8e80ce5248fbd763ef2c7",
+          "start": 1023
+        },
+        {
+          "end": 1513,
+          "sha256": "3e3988429491455f183dbe25fb8b403884bdfeb856c69af993e5bbecd9c6523c",
+          "start": 1427
+        },
+        {
+          "end": 3020,
+          "sha256": "3d3a875aba1f7bee7960d31815213912f930642705ca1f1592901e8acabc4359",
+          "start": 2745
+        },
+        {
+          "end": 3206,
+          "sha256": "778839d1578db5062263f4d7287958e8875aef49b4fdfa0e01af103b66bc3d0b",
+          "start": 3105
+        },
+        {
+          "end": 3502,
+          "sha256": "f9974cf32f4021979c2abfbfae74439980bcc5480df6185c4e0a2eff9cc234af",
+          "start": 3320
+        },
+        {
+          "end": 4418,
+          "sha256": "ba57745e31fa7fafb1b6455f0c8fd08acb31d63cdd2519c7b803a10a1e8b1fbb",
+          "start": 4073
+        },
+        {
+          "end": 4781,
+          "sha256": "3f412bf5f2514eea3426e7d139690bd071c59fce754a59ecace424ec1759539c",
+          "start": 4716
+        },
+        {
+          "end": 4994,
+          "sha256": "37e02fb1ea53296f571510a1987a835a3467070d66b244c0b143377161035ca9",
+          "start": 4887
+        },
+        {
+          "end": 5069,
+          "sha256": "a017a1fb73dd36469316e00496083355db687f141a82fcbe91c17edcdb90f18f",
+          "start": 5026
+        },
+        {
+          "end": 5154,
+          "sha256": "1a52ab5535f5a2cc96c3b46ebd39a67437e892d5be8ad7fb669d6613ce202a64",
+          "start": 5137
+        },
+        {
+          "end": 5389,
+          "sha256": "03e3ddb2bd38da541d141165565cd10386eafa0831ad98d2fa59c8c0fe88cb47",
+          "start": 5223
+        },
+        {
+          "end": 5585,
+          "sha256": "de8670ae7b8c9c181ba14cf76d60c5ac52caba08955bd5c6cc8fb12448c496ae",
+          "start": 5415
+        },
+        {
+          "end": 5954,
+          "sha256": "924155b4305b53049d780d1ae603e80efb1250c3d7f43129f0ebdbdd074305c4",
+          "start": 5820
+        },
+        {
+          "end": 6060,
+          "sha256": "e8569d11cf7717c3049d7a41ef35824c344af5e28a450da5750bfd0ee97cc148",
+          "start": 5956
+        },
+        {
+          "end": 6214,
+          "sha256": "788faef32379c9ca29ff8b4b77b4b3cd9e3d623083dfb9996156d02c4398b44b",
+          "start": 6154
+        },
+        {
+          "end": 6286,
+          "sha256": "a8ff99590d686897d9f6decbe4a9b00633b97d3dc52a64f76494168145176b36",
+          "start": 6230
+        },
+        {
+          "end": 6618,
+          "sha256": "794ae75a5495d52ac687b37006fde5d88fa76d9f2b2c6d7de5dce5b9bcfcbeb1",
+          "start": 6429
+        },
+        {
+          "end": 6768,
+          "sha256": "ba3cb4a7ae46a1fa45b901725a61b3337aac7429ae15873571feb716147ad508",
+          "start": 6730
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          59,
+          66
+        ],
+        [
+          85,
+          150
+        ],
+        [
+          421,
+          1022
+        ],
+        [
+          1023,
+          1350
+        ],
+        [
+          1427,
+          1513
+        ],
+        [
+          2745,
+          3020
+        ],
+        [
+          3105,
+          3206
+        ],
+        [
+          3320,
+          3502
+        ],
+        [
+          4073,
+          4418
+        ],
+        [
+          4716,
+          4781
+        ],
+        [
+          4887,
+          4994
+        ],
+        [
+          5026,
+          5069
+        ],
+        [
+          5137,
+          5154
+        ],
+        [
+          5223,
+          5389
+        ],
+        [
+          5415,
+          5585
+        ],
+        [
+          5820,
+          5954
+        ],
+        [
+          5956,
+          6060
+        ],
+        [
+          6154,
+          6214
+        ],
+        [
+          6230,
+          6286
+        ],
+        [
+          6429,
+          6618
+        ],
+        [
+          6730,
+          6768
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "5ba1eae8642f7694b7644a60fcfed542eb411e6cf777319afa96b7d540e1abe8"
+      },
+      "status": "INCLUDE_SPELLING_ONLY"
+    },
+    {
+      "path": "include/Ball.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": null,
+        "ef738406b61ad06bae2f402857e464735ab106a2": null
+      },
+      "status": "DIFFERS_OR_MISSING"
+    },
+    {
+      "path": "src/Vector3d.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/AABB.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "30c9e27ac95c8109ae978cbd0d31e3d1da42cfca59af7aa5099606994773f24d",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "30c9e27ac95c8109ae978cbd0d31e3d1da42cfca59af7aa5099606994773f24d"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/AABB.cpp",
+      "region_hashes": [
+        {
+          "end": 63,
+          "sha256": "fcbdc285eacd42deadd4425fb1d4085054c7777c33952b18c02ba94f8cb105fd",
+          "start": 57
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          57,
+          63
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "46a52de07c56060c49665918e74bfcb7ee59504ef0122a35a5467cb256369113",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "46a52de07c56060c49665918e74bfcb7ee59504ef0122a35a5467cb256369113"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Plane.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "b97c0af7c16cd94004c8cb3996c81a20cb4bce9b00feb023764a19d51d7ca730",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "b97c0af7c16cd94004c8cb3996c81a20cb4bce9b00feb023764a19d51d7ca730"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Plane.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "5a3a6502829f6ca6fae81f28c79deb0bbb53664db0e9fad04254b8700a317919",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "5a3a6502829f6ca6fae81f28c79deb0bbb53664db0e9fad04254b8700a317919"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Triangle.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "db9d44e7efbe630b717414e02197331e9a6eebf115d96bea867736f1eda395aa",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "db9d44e7efbe630b717414e02197331e9a6eebf115d96bea867736f1eda395aa"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Triangle.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "2c64bc0eb39abbc4b9f397174b15ba3828684593b8138a3befeb3c7405cf4809",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "2c64bc0eb39abbc4b9f397174b15ba3828684593b8138a3befeb3c7405cf4809"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Collision.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "6ccc852b58dc3558d5a64b24383ed559b1b5008b1e92e434d2b993d2961f5679",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "6ccc852b58dc3558d5a64b24383ed559b1b5008b1e92e434d2b993d2961f5679"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Collision.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "0c10833be7e92783d04ba7e74873dcca06637c178a7139c80c6695c76dc774fb",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "0c10833be7e92783d04ba7e74873dcca06637c178a7139c80c6695c76dc774fb"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/BoxShape.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "b79b21412f0d2958f220d0090ff902ef156a29ba6fc323ebb343c47a2d458603",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "b79b21412f0d2958f220d0090ff902ef156a29ba6fc323ebb343c47a2d458603"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/BoxShape.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "56355ed5b93e83e7c02137f3b4eb6d3e305c24451c684a692297cd4a48c19535",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "56355ed5b93e83e7c02137f3b4eb6d3e305c24451c684a692297cd4a48c19535"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Ball.h",
+      "region_hashes": [
+        {
+          "end": 23,
+          "sha256": "9577584d52feb57c667b07c45c506a59f3c4acceee429f1ffdc38ec6458aa51e",
+          "start": 20
+        },
+        {
+          "end": 182,
+          "sha256": "50e3b91e2b08d8108b0a27d0d15d445875876e771ed3647983d42cd610af538a",
+          "start": 121
+        },
+        {
+          "end": 364,
+          "sha256": "d9759e82cd6a55b5699e503469656737b61af1c0c646f2778ea2bab5cd61e44c",
+          "start": 340
+        },
+        {
+          "end": 422,
+          "sha256": "e2acf6edcad5ab57c48deb49ec673f2155e67d258dff8b6cf274d119270c5f73",
+          "start": 415
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          20,
+          23
+        ],
+        [
+          121,
+          182
+        ],
+        [
+          340,
+          364
+        ],
+        [
+          415,
+          422
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Ballpark.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "2fc7d886c089d9e477a36ec635c86305bcfd5d775051fb366ab55e9b81117ffb",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "2fc7d886c089d9e477a36ec635c86305bcfd5d775051fb366ab55e9b81117ffb"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Partitionable.h",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "f7c8d7c6172877c2b8f1873092634508c7d2b2e53ffd83e955bff20f1ffd3785",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "f7c8d7c6172877c2b8f1873092634508c7d2b2e53ffd83e955bff20f1ffd3785"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Partitionable.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "39190aeb458e8bea2aae4ea09d53b9f251338bbf738b116d0538ae6c4dc93fea",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "39190aeb458e8bea2aae4ea09d53b9f251338bbf738b116d0538ae6c4dc93fea"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Settings.h",
+      "review": "Only first precompiled-header include spelling differs; consumed definitions have identical bytes. Catalog revision remains the behavioral authority.",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "8d6fc829a2620c5f7e3efc073485645a48bd9ca9bc183210eca60b2ea5ecfdf8",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "ab2bb5ab3caf0f0b444828292ce85334b14c12bd74eeddb236995a62ade420f6"
+      },
+      "status": "INCLUDE_SPELLING_ONLY"
+    },
+    {
+      "path": "src/Settings.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "88db66374e0623b10626fee2c2e5e1acfc97d3b990ae51bd3a17cd99ff5bc9cc",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "88db66374e0623b10626fee2c2e5e1acfc97d3b990ae51bd3a17cd99ff5bc9cc"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Settings_Blue.cpp",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "7d0bceba8440594504a9d972a1b0e8c6b4255602fe4525ff790e68bb87a1d553",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "7d0bceba8440594504a9d972a1b0e8c6b4255602fe4525ff790e68bb87a1d553"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/net/client/_util.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "4f9aa6c9185f21a4a34a4e46f77bc35f340613de2f2257390acf18c7a292ef65",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "4f9aa6c9185f21a4a34a4e46f77bc35f340613de2f2257390acf18c7a292ef65"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/net/server/_actions.py",
+      "region_hashes": [
+        {
+          "end": 383,
+          "sha256": "5fd5760268e80c9e520b8a9af41dd1d05f1c4315d49ae6c03c6760868261338e",
+          "start": 311
+        },
+        {
+          "end": 708,
+          "sha256": "49b73b6f551f4317d8002e8679ad8da3b24a5ae01a499a7ca31af1527b57a836",
+          "start": 678
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          311,
+          383
+        ],
+        [
+          678,
+          708
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "9a2072720c3f8ebc12f9b1e9837a1fe3e73ac347e939f5255259734971995a48",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "9a2072720c3f8ebc12f9b1e9837a1fe3e73ac347e939f5255259734971995a48"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/test/net/server/helpers.py",
+      "region_hashes": [
+        {
+          "end": 230,
+          "sha256": "70d26acbcefd3b4ef6b0e4502e39ac8c2027514050adc059951aefe09f201020",
+          "start": 17
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          17,
+          230
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "a246ee42b8804a90cd375f741208eb67e09bd9760f751279f42d2027cff2aaef",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "a246ee42b8804a90cd375f741208eb67e09bd9760f751279f42d2027cff2aaef"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/_util/settings.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "6cbb1915a8a3fdfe0e79f1e25dc6b518430c4bf859a89fbe4726353d1949f78f",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "6cbb1915a8a3fdfe0e79f1e25dc6b518430c4bf859a89fbe4726353d1949f78f"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/_util/signal.py",
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "6e04aeb3b9b38a0a2f745bdc02480ce7f41286178fb5f42fb269c6fd19f927bf",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "6e04aeb3b9b38a0a2f745bdc02480ce7f41286178fb5f42fb269c6fd19f927bf"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Partition.cpp",
+      "region_hashes": [
+        {
+          "end": 161,
+          "sha256": "8a952df22c19881f5a935027b4b92b047c52e578fce9b33fbf46f7b69c1fde93",
+          "start": 20
+        },
+        {
+          "end": 238,
+          "sha256": "128abe4f45ae0d671aa05c89aee360780e4c80e16975c7e316cab0161ba9f9fe",
+          "start": 182
+        },
+        {
+          "end": 537,
+          "sha256": "7316b9e6d9279a8f86018cd2f1ce911ac800f187e9f59edbdb20dcf2b90bc0d7",
+          "start": 279
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          20,
+          161
+        ],
+        [
+          182,
+          238
+        ],
+        [
+          279,
+          537
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "1de84b01f168d8f80c423191e7627b4d4d6246ecdfc108a3201c57f4e238d1ca"
+      },
+      "status": "INCLUDE_SPELLING_ONLY"
+    },
+    {
+      "difference_review": "The behavioral revision hashes Key using (ix<<3)+(iy<<2)+(iz<<1)+n; the CI revision introduces KeyHash combining each field. Clamping/equality and grid keys match, but unordered-map iteration and build/hasher correspondence are not established. The spherical component model uses exact key equality and the undirected neighbour graph, not an assumed native hash order. GetActiveBoxes list order is established only for zero/one cell; other translated tests observe sets or sorted membership through an explicit adapter. Arbitrary native enumeration order remains unimplemented.",
+      "path": "src/Partition.h",
+      "region_hashes": [
+        {
+          "end": 110,
+          "sha256": "db9c805dad6a86bb02bee8f6c59f64057ac8fdb6c65f2e26fb44435c20687342",
+          "start": 36
+        },
+        {
+          "end": 195,
+          "sha256": "0f05b0eba5f48647cd7447a61474091edeaa33878da52a11ba34ec5acf963536",
+          "start": 181
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          36,
+          110
+        ],
+        [
+          181,
+          195
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "31bfaf15eedd3f5bf73d7f661376a06b363457c0b045f38e35517260bdc68398",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "54cbbf903edc14afd7d29db0be705aa3c5d575d3e78ea1c8fbacba5bd6e77cae"
+      },
+      "status": "DIFFERS"
+    },
+    {
+      "path": "src/Box.cpp",
+      "region_hashes": [
+        {
+          "end": 109,
+          "sha256": "e328c6405dfcd9ed6b46770ea957a793e1fd1b0d5e700a6e0bc1d37a01151be4",
+          "start": 18
+        },
+        {
+          "end": 208,
+          "sha256": "8ca6b3b212c6ec18545c28025a5bf77d76e0a40384315c2daa15e7add7d53d51",
+          "start": 155
+        },
+        {
+          "end": 277,
+          "sha256": "0b40a7c2314adbaff96321f0cf9158b1be84b85da237e7bccbaaa6f7198f7bdd",
+          "start": 216
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          18,
+          109
+        ],
+        [
+          155,
+          208
+        ],
+        [
+          216,
+          277
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "d72b01c8fc00bb5ac0381c7936fa698a57231812995a3becedba0d2efe4e0fd8",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "0d598e12b6dff3c6200fb8b0704464d325374ed22b3994dee16575c5ce914ec7"
+      },
+      "status": "INCLUDE_SPELLING_ONLY"
+    },
+    {
+      "path": "src/Box.h",
+      "region_hashes": [
+        {
+          "end": 73,
+          "sha256": "fe53003ced43450c6e8554e19b6c95a81e913666721a5e639e1153774b75c064",
+          "start": 13
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          13,
+          73
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "c12df62ee09a04437da7edb073cd86c71d67d4d3863c26fc103117f6ce97cecd",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "c12df62ee09a04437da7edb073cd86c71d67d4d3863c26fc103117f6ce97cecd"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/MapOfBalls.h",
+      "region_hashes": [
+        {
+          "end": 135,
+          "sha256": "c3c10b4601d1fe4a0f7162a2a23b48d60a4ff4331aff3d43283fa1843d6f0b13",
+          "start": 10
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          10,
+          135
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "7751125fe7ca8d4ab70b67618cc20470053089174cf7fb6da8294157888aef3d",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "7751125fe7ca8d4ab70b67618cc20470053089174cf7fb6da8294157888aef3d"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Thunkers.cpp",
+      "region_hashes": [
+        {
+          "end": 430,
+          "sha256": "fd54bf67761ce8bd4599a4098389cc21f26ac6a3e173bd0529c89f341b3a4fa2",
+          "start": 356
+        },
+        {
+          "end": 975,
+          "sha256": "ed3f5c8aef737607f14ef01dd99c35a92c99a3bda310fa9cd76f7b7836f1a401",
+          "start": 855
+        },
+        {
+          "end": 1250,
+          "sha256": "96a7f8f2591e445e40db2d444bced83e146ba20d5ef0bbad875df5e2044903c7",
+          "start": 1121
+        },
+        {
+          "end": 1800,
+          "sha256": "8d0f10765ad577782f1574d09e27c0a7c137a63c9fd8e16db2d64682d4101cf2",
+          "start": 1330
+        },
+        {
+          "end": 1879,
+          "sha256": "4e2cf7faf07eefeb9d263ae74c1b85e09ed59cfaa308d268ae32552ac1fc6547",
+          "start": 1822
+        },
+        {
+          "end": 2043,
+          "sha256": "c0a2eacb8a88a3f13166167dab8329e38e889116c14fa8dfa140cefc182cf932",
+          "start": 1948
+        },
+        {
+          "end": 2260,
+          "sha256": "c120f97b0742c5df8d54b8ad5ff42ed475d86f20aaead09b0606df35df6af9cd",
+          "start": 2083
+        },
+        {
+          "end": 2377,
+          "sha256": "b224a1bd13688c95bb49e6d784c4d7e70484f8c824191cf5fa12d73e8ff710ad",
+          "start": 2260
+        },
+        {
+          "end": 2505,
+          "sha256": "796cd7d4daece5920e072c477a0f56fc767b2849eab9a032a45d06d7cc7c530a",
+          "start": 2379
+        },
+        {
+          "end": 2894,
+          "sha256": "cd74ab5b3430bc5623861a50b366c604fcd593d2e900b749b49910fee2d392fc",
+          "start": 2509
+        },
+        {
+          "end": 3381,
+          "sha256": "3ed8d7d3ea9c3cb3f20a912b2ff306eab8dd4e128fde0a4ef577e6ac753c4696",
+          "start": 2897
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          356,
+          430
+        ],
+        [
+          855,
+          975
+        ],
+        [
+          1121,
+          1250
+        ],
+        [
+          1330,
+          1800
+        ],
+        [
+          1822,
+          1879
+        ],
+        [
+          1948,
+          2043
+        ],
+        [
+          2083,
+          2260
+        ],
+        [
+          2260,
+          2377
+        ],
+        [
+          2379,
+          2505
+        ],
+        [
+          2509,
+          2894
+        ],
+        [
+          2897,
+          3381
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "61acb87a22569561e7a608cd7a9a82698145afd2d5a3671365c24372a035ea17",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "bde7055d9693eb28459477290329896795aa9a07c554b454ad08816a45181406"
+      },
+      "status": "INCLUDE_SPELLING_ONLY"
+    },
+    {
+      "path": "python/destiny/net/server/_parkupdatebatcher.py",
+      "region_hashes": [
+        {
+          "end": 343,
+          "sha256": "b7015b528e1ed07bfe043907593020343f2d3ec5a4ad68899833345cb5547b0b",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          343
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "17ed44726abda56bb84cc02dbc32af5f45a95e776f42bb70c74d78bc5f639058",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "17ed44726abda56bb84cc02dbc32af5f45a95e776f42bb70c74d78bc5f639058"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/net/server/_bubbleupdater.py",
+      "region_hashes": [
+        {
+          "end": 54,
+          "sha256": "557a3186d1ab59d257311dd20f89975e4ed3d69ece69f5df5e7bd92536255d77",
+          "start": 11
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          11,
+          54
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "c0be29a378eb6343321888089e5b9867b66cc8e7ee4962d276db613a954bb7a5",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "c0be29a378eb6343321888089e5b9867b66cc8e7ee4962d276db613a954bb7a5"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/net/const.py",
+      "region_hashes": [
+        {
+          "end": 8,
+          "sha256": "fe4f73ba90d28d9b8fc4c612506e073ee30de3023c98e85fbfab2be1ed0da1b8",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          8
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "fe4f73ba90d28d9b8fc4c612506e073ee30de3023c98e85fbfab2be1ed0da1b8",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "fe4f73ba90d28d9b8fc4c612506e073ee30de3023c98e85fbfab2be1ed0da1b8"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Capsule.cpp",
+      "region_hashes": [
+        {
+          "end": 35,
+          "sha256": "d4293db81cc18b80ae51053049821ad4071226f63de6b4646eabfdf9cfa1d27d",
+          "start": 1
+        },
+        {
+          "end": 581,
+          "sha256": "0807fca89aa37680f035a512b743bb423d33a3b06281a788b506a5e9b2218b76",
+          "start": 197
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          35
+        ],
+        [
+          197,
+          581
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "9539900224c89599060dfdc3e8d5715d94cab8a380dc4075d49a0994aa2f7dac",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "bd5a8501054e9cb92ed0460b864df3820d84dea0e9226b4c80a50a3b8129ba60"
+      },
+      "status": "DIFFERS"
+    },
+    {
+      "path": "src/OrientedBox.cpp",
+      "region_hashes": [
+        {
+          "end": 291,
+          "sha256": "929a1a7abc9cc9d0c9751ce3bbe603f2359e7307bf931e6880061fa7761f4662",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          291
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "09e5ddfa96b8056279cb1cdbd6f4f1ad28d2e2dc06fa6a148b6869da46b12933",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "09e5ddfa96b8056279cb1cdbd6f4f1ad28d2e2dc06fa6a148b6869da46b12933"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/StaticCollidable.cpp",
+      "region_hashes": [
+        {
+          "end": 63,
+          "sha256": "752a22a1adbdca6f60bd2607e4442eb4469729549f9dc8a8612012ab363d374a",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          63
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "752a22a1adbdca6f60bd2607e4442eb4469729549f9dc8a8612012ab363d374a",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "752a22a1adbdca6f60bd2607e4442eb4469729549f9dc8a8612012ab363d374a"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/IDstConstants.h",
+      "region_hashes": [
+        {
+          "end": 82,
+          "sha256": "ea012d122434c5c2f5ccfe40d5cd3b8b3fa4379772b566d4b33aeac4a69290cf",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          82
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "90d722e6815d83b183a3903fcd9ffc25f1473aeb876f8615c30f0a601a5e27d8",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "90d722e6815d83b183a3903fcd9ffc25f1473aeb876f8615c30f0a601a5e27d8"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/Ball_Blue.cpp",
+      "region_hashes": [
+        {
+          "end": 65,
+          "sha256": "da5c7aa40b6323397ba2481af0cf28c37d0a5cb1f39335ccdd0423fd3aa446e0",
+          "start": 42
+        },
+        {
+          "end": 326,
+          "sha256": "600fab92385caf0dc5a941c3176cafd048713ff4446973f1d0cfc1368cbcccdf",
+          "start": 308
+        },
+        {
+          "end": 586,
+          "sha256": "d2dfa34ec8d2eec470eafaa4b386b4cba03c80b9214b1f75f5c88f049ba2ab3c",
+          "start": 546
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          42,
+          65
+        ],
+        [
+          308,
+          326
+        ],
+        [
+          546,
+          586
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "cff5977cfabb09dfc69de51b90470ea5329ea8bc22971dada402f06db9fd018b",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "15ea652f881119c759c31b4ae7ef933a4b938a692afe6de35ce404183101ae9e"
+      },
+      "status": "INCLUDE_SPELLING_ONLY"
+    }
+  ],
+  "generator_sha256": "7536ea82997321ac9cbb3ad6bf2052d98ddc503ae8398d03960c81d029a65fcc",
+  "implementation_review": "Previously reviewed geometry/collision/box/formation/settings/history definitions retained. Additional consumed partition/initialization/query/attribute-notification and batcher, collision/evolution/Orbit/callback/visibility/remote-follower and static partition definitions have explicit line-region hashes. NaN inflated radius affects comparisons, not the coordinate cast; finite-coordinate insertion is retained. Partition.h has a substantive hasher difference. File comparisons and region review do not establish native allocation, Python, compiler, math or production refinement. Missing include/Ball.h is retained as a historical unresolved path; the actual consumed definition is src/Ball.h.",
+  "note": "File comparison alone does not review all implementation dependencies or discharge a reference correspondence obligation.",
+  "numeric_dependency_review": {
+    "baseline_path": "versions/baseline.json",
+    "baseline_sha256": "b92ec335ff6db1c4bbd2c6b05a7618adf9ebe9ed73e0834a03f4994ae55f517e",
+    "carbon_math": "1.2.1#0",
+    "carbon_rotation": "Exact Carbon math 1.2.1 commit 50f7c65241b9e22514fdd0a7a159e86322e4d53e and builtin-registry DirectXMath apr2025 commit 56206b1916646b29b37e1eac56e96e2008d6c71f reviewed. Linux SSE2 non-FMA rotation operations ported. Every retained artifact matches its Git blob ID; verification/cases/math_dependencies.json records actual SHA256 and licenses. Other target branches, compiler flags/rounding, Python list identity and native numerical correspondence remain unproved.",
+    "python": "3.12.9#4",
+    "python_sum_algorithm": "https://github.com/python/cpython/blob/v3.12.9/Python/bltinmodule.c#L2393-L2477",
+    "registry_baseline": "2027e0c9d34193f468438589c4e6bb25996e823d",
+    "scope": "Three exact float objects and initial integer zero; compensated fast path ported. Interpreter/build/libm and object correspondence remain unproved. The URL is review provenance, not a downloaded artifact or measured source-file hash."
+  },
+  "occurrences": 531,
+  "qualified_identities": 531,
+  "schema": 1,
+  "unqualified_pairs": 509
+}

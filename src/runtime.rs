@@ -16,9 +16,8 @@ use bevy::{
     time::TimeUpdateStrategy,
 };
 use destiny_original_spec::{
-    NO_FORMATION, adjust_time, assign_formation, clamp_speed_fraction, free_formation_slot,
-    non_negative_setter_accepts, positive_setter_accepts, reserve_formation_slot,
-    surface_distance_from_center,
+    NO_FORMATION, adjust_time, assign_formation, clamp_speed_fraction, non_negative_setter_accepts,
+    positive_setter_accepts, surface_distance_from_center,
 };
 use serde::{
     Deserialize, Serialize,
@@ -29,6 +28,7 @@ use thiserror::Error;
 
 use crate::{
     carbon_codec::decode_canonical,
+    formation::{free_formation_slot, reserve_formation_slot},
     generated_registry::{GENERATED_TITLE_RECORDS, GeneratedTitleRecord},
 };
 

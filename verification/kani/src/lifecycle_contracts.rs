@@ -1,6 +1,4 @@
-use destiny_original_spec::{
-    membership_count_after_add, membership_count_after_remove,
-};
+use destiny_original_spec::{membership_count_after_add, membership_count_after_remove};
 
 // original-test: python/destiny/test/ballpark/test_lifecycle_management.py::test_can_create_ballpark
 #[cfg(kani)]

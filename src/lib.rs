@@ -3,6 +3,7 @@
 
 mod carbon_codec;
 mod ffi;
+mod formation;
 mod generated_registry;
 mod runtime;
 

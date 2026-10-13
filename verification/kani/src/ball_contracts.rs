@@ -1,8 +1,7 @@
 use destiny_original_spec::{
     MAX_ORIGINAL_FORMATION_SLOTS, MotionMode, ORIGINAL_TEN_BILLION,
-    child_count_after_capsule_attempt, child_count_after_successful_add,
-    identity_rotated_vector, mini_capsule_radius_accepted,
-    next_sequential_formation_slot, original_ball_defaults,
+    child_count_after_capsule_attempt, child_count_after_successful_add, identity_rotated_vector,
+    mini_capsule_radius_accepted, next_sequential_formation_slot, original_ball_defaults,
     proximity_sensor_accepted, slot_reused_after_free,
 };
 
@@ -83,7 +82,10 @@ fn non_positive_minicapsule_radius_is_rejected_without_count_change() {
     let radius: f64 = kani::any();
     kani::assume(radius.is_finite() && radius <= 0.0);
     assert!(!mini_capsule_radius_accepted(radius));
-    assert_eq!(child_count_after_capsule_attempt(current, radius), Some(current));
+    assert_eq!(
+        child_count_after_capsule_attempt(current, radius),
+        Some(current)
+    );
 }
 
 // original-test: python/destiny/test/test_ball.py::test_get_rotated_vector_returns_original_vector_if_there_is_no_rotation
@@ -119,7 +121,10 @@ fn formation_slot_reservation_rejects_unconfigured_ball() {
 fn first_slot_of_valid_nonempty_formation_is_zero() {
     let slots: u8 = kani::any();
     kani::assume(slots > 0 && slots <= MAX_ORIGINAL_FORMATION_SLOTS);
-    assert_eq!(next_sequential_formation_slot(0, slots, true, true, true), 0);
+    assert_eq!(
+        next_sequential_formation_slot(0, slots, true, true, true),
+        0
+    );
 }
 
 // original-test: python/destiny/test/test_ball.py::test_slots_are_reserved_in_incremental_order

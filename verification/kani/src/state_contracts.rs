@@ -1,7 +1,7 @@
 use destiny_original_spec::{
-    BallState, Vec3, adjust_time, apply_non_negative_setter, apply_positive_setter,
-    assign_flag, assign_vec3, center_distance, clamp_speed_fraction, running_after_pause,
-    running_after_start, surface_distance, surface_distance_from_center,
+    BallState, Vec3, adjust_time, apply_non_negative_setter, apply_positive_setter, assign_flag,
+    assign_vec3, center_distance, clamp_speed_fraction, running_after_pause, running_after_start,
+    surface_distance, surface_distance_from_center,
 };
 
 // original-test: python/destiny/test/ballpark/test_time.py::test_ballpark_time_initialises_to_zero
@@ -197,8 +197,18 @@ fn same_place_zero_radius_surface_distance_is_zero() {
 #[kani::proof]
 fn zero_radius_surface_distance_equals_axis_center_distance() {
     let left = ball(Vec3::ZERO, 0.0);
-    let right = ball(Vec3 { x: 100.0, y: 0.0, z: 0.0 }, 0.0);
-    assert_eq!(surface_distance(&left, &right).to_bits(), 100.0_f64.to_bits());
+    let right = ball(
+        Vec3 {
+            x: 100.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        0.0,
+    );
+    assert_eq!(
+        surface_distance(&left, &right).to_bits(),
+        100.0_f64.to_bits()
+    );
 }
 
 // original-test: python/destiny/test/ballpark/test_getters_and_setters.py::test_surface_distance_between_two_balls_equals_the_distance_between_the_balls_minus_their_combined_radii
@@ -216,7 +226,14 @@ fn surface_distance_subtracts_combined_radii() {
 #[kani::proof]
 fn euclidean_distance_matches_original_three_axis_case() {
     let left = ball(Vec3::ZERO, 0.0);
-    let right = ball(Vec3 { x: 1.0, y: 2.0, z: 3.0 }, 0.0);
+    let right = ball(
+        Vec3 {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        },
+        0.0,
+    );
     let observed = center_distance(&left, &right);
     let expected = 3.7416573867739413_f64;
     assert!((observed - expected).abs() < 1.0e-12);
@@ -236,6 +253,16 @@ fn same_place_center_distance_is_zero() {
 #[kani::proof]
 fn axis_center_distance_matches_absolute_offset() {
     let left = ball(Vec3::ZERO, 0.0);
-    let right = ball(Vec3 { x: 100.0, y: 0.0, z: 0.0 }, 0.0);
-    assert_eq!(center_distance(&left, &right).to_bits(), 100.0_f64.to_bits());
+    let right = ball(
+        Vec3 {
+            x: 100.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        0.0,
+    );
+    assert_eq!(
+        center_distance(&left, &right).to_bits(),
+        100.0_f64.to_bits()
+    );
 }

@@ -12,6 +12,8 @@ fn reusable_non_negative_setter(previous: f64, requested: f64) -> f64 {
     destiny_original_spec::apply_non_negative_setter(previous, requested)
 }
 
+// Retain the direct branch form as the independent metaverification reference.
+#[allow(clippy::manual_clamp)]
 fn handwritten_speed_fraction(requested: f64) -> f64 {
     if requested < 0.0 {
         0.0
@@ -27,10 +29,12 @@ delegate_unary!(
         => destiny_original_spec::clamp_speed_fraction
 );
 
+#[cfg(kani)]
 fn handwritten_saturating_increment(value: u64) -> u64 {
     value.saturating_add(1)
 }
 
+#[cfg(kani)]
 fn reusable_saturating_increment(value: u64) -> u64 {
     value.saturating_add(1)
 }
@@ -42,7 +46,11 @@ kani_regression!(reusable_non_negative_setter_matches_handwritten_pattern, {
     let handwritten = handwritten_non_negative_setter(previous, requested);
     let reusable = reusable_non_negative_setter(previous, requested);
 
-    assert_eq!(handwritten.to_bits(), reusable.to_bits());
+    assert!(handwritten.to_bits() == reusable.to_bits());
+    kani::cover!(previous.is_nan());
+    kani::cover!(requested.is_nan());
+    kani::cover!(requested == f64::INFINITY);
+    kani::cover!(requested.to_bits() == (-0.0_f64).to_bits());
 });
 
 kani_regression!(delegated_speed_fraction_matches_handwritten_pattern, {
@@ -51,15 +59,18 @@ kani_regression!(delegated_speed_fraction_matches_handwritten_pattern, {
     let handwritten = handwritten_speed_fraction(requested);
     let delegated = delegated_speed_fraction(requested);
 
-    assert_eq!(handwritten.to_bits(), delegated.to_bits());
+    assert!(handwritten.to_bits() == delegated.to_bits());
+    kani::cover!(requested.is_nan());
+    kani::cover!(requested == f64::NEG_INFINITY);
+    kani::cover!(requested == f64::INFINITY);
+    kani::cover!(requested.to_bits() == (-0.0_f64).to_bits());
 });
 
 kani_regression!(saturating_counter_helper_matches_handwritten_pattern, {
     let value: u64 = kani::any();
-    assert_eq!(
-        handwritten_saturating_increment(value),
-        reusable_saturating_increment(value)
-    );
+    assert!(handwritten_saturating_increment(value) == reusable_saturating_increment(value));
+    kani::cover!(value == u64::MAX);
+    kani::cover!(value == 0);
 });
 
 #[cfg(test)]
