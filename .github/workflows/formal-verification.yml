@@ -99,6 +99,13 @@ jobs:
           }, sort_keys=True))
           PY
 
+      - name: Bind Kani-selected Destiny functions to reviewed Verus entries
+        run: |
+          python3 -B verification/tools/bind_kani_verus.py bind \
+            --normalized .aegis/destiny/kani-autoharness-discovery/normalized-discovery.json \
+            --output .aegis/destiny/kani-autoharness-discovery/verus-binding.json
+          python3 -B verification/tools/test_bind_kani_verus.py
+
       - name: Retain Kani-to-Verus discovery evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -123,6 +130,7 @@ jobs:
 
   verus:
     name: Verus 0.2026.09.20.aef82ed
+    needs: vendor-automation-boundary
     runs-on: ubuntu-24.04
     env:
       VERUS_RELEASE: 0.2026.09.20.aef82ed
@@ -132,6 +140,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+
+      - name: Reuse Kani compiler discovery from the automation gate
+        uses: actions/download-artifact@v4
+        with:
+          name: kani-verus-automation-discovery
+          path: .aegis/destiny/kani-autoharness-discovery
 
       - name: Check out the pinned maintained controller
         uses: actions/checkout@v4
@@ -164,6 +178,13 @@ jobs:
           python3 -B verification/tools/check_concurrency_acceptance.py --structure-only
           python3 -B verification/tools/run_verus_campaign.py --verus "$VERUS_BIN"
 
+      - name: Bind Kani-selected identities to the fresh Verus campaign receipts
+        run: |
+          python3 -B verification/tools/bind_kani_verus.py check-campaign \
+            --binding .aegis/destiny/kani-autoharness-discovery/verus-binding.json \
+            --campaign-dir .aegis/destiny/verus-final-campaign \
+            --output .aegis/destiny/kani-autoharness-discovery/verus-receipt-binding.json
+
       - name: Retain complete counted results, VIR inventories and scope audit
         if: always()
         uses: actions/upload-artifact@v4
@@ -176,6 +197,7 @@ jobs:
             .aegis/destiny/bindings
             .aegis/destiny/proofs
             .aegis/destiny/concurrency-acceptance.json
+            .aegis/destiny/kani-autoharness-discovery
 
   runtime-parity:
     name: concrete runtime parity regression

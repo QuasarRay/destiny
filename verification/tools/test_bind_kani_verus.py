@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+MODULE = ROOT / "verification/tools/bind_kani_verus.py"
+SPEC = importlib.util.spec_from_file_location("bind_kani_verus", MODULE)
+assert SPEC and SPEC.loader
+bridge = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = bridge
+SPEC.loader.exec_module(bridge)
+
+
+class BindingTests(unittest.TestCase):
+    def write(self, root: Path, name: str, payload) -> Path:
+        path = root / name
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        return path
+
+    def registry(self):
+        return {
+            "schema": 1,
+            "default_engine": "verus",
+            "kani": {"vendor_commit": bridge.KANI_COMMIT},
+            "verus": {"vendor_commit": bridge.VERUS_COMMIT},
+            "supported_subset": {},
+            "candidates": [
+                {
+                    "function": "destiny_original_spec::model::assign_flag",
+                    "status": "supported",
+                    "reason": "Boolean identity",
+                    "controller_obligation": "state-contracts-reviewed-inventory",
+                    "verus_entry": "verification/verus/state_contracts.rs",
+                    "kani_metadata_name": "model::assign_flag",
+                }
+            ],
+        }
+
+    def normalized(self, disposition="kani_eligible"):
+        return {
+            "default_engine": "verus",
+            "proof_credit": False,
+            "kani_source_commit": bridge.KANI_COMMIT,
+            "crates_with_autoharness_metadata": 1,
+            "candidates": [
+                {
+                    "crate_name": "destiny_original_spec",
+                    "function": "model::assign_flag",
+                    "disposition": disposition,
+                    "reason": "fixture",
+                    "provenance": "kani_metadata::AutoHarnessMetadata::chosen",
+                },
+                {
+                    "crate_name": "destiny_original_spec",
+                    "function": "model::apply_non_negative_setter",
+                    "disposition": "kani_eligible",
+                    "reason": "outside mapped subset",
+                    "provenance": "kani_metadata::AutoHarnessMetadata::chosen",
+                },
+            ],
+        }
+
+    def test_selected_and_unmapped_candidates_are_distinguished(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            reg=self.write(root,"registry.json",self.registry())
+            norm=self.write(root,"normalized.json",self.normalized())
+            plan=self.write(root,"plan.json",{
+                "obligations":[{"id":"state-contracts-reviewed-inventory"}]
+            })
+            result=bridge.bind_discovery(norm,reg,plan)
+        self.assertEqual(result["status"],"BOUND_FOR_VERUS")
+        classes={r["kani_metadata_name"]:r["classification"] for r in result["records"]}
+        self.assertEqual(classes["model::assign_flag"],"selected")
+        self.assertEqual(classes["model::apply_non_negative_setter"],"intentionally_excluded")
+        self.assertFalse(result["kani_proof_credit"])
+
+    def test_required_supported_candidate_blocker_is_incomplete(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            reg=self.write(root,"registry.json",self.registry())
+            norm=self.write(root,"normalized.json",self.normalized("blocked"))
+            plan=self.write(root,"plan.json",{
+                "obligations":[{"id":"state-contracts-reviewed-inventory"}]
+            })
+            result=bridge.bind_discovery(norm,reg,plan)
+        self.assertEqual(result["status"],"INCOMPLETE")
+        self.assertTrue(result["unresolved"])
+
+    def test_empty_discovery_cannot_pass(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            reg=self.write(root,"registry.json",self.registry())
+            norm=self.write(root,"normalized.json",{
+                "default_engine":"verus",
+                "proof_credit":False,
+                "kani_source_commit":bridge.KANI_COMMIT,
+                "candidates":[],
+            })
+            plan=self.write(root,"plan.json",{
+                "obligations":[{"id":"state-contracts-reviewed-inventory"}]
+            })
+            result=bridge.bind_discovery(norm,reg,plan)
+        self.assertEqual(result["status"],"INCOMPLETE")
+
+    def test_campaign_requires_fresh_checked_receipts(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            binding=self.write(root,"binding-map.json",{
+                "status":"BOUND_FOR_VERUS",
+                "kani_proof_credit":False,
+                "controller_obligations":["state-contracts-reviewed-inventory"],
+            })
+            campaign=root/"campaign"
+            campaign.mkdir()
+            self.write(campaign,"binding.json",{"status":"BOUND"})
+            self.write(campaign,"audit.json",{"status":"CHECKED_SCOPED"})
+            self.write(campaign,"state-contracts-reviewed-inventory.json",{"status":"CHECKED_SCOPED"})
+            result=bridge.check_campaign(binding,campaign)
+        self.assertEqual(result["status"],"KANI_SELECTED_VERUS_CHECKED_SCOPED")
+        self.assertTrue(result["verus_checked_scoped"])
+        self.assertFalse(result["kani_proof_credit"])
+
+
+if __name__ == "__main__":
+    unittest.main()
