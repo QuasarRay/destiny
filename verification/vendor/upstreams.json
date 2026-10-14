@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "generated_from_branch_head": "f5bb8edafb27d35165ceafeb39be8b0498e553e9",
+  "upstreams": {
+    "verus": {
+      "repository": "https://github.com/verus-lang/verus.git",
+      "path": "third_party/verus",
+      "commit": "aef82eda71838deef4a8cd0260fda6c9504be9b9",
+      "tree": "04ee402221823dccc6e98da618831d4176da68f9",
+      "release": "0.2026.09.20.aef82ed",
+      "toolchain": "1.98.1",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "nested_submodules": []
+    },
+    "kani": {
+      "repository": "https://github.com/model-checking/kani.git",
+      "path": "third_party/kani",
+      "commit": "0d2328a93f0e0ff66132d6bfa1a7d884877cf862",
+      "tree": "9b59a9dfa917ba5b9f1af1f27a1ed2b5c02bc752",
+      "release": "0.68.0",
+      "toolchain": "nightly-2026-08-21",
+      "license_paths": [
+        "LICENSE-APACHE",
+        "LICENSE-MIT"
+      ],
+      "nested_submodules": [
+        {
+          "path": "charon",
+          "commit": "b250680abd40ff1aaa07081d0497dc2755ed112e",
+          "required_for_current_boundary": false
+        },
+        {
+          "path": "firecracker",
+          "commit": "cd36c699f3cb3d531289aadee26c45c1306edcfc",
+          "required_for_current_boundary": false
+        }
+      ]
+    }
+  },
+  "current_boundary": {
+    "description": "Compile and consume Kani's own autoharness metadata types in the shared automation layer. No CBMC invocation and no claim of autoharness generation or Verus discharge.",
+    "default_engine": "verus"
+  }
+}

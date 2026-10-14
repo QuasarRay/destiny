@@ -1,0 +1,6 @@
+[submodule "third_party/verus"]
+	path = third_party/verus
+	url = https://github.com/verus-lang/verus.git
+[submodule "third_party/kani"]
+	path = third_party/kani
+	url = https://github.com/model-checking/kani.git

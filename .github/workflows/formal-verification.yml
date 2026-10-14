@@ -47,6 +47,23 @@ jobs:
           name: formal-repetition-patterns
           path: repetition-patterns.json
 
+  vendor-automation-boundary:
+    name: vendored Verus/Kani automation boundary
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Verify immutable upstream source pins
+        run: python3 -B verification/tools/check_vendor_integrity.py
+
+      - name: Install pinned Kani source toolchain
+        run: rustup toolchain install nightly-2026-08-21 --profile minimal
+
+      - name: Test shared autoharness metadata adapter
+        run: cargo +nightly-2026-08-21 test --manifest-path verification/automation/Cargo.toml --locked
+
   kani:
     name: Kani 0.68.0
     runs-on: ubuntu-24.04
