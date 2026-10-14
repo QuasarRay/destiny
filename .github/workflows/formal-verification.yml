@@ -198,6 +198,23 @@ jobs:
           for line in Path("cbmc-invocations.log").read_text().splitlines():
               assert line == "--version", f"unexpected CBMC execution: {line}"
           PY
+          mv "$REAL_CBMC" "$CBMC_BIN"
+
+      - name: Replay the invalid fixture through explicit Kani reference mode
+        run: |
+          set -euo pipefail
+          KANI_BIN="$(find "$HOME/.kani" -type f -name kani -perm -u+x | head -n 1)"
+          test -n "$KANI_BIN"
+          python3 -B verification/tools/verus_kani.py replay-kani             --source verification/automation/fixtures/invalid/src/lib.rs             --function branch_invalid --kani "$KANI_BIN" > automation-replay.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          replay = json.loads(Path("automation-replay.json").read_text())
+          assert replay["status"] == "reproduced_source_failure", replay
+          assert replay["source_location_reproduced"] is True, replay
+          assert replay["original_source_unchanged"] is True, replay
+          assert replay["playback_returncode"] != 0, replay
+          PY
 
       - name: Verify logical refinement proofs
         run: |
@@ -221,6 +238,7 @@ jobs:
             automation-loop.json
             automation-invalid.json
             automation-unsupported.json
+            automation-replay.json
             cbmc-invocations.log
 
   runtime-parity:

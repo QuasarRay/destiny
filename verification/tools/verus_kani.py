@@ -644,6 +644,261 @@ def verify_one(
     return row
 
 
+def collect_assert_lines(statements: Sequence[Stmt]) -> list[int]:
+    lines: list[int] = []
+    for statement in statements:
+        if isinstance(statement, AssertStmt):
+            lines.append(statement.line)
+        elif isinstance(statement, IfStmt):
+            lines.extend(collect_assert_lines(statement.then_body))
+            lines.extend(collect_assert_lines(statement.else_body))
+        elif isinstance(statement, ForStmt):
+            lines.extend(collect_assert_lines(statement.body))
+    return lines
+
+
+def explicit_kani_replay(
+    source_path: Path,
+    function: Function,
+    kani: Path,
+    output_root: Path,
+    timeout: int,
+) -> dict:
+    """Use Kani/CBMC only as an explicit reference backend and replay its witness."""
+    assert_lines = collect_assert_lines(function.body)
+    if len(assert_lines) != 1:
+        return {
+            "function": function.name,
+            "status": "unsupported",
+            "reason": (
+                "initial concrete replay requires exactly one source assert!; "
+                f"found {len(assert_lines)}"
+            ),
+        }
+
+    source_before = sha256_file(source_path)
+    kani_sha = sha256_file(kani)
+    identity = {
+        "schema": SCHEMA,
+        "engine": "kani_cbmc_reference",
+        "kani_commit": KANI_COMMIT,
+        "source_file": str(source_path.resolve()),
+        "source_sha256": source_before,
+        "function": function.name,
+        "assert_line": assert_lines[0],
+        "kani_sha256": kani_sha,
+        "explicit_reference_backend": True,
+    }
+    key = sha256_bytes(
+        json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()
+    )
+    destination = output_root / key
+    destination.mkdir(parents=True, exist_ok=True)
+    replay_source = destination / "replay.rs"
+    original_text = source_path.read_text()
+    replay_source.write_text(original_text)
+
+    harness_name = f"__destiny_kani_reference_{function.name}"
+    params = [
+        f"    let {name}: {type_name} = kani::any();"
+        for name, type_name in function.params
+    ]
+    call_args = ", ".join(name for name, _ in function.params)
+    harness = [
+        "",
+        "#[kani::proof]",
+        f"fn {harness_name}() {{",
+        *params,
+        f"    {function.name}({call_args});",
+        "}",
+        "",
+    ]
+    replay_source.write_text(original_text + "\n".join(harness))
+    harness_sha = sha256_file(replay_source)
+
+    verify_command = [
+        str(kani),
+        str(replay_source),
+        "-Z",
+        "concrete-playback",
+        "--concrete-playback=print",
+        "--harness",
+        harness_name,
+        "--output-format=regular",
+    ]
+    try:
+        verification = run(verify_command, destination, timeout)
+    except subprocess.TimeoutExpired as error:
+        return {
+            **identity,
+            "key": key,
+            "status": "timeout",
+            "stage": "kani_reference_verification",
+            "command": verify_command,
+            "stdout": error.stdout or "",
+            "stderr": error.stderr or "",
+        }
+
+    combined = verification.stdout + "\n" + verification.stderr
+    block_match = re.search(
+        r"Concrete playback unit test for .*?:\s*[\x60]{3}\s*(.*?)\s*[\x60]{3}",
+        combined,
+        re.S,
+    )
+    if block_match is None:
+        row = {
+            **identity,
+            "key": key,
+            "status": "non_replayable_reference_failure",
+            "verify_command": verify_command,
+            "verify_returncode": verification.returncode,
+            "verify_stdout_sha256": sha256_bytes(verification.stdout.encode()),
+            "verify_stderr_sha256": sha256_bytes(verification.stderr.encode()),
+            "reason": "Kani did not emit a concrete playback unit test",
+        }
+        (destination / "kani-verify.stdout.txt").write_text(verification.stdout)
+        (destination / "kani-verify.stderr.txt").write_text(verification.stderr)
+        (destination / "evidence.json").write_text(json.dumps(row, indent=2) + "\n")
+        return row
+
+    concrete_test = block_match.group(1).strip() + "\n"
+    test_name_match = re.search(
+        r"\bfn\s+(kani_concrete_playback_[A-Za-z0-9_]+)\s*\(",
+        concrete_test,
+    )
+    if test_name_match is None:
+        row = {
+            **identity,
+            "key": key,
+            "status": "malformed_output",
+            "reason": "Kani concrete playback output did not contain a test name",
+        }
+        (destination / "evidence.json").write_text(json.dumps(row, indent=2) + "\n")
+        return row
+
+    test_name = test_name_match.group(1)
+    with replay_source.open("a") as output:
+        output.write("\n")
+        output.write(concrete_test)
+    replay_input_sha = sha256_file(replay_source)
+
+    playback_command = [
+        str(kani),
+        "playback",
+        "-Z",
+        "concrete-playback",
+        str(replay_source),
+        "--",
+        test_name,
+        "--exact",
+        "--nocapture",
+    ]
+    try:
+        playback = run(playback_command, destination, timeout)
+    except subprocess.TimeoutExpired as error:
+        row = {
+            **identity,
+            "key": key,
+            "status": "timeout",
+            "stage": "kani_concrete_playback",
+            "command": playback_command,
+            "stdout": error.stdout or "",
+            "stderr": error.stderr or "",
+        }
+        (destination / "evidence.json").write_text(json.dumps(row, indent=2) + "\n")
+        return row
+
+    playback_text = playback.stdout + "\n" + playback.stderr
+    location_patterns = [
+        rf"{re.escape(str(replay_source))}:{assert_lines[0]}(?::\d+)?",
+        rf"{re.escape(replay_source.name)}:{assert_lines[0]}(?::\d+)?",
+    ]
+    source_location_reproduced = any(
+        re.search(pattern, playback_text) for pattern in location_patterns
+    )
+    original_unchanged = sha256_file(source_path) == source_before
+    replay_input_unchanged = sha256_file(replay_source) == replay_input_sha
+    status = (
+        "reproduced_source_failure"
+        if playback.returncode != 0
+        and source_location_reproduced
+        and original_unchanged
+        and replay_input_unchanged
+        else "non_replayable_reference_failure"
+    )
+    row = {
+        **identity,
+        "key": key,
+        "status": status,
+        "harness_name": harness_name,
+        "harness_source_sha256": harness_sha,
+        "concrete_test_name": test_name,
+        "concrete_test_sha256": sha256_bytes(concrete_test.encode()),
+        "replay_input_sha256": replay_input_sha,
+        "verify_command": verify_command,
+        "verify_returncode": verification.returncode,
+        "verify_stdout_sha256": sha256_bytes(verification.stdout.encode()),
+        "verify_stderr_sha256": sha256_bytes(verification.stderr.encode()),
+        "playback_command": playback_command,
+        "playback_returncode": playback.returncode,
+        "playback_stdout_sha256": sha256_bytes(playback.stdout.encode()),
+        "playback_stderr_sha256": sha256_bytes(playback.stderr.encode()),
+        "source_location_reproduced": source_location_reproduced,
+        "original_source_unchanged": original_unchanged,
+        "replay_input_unchanged": replay_input_unchanged,
+        "artifact": str(replay_source),
+        "boundary": (
+            "This is an explicit Kani/CBMC reference replay. It does not discharge "
+            "the Verus proof; it only upgrades the failing fixture from an unproved "
+            "obligation to a reproduced source-level failure for the concrete witness."
+        ),
+    }
+    (destination / "kani-verify.stdout.txt").write_text(verification.stdout)
+    (destination / "kani-verify.stderr.txt").write_text(verification.stderr)
+    (destination / "playback.stdout.txt").write_text(playback.stdout)
+    (destination / "playback.stderr.txt").write_text(playback.stderr)
+    (destination / "concrete-test.rs").write_text(concrete_test)
+    (destination / "evidence.json").write_text(json.dumps(row, indent=2) + "\n")
+    return row
+
+
+def command_replay_kani(args) -> int:
+    source_path = Path(args.source).resolve()
+    if not source_path.is_file():
+        print(json.dumps(
+            {"status": "infrastructure_error", "reason": f"source not found: {source_path}"},
+            indent=2,
+        ))
+        return 2
+    functions = parse_source(source_path)
+    matches = [function for function in functions if function.name == args.function]
+    if len(matches) != 1:
+        print(json.dumps(
+            {
+                "status": "unsupported",
+                "reason": f"function {args.function!r} is not uniquely supported",
+            },
+            indent=2,
+        ))
+        return 1
+    kani = Path(args.kani).resolve()
+    if not kani.is_file():
+        print(json.dumps(
+            {"status": "infrastructure_error", "reason": f"Kani binary not found: {kani}"},
+            indent=2,
+        ))
+        return 2
+    result = explicit_kani_replay(
+        source_path,
+        matches[0],
+        kani,
+        ROOT / ".aegis" / "destiny" / "verus-kani-replay",
+        args.timeout,
+    )
+    print(json.dumps(result, indent=2))
+    return 0 if result.get("status") == "reproduced_source_failure" else 1
+
+
 def command_doctor(args) -> int:
     vendor = ROOT / "verification" / "vendor" / "manifest.json"
     info = {
@@ -815,6 +1070,16 @@ def main() -> int:
     replay = subcommands.add_parser("replay")
     replay.add_argument("--evidence", required=True)
     replay.set_defaults(func=command_replay)
+
+    replay_kani = subcommands.add_parser(
+        "replay-kani",
+        help="explicitly use the Kani/CBMC reference backend to obtain and replay a witness",
+    )
+    replay_kani.add_argument("--source", required=True)
+    replay_kani.add_argument("--function", required=True)
+    replay_kani.add_argument("--kani", required=True)
+    replay_kani.add_argument("--timeout", type=int, default=120)
+    replay_kani.set_defaults(func=command_replay_kani)
 
     args = parser.parse_args()
     try:
