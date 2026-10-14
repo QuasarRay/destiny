@@ -21,3 +21,18 @@ cargo +nightly-2026-08-21 test --manifest-path verification/automation/Cargo.tom
 ```
 
 The Kani nested Charon/firecracker/performance submodules are not required for this metadata-only boundary and are intentionally not initialized by CI. Any later Kani compiler feature that needs one must first promote it to a required pin in `verification/vendor/upstreams.json`.
+
+
+## Staged compiler-discovery patch
+
+The next dependency-ordered slice is recorded in
+`verification/vendor/patches/kani/0001-autoharness-metadata-only.patch`.
+It adds `cargo_metadata_only` in Kani's driver and routes
+`autoharness --list` through that function. The path still executes Kani's
+real compiler and automatic-harness generation, but stops before
+`Project::try_new` links GOTO artifacts.
+
+`verification/tools/bootstrap_kani_vendor.py` validates the exact base,
+patch digest and postimage Git blobs. `run_kani_autoharness_discovery.py`
+puts failing shims ahead of CBMC/GOTO executables; any accidental backend
+invocation is therefore an error rather than silently becoming proof work.

@@ -36,11 +36,27 @@
           "commit": "cd36c699f3cb3d531289aadee26c45c1306edcfc",
           "required_for_current_boundary": false
         }
+      ],
+      "patches": [
+        {
+          "id": "0001-autoharness-metadata-only",
+          "path": "verification/vendor/patches/kani/0001-autoharness-metadata-only.patch",
+          "sha256": "e2e1803d625e6322cb2da53aa32a682cf3cc57c90dc7fb0af840a3cee9e8a5d6",
+          "upstream_files": [
+            "kani-driver/src/autoharness/mod.rs",
+            "kani-driver/src/project.rs"
+          ],
+          "postimage_git_blobs": {
+            "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
+            "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b"
+          },
+          "purpose": "Make autoharness --list consume compiler-generated KaniMetadata before Project::try_new GOTO linking, so discovery can run without CBMC/GOTO execution."
+        }
       ]
     }
   },
   "current_boundary": {
-    "description": "Compile and consume Kani's own autoharness metadata types in the shared automation layer. No CBMC invocation and no claim of autoharness generation or Verus discharge.",
+    "description": "Compile and consume Kani's autoharness metadata types now; next staged slice applies a two-file Kani patch so compiler-side autoharness discovery/listing stops before GOTO/CBMC linking. Neither path grants proof credit.",
     "default_engine": "verus"
   }
 }
