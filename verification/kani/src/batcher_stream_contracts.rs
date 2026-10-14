@@ -4,8 +4,10 @@
 // Native park allocation/destruction, Python/weakref dispatch and representation
 // correspondence remain required; no production refinement is claimed.
 #![allow(non_snake_case)]
-use destiny_original_spec::{ActionName, ActionValue, BatcherEvent, BatcherHistory,
-    BatcherPayload, BoundedList, OriginalParkProjection, OriginalUpdateBatcher};
+use destiny_original_spec::{
+    ActionName, ActionValue, BatcherEvent, BatcherHistory, BatcherPayload, BoundedList,
+    OriginalParkProjection, OriginalUpdateBatcher,
+};
 const CHAR_ID_1: i64 = 90000128;
 const BUBBLE_1: i64 = 21;
 fn goto_action() -> BatcherEvent {
@@ -14,252 +16,373 @@ fn goto_action() -> BatcherEvent {
     assert!(args.push(ActionValue::Float(1.0)));
     assert!(args.push(ActionValue::Float(2.0)));
     assert!(args.push(ActionValue::Float(3.0)));
-    BatcherEvent { timestamp: 0, name: ActionName::GotoPoint, payload: BatcherPayload::Tuple(args) }
+    BatcherEvent {
+        timestamp: 0,
+        name: ActionName::GotoPoint,
+        payload: BatcherPayload::Tuple(args),
+    }
 }
 fn stop_action() -> BatcherEvent {
     // Original STOP_ACTION is (0, ("Stop", (BALL_ID_1))), with scalar payload.
-    BatcherEvent { timestamp: 0, name: ActionName::Stop, payload: BatcherPayload::Scalar(ActionValue::Integer(1001)) }
+    BatcherEvent {
+        timestamp: 0,
+        name: ActionName::Stop,
+        payload: BatcherPayload::Scalar(ActionValue::Integer(1001)),
+    }
 }
 fn event_list(events: &[BatcherEvent]) -> BatcherHistory {
     let mut list = BatcherHistory::new();
     let mut i = 0_usize;
     while i < events.len() {
-        if let Some(event) = events.get(i) { assert!(list.push(*event)); }
+        if let Some(event) = events.get(i) {
+            assert!(list.push(*event));
+        }
         i = i.saturating_add(1);
     }
     list
 }
 
-use destiny_original_spec::{OriginalBallInit,OriginalNetworkInterests,OriginalNetworkOutput,
-    OriginalNetworkCast,Vec3};
-const BALL_ID_1:i64=1001;const CLIENT_ID_1:i64=13579;
-fn set_up_ball(park:&mut OriginalParkProjection,interests:&mut OriginalNetworkInterests)->i64 {
-    let id=park.add_ball(OriginalBallInit{id:BALL_ID_1,mass:1.0,radius:1.0,max_velocity:1.0,
-        is_free:true,is_global:false,is_massive:true,is_interactive:true,is_space_junk:false,
-        position:Vec3::ZERO,velocity:Vec3::ZERO,agility:1.0,speed_fraction:1.0});
+use destiny_original_spec::{
+    OriginalBallInit, OriginalNetworkCast, OriginalNetworkInterests, OriginalNetworkOutput, Vec3,
+};
+const BALL_ID_1: i64 = 1001;
+const CLIENT_ID_1: i64 = 13579;
+fn set_up_ball(park: &mut OriginalParkProjection, interests: &mut OriginalNetworkInterests) -> i64 {
+    let id = park.add_ball(OriginalBallInit {
+        id: BALL_ID_1,
+        mass: 1.0,
+        radius: 1.0,
+        max_velocity: 1.0,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        position: Vec3::ZERO,
+        velocity: Vec3::ZERO,
+        agility: 1.0,
+        speed_fraction: 1.0,
+    });
     assert!(park.contains(id) && !park.scope_error);
-    assert!(park.insert_new_query_ball(id)==Ok(()));
-    assert!(interests.add_client_interest(id,CLIENT_ID_1).is_ok());
-    assert!(interests.add_character_interest(id,CHAR_ID_1).is_ok());
-    assert!(interests.map_to_client(CHAR_ID_1,Some(CLIENT_ID_1)).is_ok());
-    assert!(interests.set_ball_info_characters(id,&[CHAR_ID_1]).is_ok());
+    assert!(park.insert_new_query_ball(id) == Ok(()));
+    assert!(interests.add_client_interest(id, CLIENT_ID_1).is_ok());
+    assert!(interests.add_character_interest(id, CHAR_ID_1).is_ok());
+    assert!(
+        interests
+            .map_to_client(CHAR_ID_1, Some(CLIENT_ID_1))
+            .is_ok()
+    );
+    assert!(interests.set_ball_info_characters(id, &[CHAR_ID_1]).is_ok());
     id
 }
-fn ids_contain(ids:&BoundedList<i64,8>,id:i64)->bool {
-    let mut i=0;while i<ids.len() { if ids.get(i)==Some(id) { return true; }i+=1; }false
+fn ids_contain(ids: &BoundedList<i64, 8>, id: i64) -> bool {
+    let mut i = 0;
+    while i < ids.len() {
+        if ids.get(i) == Some(id) {
+            return true;
+        }
+        i += 1;
+    }
+    false
 }
-fn assert_cast_count(casts:&BoundedList<OriginalNetworkCast,8>,client:i64,expected:u8,single:bool) {
-    let mut found=false;let mut i=0;
-    while i<casts.len() {
-        if let Some(cast)=casts.get(i) {
-            let recipient=if single { cast.clients.get(0)==Some(client) } else { ids_contain(&cast.clients,client) };
+fn assert_cast_count(
+    casts: &BoundedList<OriginalNetworkCast, 8>,
+    client: i64,
+    expected: u8,
+    single: bool,
+) {
+    let mut found = false;
+    let mut i = 0;
+    while i < casts.len() {
+        if let Some(cast) = casts.get(i) {
+            let recipient = if single {
+                cast.clients.get(0) == Some(client)
+            } else {
+                ids_contain(&cast.clients, client)
+            };
             // The source send_batch uses DoDestinyUpdate for every cast.
             if recipient {
-                assert!(expected==cast.casts_in_batch); // original helper assertEqual
-                found=true;
+                assert!(expected == cast.casts_in_batch); // original helper assertEqual
+                found = true;
             }
         }
-        i+=1;
+        i += 1;
     }
     assert!(found); // original helper assertTrue(found)
 }
 
-fn assert_balls_equal_without_bubbles(first:destiny_original_spec::OriginalParkBall,second:destiny_original_spec::OriginalParkBall) {
+fn assert_balls_equal_without_bubbles(
+    first: destiny_original_spec::OriginalParkBall,
+    second: destiny_original_spec::OriginalParkBall,
+) {
     // original-assertion: python/destiny/test/net/server/helpers.py:142
-    assert!(first.id==second.id);
+    assert!(first.id == second.id);
     // original-assertion: python/destiny/test/net/server/helpers.py:143
-    assert!(first.mass==second.mass);
+    assert!(first.mass == second.mass);
     // original-assertion: python/destiny/test/net/server/helpers.py:144
-    assert!(f64::from(first.radius)==f64::from(second.radius));
+    assert!(f64::from(first.radius) == f64::from(second.radius));
     // original-assertion: python/destiny/test/net/server/helpers.py:145
-    assert!(f64::from(first.max_velocity)==f64::from(second.max_velocity));
+    assert!(f64::from(first.max_velocity) == f64::from(second.max_velocity));
     // original-assertion: python/destiny/test/net/server/helpers.py:146
-    assert!(first.is_free==second.is_free);
+    assert!(first.is_free == second.is_free);
     // original-assertion: python/destiny/test/net/server/helpers.py:147
-    assert!(first.is_global==second.is_global);
+    assert!(first.is_global == second.is_global);
     // original-assertion: python/destiny/test/net/server/helpers.py:148
-    assert!(first.is_massive==second.is_massive);
+    assert!(first.is_massive == second.is_massive);
     // original-assertion: python/destiny/test/net/server/helpers.py:149
-    assert!(first.is_interactive==second.is_interactive);
+    assert!(first.is_interactive == second.is_interactive);
     // original-assertion: python/destiny/test/net/server/helpers.py:150
-    assert!(first.is_cloaked==second.is_cloaked);
+    assert!(first.is_cloaked == second.is_cloaked);
     // original-assertion: python/destiny/test/net/server/helpers.py:151
-    assert!(first.is_moribund==second.is_moribund);
+    assert!(first.is_moribund == second.is_moribund);
     // original-assertion: python/destiny/test/net/server/helpers.py:152
-    assert!(first.harmonic==second.harmonic);
+    assert!(first.harmonic == second.harmonic);
     // original-assertion: python/destiny/test/net/server/helpers.py:153
-    assert!(first.corporation_id==second.corporation_id);
+    assert!(first.corporation_id == second.corporation_id);
     // original-assertion: python/destiny/test/net/server/helpers.py:154
-    assert!(first.alliance_id==second.alliance_id);
+    assert!(first.alliance_id == second.alliance_id);
     // original-assertion: python/destiny/test/net/server/helpers.py:155
-    assert!(first.position.x==second.position.x);
+    assert!(first.position.x == second.position.x);
     // original-assertion: python/destiny/test/net/server/helpers.py:156
-    assert!(first.position.y==second.position.y);
+    assert!(first.position.y == second.position.y);
     // original-assertion: python/destiny/test/net/server/helpers.py:157
-    assert!(first.position.z==second.position.z);
+    assert!(first.position.z == second.position.z);
     // original-assertion: python/destiny/test/net/server/helpers.py:158
-    assert!(first.velocity.x==second.velocity.x);
+    assert!(first.velocity.x == second.velocity.x);
     // original-assertion: python/destiny/test/net/server/helpers.py:159
-    assert!(first.velocity.y==second.velocity.y);
+    assert!(first.velocity.y == second.velocity.y);
     // original-assertion: python/destiny/test/net/server/helpers.py:160
-    assert!(first.velocity.z==second.velocity.z);
+    assert!(first.velocity.z == second.velocity.z);
     // original-assertion: python/destiny/test/net/server/helpers.py:161
-    assert!(f64::from(first.agility)==f64::from(second.agility));
+    assert!(f64::from(first.agility) == f64::from(second.agility));
     // original-assertion: python/destiny/test/net/server/helpers.py:162
-    assert!(f64::from(first.speed_fraction)==f64::from(second.speed_fraction));
+    assert!(f64::from(first.speed_fraction) == f64::from(second.speed_fraction));
     // original-assertion: python/destiny/test/net/server/helpers.py:163
-    assert!(first.mode==second.mode);
+    assert!(first.mode == second.mode);
     // original-assertion: python/destiny/test/net/server/helpers.py:164
-    assert!(first.goto.x==second.goto.x);
+    assert!(first.goto.x == second.goto.x);
     // original-assertion: python/destiny/test/net/server/helpers.py:165
-    assert!(first.goto.y==second.goto.y);
+    assert!(first.goto.y == second.goto.y);
     // original-assertion: python/destiny/test/net/server/helpers.py:166
-    assert!(first.goto.z==second.goto.z);
+    assert!(first.goto.z == second.goto.z);
     // original-assertion: python/destiny/test/net/server/helpers.py:167
-    assert!(first.follow_id==second.follow_id);
+    assert!(first.follow_id == second.follow_id);
     // original-assertion: python/destiny/test/net/server/helpers.py:168
-    assert!(f64::from(first.follow_range)==f64::from(second.follow_range));
+    assert!(f64::from(first.follow_range) == f64::from(second.follow_range));
     // original-assertion: python/destiny/test/net/server/helpers.py:169
-    assert!(first.owner_id==second.owner_id);
+    assert!(first.owner_id == second.owner_id);
     // original-assertion: python/destiny/test/net/server/helpers.py:170
-    assert!(first.effect_stamp==second.effect_stamp);
+    assert!(first.effect_stamp == second.effect_stamp);
     // original-assertion: python/destiny/test/net/server/helpers.py:174
-    assert!(first.formation_id==second.formation_id);
+    assert!(first.formation_id == second.formation_id);
     // original-assertion: python/destiny/test/net/server/helpers.py:175
-    assert!(first.mini_balls==second.mini_balls);
+    assert!(first.mini_balls == second.mini_balls);
     // original-assertion: python/destiny/test/net/server/helpers.py:176
-    assert!(first.mini_capsules==second.mini_capsules);
+    assert!(first.mini_capsules == second.mini_capsules);
     // original-assertion: python/destiny/test/net/server/helpers.py:177
-    assert!(first.mini_boxes==second.mini_boxes);
+    assert!(first.mini_boxes == second.mini_boxes);
 }
-fn assert_packaged_bubble_action(park:&OriginalParkProjection,batcher:&OriginalUpdateBatcher,event:destiny_original_spec::BatcherEvent,ball:i64,additions:bool) {
-    let package=match event.payload { BatcherPayload::Packaged{package_index}=>Some(package_index),_=>None };
+fn assert_packaged_bubble_action(
+    park: &OriginalParkProjection,
+    batcher: &OriginalUpdateBatcher,
+    event: destiny_original_spec::BatcherEvent,
+    ball: i64,
+    additions: bool,
+) {
+    let package = match event.payload {
+        BatcherPayload::Packaged { package_index } => Some(package_index),
+        _ => None,
+    };
     assert!(package.is_some()); // original marshal.Load argument must be bytes
-    let bytes=batcher.package_bytes(package.unwrap_or(0));assert!(bytes.is_some());
-    let unpacked=destiny_original_spec::unmarshal_original_event(&bytes.unwrap_or_default());
+    let bytes = batcher.package_bytes(package.unwrap_or(0));
+    assert!(bytes.is_some());
+    let unpacked = destiny_original_spec::unmarshal_original_event(&bytes.unwrap_or_default());
     assert!(unpacked.is_ok()); // original native marshal.Load must not raise
-    if let Ok(unpacked)=unpacked {
-        assert!(unpacked.action_count==1); // original len(unpackaged_action_list)
-        assert!(unpacked.timestamp==park.current_time);
-        assert!(unpacked.parameter_count==1); // original len(action_parameters)
+    if let Ok(unpacked) = unpacked {
+        assert!(unpacked.action_count == 1); // original len(unpackaged_action_list)
+        assert!(unpacked.timestamp == park.current_time);
+        assert!(unpacked.parameter_count == 1); // original len(action_parameters)
         if additions {
-            let stream=match unpacked.action { destiny_original_spec::OriginalMarshalledAction::AddBalls{stream}=>Some(stream),_=>None };
+            let stream = match unpacked.action {
+                destiny_original_spec::OriginalMarshalledAction::AddBalls { stream } => {
+                    Some(stream)
+                }
+                _ => None,
+            };
             assert!(stream.is_some()); // original AddBallsToPark name and one byte parameter
-            let mut reader=OriginalParkProjection::default();
-            assert!(reader.read_original_state(&stream.unwrap_or_default(),0)==Ok(()));
+            let mut reader = OriginalParkProjection::default();
+            assert!(reader.read_original_state(&stream.unwrap_or_default(), 0) == Ok(()));
             assert!(reader.contains(ball)); // original dictionary index must not raise
-            assert_balls_equal_without_bubbles(park.retained(ball),reader.retained(ball));
+            assert_balls_equal_without_bubbles(park.retained(ball), reader.retained(ball));
         } else {
-            let ids=match unpacked.action { destiny_original_spec::OriginalMarshalledAction::RemoveBalls{ids}=>Some(ids),_=>None };
+            let ids = match unpacked.action {
+                destiny_original_spec::OriginalMarshalledAction::RemoveBalls { ids } => Some(ids),
+                _ => None,
+            };
             assert!(ids.is_some()); // original RemoveBalls name and one list parameter
-            if let Some(ids)=ids { assert!(ids.len()==1 && ids.get(0)==Some(ball)); }
+            if let Some(ids) = ids {
+                assert!(ids.len() == 1 && ids.get(0) == Some(ball));
+            }
         }
     }
 }
-fn count_set_state_actions(park:&OriginalParkProjection,batcher:&OriginalUpdateBatcher,history:BatcherHistory,ball:i64)->usize {
-    let mut count=0;let mut i=0;
-    while i<history.len() {
-        let event=history.get(i);assert!(event.is_some());
-        if let Some(event)=event {
-            if event.name==ActionName::SetState {
-                let payload=match event.payload { BatcherPayload::Stream{stream_index,reference}=>Some((stream_index,reference)),_=>None };
+fn count_set_state_actions(
+    park: &OriginalParkProjection,
+    batcher: &OriginalUpdateBatcher,
+    history: BatcherHistory,
+    ball: i64,
+) -> usize {
+    let mut count = 0;
+    let mut i = 0;
+    while i < history.len() {
+        let event = history.get(i);
+        assert!(event.is_some());
+        if let Some(event) = event {
+            if event.name == ActionName::SetState {
+                let payload = match event.payload {
+                    BatcherPayload::Stream {
+                        stream_index,
+                        reference,
+                    } => Some((stream_index, reference)),
+                    _ => None,
+                };
                 assert!(payload.is_some()); // original parameter[0] bytes and source argument exist
-                if let Some((index,_))=payload {
-                    let bytes=batcher.stream_bytes(index);assert!(bytes.is_some());
-                    let mut reader=OriginalParkProjection::default();
-                    assert!(reader.read_original_state(&bytes.unwrap_or_default(),0)==Ok(()));
+                if let Some((index, _)) = payload {
+                    let bytes = batcher.stream_bytes(index);
+                    assert!(bytes.is_some());
+                    let mut reader = OriginalParkProjection::default();
+                    assert!(reader.read_original_state(&bytes.unwrap_or_default(), 0) == Ok(()));
                     assert!(reader.contains(ball)); // original helper assertIn
-                    assert_balls_equal_without_bubbles(park.retained(ball),reader.retained(ball));
-                    count+=1;
+                    assert_balls_equal_without_bubbles(park.retained(ball), reader.retained(ball));
+                    count += 1;
                 }
             }
-        }i+=1;
-    }count
+        }
+        i += 1;
+    }
+    count
 }
 
-fn add_second_ball(park:&mut OriginalParkProjection)->i64 {
-    let id=park.add_ball(destiny_original_spec::OriginalBallInit{id:1002,mass:1.0,radius:1.0,max_velocity:1.0,
-        is_free:true,is_global:false,is_massive:true,is_interactive:true,is_space_junk:false,
-        position:Vec3::ZERO,velocity:Vec3::ZERO,agility:1.0,speed_fraction:1.0});
-    assert!(park.contains(id) && !park.scope_error);assert!(park.insert_new_query_ball(id)==Ok(()));id
+fn add_second_ball(park: &mut OriginalParkProjection) -> i64 {
+    let id = park.add_ball(destiny_original_spec::OriginalBallInit {
+        id: 1002,
+        mass: 1.0,
+        radius: 1.0,
+        max_velocity: 1.0,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        position: Vec3::ZERO,
+        velocity: Vec3::ZERO,
+        agility: 1.0,
+        speed_fraction: 1.0,
+    });
+    assert!(park.contains(id) && !park.scope_error);
+    assert!(park.insert_new_query_ball(id) == Ok(()));
+    id
 }
 
 // original-case: python/destiny/test/net/server/test_updatebatcher.py::TestUpdateBatcher::test_send_full_state_update
 // original-source-sha256: 7fd21a9587140ea97736480b9355400b29f7798d5504f799b4f32de543d6cb36
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn test_send_full_state_update() {
-    let mut park=OriginalParkProjection::default();park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     {
-    let mut batcher=OriginalUpdateBatcher::default();let mut interests=OriginalNetworkInterests::default();
-    let _=set_up_ball(&mut park,&mut interests);
-    assert!(batcher.send_full_state_update(&park,CHAR_ID_1,BALL_ID_1)==Ok(()));
-    let character_history=batcher.get_character_history(CHAR_ID_1);
-    // Full original count helper assertion sites: [169, 171]
-    let count=count_set_state_actions(&park,&batcher,character_history,BALL_ID_1);
-    // original-assertion: python/destiny/test/net/server/test_updatebatcher.py:180
-    assert!(count==1);
+        let mut batcher = OriginalUpdateBatcher::default();
+        let mut interests = OriginalNetworkInterests::default();
+        let _ = set_up_ball(&mut park, &mut interests);
+        assert!(batcher.send_full_state_update(&park, CHAR_ID_1, BALL_ID_1) == Ok(()));
+        let character_history = batcher.get_character_history(CHAR_ID_1);
+        // Full original count helper assertion sites: [169, 171]
+        let count = count_set_state_actions(&park, &batcher, character_history, BALL_ID_1);
+        // original-assertion: python/destiny/test/net/server/test_updatebatcher.py:180
+        assert!(count == 1);
     } // source batcher/reference destruction boundary
-    park.clear_all();assert!(!park.scope_error);
-    #[cfg(kani)] kani::cover!(true,"original full-state event, complete equality helpers and teardown completed");
+    park.clear_all();
+    assert!(!park.scope_error);
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "original full-state event, complete equality helpers and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_updatebatcher.py::TestUpdateBatcher::test_update_bubbles_inserts_add_balls_actions_to_character_history
 // original-source-sha256: 7fd21a9587140ea97736480b9355400b29f7798d5504f799b4f32de543d6cb36
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(1025))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(1025))]
+#[cfg_attr(test, test)]
 fn test_update_bubbles_inserts_add_balls_actions_to_character_history() {
-    let mut park=OriginalParkProjection::default();park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     {
-    let mut batcher=OriginalUpdateBatcher::default();let mut interests=OriginalNetworkInterests::default();
-    let mut updater=destiny_original_spec::OriginalBubbleUpdater::default();
-    let _=set_up_ball(&mut park,&mut interests);
-    assert!(batcher.update_bubbles(&mut park,&mut updater,&interests)==Ok(()));
-    assert!(park.evolve_two_spherical_bodies()==Ok(()));
-    batcher.clear_character_history(CHAR_ID_1);
-    let second=add_second_ball(&mut park);
-    assert!(batcher.update_bubbles(&mut park,&mut updater,&interests)==Ok(()));
-    let char_history=batcher.get_character_history(CHAR_ID_1);
-    // original-assertion sites: python/destiny/test/net/server/test_updatebatcher.py:[223, 225, 226]; complete helper sites [201, 203, 204, 184, 185, 189]
-    assert!(char_history.len()==1);
-    let action=char_history.get(0);assert!(action.is_some());
-    if let Some(action)=action {
-        assert!(park.current_time==action.timestamp);
-        assert_packaged_bubble_action(&park,&batcher,action,second,true);
-    }
+        let mut batcher = OriginalUpdateBatcher::default();
+        let mut interests = OriginalNetworkInterests::default();
+        let mut updater = destiny_original_spec::OriginalBubbleUpdater::default();
+        let _ = set_up_ball(&mut park, &mut interests);
+        assert!(batcher.update_bubbles(&mut park, &mut updater, &interests) == Ok(()));
+        assert!(park.evolve_two_spherical_bodies() == Ok(()));
+        batcher.clear_character_history(CHAR_ID_1);
+        let second = add_second_ball(&mut park);
+        assert!(batcher.update_bubbles(&mut park, &mut updater, &interests) == Ok(()));
+        let char_history = batcher.get_character_history(CHAR_ID_1);
+        // original-assertion sites: python/destiny/test/net/server/test_updatebatcher.py:[223, 225, 226]; complete helper sites [201, 203, 204, 184, 185, 189]
+        assert!(char_history.len() == 1);
+        let action = char_history.get(0);
+        assert!(action.is_some());
+        if let Some(action) = action {
+            assert!(park.current_time == action.timestamp);
+            assert_packaged_bubble_action(&park, &batcher, action, second, true);
+        }
     } // original updater/batcher/reference destruction boundary
-    park.clear_all();assert!(!park.scope_error);
-    #[cfg(kani)] kani::cover!(true,"original packaged bubble action and all nested helper assertions completed");
+    park.clear_all();
+    assert!(!park.scope_error);
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "original packaged bubble action and all nested helper assertions completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_updatebatcher.py::TestUpdateBatcher::test_update_bubbles_inserts_remove_balls_actions_to_character_history
 // original-source-sha256: 7fd21a9587140ea97736480b9355400b29f7798d5504f799b4f32de543d6cb36
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(1025))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(1025))]
+#[cfg_attr(test, test)]
 fn test_update_bubbles_inserts_remove_balls_actions_to_character_history() {
-    let mut park=OriginalParkProjection::default();park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     {
-    let mut batcher=OriginalUpdateBatcher::default();let mut interests=OriginalNetworkInterests::default();
-    let mut updater=destiny_original_spec::OriginalBubbleUpdater::default();
-    let _=set_up_ball(&mut park,&mut interests);
-    let second=add_second_ball(&mut park);
-    assert!(batcher.update_bubbles(&mut park,&mut updater,&interests)==Ok(()));
-    batcher.clear_character_history(CHAR_ID_1);
-    park.remove_ball(second,0);
-    assert!(park.evolve_two_spherical_bodies()==Ok(()));
-    assert!(batcher.update_bubbles(&mut park,&mut updater,&interests)==Ok(()));
-    let char_history=batcher.get_character_history(CHAR_ID_1);
-    // original-assertion sites: python/destiny/test/net/server/test_updatebatcher.py:[238, 240, 241]; complete helper sites [209, 211, 212, 193, 194, 196]
-    assert!(char_history.len()==1);
-    let action=char_history.get(0);assert!(action.is_some());
-    if let Some(action)=action {
-        assert!(park.current_time==action.timestamp);
-        assert_packaged_bubble_action(&park,&batcher,action,second,false);
-    }
+        let mut batcher = OriginalUpdateBatcher::default();
+        let mut interests = OriginalNetworkInterests::default();
+        let mut updater = destiny_original_spec::OriginalBubbleUpdater::default();
+        let _ = set_up_ball(&mut park, &mut interests);
+        let second = add_second_ball(&mut park);
+        assert!(batcher.update_bubbles(&mut park, &mut updater, &interests) == Ok(()));
+        batcher.clear_character_history(CHAR_ID_1);
+        park.remove_ball(second, 0);
+        assert!(park.evolve_two_spherical_bodies() == Ok(()));
+        assert!(batcher.update_bubbles(&mut park, &mut updater, &interests) == Ok(()));
+        let char_history = batcher.get_character_history(CHAR_ID_1);
+        // original-assertion sites: python/destiny/test/net/server/test_updatebatcher.py:[238, 240, 241]; complete helper sites [209, 211, 212, 193, 194, 196]
+        assert!(char_history.len() == 1);
+        let action = char_history.get(0);
+        assert!(action.is_some());
+        if let Some(action) = action {
+            assert!(park.current_time == action.timestamp);
+            assert_packaged_bubble_action(&park, &batcher, action, second, false);
+        }
     } // original updater/batcher/reference destruction boundary
-    park.clear_all();assert!(!park.scope_error);
-    #[cfg(kani)] kani::cover!(true,"original packaged bubble action and all nested helper assertions completed");
+    park.clear_all();
+    assert!(!park.scope_error);
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "original packaged bubble action and all nested helper assertions completed"
+    );
 }

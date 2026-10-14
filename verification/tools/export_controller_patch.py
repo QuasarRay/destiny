@@ -11,7 +11,8 @@ import subprocess
 
 ROOT=Path(__file__).resolve().parents[2]
 BASE="46f90f7dbc4f3db8a1a74ef9d8aa91fb4b679460"
-EXTRA=("infra/agentinfra/coverage.py","infra/tests/test_coverage.py")
+EXTRA=("infra/agentinfra/coverage.py","infra/tests/test_coverage.py",
+       "infra/agentinfra/verus_evidence.py","infra/tests/test_verus_evidence.py")
 
 def git(*arguments,check=True):
     return subprocess.run(["git","-C",str(ROOT/".agents"),*arguments],

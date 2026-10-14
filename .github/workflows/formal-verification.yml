@@ -60,7 +60,7 @@ jobs:
           cargo kani --version
 
       - name: Verify Kani harnesses
-        run: cargo kani --manifest-path verification/kani/Cargo.toml --output-format=terse
+        run: cargo kani -Z function-contracts -Z stubbing --manifest-path verification/kani/Cargo.toml --output-format=terse
 
   verus:
     name: Verus 0.2026.09.20.aef82ed
@@ -70,6 +70,18 @@ jobs:
       VERUS_SHA256: 7b870fa12bc589015c2fab60a8b3d9f07c7b1adb3444eb0fadffcbf7f0447b33
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check out the pinned maintained controller
+        uses: actions/checkout@v4
+        with:
+          repository: QuasarRay/Aegis
+          ref: 46f90f7dbc4f3db8a1a74ef9d8aa91fb4b679460
+          path: .agents
+
+      - name: Apply and validate the exported controller postimages
+        run: python3 -B verification/tools/bootstrap_controller.py
 
       - name: Install Verus Rust toolchain
         run: rustup toolchain install 1.98.1-x86_64-unknown-linux-gnu
@@ -89,12 +101,21 @@ jobs:
 
       - name: Verify logical refinement proofs
         run: |
-          "$VERUS_BIN" --crate-type=lib verification/verus/proofs.rs
-          "$VERUS_BIN" --crate-type=lib verification/verus/state_contracts.rs
-          "$VERUS_BIN" --crate-type=lib verification/verus/lifecycle_contracts.rs
-          "$VERUS_BIN" --crate-type=lib verification/verus/ball_contracts.rs
-          "$VERUS_BIN" --crate-type=lib verification/verus/visibility_contracts.rs
-          "$VERUS_BIN" --crate-type=lib verification/verus/geometry_contracts.rs
+          python3 -B verification/tools/check_concurrency_acceptance.py --structure-only
+          python3 -B verification/tools/run_verus_campaign.py --verus "$VERUS_BIN"
+
+      - name: Retain complete counted results, VIR inventories and scope audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verus-counted-concurrency-evidence
+          path: |
+            .aegis/destiny/receipts
+            .aegis/destiny/verus-artifacts
+            .aegis/destiny/verus-final-campaign
+            .aegis/destiny/bindings
+            .aegis/destiny/proofs
+            .aegis/destiny/concurrency-acceptance.json
 
   runtime-parity:
     name: concrete runtime parity regression
@@ -136,3 +157,6 @@ jobs:
           cargo build --lib --all-features --locked
           python verification/tools/run_original_formation_tests.py --original-root original-destiny
           python verification/tools/run_original_formation_tests.py --original-root original-destiny --library target/debug/libdestiny_bevy_compat.so
+
+      - name: Run the unchanged original evolution callback on the native library
+        run: python3 -B verification/tools/run_original_callback_test.py --original-root original-destiny --library target/debug/libdestiny_bevy_compat.so

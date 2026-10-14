@@ -4,145 +4,235 @@
 // history processing. Native Python/Blue, method replacement and object alias
 // correspondence remain separate requirements; no production credit is claimed.
 #![allow(non_snake_case)]
-use destiny_original_spec::{ClientHistoryAction,ClientHistoryEvent,ClientHistoryState,
-    OriginalBallInit,OriginalClientTicker,OriginalMode,OriginalParkProjection,Vec3};
+use destiny_original_spec::{
+    ClientHistoryAction, ClientHistoryEvent, ClientHistoryState, OriginalBallInit,
+    OriginalClientTicker, OriginalMode, OriginalParkProjection, Vec3,
+};
 
-fn state(events:&[(i64,ClientHistoryAction)])->ClientHistoryState {
-    let mut state=ClientHistoryState::new();let mut i=0;
-    while i<events.len() {
-        if let Some((timestamp,action))=events.get(i) {
-            assert!(state.push(ClientHistoryEvent{timestamp:*timestamp,action:*action}));
-        }i+=1;
-    }state
+fn state(events: &[(i64, ClientHistoryAction)]) -> ClientHistoryState {
+    let mut state = ClientHistoryState::new();
+    let mut i = 0;
+    while i < events.len() {
+        if let Some((timestamp, action)) = events.get(i) {
+            assert!(state.push(ClientHistoryEvent {
+                timestamp: *timestamp,
+                action: *action
+            }));
+        }
+        i += 1;
+    }
+    state
 }
-fn tick(ticker:&mut OriginalClientTicker,time_stamp:i64) {
-    assert!(ticker.do_pre_tick()==Ok(()));
-    assert!(ticker.parent_evolve()==Ok(()));
-    assert!(ticker.do_post_tick(time_stamp)==Ok(()));
+fn tick(ticker: &mut OriginalClientTicker, time_stamp: i64) {
+    assert!(ticker.do_pre_tick() == Ok(()));
+    assert!(ticker.parent_evolve() == Ok(()));
+    assert!(ticker.do_post_tick(time_stamp) == Ok(()));
 }
-fn ticker_fixture(ticker:&mut OriginalClientTicker) {
+fn ticker_fixture(ticker: &mut OriginalClientTicker) {
     // Default constructs the fresh park in its final storage. set_ballpark's
     // three reference assignments all point to this same initialized value.
     // Avoid copying the large park through a fixture return on the test stack.
-    ticker.has_ballpark=true;
-    let mut bp=OriginalParkProjection::default();
-    let mut ball_ids=[0_i64;3];let positions=[0.0,1000.0,-1000.0];let mut i=0;
-    while i<3 {
-        let id=i64::try_from(i+1);assert!(id.is_ok());
-        let ball=OriginalBallInit{id:id.unwrap_or(0),mass:1.0,radius:1.0,max_velocity:1.0,
-            is_free:true,is_global:false,is_massive:true,is_interactive:true,is_space_junk:false,
-            position:Vec3{x:positions[i],y:0.0,z:0.0},velocity:Vec3::ZERO,agility:1.0,speed_fraction:1.0};
-        ball_ids[i]=bp.add_ball(ball);assert!(!bp.scope_error);i+=1;
+    ticker.has_ballpark = true;
+    let mut bp = OriginalParkProjection::default();
+    let mut ball_ids = [0_i64; 3];
+    let positions = [0.0, 1000.0, -1000.0];
+    let mut i = 0;
+    while i < 3 {
+        let id = i64::try_from(i + 1);
+        assert!(id.is_ok());
+        let ball = OriginalBallInit {
+            id: id.unwrap_or(0),
+            mass: 1.0,
+            radius: 1.0,
+            max_velocity: 1.0,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: positions[i],
+                y: 0.0,
+                z: 0.0,
+            },
+            velocity: Vec3::ZERO,
+            agility: 1.0,
+            speed_fraction: 1.0,
+        };
+        ball_ids[i] = bp.add_ball(ball);
+        assert!(!bp.scope_error);
+        i += 1;
     }
-    bp.follow(ball_ids[1],ball_ids[0],1.0,true);
-    bp.goto_point(ball_ids[2],Vec3::ZERO);
-    bp.goto_direction(ball_ids[0],Vec3{x:0.0,y:1.0,z:0.0});
-    for _ in 0..10 { assert!(bp.evolve_two_spherical_bodies()==Ok(())); }
-    let stream=bp.write_original_full_state(None);assert!(stream.is_ok());
-    let index=ticker.retain_received_stream(stream.unwrap_or_default());assert!(index.is_ok());
-    assert!(ticker.update(&state(&[(0,ClientHistoryAction::SetState{stream_index:index.unwrap_or(usize::MAX),ego_id:1})]),false)==Ok(()));
-    tick(ticker,10);
+    bp.follow(ball_ids[1], ball_ids[0], 1.0, true);
+    bp.goto_point(ball_ids[2], Vec3::ZERO);
+    bp.goto_direction(
+        ball_ids[0],
+        Vec3 {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+        },
+    );
+    for _ in 0..10 {
+        assert!(bp.evolve_two_spherical_bodies() == Ok(()));
+    }
+    let stream = bp.write_original_full_state(None);
+    assert!(stream.is_ok());
+    let index = ticker.retain_received_stream(stream.unwrap_or_default());
+    assert!(index.is_ok());
+    assert!(
+        ticker.update(
+            &state(&[(
+                0,
+                ClientHistoryAction::SetState {
+                    stream_index: index.unwrap_or(usize::MAX),
+                    ego_id: 1
+                }
+            )]),
+            false
+        ) == Ok(())
+    );
+    tick(ticker, 10);
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_setstate
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_setstate() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:53
-    assert!(ticker.park.current_time==(10_i64+1_i64));
+    assert!(ticker.park.current_time == (10_i64 + 1_i64));
     assert!(ticker.park.contains(2)); // original dictionary lookup
-    let ball_two=2_i64; // retained object alias, checked against the live ID
+    let ball_two = 2_i64; // retained object alias, checked against the live ID
     // original-assertion: python/destiny/test/net/client/test_ticker.py:55
-    assert!(OriginalMode::Orbit==ticker.park.retained(ball_two).mode);
+    assert!(OriginalMode::Orbit == ticker.park.retained(ball_two).mode);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_fatal_desync_reported_when_update_has_multiple_timestamps
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_fatal_desync_reported_when_update_has_multiple_timestamps() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    assert!(ticker.update(&state(&[((10_i64+1_i64),ClientHistoryAction::Stop{id:2_i64}),((10_i64+2_i64),ClientHistoryAction::Stop{id:2_i64})]),false)==Ok(()));
+    assert!(
+        ticker.update(
+            &state(&[
+                ((10_i64 + 1_i64), ClientHistoryAction::Stop { id: 2_i64 }),
+                ((10_i64 + 2_i64), ClientHistoryAction::Stop { id: 2_i64 })
+            ]),
+            false
+        ) == Ok(())
+    );
     // original-assertion: python/destiny/test/net/client/test_ticker.py:118
     assert!(ticker.fatal_desync_occurred);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_future_state_gets_applied_at_correct_time
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_future_state_gets_applied_at_correct_time() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    assert!(ticker.update(&state(&[((10_i64+2_i64),ClientHistoryAction::Stop{id:2_i64})]),false)==Ok(()));
+    assert!(
+        ticker.update(
+            &state(&[((10_i64 + 2_i64), ClientHistoryAction::Stop { id: 2_i64 })]),
+            false
+        ) == Ok(())
+    );
     assert!(ticker.park.contains(2)); // original dictionary lookup
-    let ball_two=2_i64; // retained object alias, checked against the live ID
-    tick(&mut ticker,(10_i64+1_i64));
+    let ball_two = 2_i64; // retained object alias, checked against the live ID
+    tick(&mut ticker, (10_i64 + 1_i64));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:68
-    assert!(OriginalMode::Orbit==ticker.park.retained(ball_two).mode);
-    tick(&mut ticker,(10_i64+2_i64));
+    assert!(OriginalMode::Orbit == ticker.park.retained(ball_two).mode);
+    tick(&mut ticker, (10_i64 + 2_i64));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:70
-    assert!(OriginalMode::Stop==ticker.park.retained(ball_two).mode);
+    assert!(OriginalMode::Stop == ticker.park.retained(ball_two).mode);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_late_arrival
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_late_arrival() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
     assert!(ticker.park.contains(2)); // original dictionary lookup
-    let ball_two=2_i64; // retained object alias, checked against the live ID
-    tick(&mut ticker,(10_i64+1_i64));
-    tick(&mut ticker,(10_i64+2_i64));
+    let ball_two = 2_i64; // retained object alias, checked against the live ID
+    tick(&mut ticker, (10_i64 + 1_i64));
+    tick(&mut ticker, (10_i64 + 2_i64));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:76
-    assert!(OriginalMode::Orbit==ticker.park.retained(ball_two).mode);
-    assert!(ticker.update(&state(&[((10_i64+2_i64),ClientHistoryAction::Stop{id:2_i64})]),false)==Ok(()));
-    tick(&mut ticker,(10_i64+3_i64));
+    assert!(OriginalMode::Orbit == ticker.park.retained(ball_two).mode);
+    assert!(
+        ticker.update(
+            &state(&[((10_i64 + 2_i64), ClientHistoryAction::Stop { id: 2_i64 })]),
+            false
+        ) == Ok(())
+    );
+    tick(&mut ticker, (10_i64 + 3_i64));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:79
-    assert!(OriginalMode::Stop==ticker.park.retained(ball_two).mode);
+    assert!(OriginalMode::Stop == ticker.park.retained(ball_two).mode);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_no_desync_reported_for_successfuly_handled_update
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_no_desync_reported_for_successfuly_handled_update() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    assert!(ticker.update(&state(&[((10_i64+1_i64),ClientHistoryAction::Stop{id:2_i64})]),false)==Ok(()));
-    assert!(ticker.do_pre_tick()==Ok(()));
+    assert!(
+        ticker.update(
+            &state(&[((10_i64 + 1_i64), ClientHistoryAction::Stop { id: 2_i64 })]),
+            false
+        ) == Ok(())
+    );
+    assert!(ticker.do_pre_tick() == Ok(()));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:113
     assert!(!ticker.recoverable_desync_occurred);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:114
@@ -150,123 +240,162 @@ fn TestTicker__test_no_desync_reported_for_successfuly_handled_update() {
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_recoverable_desync_reported_when_fail_to_sync_to_timestamp
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_recoverable_desync_reported_when_fail_to_sync_to_timestamp() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    assert!(ticker.update(&state(&[((10_i64+1_i64),ClientHistoryAction::Stop{id:2_i64})]),false)==Ok(()));
-    ticker.synchronization_mock_return=Some(false); // original explicit mock replacement
-    assert!(ticker.do_pre_tick()==Ok(()));
+    assert!(
+        ticker.update(
+            &state(&[((10_i64 + 1_i64), ClientHistoryAction::Stop { id: 2_i64 })]),
+            false
+        ) == Ok(())
+    );
+    ticker.synchronization_mock_return = Some(false); // original explicit mock replacement
+    assert!(ticker.do_pre_tick() == Ok(()));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:124
     assert!(ticker.recoverable_desync_occurred);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_stopball
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_stopball() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    assert!(ticker.update(&state(&[((10_i64+1_i64),ClientHistoryAction::Stop{id:2_i64})]),false)==Ok(()));
-    assert!(ticker.do_pre_tick()==Ok(()));
-    assert!(ticker.do_post_tick(10_i64)==Ok(()));
+    assert!(
+        ticker.update(
+            &state(&[((10_i64 + 1_i64), ClientHistoryAction::Stop { id: 2_i64 })]),
+            false
+        ) == Ok(())
+    );
+    assert!(ticker.do_pre_tick() == Ok(()));
+    assert!(ticker.do_post_tick(10_i64) == Ok(()));
     assert!(ticker.park.contains(2)); // original dictionary lookup
-    let ball_two=2_i64; // retained object alias, checked against the live ID
+    let ball_two = 2_i64; // retained object alias, checked against the live ID
     // original-assertion: python/destiny/test/net/client/test_ticker.py:62
-    assert!(OriginalMode::Stop==ticker.park.retained(ball_two).mode);
+    assert!(OriginalMode::Stop == ticker.park.retained(ball_two).mode);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_synchronize_to_simulation_time_can_not_rewind_before_first_tick
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_synchronize_to_simulation_time_can_not_rewind_before_first_tick() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    let result=ticker.synchronize_to_simulation_time((10_i64-1_i64));assert!(result.is_ok());
-    let success=result.unwrap_or(false);
+    let result = ticker.synchronize_to_simulation_time((10_i64 - 1_i64));
+    assert!(result.is_ok());
+    let success = result.unwrap_or(false);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:88
     assert!(!success);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_synchronize_to_simulation_time_can_rewind_to_last_tick
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_synchronize_to_simulation_time_can_rewind_to_last_tick() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    tick(&mut ticker,(10_i64+1_i64));
-    ticker.park.remove_ball(1_i64,0);assert!(!ticker.park.scope_error);
+    tick(&mut ticker, (10_i64 + 1_i64));
+    ticker.park.remove_ball(1_i64, 0);
+    assert!(!ticker.park.scope_error);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:93
     assert!(!ticker.park.contains(1_i64));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:94
-    assert!((10_i64+2_i64)==ticker.park.current_time);
-    let result=ticker.synchronize_to_simulation_time((10_i64+1_i64));assert!(result.is_ok());
-    let success=result.unwrap_or(false);
+    assert!((10_i64 + 2_i64) == ticker.park.current_time);
+    let result = ticker.synchronize_to_simulation_time((10_i64 + 1_i64));
+    assert!(result.is_ok());
+    let success = result.unwrap_or(false);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:96
     assert!(success);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:97
-    assert!((10_i64+1_i64)==ticker.park.current_time);
+    assert!((10_i64 + 1_i64) == ticker.park.current_time);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:98
     assert!(ticker.park.contains(1_i64));
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }
 
 // original-case: python/destiny/test/net/client/test_ticker.py::TestTicker::test_synchronize_to_simulation_time_can_rewind_two_ticks
 // original-source-sha256: 40c1558b6cf23c70d13af9eceee8b621085cce3fc6afbd4ad96e668bb0d0b686
 // original-helpers-sha256: 9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestTicker__test_synchronize_to_simulation_time_can_rewind_two_ticks() {
-    let mut ticker=OriginalClientTicker::default();
+    let mut ticker = OriginalClientTicker::default();
     ticker_fixture(&mut ticker);
-    tick(&mut ticker,(10_i64+1_i64));
-    ticker.park.remove_ball(1_i64,0);assert!(!ticker.park.scope_error);
+    tick(&mut ticker, (10_i64 + 1_i64));
+    ticker.park.remove_ball(1_i64, 0);
+    assert!(!ticker.park.scope_error);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:103
     assert!(!ticker.park.contains(1_i64));
-    tick(&mut ticker,(10_i64+2_i64));
+    tick(&mut ticker, (10_i64 + 2_i64));
     // original-assertion: python/destiny/test/net/client/test_ticker.py:105
-    assert!((10_i64+3_i64)==ticker.park.current_time);
-    let result=ticker.synchronize_to_simulation_time((10_i64+1_i64));assert!(result.is_ok());
-    let success=result.unwrap_or(false);
+    assert!((10_i64 + 3_i64) == ticker.park.current_time);
+    let result = ticker.synchronize_to_simulation_time((10_i64 + 1_i64));
+    assert!(result.is_ok());
+    let success = result.unwrap_or(false);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:107
     assert!(success);
     // original-assertion: python/destiny/test/net/client/test_ticker.py:108
-    assert!((10_i64+1_i64)==ticker.park.current_time);
+    assert!((10_i64 + 1_i64) == ticker.park.current_time);
     assert!(!ticker.park.scope_error);
     // tearDown deletes the four native references; Rust lexical drop is
     // represented here. Blue/native destructor correspondence is pending.
-    #[cfg(kani)] kani::cover!(true,"complete original client ticker scenario and fixture reached");
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete original client ticker scenario and fixture reached"
+    );
 }

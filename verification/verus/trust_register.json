@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "verus_release": "0.2026.09.20.aef82ed",
+  "verus_source_commit": "aef82eda71838deef4a8cd0260fda6c9504be9b9",
+  "release_archive_sha256": "7b870fa12bc589015c2fab60a8b3d9f07c7b1adb3444eb0fadffcbf7f0447b33",
+  "verus_binary_sha256": "2fe2fca366846ec5aaaaaf80edf061f7d19564c097cb9840c7638719e8bc1854",
+  "verifier_rust_toolchain": "1.98.1-x86_64-unknown-linux-gnu",
+  "production_rust_toolchain": "1.95.0",
+  "solver": {
+    "name": "Z3",
+    "version": "4.16.0",
+    "sha256": "e583c4186a45e72411fa2cb2048401eed03f0f8e5f24694676a8f6271a50b765"
+  },
+  "configured_topology": {
+    "target": "x86_64-unknown-linux-gnu",
+    "features": ["default", "carbon-network"],
+    "bevy_ecs_multi_threaded": "Absent in the inspected locked root feature tree; not a proof of other host or downstream feature configurations.",
+    "public_call_threads": "Independently retained ABI owners may call through the operation gate and runtime data Mutex; callbacks reenter on the owning thread. Arbitrary-thread ECS/resource and host configuration correspondence remain unproved.",
+    "reference_atomic_ordering": "SeqCst load and weak compare_exchange success/failure",
+    "poison_atomic_ordering": "Acquire load / Release store; outside the counter proof"
+  },
+  "trusted_boundaries": [
+    {
+      "id": "standard-vecdeque-view-and-extraction",
+      "scope": "Pinned vstd existing VecDeque view/new/push/split_off/pop_front contracts. The checked generic production kernels preserve the prefix/exact operation suffix and consume exactly one current continuation head. Checked constructors witness nonempty parent work and empty nested reads.",
+      "source": "https://github.com/verus-lang/verus/blob/aef82eda71838deef4a8cd0260fda6c9504be9b9/source/vstd/std_specs/vecdeque.rs",
+      "git_blob": "010314523b012b114b602a707337363f4f35b9d4",
+      "source_sha256": "153a0c3faa18c8fbfcaeafa54326b8f7b5d97d6e7d9aa7b47c812f58159a8bf8",
+      "residual": "These are existing standard-library primitive assumptions, not custom behavior stubs. Allocation failure, every dispatch caller's append-only suffix boundary, queue ownership across the entire FFI drain, cancellation/ID reuse and callback trace correspondence still require completion."
+    },
+    {
+      "id": "verus-compiler-solver-and-compiled-vstd",
+      "scope": "The pinned verifier, SMT solver, imported vstd contracts and compiled macro implementations.",
+      "provenance": "Exact archive checksum, binary/version probes and complete rlib/so/vstd.vir/Z3 payload hashes are retained in controller receipts. No substituted /opt/verus installation is accepted.",
+      "residual": "Toolchain correctness and same-user artifact authenticity are trust premises; reproducible source/build equivalence is not established merely by matching the release label."
+    },
+    {
+      "id": "standard-sc-atomic-primitive",
+      "scope": "PAtomicUsize permission contracts for SeqCst weak CAS/load and its underlying std AtomicUsize operations. The checked shared attempt body uses the same SC orderings in production.",
+      "source": "https://github.com/verus-lang/verus/blob/aef82eda71838deef4a8cd0260fda6c9504be9b9/source/vstd/atomic.rs",
+      "git_blob": "ae8c4081b6559c9aec47aff480f1da8f8764e7ef",
+      "source_sha256": "218c3aea79efd986faa9984458cbdd45a699c788d8cab462b09b5accd3eba7ea",
+      "residual": "Primitive permission creation and its binding to the actual allocation/count/global atomic invariant and retry driver remain caller/correspondence obligations. SC counter verification does not discharge the separate Acquire/Release poison protocol."
+    },
+    {
+      "id": "tokenized-state-machine-sharding",
+      "scope": "The standard macro-generated permission/token interface justified by the checked initialization and six inductive transitions. The actual generated trusted symbol inventory is preserved separately for the ffi_lifecycle entry.",
+      "provenance": "Pinned compiled verus_state_machines_macros payload hash in receipts. Counting example 94afe09f890dc6eba1f253848a9e44a18f97076b was used only to review supported tracked syntax; no example theorem substitutes for the runtime_references proofs.",
+      "residual": "31 generated external-body interfaces are framework trust. Allocation nat identifiers/storage and reference-token instance identity are not yet tied to physical Box addresses and every FFI caller. No custom external_body or assume was introduced to discharge that gap."
+    },
+    {
+      "id": "verus-exec-expression-expansion",
+      "scope": "Pinned verus_exec_expr expands tracked weak-CAS permission syntax in the shared production attempt body.",
+      "source": "https://github.com/verus-lang/verus/blob/aef82eda71838deef4a8cd0260fda6c9504be9b9/source/builtin_macros/src/lib.rs",
+      "git_blob": "a38df294167a8fcef3aea0a0354955c1408ed68a",
+      "source_sha256": "b6650b8b354bb47dddb0fd4d315f341f01918e882aea273d7e8ef352ffc4d5ce",
+      "residual": "Compiler/macro expansion correctness remains tool trust. Actual VIR body locations and shared body provenance must still match each counted observation."
+    },
+    {
+      "id": "std-mutex-condvar-thread-id-and-unwind",
+      "scope": "Actual OperationGate bookkeeping uses Mutex, Condvar, stable owner equality and a thread-bound RAII lease. The data Mutex is dropped across foreign callbacks; the outer lease spans panic publication and a call reference spans cleanup.",
+      "provenance": "src/operation_gate.rs, src/ffi.rs and include/destiny_bevy_compat.h; focused barrier/unwind/native reentry/close regressions are runtime observations.",
+      "residual": "No full machine-checked gate/Mutex/caller wrapper relation yet. Condvar/scheduler fairness, lock freedom, deadlock/starvation freedom, arbitrary callback termination, allocator failure and OS behavior are not proved by the phase kernels or schedule tests."
+    },
+    {
+      "id": "original-numeric-and-engine-adapters",
+      "scope": "Native motion uses the reviewed original Goto integration/alignment/Warp numeric definitions through explicit component adapters. Bevy/Avian scheduling, collision caches, dynamic world access, IEEE-754/libm and representation are independent boundaries.",
+      "provenance": "verification/cases/reference_review.json, verification/spec/src/original_motion.rs, verification/spec/src/original_warp.rs, src/runtime.rs",
+      "residual": "Verus u8/usize and mathematical legacy results do not prove floating-point parity, every source tolerance, every collision/update ordering, complete snapshot/control rollback, all host workers or engine schedules. Applicable Kani and original/native differential evidence remain required."
+    },
+    {
+      "id": "foreign-pointer-buffer-and-python-callback",
+      "scope": "Caller must provide live retained handles and valid input/context memory. Callback must return synchronously without foreign unwind/longjmp. Python wrapping and exception reporting remain executable correspondence surfaces.",
+      "provenance": "include/destiny_bevy_compat.h, src/ffi.rs, python/destiny/_backend.py and python/destiny/_facade.py; unchanged pinned callback runner and explicit native regressions.",
+      "residual": "Null checks do not validate dangling pointers. No complete raw-pointer/Box reclamation, output-buffer uniqueness, interpreter/GIL, library loading or foreign unwind proof is credited."
+    }
+  ],
+  "notice": "Explicit trust and residual obligation register. It grants no assurance or completed case. Every observation must independently bind exact source, symbol inventory, controller, tool payload and complete result. Required residuals keep the corresponding conjunction incomplete."
+}

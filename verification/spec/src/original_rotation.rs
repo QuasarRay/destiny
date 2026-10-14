@@ -13,23 +13,48 @@ use crate::{OriginalParkBall, OriginalParkError, Vec3};
 /// Python allocation/reference counting and arbitrary element types/lengths
 /// remain external correspondence obligations, not successful Rust cases.
 #[derive(Default)]
-pub struct OriginalPythonVectorLists { lists:[Option<[f64;3]>;2] }
+pub struct OriginalPythonVectorLists {
+    lists: [Option<[f64; 3]>; 2],
+}
 impl OriginalPythonVectorLists {
-    pub fn allocate(&mut self,values:[f64;3])->Result<usize,OriginalParkError> {
-        let mut i=0;
-        while i<2 {
-            if self.lists[i].is_none() { self.lists[i]=Some(values);return Ok(i); }
-            i+=1;
+    pub fn allocate(&mut self, values: [f64; 3]) -> Result<usize, OriginalParkError> {
+        let mut i = 0;
+        while i < 2 {
+            if self.lists[i].is_none() {
+                self.lists[i] = Some(values);
+                return Ok(i);
+            }
+            i += 1;
         }
         Err(OriginalParkError::OutsideDeclaredScope)
     }
-    #[must_use] pub fn values(&self,handle:usize)->Option<[f64;3]> { self.lists.get(handle).copied().flatten() }
-    pub fn get_rotated_vector(&mut self,ball:&OriginalParkBall,handle:usize)->Result<usize,OriginalParkError> {
-        let values=self.values(handle).ok_or(OriginalParkError::OutsideDeclaredScope)?;
-        let vector=original_rotated_vector(ball,Vec3{x:values[0],y:values[1],z:values[2]});
+    #[must_use]
+    pub fn values(&self, handle: usize) -> Option<[f64; 3]> {
+        self.lists.get(handle).copied().flatten()
+    }
+    pub fn get_rotated_vector(
+        &mut self,
+        ball: &OriginalParkBall,
+        handle: usize,
+    ) -> Result<usize, OriginalParkError> {
+        let values = self
+            .values(handle)
+            .ok_or(OriginalParkError::OutsideDeclaredScope)?;
+        let vector = original_rotated_vector(
+            ball,
+            Vec3 {
+                x: values[0],
+                y: values[1],
+                z: values[2],
+            },
+        );
         // PyList_SET_ITEM(list,0..2), then Py_INCREF(list), then return list.
-        let slot=self.lists.get_mut(handle).ok_or(OriginalParkError::OutsideDeclaredScope)?;
-        *slot=Some([vector.x,vector.y,vector.z]);Ok(handle)
+        let slot = self
+            .lists
+            .get_mut(handle)
+            .ok_or(OriginalParkError::OutsideDeclaredScope)?;
+        *slot = Some([vector.x, vector.y, vector.z]);
+        Ok(handle)
     }
 }
 
@@ -37,7 +62,11 @@ fn directx_round(value: f32) -> f32 {
     // XMVectorRound SSE2, including its signed magic and large/NaN mask.
     let magic = f32::from_bits(8_388_608.0_f32.to_bits() | (value.to_bits() & 0x8000_0000));
     let rounded = (value + magic) - magic;
-    if value.abs() <= 8_388_608.0 { rounded } else { value }
+    if value.abs() <= 8_388_608.0 {
+        rounded
+    } else {
+        value
+    }
 }
 
 fn directx_sin_cos(angle: f32) -> (f32, f32) {
@@ -97,33 +126,90 @@ pub fn original_rotated_vector(ball: &OriginalParkBall, coordinate: Vec3) -> Vec
             y: f64::from((((x * m12 + y * m22) + z * m32) + 0.0_f32) / norm),
             z: f64::from((((x * m13 + y * m23) + z * m33) + 0.0_f32) / norm),
         }
-    } else { Vec3::ZERO }
+    } else {
+        Vec3::ZERO
+    }
 }
 
-pub fn original_formation_thrust(ball: &mut OriginalParkBall, other: &OriginalParkBall)
-    -> Result<Vec3, OriginalParkError> {
+pub fn original_formation_thrust(
+    ball: &mut OriginalParkBall,
+    other: &OriginalParkBall,
+) -> Result<Vec3, OriginalParkError> {
     let points = match other.formation_id {
-        0 => [Vec3{x:100.0,y:0.0,z:0.0},Vec3{x:0.0,y:100.0,z:0.0},
-              Vec3{x:-100.0,y:0.0,z:0.0},Vec3{x:0.0,y:-100.0,z:0.0}],
-        1 => [Vec3{x:100.0,y:0.0,z:-50.0},Vec3{x:50.0,y:0.0,z:0.0},
-              Vec3{x:-100.0,y:0.0,z:-50.0},Vec3{x:-50.0,y:0.0,z:0.0}],
-        2 => [Vec3::ZERO;4],
+        0 => [
+            Vec3 {
+                x: 100.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Vec3 {
+                x: 0.0,
+                y: 100.0,
+                z: 0.0,
+            },
+            Vec3 {
+                x: -100.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Vec3 {
+                x: 0.0,
+                y: -100.0,
+                z: 0.0,
+            },
+        ],
+        1 => [
+            Vec3 {
+                x: 100.0,
+                y: 0.0,
+                z: -50.0,
+            },
+            Vec3 {
+                x: 50.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            Vec3 {
+                x: -100.0,
+                y: 0.0,
+                z: -50.0,
+            },
+            Vec3 {
+                x: -50.0,
+                y: 0.0,
+                z: 0.0,
+            },
+        ],
+        2 => [Vec3::ZERO; 4],
         _ => return Ok(Vec3::ZERO),
     };
     let slot = ball.effect_stamp as i8;
     let count = if other.formation_id == 2 { 1 } else { 4 };
-    if i32::from(slot) >= count { return Ok(Vec3::ZERO); }
+    if i32::from(slot) >= count {
+        return Ok(Vec3::ZERO);
+    }
     // Negative signed-char indexing is undefined in the original C++ vector;
     // it is an explicit caller obligation, never successful omission.
-    if slot < 0 { return Err(OriginalParkError::OutsideDeclaredScope); }
+    if slot < 0 {
+        return Err(OriginalParkError::OutsideDeclaredScope);
+    }
     let Some(offset) = points.get(slot as usize).copied() else {
         return Err(OriginalParkError::OutsideDeclaredScope);
     };
     let mut length = offset.length();
-    if length == 0.0 { length = 1.0; }
-    let vector = offset.scale(f64::from(ball.radius) + f64::from(other.radius) + length)
+    if length == 0.0 {
+        length = 1.0;
+    }
+    let vector = offset
+        .scale(f64::from(ball.radius) + f64::from(other.radius) + length)
         .scale(1.0 / length);
     let target = other.position.add(original_rotated_vector(other, vector));
     ball.goto = target;
-    Ok(crate::original_goto_thrust(ball,target,1_000_000.0,1.0,false))
+    Ok(crate::original_goto_thrust(
+        ball,
+        target,
+        1_000_000.0,
+        1.0,
+        false,
+    ))
 }

@@ -241,7 +241,15 @@ class Ticker(BaseTicker):
         if ballpark is not None:
             # Carbon tickers own simulation scheduling. An internal wall-clock
             # driver would race snapshot labels, rewind, and replay.
+            claim = getattr(ballpark, "_claim_manual_scheduler", None)
+            if claim is not None:
+                claim(self)
             ballpark.Pause()
+        previous = self._ballpark
+        if previous is not None and previous is not ballpark:
+            release = getattr(previous, "_release_manual_scheduler", None)
+            if release is not None:
+                release(self)
         super().set_ballpark(ballpark)
         self._client_ticker_interface.set_ballpark(ballpark)
 
@@ -287,7 +295,6 @@ class Ticker(BaseTicker):
             self._should_rebase = False
         elif stamp > self._last_stamp + 10:
             self.store_state()
-        self._last_stamp = stamp
 
     def _set_state(self, state, ego_ball_id):
         from io import BytesIO
@@ -316,6 +323,9 @@ class Ticker(BaseTicker):
                     raise RuntimeError("failed to restore the pre-SetState rollback snapshot")
             raise
         self._client_ticker_interface.on_set_state()
+        # Original SetState starts the park before saving its first state. The
+        # manual scheduler lease keeps this from starting a competing driver.
+        self._ballpark.Start()
         self._state_is_valid = True
         self.flush_simulation_history()
 
@@ -384,14 +394,16 @@ class Ticker(BaseTicker):
             self._ballpark.RemoveBall(ball_id, delays.get(ball_id, 0))
 
     def clear_states(self):
-        self._history.clear()
         self._states.clear()
 
     def store_state(self, mid_tick=False):
+        if not self._ballpark.isRunning:
+            return
         stamp, payload = self._ballpark.CaptureFullState()
         self._states.append((stamp, payload, bool(mid_tick)))
         if len(self._states) > MAX_STATE_HISTORY:
-            self._states = self._states[:1] + self._states[-(MAX_STATE_HISTORY - 1):]
+            # Keep the exact original policy, including its empty [3:3] slice.
+            self._states = self._states[:1] + self._states[3:3] + self._states[-5:]
         self._last_stamp = stamp
 
     def synchronize_to_simulation_time(self, stamp):

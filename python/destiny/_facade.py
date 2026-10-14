@@ -4,12 +4,16 @@ from __future__ import annotations
 
 import base64
 from collections.abc import Iterator, Mapping
+from contextlib import nullcontext
 import io
 import json
 import logging
 import math
+import operator
+import struct
 from threading import Event, RLock, Thread, current_thread
 from typing import Any
+import weakref
 
 from ._backend import (
     MAX_PROXIMITY_EVENTS,
@@ -19,7 +23,7 @@ from ._backend import (
     InMemoryBackend,
     NativeBackend,
 )
-from ._errors import BackendCallError, UnsupportedTitleError
+from ._errors import BackendCallError, BallNotFoundError, UnsupportedTitleError
 from ._registry import RECORDS
 
 
@@ -32,6 +36,9 @@ _backend_users: dict[int, tuple[Backend, int]] = {}
 _retired_backends: set[int] = set()
 
 _SUPPORTED_DYNAMIC_PARK_METHODS = frozenset({
+    "AddMushroom",
+    "InitializeBubbles", "CopyBubbles", "GetBubbleAtCoordinates",
+    "GetFollowers",
     "AdjustTimes",
     "CheckVisibility",
     "CloakBall",
@@ -42,17 +49,39 @@ _SUPPORTED_DYNAMIC_PARK_METHODS = frozenset({
     "GetBallIdsInRangeOfTriangle",
     "GetBoxCenter",
     "GetCurrentEgoPos",
+    "GotoPoint",
+    "GotoDirection",
+    "FollowBall",
+    "Orbit",
+    "MissileFollow",
+    "LaunchMissile",
+    "FormationFollow",
     "ScanCone",
     "SetBallAgility",
+    "SetBallHarmonic",
+    "SetBoid",
+    "SetBallTroll",
+    "SetBallRigid",
     "SetBallFree",
     "SetBallGlobal",
     "SetBallInteractive",
     "SetBallMassive",
     "SetBallRadius",
     "SetSpeedFraction",
+    "SetNotificationRange",
+    "SetTargetTracking",
     "Stop",
     "UncloakBall",
+    "WarpTo",
+    "EntityWarpIn",
 })
+
+
+def _source_range_operand(value):
+    value=float(value)
+    if not math.isfinite(value):
+        return {"ieee754_bits":struct.unpack("<Q",struct.pack("<d",value))[0]}
+    return value
 
 
 def _exact_i64(value: Any, name: str, *, allow_canonical_string: bool = False) -> int:
@@ -233,6 +262,10 @@ def _validate_ball_handle(value: Any, park_handle: str, expected_id: int | None 
     if not value.startswith(prefix):
         raise BackendCallError("backend returned a ball for a different park", code="invalid_backend_response")
     encoded_id = value[len(prefix):]
+    if ":" in encoded_id:
+        generation, encoded_id = encoded_id.split(":", 1)
+        if not generation.isdecimal() or str(int(generation)) != generation or not 0 < int(generation) < 2**64:
+            raise BackendCallError("backend returned an invalid object generation", code="invalid_backend_response")
     ball_id = _exact_i64(encoded_id, "ball handle", allow_canonical_string=True)
     if expected_id is not None and ball_id != expected_id:
         raise BackendCallError(
@@ -348,16 +381,63 @@ class _BoundObject:
 class Ball(_BoundObject):
     """Destiny ``Ball`` whose state is stored in Bevy/Avian components."""
 
-    __slots__ = ("_park",)
+    __slots__ = ("_park", "_lease_owned", "__weakref__")
 
     def __init__(self, ball_id: int = 0, *, _backend: Backend | None = None, _handle: str | None = None, _park=None) -> None:
+        preowned = False
+        if isinstance(ball_id, Ball) and _backend is None and _handle is None:
+            _backend, _handle, _park = ball_id._backend, ball_id._handle, ball_id._park
+        elif _handle is None and type(ball_id) is int and ball_id == 0:
+            # A private runtime arena owns the detached native allocation; it
+            # has no ball membership and is never exposed as Ball.ballpark.
+            _park = Ballpark(_backend=_backend)
+            _backend = _park._backend
+            try:
+                generation = _park._invoke("dbc.compat.Ballpark.NewDetachedBall", "call", isinstance(self, ClientBall))
+                if type(generation) is not int or not 0 < generation < 2**64:
+                    raise BackendCallError("invalid detached object generation", code="invalid_backend_response")
+                _handle = f"ball:{_park._handle.rsplit(':',1)[1]}:{generation}:0"
+                preowned = True
+            except Exception:
+                _park.close()
+                raise
         if _backend is None or _handle is None:
             raise TypeError("Ball instances are created by Ballpark.AddBall")
+        retain = getattr(_backend, "retain_ball", None)
+        if retain is not None and not preowned:
+            _handle = retain(_handle)
         super().__init__(_backend, _handle)
+        object.__setattr__(self, "_lease_owned", preowned or retain is not None)
         object.__setattr__(self, "_park", _park)
+        register = getattr(_backend, "register_ball_callback", None)
+        if register is not None:
+            register(_handle, self)
+
+    def __del__(self):
+        # Each wrapper owns one lease, including wrappers copied for callbacks.
+        # Explicit park close may already have reclaimed the entire runtime.
+        try:
+            if object.__getattribute__(self, "_lease_owned"):
+                object.__setattr__(self, "_lease_owned", False)
+                self._backend.release_ball(self._handle)
+        except (AttributeError, BackendCallError):
+            pass
+
+    @property
+    def isMoribund(self) -> bool:
+        value = self._invoke("destiny.Ball.isMoribund", "get")
+        if type(value) is not bool:
+            raise BackendCallError("backend returned invalid moribund state", code="invalid_backend_response")
+        return value
 
     @property
     def ballpark(self):
+        if self._lease_owned:
+            value = self._invoke("destiny.Ball.ballpark", "get")
+            if value is None:
+                return None
+            if not isinstance(value, str) or not value.startswith("park:"):
+                raise BackendCallError("invalid native ballpark reference", code="invalid_backend_response")
         return self._park
 
     def _invoke(self, title: str, operation: str = "call", *args: Any, **kwargs: Any) -> Any:
@@ -391,7 +471,21 @@ class Ball(_BoundObject):
     def AddMiniBox(self, c0, c1, c2, x0, x1, x2, y0, y1, y2, z0, z1, z2) -> None:
         self._invoke("destiny.Ball.AddMiniBox", "call", c0, c1, c2, x0, x1, x2, y0, y1, y2, z0, z1, z2)
 
+    @property
+    def miniBalls(self):
+        return _MiniGeometrySequence(self, "miniBalls")
+
+    @property
+    def miniCapsules(self):
+        return _MiniGeometrySequence(self, "miniCapsules")
+
+    @property
+    def miniBoxes(self):
+        return _MiniGeometrySequence(self, "miniBoxes")
+
     def AddProximitySensor(self, range_value, period=2.0, shuffle=0, onlyInteractives=False) -> None:
+        # Original PyArg_ParseTuple's integer shuffle slot accepts Python bool.
+        shuffle = int(shuffle) if isinstance(shuffle, bool) else shuffle
         self._invoke("destiny.Ball.AddProximitySensor", "call", range_value, period, shuffle, onlyInteractives)
 
     def ReserveFormationSlot(self) -> int:
@@ -399,6 +493,10 @@ class Ball(_BoundObject):
         if not -1 <= slot < 16:
             raise BackendCallError("backend returned an invalid formation slot", code="invalid_backend_response")
         return slot
+
+    @property
+    def mode(self) -> int:
+        return _exact_i64(self._invoke("destiny.Ball.mode", "get"), "Ball.mode")
 
     def FreeFormationSlot(self, slot: int) -> None:
         self._invoke("destiny.Ball.FreeFormationSlot", "call", _input_i64(slot, "slot"))
@@ -445,7 +543,7 @@ def _ball_property(name: str, *, writable: bool = True):
                     code="invalid_backend_response",
                 )
             return value
-        if name in {"id", "isCloaked", "newBubbleId", "oldBubbleId", "effectStamp"}:
+        if name in {"id", "ownerId", "harmonic", "corporationID", "allianceID", "followId", "isCloaked", "newBubbleId", "oldBubbleId", "effectStamp"}:
             result = _exact_i64(value, f"Ball.{name}")
             if name == "id":
                 expected_id = _exact_i64(
@@ -486,6 +584,9 @@ for _field_name in (
 for _field_name in ("id", "roll", "pitch", "yaw", "newBubbleId", "oldBubbleId", "effectStamp"):
     setattr(Ball, _field_name, _ball_property(_field_name, writable=False))
 
+for _field_name in ("ownerId", "harmonic", "corporationID", "allianceID", "followId", "followRange", "gotoX", "gotoY", "gotoZ"):
+    setattr(Ball, _field_name, _ball_property(_field_name, writable=False))
+
 
 class ClientBall(Ball):
     @property
@@ -506,12 +607,63 @@ class ClientBall(Ball):
         return super().__getattr__(name)
 
 
+class _MiniGeometryView:
+    """Read the actual native descriptor; coordinates are parent-local in source."""
+    __slots__ = ("_ball", "_collection", "_index")
+
+    def __init__(self, ball, collection, index):
+        self._ball, self._collection, self._index = ball, collection, index
+
+    def __getattr__(self, name):
+        row = self._ball._invoke("destiny.Ball." + self._collection, "get")[self._index]
+        if name == "id":
+            return _exact_i64(row["id"], "mini object identity")
+        if self._collection == "miniBalls" and name in {"x", "y", "z"}:
+            return _backend_number(row["position"]["xyz".index(name)], name)
+        if self._collection == "miniCapsules":
+            if name == "radius":
+                return _backend_number(row["radius"], "mini capsule radius")
+            if name in {"ax", "ay", "az", "bx", "by", "bz"}:
+                return _backend_number(row[name[0]]["xyz".index(name[1])], name)
+        elif self._collection == "miniBoxes" and name in {
+            "c0", "c1", "c2", "x0", "x1", "x2", "y0", "y1", "y2", "z0", "z1", "z2"
+        }:
+            return _backend_number(row["basis"]["cxyz".index(name[0]) * 3 + int(name[1])], name)
+        raise AttributeError(name)
+
+
+class _MiniGeometrySequence:
+    def __init__(self, ball, collection):
+        self._ball, self._collection = ball, collection
+
+    def __len__(self):
+        return len(self._ball._invoke("destiny.Ball." + self._collection, "get"))
+
+    def __getitem__(self, index):
+        size = len(self)
+        if isinstance(index, slice):
+            return [self[i] for i in range(*index.indices(size))]
+        if not isinstance(index, int):
+            raise TypeError("mini shape index must be an integer")
+        if index < 0:
+            index += size
+        if not 0 <= index < size:
+            raise IndexError(index)
+        return _MiniGeometryView(self._ball, self._collection, index)
+
+
 class _BallsView(Mapping[int, Ball]):
     def __init__(self, park: "Ballpark") -> None:
         self._park = park
 
     def __getitem__(self, ball_id: int) -> Ball:
-        return self._park.GetBall(ball_id)
+        try:
+            return self._park.GetBall(ball_id)
+        except BallNotFoundError as error:
+            raise KeyError(ball_id) from error
+
+    def __contains__(self, ball_id: object) -> bool:
+        return self._park.HasBall(ball_id)
 
     def __iter__(self) -> Iterator[int]:
         targets = self._park._invoke("dbc.compat.Ballpark.ListBalls")
@@ -547,6 +699,8 @@ class Ballpark(_BoundObject):
         "_driver_generation",
         "_is_master",
         "_backend_registered",
+        "_manual_scheduler_owner",
+        "__weakref__",
     )
 
     def __init__(self, isMaster: bool = False, *, _backend: Backend | None = None) -> None:
@@ -578,6 +732,10 @@ class Ballpark(_BoundObject):
         object.__setattr__(self, "_driver_generation", 0)
         object.__setattr__(self, "_is_master", is_master)
         object.__setattr__(self, "_backend_registered", True)
+        object.__setattr__(self, "_manual_scheduler_owner", None)
+        register = getattr(backend, "register_park_callback", None)
+        if register is not None:
+            register(validated_handle, self)
 
     @property
     def balls(self) -> Mapping[int, Ball]:
@@ -598,7 +756,10 @@ class Ballpark(_BoundObject):
                     code="driver_failed",
                     details=repr(self._driver_error),
                 ) from self._driver_error
-            return super()._invoke(title, operation, *args, **kwargs)
+        # A native callback reenters this facade while holding the backend
+        # operation lock. Do not let a competing caller hold the driver lock
+        # while waiting for that backend: it would invert this lock order.
+        return super()._invoke(title, operation, *args, **kwargs)
 
     @property
     def bubbleInteractives(self) -> dict[int, list[int]]:
@@ -629,29 +790,40 @@ class Ballpark(_BoundObject):
         if not args:
             raise TypeError("AddBall requires a source ID and ball parameters")
         source_id = _input_i64(args[0], "source_id")
-        handle = self._invoke("destiny.Ballpark.AddBall", "call", *args)
-        ball_type = Ball if self._is_master else ClientBall
-        return ball_type(
-            _backend=self._backend,
-            _handle=_validate_ball_handle(handle, self._handle, source_id),
-            _park=self,
-        )
+        binding = getattr(self._backend, "ball_binding_session", nullcontext)
+        with binding():
+            handle = self._invoke("destiny.Ballpark.AddBall", "call", *args)
+            ball_type = Ball if self._is_master else ClientBall
+            return ball_type(
+                _backend=self._backend,
+                _handle=_validate_ball_handle(handle, self._handle,
+                    None if (self._is_master and source_id<=0) or source_id==-1 else source_id),
+                _park=self,
+            )
 
     def GetBall(self, ball_id: int) -> Ball:
         ball_id = _input_i64(ball_id, "ball_id")
-        handle = self._invoke("dbc.compat.Ballpark.GetBall", "call", ball_id)
-        ball_type = Ball if self._is_master else ClientBall
-        return ball_type(
-            _backend=self._backend,
-            _handle=_validate_ball_handle(handle, self._handle, ball_id),
-            _park=self,
-        )
+        binding = getattr(self._backend, "ball_binding_session", nullcontext)
+        with binding():
+            handle = self._invoke("dbc.compat.Ballpark.GetBall", "call", ball_id)
+            ball_type = Ball if self._is_master else ClientBall
+            return ball_type(
+                _backend=self._backend,
+                _handle=_validate_ball_handle(handle, self._handle, ball_id),
+                _park=self,
+            )
 
     def HasBall(self, ball_id: int) -> bool:
         result = self._invoke("dbc.compat.Ballpark.HasBall", "call", _input_i64(ball_id, "ball_id"))
         if type(result) is not bool:
             raise BackendCallError("backend returned a non-boolean HasBall result", code="invalid_backend_response")
         return result
+
+    def GetFollowers(self, ball_id: int) -> list[int]:
+        result=self._invoke("destiny.Ballpark.GetFollowers","call",_input_i64(ball_id,"ball_id"))
+        if not isinstance(result,list):
+            raise BackendCallError("invalid follower list",code="invalid_backend_response")
+        return [_exact_i64(value,"follower ID") for value in result]
 
     def RemoveBall(self, ball_id: int, delay: int = 0) -> None:
         self._invoke(
@@ -663,6 +835,34 @@ class Ballpark(_BoundObject):
 
     def ClearAll(self) -> None:
         self._invoke("destiny.Ballpark.ClearAll")
+
+    def AdditionsAndDeletions(self, additionsPerPlayer, deletionsPerPlayer,
+                             additionsPerBubble, deletionsPerBubble, userShips):
+        outputs = (additionsPerPlayer, deletionsPerPlayer, additionsPerBubble, deletionsPerBubble)
+        if any(not isinstance(value, dict) for value in outputs) or not isinstance(userShips, list):
+            raise TypeError("AdditionsAndDeletions expects four dictionaries and a list")
+        session = getattr(self._backend, "bubble_output_session", None)
+        if session is None:
+            raise UnsupportedTitleError.for_title("destiny.Ballpark.AdditionsAndDeletions")
+        # Native processing preserves the prefix before the first invalid ID;
+        # passed dictionaries are populated before the synchronous callback.
+        users = [int(value) if isinstance(value, int) and -(2**63) <= value < 2**63 else None
+                 for value in userShips]
+        with session(outputs) as frame:
+            aliases = [next(index for index in range(current + 1) if outputs[index] is value)
+                       for current, value in enumerate(outputs)]
+            result = self._invoke("destiny.Ballpark.AdditionsAndDeletions", "call", users, aliases)
+            if not isinstance(result, dict) or set(result) != {"dictionaries", "transitions", "invalid_user_index"}:
+                raise BackendCallError("invalid bubble update response", code="invalid_backend_response")
+            if not frame["applied"]:
+                self._backend.apply_bubble_dictionaries(result["dictionaries"])
+            invalid = result["invalid_user_index"]
+            if invalid is not None:
+                if type(invalid) is not int or not 0 <= invalid < len(userShips):
+                    raise BackendCallError("invalid failed user index", code="invalid_backend_response")
+                if isinstance(userShips[invalid], int):
+                    raise OverflowError("user ball ID exceeds signed64")
+                raise TypeError("user ball ID must be an integer")
 
     def Pause(self) -> None:
         self._stop_driver()
@@ -676,6 +876,32 @@ class Ballpark(_BoundObject):
             super()._invoke("destiny.Ballpark.Pause")
             raise
 
+    def _claim_manual_scheduler(self, owner) -> None:
+        with self._driver_lock:
+            current = self._manual_scheduler_owner
+            if current is not None and current() is not None and current() is not owner:
+                raise BackendCallError("a different ticker owns the manual scheduler", code="scheduler_busy")
+            # Reserve ownership before releasing the lock to join. Every
+            # competing driver start checks this reservation under that lock.
+            # A distinct weakref identifies this claim for conditional rollback.
+            reservation = weakref.ref(owner, lambda _reference: None)
+            object.__setattr__(self, "_manual_scheduler_owner", reservation)
+        # Joining a driver must not hold the lifecycle lock it may need in
+        # order to notice cancellation and exit.
+        try:
+            self._stop_driver()
+        except Exception:
+            with self._driver_lock:
+                if self._manual_scheduler_owner is reservation:
+                    object.__setattr__(self, "_manual_scheduler_owner", current)
+            raise
+
+    def _release_manual_scheduler(self, owner) -> None:
+        with self._driver_lock:
+            current = self._manual_scheduler_owner
+            if current is not None and current() is owner:
+                object.__setattr__(self, "_manual_scheduler_owner", None)
+
     def Evolve(self) -> None:
         with self._driver_lock:
             thread = self._driver_thread
@@ -684,7 +910,7 @@ class Ballpark(_BoundObject):
                     "manual Evolve is unavailable while the automatic driver owns the scheduler",
                     code="scheduler_busy",
                 )
-            self._invoke("destiny.Ballpark.Evolve")
+        self._invoke("destiny.Ballpark.Evolve")
 
     def SetBallPosition(self, ball_id, x, y, z) -> None:
         self._invoke("destiny.Ballpark.SetBallPosition", "call", ball_id, x, y, z)
@@ -720,9 +946,37 @@ class Ballpark(_BoundObject):
         result = self._invoke("destiny.Ballpark.GetSurfaceDist", "call", first_id, second_id)
         return None if result is None else _backend_number(result, "surface distance")
 
+    def FollowBall(self, src_id, dst_id, follow_range=1.0) -> None:
+        self._invoke("destiny.Ballpark.FollowBall","call",src_id,dst_id,_source_range_operand(follow_range))
+
+    def Orbit(self, src_id, dst_id, orbit_range=1.0) -> None:
+        self._invoke("destiny.Ballpark.Orbit","call",src_id,dst_id,_source_range_operand(orbit_range))
+
+    def LaunchMissile(self, src_id, dst_id, owner_id, aimed_launch, massive) -> None:
+        controls = [operator.index(value) for value in (aimed_launch,massive)]
+        if any(value < 0 or value > 255 for value in controls):
+            raise OverflowError("unsigned byte integer is out of range")
+        self._invoke("destiny.Ballpark.LaunchMissile","call",src_id,dst_id,owner_id,*controls)
+
     def GetCenterDist(self, first_id, second_id):
         result = self._invoke("destiny.Ballpark.GetCenterDist", "call", first_id, second_id)
         return None if result is None else _backend_number(result, "center distance")
+
+    def GetAccuracy(self, src_id, dst_id, optimal_range, falloff, tracking_speed, signature_radius, optimal_signature_radius):
+        result=self._invoke("destiny.Ballpark.GetAccuracy","call",src_id,dst_id,optimal_range,falloff,tracking_speed,signature_radius,optimal_signature_radius)
+        if not isinstance(result,list) or len(result)!=3:
+            raise BackendCallError("GetAccuracy returned invalid values",code="invalid_backend_response")
+        return [_backend_number(value,"accuracy result") for value in result]
+
+    def GetRemoteFollowers(self):
+        result=self._invoke("destiny.Ballpark.GetRemoteFollowers","call")
+        return _backend_id_list(result,"remote follower IDs")
+
+    def GetCurrentEgoPos(self):
+        result=self._invoke("destiny.Ballpark.GetCurrentEgoPos","call")
+        if not isinstance(result,(list,tuple)) or len(result)!=3:
+            raise BackendCallError("GetCurrentEgoPos returned invalid coordinates",code="invalid_backend_response")
+        return tuple(_backend_number(value,"Ego coordinate") for value in result)
 
     def AddProximitySensor(self, ball_id, range_value, period=2.0, shuffle=0, onlyInteractives=False) -> None:
         self._invoke("destiny.Ballpark.AddProximitySensor", "call", ball_id, range_value, period, shuffle, onlyInteractives)
@@ -797,13 +1051,16 @@ class Ballpark(_BoundObject):
             return
         self._stop_driver()
         with self._driver_lock:
-            try:
-                self._backend.release(self._handle)
-            finally:
-                object.__setattr__(self, "_closed", True)
-                if self._backend_registered:
-                    object.__setattr__(self, "_backend_registered", False)
-                    _release_ballpark_backend(self._backend)
+            if self._closed:
+                return
+            object.__setattr__(self, "_closed", True)
+            registered = self._backend_registered
+            object.__setattr__(self, "_backend_registered", False)
+        try:
+            self._backend.release(self._handle)
+        finally:
+            if registered:
+                _release_ballpark_backend(self._backend)
 
     def __enter__(self) -> "Ballpark":
         if self._closed:
@@ -823,6 +1080,9 @@ class Ballpark(_BoundObject):
         with self._driver_lock:
             if self._closed:
                 raise BackendCallError("ballpark is closed", code="closed")
+            owner = self._manual_scheduler_owner
+            if owner is not None and owner() is not None:
+                return
             if self._driver_error is not None:
                 raise BackendCallError(
                     f"automatic Destiny driver failed: {self._driver_error}",
@@ -836,8 +1096,8 @@ class Ballpark(_BoundObject):
             object.__setattr__(self, "_driver_generation", generation)
             object.__setattr__(self, "_driver_stop", stop)
             thread = Thread(
-                target=self._drive,
-                args=(stop, generation),
+                target=Ballpark._drive,
+                args=(weakref.ref(self), stop, generation),
                 name=f"destiny-{self._handle}-{generation}",
                 daemon=True,
             )
@@ -860,46 +1120,59 @@ class Ballpark(_BoundObject):
             if self._driver_thread is thread and (thread is None or not thread.is_alive()):
                 object.__setattr__(self, "_driver_thread", None)
 
-    def _drive(self, stop: Event, generation: int) -> None:
+    @staticmethod
+    def _drive(owner, stop: Event, generation: int) -> None:
+        # The sleeping worker owns only a weak park reference. It may borrow
+        # the park during native work; it must not keep it alive between ticks.
         while not stop.is_set():
+            park = owner()
+            if park is None:
+                return
             try:
-                with self._driver_lock:
-                    if generation != self._driver_generation or self._driver_thread is not current_thread():
+                with park._driver_lock:
+                    if generation != park._driver_generation or park._driver_thread is not current_thread():
                         return
-                # Backend calls can block in product transports. Never hold the
-                # lifecycle lock across one: Pause/close must remain able to set
-                # the generation-specific stop event and enforce their timeout.
                 tick_interval = _backend_number(
-                    super()._invoke("destiny.Ballpark.tickInterval", "get"),
+                    _BoundObject._invoke(park, "destiny.Ballpark.tickInterval", "get"),
                     "tick interval",
                 )
                 if tick_interval <= 0.0:
-                    raise BackendCallError(
-                        "backend returned a non-positive tick interval",
-                        code="invalid_backend_response",
-                    )
+                    raise BackendCallError("backend returned a non-positive tick interval", code="invalid_backend_response")
                 interval = max(0.001, tick_interval / 1000.0)
+                park = None
                 if stop.wait(interval):
                     return
-                with self._driver_lock:
-                    if generation != self._driver_generation or stop.is_set():
+                park = owner()
+                if park is None:
+                    return
+                with park._driver_lock:
+                    if generation != park._driver_generation or stop.is_set():
                         return
-                self._backend.update(self._handle)
-            except Exception as exc:  # noqa: BLE001 - retain and surface terminal driver failure
-                logger.exception("automatic Destiny driver failed for %s", self._handle)
-                with self._driver_lock:
-                    object.__setattr__(self, "_driver_error", exc)
+                park._backend.update(park._handle)
+            except Exception as exc:
+                if park is None:
+                    return
+                logger.exception("automatic Destiny driver failed for %s", park._handle)
+                with park._driver_lock:
+                    object.__setattr__(park, "_driver_error", exc)
                 stop.set()
                 try:
-                    self._backend.invoke("destiny.Ballpark.Pause", "call", self._handle, (), {})
+                    park._backend.invoke("destiny.Ballpark.Pause", "call", park._handle, (), {})
                 except Exception:
                     logger.exception("failed to pause backend after automatic driver failure")
                 return
+            finally:
+                park = None
 
     def __getattr__(self, name: str) -> Any:
         original_name = name
         if name.startswith("_parent_"):
             name = name[len("_parent_"):]
+            # The original decorator's alias bypasses a subclass override.
+            # Looking up on type(self) recursively selects that override.
+            descriptor = getattr(Ballpark, name, None)
+            if callable(descriptor):
+                return descriptor.__get__(self, type(self))
         canonical_title = f"destiny.Ballpark.{name}"
         record = RECORDS.get(canonical_title)
         if record is None:
@@ -947,14 +1220,16 @@ def _park_property(name: str, *, writable: bool = True):
 
     def setter(self: Ballpark, value):
         self._invoke(title, "set", value)
+        if name == "isMaster":
+            object.__setattr__(self, "_is_master", _input_bool(value, "isMaster"))
 
     return property(getter, setter)
 
 
-for _field_name in ("tickInterval", "friction", "time", "ego"):
+for _field_name in ("tickInterval", "friction", "time", "ego", "isMaster"):
     setattr(Ballpark, _field_name, _park_property(_field_name))
 
-for _field_name in ("isRunning", "currentTime", "isMaster"):
+for _field_name in ("isRunning", "currentTime"):
     setattr(Ballpark, _field_name, _park_property(_field_name, writable=False))
 
 
@@ -1152,7 +1427,7 @@ def _decode_snapshot_response(encoded: Any, *, expected_current_time: int | None
         or type(snapshot.get("schema_version")) is not int
         or snapshot.get("schema_version") != 3
         or not isinstance(snapshot.get("park"), dict)
-        or not expected_park <= set(snapshot["park"]) <= expected_park | {"formations"}
+        or not expected_park <= set(snapshot["park"]) <= expected_park | {"formations", "local_counter", "local_high_counter"}
         or not isinstance(snapshot.get("balls"), list)
         or len(snapshot["balls"]) > MAX_SNAPSHOT_BALLS
     ):

@@ -251,8 +251,12 @@ class HardeningContractTests(unittest.TestCase):
     def test_unsupported_actions_are_rejected_before_queueing(self) -> None:
         park = destiny.Ballpark(True)
         actions = Actions(park)
+        actions.go_to_point(99, 1.0, 2.0, 3.0)
+        self.assertEqual(actions.flush_history(), [(99, 0, ("GotoPoint", (99, 1.0, 2.0, 3.0)))])
+        actions.launch_missile(99, 100, 101, False, True)
+        self.assertEqual(actions.flush_history(), [(99, 0, ("LaunchMissile", (99, 100, 101, False, True)))])
         with self.assertRaises(UnsupportedTitleError):
-            actions.go_to_point(99, 1.0, 2.0, 3.0)
+            actions._add(99, "UnregisteredAction")
         self.assertEqual(actions.flush_history(), [])
         with self.assertRaises(RuntimeError):
             actions.set_ball_angular_velocity(99, 1.0, 2.0, 3.0)

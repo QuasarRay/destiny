@@ -16,4 +16,4 @@ destiny-verification-macros = { path = "../meta" }
 
 [lints.rust]
 unsafe_code = "forbid"
-unexpected_cfgs = { level = "allow", check-cfg = ['cfg(kani)'] }
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(kani)', 'cfg(verus_keep_ghost)'] }

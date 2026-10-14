@@ -1,0 +1,1778 @@
+{
+  "schema": 1,
+  "original_commit": "ef738406b61ad06bae2f402857e464735ab106a2",
+  "verus_pin": "0.2026.09.20.aef82ed",
+  "generator_sha256": "64ad89d13f1a0cad123b031dd38097a86ac4c05d82310b15abc8631ba680fe21",
+  "entries": [
+    {
+      "schema": 1,
+      "entry": "verification/verus/proofs.rs",
+      "expected_checks": 20,
+      "plan_obligation": "proofs-reviewed-inventory",
+      "scope": "legacy_mathematical_sequential_model_only",
+      "symbols": [
+        {
+          "symbol": "proofs::add_during_evolve_is_rejected",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::cloaked_is_not_occluder",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::follow_rejects_moribund",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::follow_rejects_self",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::missile_range_is_negative_radius_sum",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::negative_setter_is_noop",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::non_massive_is_not_occluder",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::non_positive_positive_setter_is_noop",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::orbit_rejects_cloaked_target",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::orbit_rejects_cross_bubble_target",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::orbit_rejects_nonfinite_range",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::orbit_rejects_self",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::proximity_only_interactives_rejects_noninteractive",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::proximity_rejects_nonfree_owner",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::setter_thresholds_are_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::speed_fraction_above_one_clamps_to_one",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::speed_fraction_below_zero_clamps_to_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::stop_maps_every_mode_to_stop",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::uncloak_keeps_nonmassive_in_warp",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "proofs::uncloak_restores_massive_outside_warp",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        }
+      ],
+      "generated_trusted_symbols": [],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/7722f2e440df4bc0a0a01d6fdcc15320.json",
+        "artifact": ".aegis/destiny/verus-artifacts/7722f2e440df4bc0a0a01d6fdcc15320.vir",
+        "artifact_sha256": "a0cafb2372beeb0dca38a58ffa81b3a87772e07e72deb9c8ea9d393ae4c37506",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+      ]
+    },
+    {
+      "schema": 1,
+      "entry": "verification/verus/state_contracts.rs",
+      "expected_checks": 22,
+      "plan_obligation": "state-contracts-reviewed-inventory",
+      "scope": "legacy_mathematical_sequential_model_only",
+      "symbols": [
+        {
+          "symbol": "state_contracts::adjust_times_accumulates_original_deltas",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::axis_center_distance_is_absolute_offset",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::ballpark_time_initializes_to_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::euclidean_distance_case_has_exact_squared_distance",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::free_flag_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::global_flag_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::in_range_speed_fraction_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::initial_state_is_paused",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::interactive_flag_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::massive_flag_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::non_negative_max_speed_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::non_negative_radius_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::pause_clears_running",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::position_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::positive_agility_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::positive_mass_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::same_place_center_distance_is_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::same_place_zero_radius_surface_distance_is_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::start_sets_running",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::surface_distance_subtracts_combined_radii",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::velocity_assignment_is_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "state_contracts::zero_radius_surface_distance_equals_axis_center_distance",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        }
+      ],
+      "generated_trusted_symbols": [],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/550391255c9c47f4981156d7ed0711ff.json",
+        "artifact": ".aegis/destiny/verus-artifacts/550391255c9c47f4981156d7ed0711ff.vir",
+        "artifact_sha256": "d4ce297bd7319eb6a261a163462a1dd4d90bf7842e75a787b1055ed56f71f0f2",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+      ]
+    },
+    {
+      "schema": 1,
+      "entry": "verification/verus/lifecycle_contracts.rs",
+      "expected_checks": 4,
+      "plan_obligation": "lifecycle-contracts-reviewed-inventory",
+      "scope": "legacy_mathematical_sequential_model_only",
+      "symbols": [
+        {
+          "symbol": "lifecycle_contracts::adding_first_ball_changes_membership_zero_to_one",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "lifecycle_contracts::constructed_park_has_zero_members",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "lifecycle_contracts::removing_absent_ball_preserves_membership",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "lifecycle_contracts::removing_only_present_ball_changes_membership_one_to_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        }
+      ],
+      "generated_trusted_symbols": [],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/6eda1a88090849e38181b86381ca6038.json",
+        "artifact": ".aegis/destiny/verus-artifacts/6eda1a88090849e38181b86381ca6038.vir",
+        "artifact_sha256": "4de4d889cc62d2b502ff69995a33f518bdc7182298d4a7d7a3bee276652811aa",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+      ]
+    },
+    {
+      "schema": 1,
+      "entry": "verification/verus/ball_contracts.rs",
+      "expected_checks": 12,
+      "plan_obligation": "ball-contracts-reviewed-inventory",
+      "scope": "legacy_mathematical_sequential_model_only",
+      "symbols": [
+        {
+          "symbol": "ball_contracts::first_valid_formation_slot_is_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::freed_formation_slot_is_reused",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::full_formation_has_no_free_slot",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::identity_rotation_preserves_vector",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::miniball_add_increments_count",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::nonpositive_minicapsule_is_rejected",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::original_ball_can_be_constructed",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::original_ball_defaults_are_exact",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::original_proximity_example_is_accepted",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::positive_minicapsule_add_increments_count",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::unconfigured_ball_has_no_formation_slot",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "ball_contracts::valid_formation_slots_are_incremental",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        }
+      ],
+      "generated_trusted_symbols": [],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/2dd0a318956c4fda93d2453346c33e3e.json",
+        "artifact": ".aegis/destiny/verus-artifacts/2dd0a318956c4fda93d2453346c33e3e.vir",
+        "artifact_sha256": "0cc22424cc6072437fee7712cea96c6a87cbcd244004c5f1eb3d551d9eb20ba5",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+      ]
+    },
+    {
+      "schema": 1,
+      "entry": "verification/verus/visibility_contracts.rs",
+      "expected_checks": 10,
+      "plan_obligation": "visibility-contracts-reviewed-inventory",
+      "scope": "legacy_mathematical_sequential_model_only",
+      "symbols": [
+        {
+          "symbol": "visibility_contracts::cloak_sets_expected_visibility_state",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::cloaked_candidate_is_not_occluder",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::empty_scan_candidate_set_returns_empty",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::no_occlusion_returns_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::nonmassive_candidate_is_not_occluder",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::nonwarp_uncloak_sets_expected_visibility_state",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::occlusion_returns_candidate_id",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::orthogonal_and_backward_test_candidates_are_excluded",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::positive_x_candidate_is_inside_test_cone",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "visibility_contracts::warp_uncloak_does_not_restore_massive",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        }
+      ],
+      "generated_trusted_symbols": [],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/19570afe5330442ca94bf19ae946aa16.json",
+        "artifact": ".aegis/destiny/verus-artifacts/19570afe5330442ca94bf19ae946aa16.vir",
+        "artifact_sha256": "3665cd2f2cd8e637af7c4881b29c67f4ad09a70c897a18a7ac7f092c14ac73b8",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+      ]
+    },
+    {
+      "schema": 1,
+      "entry": "verification/verus/geometry_contracts.rs",
+      "expected_checks": 36,
+      "plan_obligation": "geometry-contracts-reviewed-inventory",
+      "scope": "legacy_mathematical_sequential_model_only",
+      "symbols": [
+        {
+          "symbol": "geometry_contracts::aabb_default_constructor_is_zero_box",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_excludes_back",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_excludes_bottom",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_excludes_front",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_excludes_left",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_excludes_right",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_excludes_top",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_inside_sphere_cannot_be_excluded",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_intersecting_radius_cannot_be_excluded",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_parameter_constructor_preserves_corners",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_update_expands_high_corner",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_update_expands_low_corner",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_update_inside_does_not_raise_low_corner",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_update_inside_does_not_reduce_high_corner",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_x_longest_width_scaled2_is_three",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_y_longest_width_scaled2_is_three",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::aabb_z_longest_width_scaled2_is_three",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::orthogonal_vector_cross_product_is_positive_z",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::parallel_vector_cross_product_is_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::plane_constructor_matches_original",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_closest_point_above_is_plane_projection",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_closest_point_below_is_plane_projection",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_closest_point_bottom_is_edge_projection",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_closest_point_left_is_edge_projection",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_closest_point_long_side_is_diagonal_projection",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_closest_point_right_is_edge_projection",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_closest_point_top_is_edge_projection",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_constructor_preserves_vertices",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_contains_center",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_normal_is_positive_y",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_rejects_outside_ab",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_rejects_outside_ac",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::triangle_rejects_outside_bc",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::vector_initializes_to_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::vector_subtraction_matches_original_case",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        },
+        {
+          "symbol": "geometry_contracts::zero_aabb_longest_width_is_zero",
+          "mode": "Proof",
+          "obligations": [
+            "legacy-sequential-model-preservation"
+          ],
+          "original_cases": [],
+          "relation": "Preserve the existing named theorem of its local mathematical sequential specification. Its int/bool abstractions, identity clauses and legacy markers provide no complete qualified original-case, IEEE-754 or production-concurrency credit.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": null
+        }
+      ],
+      "generated_trusted_symbols": [],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/7201f889bfa34111ab6a72a8d756b7f2.json",
+        "artifact": ".aegis/destiny/verus-artifacts/7201f889bfa34111ab6a72a8d756b7f2.vir",
+        "artifact_sha256": "62d1f7dd31f95db1a7a276effe8eeae25f96572dd89ec078750f9f3cdee6866d",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+      ]
+    },
+    {
+      "schema": 1,
+      "entry": "verification/verus/ffi_lifecycle.rs",
+      "expected_checks": 25,
+      "plan_obligation": "ffi-lifecycle-reviewed-inventory",
+      "scope": "production_counter_and_atomic_attempt_kernels_plus_logical_token_relation",
+      "symbols": [
+        {
+          "symbol": "ffi_lifecycle::allocate_collision_id",
+          "mode": "Exec",
+          "obligations": [
+            "collision-identity-counters"
+          ],
+          "original_cases": [],
+          "relation": "Actual production signed-i64 source policy: server negative/client -1 consume only the high counter, server zero consumes only the local counter, explicit identities preserve both counters; MIN exhaustion rejects before decrement. Object-map uniqueness, registration, reset/restore, callers and concurrent ownership remain required.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/collision_identity.rs:7:110: 17:10 (#338)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::action",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [],
+          "relation": "Actual harmonic mode action for all bool/u8 values: field true requests Stop/Field, removing existing Field requests Stop, otherwise preserves mode. Actual identity update precedes this decision; complete field/generation/mode/callback/ABI/stream correspondence remains required.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/harmonic.rs:5:44: 9:14 (#254)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::admitted",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [],
+          "relation": "Actual MissileFollow admission includes every i64/bool input, rejects self/owner/target aliases, absent source/target and moribund targets. A missing owner is tolerated by source; registry, mode callback and finite-field adapters retain separate correspondence obligations.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/missile.rs:9:120: 13:14 (#261)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::feasible_clear_and_delayed_repair",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [],
+          "relation": "Checked executable witnesses distinguish Clear from Remove and show delayed removal remains attached while an attached repair clears moribund, with reference counts preserved.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/ball_lifecycle.rs:108:44: 115:2 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::feasible_follower_reentry_and_special_modes",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [],
+          "relation": "Checked executable witnesses exercise original Follow, reentrant retarget, absent follower, missile, and interactive/noninteractive Orbit decisions without assumptions.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/ball_lifecycle.rs:84:54: 92:2 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::feasible_retained_remove_alias",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [],
+          "relation": "Checked executable transition sequence constructs two leases, removes membership with moribund true, copies the retained object, releases all three leases and rejects resurrection at detached zero.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/ball_lifecycle.rs:93:41: 106:2 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::follower_action",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [
+            "python/destiny/test/ballpark/test_movement_controls.py::TestFollow::test_removing_ball_stops_followers_from_following_that_ball",
+            "python/destiny/test/ballpark/test_movement_controls.py::TestMissileFollow::test_removing_ball_stops_followers_from_following_that_ball"
+          ],
+          "relation": "Actual StopAllFollowers action selection rejects absent or retargeted followers, sends missiles to nonmassive Goto and interactive orbiters to Goto, and stops every other admitted mode. Covers all bool/u8 inputs; ordered callback/registry/FFI callers remain required.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/ball_lifecycle.rs:60:91: 67:14 (#275)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::remote_follower",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [],
+          "relation": "Actual source free/follow-mode/remote-bubble selection includes missing targets and does not exclude moribund or mismatched registry entries. All bool/u8 inputs are covered. Free registry, mode/ID/bubble adapters, complete collection and query execution remain required.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/ball_lifecycle.rs:85:99: 89:14 (#282)"
+        },
+        {
+          "symbol": "ffi_lifecycle::ball_lifecycle::transition",
+          "mode": "Exec",
+          "obligations": [
+            "retained-object-membership-and-identity"
+          ],
+          "original_cases": [],
+          "relation": "Actual total retained-object transition preserves reference frames, rejects usize exhaustion/empty release/dead resurrection, sets moribund on Remove, preserves it on Clear, and clears it only for attached repair. Every bool/usize/u8 input is included; registry/object/lease/Mutex/Python correspondence remains required.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/ball_lifecycle.rs:8:48: 37:14 (#268)"
+        },
+        {
+          "symbol": "ffi_lifecycle::coupled_release_attempt",
+          "mode": "Exec",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The actual checked decrement attempt consumes one owner only on success and withdraws logical allocation storage exactly for the final 1 -> 0 transition; failure returns the same owner.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/ffi_lifecycle.rs:154:1: 169:2 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::coupled_retain_attempt",
+          "mode": "Exec",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The actual checked increment attempt and token retain transition preserve count-token.value == atomic-permission.value and create a matching new owner only on success.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/ffi_lifecycle.rs:103:1: 113:2 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::initialized_live_reference_is_feasible",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Checked tracked constructor establishes a feasible logical initialized state with one matching reference and nonempty allocation storage.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/ffi_lifecycle.rs:118:1: 127:2 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::a_live_reference_guards_its_allocation_asserts",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named generated transition/guard assertions follow from the ownership invariant: retain needs a live reference, final release consumes storage, and live-reference guard excludes reclamation.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:9:1: 98:4 (#40)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::failed_compare_exchange_inductive",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named token-machine initialization/transition preserves the single-allocation invariant: no owners at zero, matching owner multiplicity at a positive machine count, and no unrelated allocation tokens.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:97:65: 97:68 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::new_inductive",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named token-machine initialization/transition preserves the single-allocation invariant: no owners at zero, matching owner multiplicity at a positive machine count, and no unrelated allocation tokens.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:87:51: 87:54 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::reject_retain_at_limit_inductive",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named token-machine initialization/transition preserves the single-allocation invariant: no owners at zero, matching owner multiplicity at a positive machine count, and no unrelated allocation tokens.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:91:81: 91:84 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::release_final_asserts",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named generated transition/guard assertions follow from the ownership invariant: retain needs a live reference, final release consumes storage, and live-reference guard excludes reclamation.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:9:1: 98:4 (#40)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::release_final_inductive",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named token-machine initialization/transition preserves the single-allocation invariant: no owners at zero, matching owner multiplicity at a positive machine count, and no unrelated allocation tokens.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:95:72: 95:75 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::release_nonfinal_inductive",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named token-machine initialization/transition preserves the single-allocation invariant: no owners at zero, matching owner multiplicity at a positive machine count, and no unrelated allocation tokens.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:93:75: 93:78 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::retain_asserts",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named generated transition/guard assertions follow from the ownership invariant: retain needs a live reference, final release consumes storage, and live-reference guard excludes reclamation.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:9:1: 98:4 (#40)"
+        },
+        {
+          "symbol": "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::retain_inductive",
+          "mode": "Proof",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "The named token-machine initialization/transition preserves the single-allocation invariant: no owners at zero, matching owner multiplicity at a positive machine count, and no unrelated allocation tokens.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/reference_protocol.rs:89:65: 89:68 (#0)"
+        },
+        {
+          "symbol": "ffi_lifecycle::release_attempt",
+          "mode": "Exec",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Actual shared weak-CAS attempt changes the SC atomic permission only on successful decrement; rejection and failure preserve it.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/ffi_lifecycle.rs:59:89: 64:14 (#308)"
+        },
+        {
+          "symbol": "ffi_lifecycle::release_count",
+          "mode": "Exec",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Total actual usize kernel rejects zero and otherwise returns count-1; only one reaches zero.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/ffi_lifecycle.rs:21:58: 29:14 (#295)"
+        },
+        {
+          "symbol": "ffi_lifecycle::retain_attempt",
+          "mode": "Exec",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Actual shared weak-CAS attempt changes the SC atomic permission only on successful increment; rejection and failure preserve it.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/ffi_lifecycle.rs:51:88: 56:14 (#308)"
+        },
+        {
+          "symbol": "ffi_lifecycle::retain_count",
+          "mode": "Exec",
+          "obligations": [
+            "abi-machine-counters",
+            "abi-reference-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Total actual usize kernel rejects zero/MAX and otherwise returns count+1 without overflow.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/ffi_lifecycle.rs:10:57: 18:14 (#295)"
+        }
+      ],
+      "generated_trusted_symbols": [
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%10::clone",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%12::lemma_msg_ownership",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%5::agree",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%5::arbitrary",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%5::instance_id",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%5::value",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%6::unique",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%8::arbitrary",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%8::element",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%8::instance_id",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::a_live_reference_guards_its_allocation",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::clone",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::failed_compare_exchange",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::id",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::new",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::reject_retain_at_limit",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::release_final",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::release_nonfinal",
+        "ffi_lifecycle::reference_protocol::runtime_references::impl&%9::retain",
+        "ffi_lifecycle::reference_protocol::runtime_references::show::failed_compare_exchange",
+        "ffi_lifecycle::reference_protocol::runtime_references::show::new",
+        "ffi_lifecycle::reference_protocol::runtime_references::show::reject_retain_at_limit",
+        "ffi_lifecycle::reference_protocol::runtime_references::show::release_final",
+        "ffi_lifecycle::reference_protocol::runtime_references::show::release_nonfinal",
+        "ffi_lifecycle::reference_protocol::runtime_references::show::retain",
+        "ffi_lifecycle::reference_protocol::runtime_references::take_step::failed_compare_exchange",
+        "ffi_lifecycle::reference_protocol::runtime_references::take_step::new",
+        "ffi_lifecycle::reference_protocol::runtime_references::take_step::reject_retain_at_limit",
+        "ffi_lifecycle::reference_protocol::runtime_references::take_step::release_final",
+        "ffi_lifecycle::reference_protocol::runtime_references::take_step::release_nonfinal",
+        "ffi_lifecycle::reference_protocol::runtime_references::take_step::retain"
+      ],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/58da3887d3aa46329433b1cb58b88960.json",
+        "artifact": ".aegis/destiny/verus-artifacts/58da3887d3aa46329433b1cb58b88960.vir",
+        "artifact_sha256": "c8f5f69935aee430432d2adccdc78df01c552b452e6aa9730e601461900372db",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "No complete raw-pointer/Box allocation identity, global atomic invariant across the retry driver, reference-transfer caller, operation gate/Mutex, poison, ECS, OS or foreign-callback refinement. No lock-free, fairness or termination claim."
+      ]
+    },
+    {
+      "schema": 1,
+      "entry": "verification/verus/evolution_callbacks.rs",
+      "expected_checks": 13,
+      "plan_obligation": "evolution-callbacks-reviewed-inventory",
+      "scope": "production_phase_kernels_and_feasible_callback_trace",
+      "symbols": [
+        {
+          "symbol": "evolution_callbacks::add_allowed",
+          "mode": "Exec",
+          "obligations": [
+            "evolution-phase-ownership"
+          ],
+          "original_cases": [
+            "python/destiny/test/ballpark/evolve/test_add.py::TestAdd::test_balls_can_not_be_added_during_evolve"
+          ],
+          "relation": "Only idle phase 0 admits AddBall; evolution and callback phases reject it.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/evolution_phase.rs:17:50: 17:64 (#5)"
+        },
+        {
+          "symbol": "evolution_callbacks::begin_tick",
+          "mode": "Exec",
+          "obligations": [
+            "evolution-phase-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Only idle phase 0 enters evolution phase 1; every other u8 is rejected without a phase change.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/evolution_phase.rs:5:55: 7:10 (#5)"
+        },
+        {
+          "symbol": "evolution_callbacks::candidate_admitted",
+          "mode": "Exec",
+          "obligations": [
+            "callback-timing-and-reentry"
+          ],
+          "original_cases": [],
+          "relation": "Actual Partition flag kernel preserves the interactive-only branch that bypasses fixed/bubble filters, and otherwise admits the original master/global/bubble and cloaked-owner/free cases.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/proximity.rs:7:89: 10:10 (#36)"
+        },
+        {
+          "symbol": "evolution_callbacks::enter_callback",
+          "mode": "Exec",
+          "obligations": [
+            "evolution-phase-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Only evolution phase 1 enters synchronous callback phase 2.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/evolution_phase.rs:8:59: 10:10 (#5)"
+        },
+        {
+          "symbol": "evolution_callbacks::feasible_callback_rejection_trace",
+          "mode": "Exec",
+          "obligations": [
+            "evolution-phase-ownership"
+          ],
+          "original_cases": [
+            "python/destiny/test/ballpark/evolve/test_add.py::TestAdd::test_balls_can_not_be_added_during_evolve"
+          ],
+          "relation": "Actual phase kernels compose idle -> evolution -> callback -> evolution -> idle, rejecting AddBall and nested evolution in the callback.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/evolution_callbacks.rs:118:1: 137:2 (#0)"
+        },
+        {
+          "symbol": "evolution_callbacks::feasible_nested_read_preserves_the_owned_parent_batch",
+          "mode": "Exec",
+          "obligations": [
+            "callback-timing-and-reentry"
+          ],
+          "original_cases": [],
+          "relation": "Checked standard-container constructor and actual extraction kernel establish a nonempty owned parent batch and an empty nested-read batch without changing the parent sequence.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/evolution_callbacks.rs:139:64: 152:2 (#0)"
+        },
+        {
+          "symbol": "evolution_callbacks::feasible_owned_notification_continuation",
+          "mode": "Exec",
+          "obligations": [
+            "callback-timing-and-reentry"
+          ],
+          "original_cases": [],
+          "relation": "Checked nonempty original-candidate constructor, actual head extraction and an empty nested read preserve the parent continuation; continuing consumes its second candidate once and reaches an empty pass. World/cancellation/geometry correspondence remains required.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/evolution_callbacks.rs:158:51: 174:2 (#0)"
+        },
+        {
+          "symbol": "evolution_callbacks::finish_tick",
+          "mode": "Exec",
+          "obligations": [
+            "evolution-phase-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Only evolution phase 1 returns to idle phase 0.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/evolution_phase.rs:14:56: 16:10 (#5)"
+        },
+        {
+          "symbol": "evolution_callbacks::leave_callback",
+          "mode": "Exec",
+          "obligations": [
+            "evolution-phase-ownership"
+          ],
+          "original_cases": [],
+          "relation": "Only callback phase 2 returns to evolution phase 1.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/evolution_phase.rs:11:59: 13:10 (#5)"
+        },
+        {
+          "symbol": "evolution_callbacks::notification_transition",
+          "mode": "Exec",
+          "obligations": [
+            "callback-timing-and-reentry"
+          ],
+          "original_cases": [],
+          "relation": "Actual notification kernel updates membership only when enabled and requests one notification precisely when its inside/outside state changes; disabled processing preserves prior state.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/proximity.rs:30:95: 32:10 (#43)"
+        },
+        {
+          "symbol": "evolution_callbacks::prepend",
+          "mode": "Exec",
+          "obligations": [
+            "callback-timing-and-reentry"
+          ],
+          "original_cases": [],
+          "relation": "Actual generic VecDeque append/swap consumes the newly produced continuation sequence and places it before the complete owned caller suffix, preserving every element and order for arbitrary valid container states. Container/memory primitive contracts are explicit trust; the foreign callback driver and gate remain separate.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/notification_batch.rs:48:94: 53:10 (#57)"
+        },
+        {
+          "symbol": "evolution_callbacks::take_next",
+          "mode": "Exec",
+          "obligations": [
+            "callback-timing-and-reentry"
+          ],
+          "original_cases": [],
+          "relation": "Actual generic production continuation kernel returns exactly the current owned queue head and removes that element; an empty queue remains empty. Pinned standard-container contracts remain explicit trust.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/notification_batch.rs:14:70: 16:10 (#64)"
+        },
+        {
+          "symbol": "evolution_callbacks::take_notifications",
+          "mode": "Exec",
+          "obligations": [
+            "callback-timing-and-reentry"
+          ],
+          "original_cases": [],
+          "relation": "Actual generic VecDeque extraction preserves the caller prefix and returns exactly the current operation suffix, or rejects an invalid start without mutation. Std container contracts are explicit primitive trust.",
+          "review": "Reviewed against the entry contracts and actual production body/transition where declared. Complete original assertions, callers and residual boundaries remain required.",
+          "production_body": "verification/verus/../../src/notification_batch.rs:7:103: 9:10 (#50)"
+        }
+      ],
+      "generated_trusted_symbols": [],
+      "discovery": {
+        "receipt": ".aegis/destiny/receipts/87d6042e7f7347438db20282716a446e.json",
+        "artifact": ".aegis/destiny/verus-artifacts/87d6042e7f7347438db20282716a446e.vir",
+        "artifact_sha256": "8dba2cf1c4b80ac03cc665ffb338bbb522a41ec99efacd7584f1f7dea07968ee",
+        "status": "HISTORICAL_DISCOVERY_NOT_ACCEPTANCE"
+      },
+      "residual_obligations": [
+        "Phase kernels alone do not establish callback invocation, ECS membership/repair frame conditions, every command ordering, foreign exception handling, Warp IEEE-754/libm reachability, all worker/engine configurations, snapshots, allocation/Mutex permissions or progress."
+      ]
+    }
+  ],
+  "notice": "Actual discovery symbol identities/counts plus semantic scope review. Only current bound regular verifier execution, exact matching inventories and the separate conjunction validator provide accepted scoped evidence. No case or production-readiness boolean is generated."
+}

@@ -3,186 +3,475 @@
 // Eight live balls, sixteen bubble entries, sixty-four top cells. Python set
 // iteration, Blue construction/lifetime and native spatial correspondence
 // remain required. These are specification counterparts, not refinement proofs.
-use destiny_original_spec::{BoundedList,OriginalBallInit,OriginalParkProjection,
-    OriginalBubbleUpdater,OriginalBubbleDelta as D,OriginalBubbleDeltaMap,
-    OriginalBubbleEntry,Vec3};
-fn ids(values:&[i64]) -> BoundedList<i64,8> {
-    let mut result=BoundedList::new(); let mut i=0;
-    while i<values.len() { if let Some(value)=values.get(i) { assert!(result.push(*value)); } i+=1; }
-    result
-}
-fn deltas(values:&[(i64,D)]) -> OriginalBubbleDeltaMap {
-    let mut result=BoundedList::new(); let mut i=0;
-    while i<values.len() { if let Some(value)=values.get(i) { assert!(result.push(*value)); } i+=1; }
-    result
-}
-fn maps_equal(left:&OriginalBubbleDeltaMap,right:&OriginalBubbleDeltaMap) -> bool {
-    if left.len()!=right.len() { return false; }
-    let mut i=0;
-    while i<left.len() {
-        let Some((key,value))=left.get(i) else { return false; };
-        let mut matches=0; let mut j=0;
-        while j<right.len() {
-            if right.get(j)==Some((key,value)) { matches+=1; } j+=1;
+use destiny_original_spec::{
+    BoundedList, OriginalBallInit, OriginalBubbleDelta as D, OriginalBubbleDeltaMap,
+    OriginalBubbleEntry, OriginalBubbleUpdater, OriginalParkProjection, Vec3,
+};
+fn ids(values: &[i64]) -> BoundedList<i64, 8> {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
         }
-        if matches!=1 { return false; } i+=1;
+        i += 1;
+    }
+    result
+}
+fn deltas(values: &[(i64, D)]) -> OriginalBubbleDeltaMap {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
+        i += 1;
+    }
+    result
+}
+fn maps_equal(left: &OriginalBubbleDeltaMap, right: &OriginalBubbleDeltaMap) -> bool {
+    if left.len() != right.len() {
+        return false;
+    }
+    let mut i = 0;
+    while i < left.len() {
+        let Some((key, value)) = left.get(i) else {
+            return false;
+        };
+        let mut matches = 0;
+        let mut j = 0;
+        while j < right.len() {
+            if right.get(j) == Some((key, value)) {
+                matches += 1;
+            }
+            j += 1;
+        }
+        if matches != 1 {
+            return false;
+        }
+        i += 1;
     }
     true
 }
-fn entries(values:&[(i64,i64,i8)]) -> BoundedList<OriginalBubbleEntry,16> {
-    let mut result=BoundedList::new(); let mut i=0;
-    while i<values.len() {
-        if let Some((bubble,ball,action))=values.get(i) {
-            assert!(result.push(OriginalBubbleEntry { bubble:*bubble,ball:*ball,action:*action }));
+fn entries(values: &[(i64, i64, i8)]) -> BoundedList<OriginalBubbleEntry, 16> {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some((bubble, ball, action)) = values.get(i) {
+            assert!(result.push(OriginalBubbleEntry {
+                bubble: *bubble,
+                ball: *ball,
+                action: *action
+            }));
         }
-        i+=1;
+        i += 1;
     }
     result
 }
-fn dictionaries_equal(left:&BoundedList<OriginalBubbleEntry,16>,right:&BoundedList<OriginalBubbleEntry,16>) -> bool {
-    if left.len()!=right.len() { return false; }
-    let mut i=0;
-    while i<left.len() {
-        let value=left.get(i); let mut matches=0; let mut j=0;
-        while j<right.len() { if value==right.get(j) { matches+=1; } j+=1; }
-        if matches!=1 { return false; } i+=1;
+fn dictionaries_equal(
+    left: &BoundedList<OriginalBubbleEntry, 16>,
+    right: &BoundedList<OriginalBubbleEntry, 16>,
+) -> bool {
+    if left.len() != right.len() {
+        return false;
+    }
+    let mut i = 0;
+    while i < left.len() {
+        let value = left.get(i);
+        let mut matches = 0;
+        let mut j = 0;
+        while j < right.len() {
+            if value == right.get(j) {
+                matches += 1;
+            }
+            j += 1;
+        }
+        if matches != 1 {
+            return false;
+        }
+        i += 1;
     }
     true
 }
 
 // original-case: python/destiny/test/net/server/test_bubbleupdater.py::TestBubbleUpdater::test_additions_and_deletions
 // original-source-sha256: 891a852dad3942dcaad384460cb448c2576d49d8e94a0c35ca75c1c0aed139b0
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(65))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(65))]
+#[cfg_attr(test, test)]
 fn test_additions_and_deletions() {
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     {
-    let mut updater=OriginalBubbleUpdater::default();
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_0=park.add_ball(OriginalBallInit { id:1001_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_0) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_0)==Ok(()));
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_1=park.add_ball(OriginalBallInit { id:1002_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:500000000.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_1) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_1)==Ok(()));
-    assert!(updater.additions_and_deletions(&mut park)==Ok(()));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:27
-    assert!(maps_equal(&deltas(&[(1001_i64,D::Balls(ids(&[1001_i64]))), (1002_i64,D::Balls(ids(&[1002_i64])))]),&updater.updates.additions_per_player));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:28
-    assert!(maps_equal(&deltas(&[(1001_i64,D::Balls(ids(&[]))), (1002_i64,D::Balls(ids(&[])))]),&updater.updates.deletions_per_player));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:29
-    assert!(maps_equal(&deltas(&[(0_i64,D::Balls(ids(&[1001_i64]))), (1_i64,D::Balls(ids(&[1002_i64])))]),&updater.updates.additions_per_bubble));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:30
-    assert!(maps_equal(&deltas(&[(0_i64,D::Balls(ids(&[]))), (1_i64,D::Balls(ids(&[])))]),&updater.updates.deletions_per_bubble));
+        let mut updater = OriginalBubbleUpdater::default();
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_0 = park.add_ball(OriginalBallInit {
+            id: 1001_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_0) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_0) == Ok(()));
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_1 = park.add_ball(OriginalBallInit {
+            id: 1002_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 500000000.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_1) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_1) == Ok(()));
+        assert!(updater.additions_and_deletions(&mut park) == Ok(()));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:27
+        assert!(maps_equal(
+            &deltas(&[
+                (1001_i64, D::Balls(ids(&[1001_i64]))),
+                (1002_i64, D::Balls(ids(&[1002_i64])))
+            ]),
+            &updater.updates.additions_per_player
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:28
+        assert!(maps_equal(
+            &deltas(&[
+                (1001_i64, D::Balls(ids(&[]))),
+                (1002_i64, D::Balls(ids(&[])))
+            ]),
+            &updater.updates.deletions_per_player
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:29
+        assert!(maps_equal(
+            &deltas(&[
+                (0_i64, D::Balls(ids(&[1001_i64]))),
+                (1_i64, D::Balls(ids(&[1002_i64])))
+            ]),
+            &updater.updates.additions_per_bubble
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:30
+        assert!(maps_equal(
+            &deltas(&[(0_i64, D::Balls(ids(&[]))), (1_i64, D::Balls(ids(&[])))]),
+            &updater.updates.deletions_per_bubble
+        ));
     } // updater and its park reference end before the native park destruction boundary
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"all original bubble updater assertions and fixture teardown completed");
+    kani::cover!(
+        true,
+        "all original bubble updater assertions and fixture teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_bubbleupdater.py::TestBubbleUpdater::test_additions_and_deletions_updates_bubbles_dict
 // original-source-sha256: 891a852dad3942dcaad384460cb448c2576d49d8e94a0c35ca75c1c0aed139b0
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(65))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(65))]
+#[cfg_attr(test, test)]
 fn test_additions_and_deletions_updates_bubbles_dict() {
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     {
-    let mut updater=OriginalBubbleUpdater::default();
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_0=park.add_ball(OriginalBallInit { id:1001_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_0) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_0)==Ok(()));
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_1=park.add_ball(OriginalBallInit { id:1002_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:500000000.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_1) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_1)==Ok(()));
-    assert!(updater.additions_and_deletions(&mut park)==Ok(()));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:36
-    assert!(dictionaries_equal(&entries(&[(0_i64,1001_i64,0_i8), (1_i64,1002_i64,0_i8)]),&park.bubble_dictionary_entries()));
+        let mut updater = OriginalBubbleUpdater::default();
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_0 = park.add_ball(OriginalBallInit {
+            id: 1001_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_0) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_0) == Ok(()));
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_1 = park.add_ball(OriginalBallInit {
+            id: 1002_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 500000000.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_1) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_1) == Ok(()));
+        assert!(updater.additions_and_deletions(&mut park) == Ok(()));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:36
+        assert!(dictionaries_equal(
+            &entries(&[(0_i64, 1001_i64, 0_i8), (1_i64, 1002_i64, 0_i8)]),
+            &park.bubble_dictionary_entries()
+        ));
     } // updater and its park reference end before the native park destruction boundary
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"all original bubble updater assertions and fixture teardown completed");
+    kani::cover!(
+        true,
+        "all original bubble updater assertions and fixture teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_bubbleupdater.py::TestBubbleUpdater::test_additions_and_deletions_multiple_calls_same_tick
 // original-source-sha256: 891a852dad3942dcaad384460cb448c2576d49d8e94a0c35ca75c1c0aed139b0
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(65))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(65))]
+#[cfg_attr(test, test)]
 fn test_additions_and_deletions_multiple_calls_same_tick() {
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     {
-    let mut updater=OriginalBubbleUpdater::default();
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_0=park.add_ball(OriginalBallInit { id:1001_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_0) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_0)==Ok(()));
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_1=park.add_ball(OriginalBallInit { id:1002_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:500000000.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_1) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_1)==Ok(()));
-    let mut original_iteration=0;
-    while original_iteration<3 {
-        assert!(updater.additions_and_deletions(&mut park)==Ok(()));
-        original_iteration+=1;
-    }
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:67
-    assert!(maps_equal(&deltas(&[(1001_i64,D::Balls(ids(&[1001_i64]))), (1002_i64,D::Balls(ids(&[1002_i64])))]),&updater.updates.additions_per_player));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:71
-    assert!(maps_equal(&deltas(&[(1001_i64,D::Balls(ids(&[]))), (1002_i64,D::Balls(ids(&[])))]),&updater.updates.deletions_per_player));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:75
-    assert!(maps_equal(&deltas(&[(0_i64,D::Balls(ids(&[1001_i64]))), (1_i64,D::Balls(ids(&[1002_i64])))]),&updater.updates.additions_per_bubble));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:79
-    assert!(maps_equal(&deltas(&[(0_i64,D::Balls(ids(&[]))), (1_i64,D::Balls(ids(&[])))]),&updater.updates.deletions_per_bubble));
+        let mut updater = OriginalBubbleUpdater::default();
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_0 = park.add_ball(OriginalBallInit {
+            id: 1001_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_0) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_0) == Ok(()));
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_1 = park.add_ball(OriginalBallInit {
+            id: 1002_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 500000000.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_1) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_1) == Ok(()));
+        let mut original_iteration = 0;
+        while original_iteration < 3 {
+            assert!(updater.additions_and_deletions(&mut park) == Ok(()));
+            original_iteration += 1;
+        }
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:67
+        assert!(maps_equal(
+            &deltas(&[
+                (1001_i64, D::Balls(ids(&[1001_i64]))),
+                (1002_i64, D::Balls(ids(&[1002_i64])))
+            ]),
+            &updater.updates.additions_per_player
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:71
+        assert!(maps_equal(
+            &deltas(&[
+                (1001_i64, D::Balls(ids(&[]))),
+                (1002_i64, D::Balls(ids(&[])))
+            ]),
+            &updater.updates.deletions_per_player
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:75
+        assert!(maps_equal(
+            &deltas(&[
+                (0_i64, D::Balls(ids(&[1001_i64]))),
+                (1_i64, D::Balls(ids(&[1002_i64])))
+            ]),
+            &updater.updates.additions_per_bubble
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:79
+        assert!(maps_equal(
+            &deltas(&[(0_i64, D::Balls(ids(&[]))), (1_i64, D::Balls(ids(&[])))]),
+            &updater.updates.deletions_per_bubble
+        ));
     } // updater and its park reference end before the native park destruction boundary
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"all original bubble updater assertions and fixture teardown completed");
+    kani::cover!(
+        true,
+        "all original bubble updater assertions and fixture teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_bubbleupdater.py::TestBubbleUpdater::test_additions_and_deletions_handles_removal
 // original-source-sha256: 891a852dad3942dcaad384460cb448c2576d49d8e94a0c35ca75c1c0aed139b0
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(65))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(65))]
+#[cfg_attr(test, test)]
 fn test_additions_and_deletions_handles_removal() {
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     {
-    let mut updater=OriginalBubbleUpdater::default();
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_0=park.add_ball(OriginalBallInit { id:1001_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_0) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_0)==Ok(()));
-    assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
-    let created_ball_1=park.add_ball(OriginalBallInit { id:1002_i64, mass:1.0_f64, radius:1.0_f32, max_velocity:1.0_f32, agility:1.0_f32, speed_fraction:1.0_f32, is_free:true, is_global:false, is_massive:true, is_interactive:true, is_space_junk:false, position:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 }, velocity:Vec3 { x:0.0_f64, y:0.0_f64, z:0.0_f64 } });
-    assert!(park.contains(created_ball_1) && !park.scope_error);
-    assert!(park.insert_new_query_ball(created_ball_1)==Ok(()));
-    assert!(updater.additions_and_deletions(&mut park)==Ok(()));
-    assert!(park.evolve_two_spherical_bodies()==Ok(()));
-    park.remove_ball(1001_i64,0);
-    assert!(updater.additions_and_deletions(&mut park)==Ok(()));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:45
-    assert!(maps_equal(&deltas(&[(1002_i64,D::Bubble(0_i64))]),&updater.updates.additions_per_player));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:49
-    assert!(maps_equal(&deltas(&[(1002_i64,D::Bubble(0_i64))]),&updater.updates.deletions_per_player));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:53
-    assert!(maps_equal(&deltas(&[(0_i64,D::Balls(ids(&[])))]),&updater.updates.additions_per_bubble));
-    // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:57
-    assert!(maps_equal(&deltas(&[(0_i64,D::Balls(ids(&[1001_i64])))]),&updater.updates.deletions_per_bubble));
+        let mut updater = OriginalBubbleUpdater::default();
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_0 = park.add_ball(OriginalBallInit {
+            id: 1001_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_0) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_0) == Ok(()));
+        assert!(!park.dynamical_orientation); // settings selects the original 18-argument constructor
+        let created_ball_1 = park.add_ball(OriginalBallInit {
+            id: 1002_i64,
+            mass: 1.0_f64,
+            radius: 1.0_f32,
+            max_velocity: 1.0_f32,
+            agility: 1.0_f32,
+            speed_fraction: 1.0_f32,
+            is_free: true,
+            is_global: false,
+            is_massive: true,
+            is_interactive: true,
+            is_space_junk: false,
+            position: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+            velocity: Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        });
+        assert!(park.contains(created_ball_1) && !park.scope_error);
+        assert!(park.insert_new_query_ball(created_ball_1) == Ok(()));
+        assert!(updater.additions_and_deletions(&mut park) == Ok(()));
+        assert!(park.evolve_two_spherical_bodies() == Ok(()));
+        park.remove_ball(1001_i64, 0);
+        assert!(updater.additions_and_deletions(&mut park) == Ok(()));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:45
+        assert!(maps_equal(
+            &deltas(&[(1002_i64, D::Bubble(0_i64))]),
+            &updater.updates.additions_per_player
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:49
+        assert!(maps_equal(
+            &deltas(&[(1002_i64, D::Bubble(0_i64))]),
+            &updater.updates.deletions_per_player
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:53
+        assert!(maps_equal(
+            &deltas(&[(0_i64, D::Balls(ids(&[])))]),
+            &updater.updates.additions_per_bubble
+        ));
+        // original-assertion: python/destiny/test/net/server/test_bubbleupdater.py:57
+        assert!(maps_equal(
+            &deltas(&[(0_i64, D::Balls(ids(&[1001_i64])))]),
+            &updater.updates.deletions_per_bubble
+        ));
     } // updater and its park reference end before the native park destruction boundary
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"all original bubble updater assertions and fixture teardown completed");
+    kani::cover!(
+        true,
+        "all original bubble updater assertions and fixture teardown completed"
+    );
 }

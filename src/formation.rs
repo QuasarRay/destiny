@@ -7,6 +7,18 @@
 // A total, literal representation of the original std::bitset<16> positions.
 // Avoid importing panic-only shift paths from the verifier's standard library.
 // Out-of-capacity inputs retain the explicit unchanged-state result below.
+pub(crate) fn oversized_follower(
+    old_count: usize,
+    new_count: usize,
+    mode: u8,
+    slot: i64,
+) -> Option<bool> {
+    #[cfg(kani)]
+    kani::cover!(true, "actual formation shrink selection executed");
+    let new_count = i32::try_from(new_count).ok()?;
+    Some(old_count > new_count as usize && mode == 12 && slot > i64::from(new_count) - 1)
+}
+
 fn slot_bit(index: u32) -> Option<u16> {
     match index {
         0 => Some(0x0001),

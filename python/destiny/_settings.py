@@ -28,10 +28,20 @@ class GlobalSettings:
         self._lock = RLock()
         self._default = SettingsConfiguration()
         self._current = self._default.copy()
+        self._revision = 0
 
     def Apply(self, configuration: SettingsConfiguration) -> None:
         if not isinstance(configuration, SettingsConfiguration):
             raise TypeError("Apply expects SettingsConfiguration")
+        # Validate the same private value that will be published. Validating a
+        # mutable caller object and copying it later admitted changed fields.
+        configuration = SettingsConfiguration(
+            collisionMaxIterations=configuration.collisionMaxIterations,
+            useIterativeCollision=configuration.useIterativeCollision,
+            useDynamicalOrientation=configuration.useDynamicalOrientation,
+            disableDynamicalOrientationForMissiles=configuration.disableDynamicalOrientationForMissiles,
+            useNewOrbit=configuration.useNewOrbit,
+        )
         iterations = configuration.collisionMaxIterations
         if isinstance(iterations, bool) or not isinstance(iterations, int):
             raise TypeError("collisionMaxIterations must be an integer")
@@ -45,21 +55,13 @@ class GlobalSettings:
         ):
             if not isinstance(getattr(configuration, field_name), bool):
                 raise TypeError(f"{field_name} must be a boolean")
-        unsupported = [
-            field_name
-            for field_name in (
-                "useDynamicalOrientation",
-                "disableDynamicalOrientationForMissiles",
-                "useNewOrbit",
-            )
-            if getattr(configuration, field_name)
-        ]
-        if unsupported:
-            raise ValueError(
-                "unsupported Destiny setting(s): " + ", ".join(unsupported)
-            )
         with self._lock:
             self._current = configuration.copy()
+            self._revision += 1
+
+    def _snapshot(self) -> tuple[int, SettingsConfiguration]:
+        with self._lock:
+            return self._revision, self._current.copy()
 
     def Get(self) -> SettingsConfiguration:
         with self._lock:
@@ -72,6 +74,7 @@ class GlobalSettings:
     def Reset(self) -> None:
         with self._lock:
             self._current = self._default.copy()
+            self._revision += 1
 
 
 settings = GlobalSettings()

@@ -23,6 +23,27 @@ REVIEWED_PYTHON_RULES={
 }
 
 
+for _test in (
+    'test_initial_settings_configuration_values_match_default_values', 'test_configure', 'test_reset',
+    'test_enable_dynamical_orientation', 'test_disable_dynamical_orientation_for_missiles', 'test_enable_new_orbit',
+):
+    REVIEWED_PYTHON_RULES['python/destiny/test/test_configure.py::TestConfigure::'+_test]={
+        'rule':'Preserve each exact original bool/integer equality and operation order: GetDefault/Get are independent configuration copies, Apply copies all five source fields, and Reset publishes the original20/false defaults. Every source assertion and tearDown Reset is retained in the selected source-backed Rust specification scenario.',
+        'setup':'Original unittest.TestCase uses the initial global defaults and resets settings on tearDown; no inherited Ballpark or assertion helper is involved. Settings.h:9..34, Settings.cpp:13..64 and Settings_Blue.cpp field/method exposure are reviewed. These six scenario proofs cover the executable Rust specification only; Python/Blue/class/global initialization, mutable callers, RLock/revision/native configuration publication, supported numeric domains and every native orientation/collision/Orbit effect remain separate correspondence obligations.',
+    }
+
+
+for _fixture,_test in (
+    ('TestPauseAndStart','test_can_pause'), ('TestPauseAndStart','test_can_start'),
+    ('TestPauseAndStart','test_initial_state_is_paused'), ('TestTime','test_adjust_times_adds_to_ballpark_time'),
+    ('TestTime','test_ballpark_time_initialises_to_zero'),
+):
+    REVIEWED_PYTHON_RULES['python/destiny/test/ballpark/test_time.py::'+_fixture+'::'+_test]={
+        'rule':'Preserve the exact default zero time/paused state, Start/Pause order and bool equality, or AdjustTimes2 then3 with exact2/5 time assertions. Tick registration/unregistration are source external events, not partition mutations. All original postconditions and no-unexpected-error checks are retained.',
+        'setup':'Original BallparkTestCase constructs an empty default client park and ClearAll/del on teardown. The complete scenario uses no balls; the bounded park projection preserves empty construction and every boundary event. Source Start/Pause (Ballpark.cpp3013..3036) and time adjustment definitions are reviewed. Native/Python/Blue/OS tick registration, object/driver lifetime, worker ownership/failure/join/cancellation and every caller/world/configuration/FFI correspondence remain separately required.',
+    }
+
+
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -32,8 +53,11 @@ def harness_index():
     for path in sorted((ROOT / "verification/kani/src").glob("*.rs")):
         text = path.read_text()
         markers = list(re.finditer(r'^// original-case: (\S+)\s*$', text, re.M))
-        for i, marker in enumerate(markers):
-            end = markers[i+1].start() if i+1 < len(markers) else len(text)
+        for marker in markers:
+            # Consecutive qualified identities can share a reviewed harness.
+            # Locate its concrete definition first, then bound its body by
+            # the next case block/function. Every identity remains separate.
+            end = len(text)
             function = re.search(r'^fn (\w+)\s*\(', text[marker.end():end], re.M)
             # paired_regression!(ordinary_test, kani_harness, body) defines
             # distinct names. Select the macro's actual Kani name, confirmed
@@ -44,6 +68,7 @@ def harness_index():
             if function is None:
                 raise ValueError("Qualified marker has no following concrete function: " + marker[1])
             function_start = marker.end() + function.start()
+            end = next((other.start() for other in markers if other.start()>function_start),len(text))
             next_function=re.search(r'^fn \w+\s*\(', text[function_start+len(function[0]):end], re.M)
             if next_function:
                 end=function_start+len(function[0])+next_function.start()
@@ -143,7 +168,7 @@ def main():
             # This formal validator's residual schema names the two proof
             # lanes. Keep executable native correspondence in the production
             # relation; the independent queue runtime field remains separate.
-            residual[0]["relation"]+=" Execute the original native Python/Blue constructor, stream call/Read, byte equality and teardown against a real built library; simulated Rust data alone cannot establish interpreter/ABI/environment correspondence."
+            residual[0]["relation"]+=" Execute the exact original Python/Blue operations and teardown through the declared boundary; every applicable native call needs a real built library. A pure Python scenario or simulated Rust data cannot establish native implementation or interpreter/ABI/environment correspondence."
         # One pre-existing ADD_DURING_EVOLVE marker only proves a guard
         # predicate. It does not execute the callback or its entire scenario.
         partial = identity.endswith("test_add.py::TestAdd::test_balls_can_not_be_added_during_evolve") and not any(
@@ -153,7 +178,7 @@ def main():
                       "rust_translation_reviewed": reviewed, "assertions": assertions,
                       "dependency_mappings": dependencies, "candidate_harnesses": candidates,
                       "candidate_scope": "partial guard predicate; original callback scenario missing" if partial else "concrete assertion candidate with pending correspondence" if candidates else "implementation missing",
-                      "execution_review": ("Reviewed original empty-list specialization, actual header codec, default timestamp, every asserted literal byte and teardown; real regular Kani property inventory has no unreachable obligations and a satisfied terminal witness. Classified current proof and native correspondence remain pending." if identity in REVIEWED_PYTHON_RULES else "Concrete C++ construction, operation order, complete assertions and no-unexpected-exception semantics reviewed; selected harness includes a terminal satisfied scenario cover.") if reviewed else "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
+                      "execution_review": ("Reviewed the declared source-specific Python rule, exact setup/operation order/all source assertions and teardown. Real regular Kani property inventory has no unreachable obligations and a satisfied terminal witness. Classified current proof and native/Python correspondence remain pending." if identity in REVIEWED_PYTHON_RULES else "Concrete C++ construction, operation order, complete assertions and no-unexpected-exception semantics reviewed; selected harness includes a terminal satisfied scenario cover.") if reviewed else "PENDING_EXECUTION_AND_TEARDOWN_REVIEW",
                       "reference_review": "verification/cases/reference_review.json",
                       "required_obligations": requirements, "residual_correspondence": residual,
                       "property_discovery": observed})

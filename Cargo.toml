@@ -31,7 +31,7 @@ lightyear_connection = { version = "=0.29.0", default-features = false, features
 lightyear_replication = { version = "=0.29.0", default-features = false, features = ["std", "client", "server"], optional = true }
 lightyear_transport = { version = "=0.29.0", default-features = false, features = ["std", "client", "server"], optional = true }
 serde = { version = "=1.0.228", features = ["derive"] }
-serde_json = "=1.0.150"
+serde_json = { version = "=1.0.150", features = ["float_roundtrip"] }
 thiserror = "=2.0.18"
 
 [profile.release]
@@ -41,4 +41,4 @@ panic = "unwind"
 strip = "debuginfo"
 
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)'] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)', 'cfg(verus_keep_ghost)'] }

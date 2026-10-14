@@ -4,114 +4,211 @@
 // Spatial indexing, Blue dispatch/lifetime, interpreter and native libm
 // correspondence remain required; no production refinement is claimed here.
 #![allow(non_snake_case, unused_variables)]
-use destiny_original_spec::{BoundedList, OriginalBallInit, OriginalBallAttribute, OriginalMode, OriginalParkBall, OriginalParkError, OriginalMiniBall, OriginalMiniCapsule, OriginalMiniBox,
-    OriginalParkProjection, OriginalBubbleDelta, OriginalBubbleDeltaMap, OriginalBoxObject,OriginalBoxObjectKey,ActionValue,Vec3, python_almost_equal, python_rounded_equal};
+use destiny_original_spec::{
+    ActionValue, BoundedList, OriginalBallAttribute, OriginalBallInit, OriginalBoxObject,
+    OriginalBoxObjectKey, OriginalBubbleDelta, OriginalBubbleDeltaMap, OriginalMiniBall,
+    OriginalMiniBox, OriginalMiniCapsule, OriginalMode, OriginalParkBall, OriginalParkError,
+    OriginalParkProjection, Vec3, python_almost_equal, python_rounded_equal,
+};
 
-fn box_object(values:&[(OriginalBoxObjectKey,ActionValue)]) -> OriginalBoxObject {
-    let mut result=BoundedList::new();let mut i=0;
-    while i<values.len() { if let Some(value)=values.get(i) { assert!(result.push(*value)); } i+=1; }
+fn box_object(values: &[(OriginalBoxObjectKey, ActionValue)]) -> OriginalBoxObject {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
+        i += 1;
+    }
     result
 }
 
-fn user_list(values:&[Option<i64>]) -> BoundedList<Option<i64>,8> {
-    let mut result=BoundedList::new(); let mut i=0;
-    while i<values.len() { if let Some(value)=values.get(i) { assert!(result.push(*value)); } i+=1; }
+fn user_list(values: &[Option<i64>]) -> BoundedList<Option<i64>, 8> {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
+        i += 1;
+    }
     result
 }
-fn proximity_events(values:&[(i64,i64)]) -> BoundedList<(i64,i64),8> {
-    let mut result=BoundedList::new(); let mut i=0;
-    while i<values.len() { if let Some(value)=values.get(i) { assert!(result.push(*value)); } i+=1; }
+fn proximity_events(values: &[(i64, i64)]) -> BoundedList<(i64, i64), 8> {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
+        i += 1;
+    }
     result
 }
-fn transition_list(values:&[(i64,i64,i64)]) -> BoundedList<(i64,i64,i64),8> {
-    let mut result=BoundedList::new(); let mut i=0;
-    while i<values.len() { if let Some(value)=values.get(i) { assert!(result.push(*value)); } i+=1; }
+fn transition_list(values: &[(i64, i64, i64)]) -> BoundedList<(i64, i64, i64), 8> {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
+        i += 1;
+    }
     result
 }
-fn delta_map(values:&[(i64,OriginalBubbleDelta)]) -> OriginalBubbleDeltaMap {
-    let mut result=BoundedList::new(); let mut i=0;
-    while i<values.len() { if let Some(value)=values.get(i) { assert!(result.push(*value)); } i+=1; }
+fn delta_map(values: &[(i64, OriginalBubbleDelta)]) -> OriginalBubbleDeltaMap {
+    let mut result = BoundedList::new();
+    let mut i = 0;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
+        i += 1;
+    }
     result
 }
-fn delta_maps_equal(left:&OriginalBubbleDeltaMap,right:&OriginalBubbleDeltaMap) -> bool {
-    if left.len()!=right.len() { return false; }
-    let mut i=0;
-    while i<left.len() {
-        let value=left.get(i); let mut matches=0; let mut j=0;
-        while j<right.len() { if value==right.get(j) { matches+=1; } j+=1; }
-        if matches!=1 { return false; } i+=1;
+fn delta_maps_equal(left: &OriginalBubbleDeltaMap, right: &OriginalBubbleDeltaMap) -> bool {
+    if left.len() != right.len() {
+        return false;
+    }
+    let mut i = 0;
+    while i < left.len() {
+        let value = left.get(i);
+        let mut matches = 0;
+        let mut j = 0;
+        while j < right.len() {
+            if value == right.get(j) {
+                matches += 1;
+            }
+            j += 1;
+        }
+        if matches != 1 {
+            return false;
+        }
+        i += 1;
     }
     true
 }
-fn store_delta_map(destination:&mut OriginalBubbleDeltaMap,value:OriginalBubbleDeltaMap) {
-    *destination=value;
+fn store_delta_map(destination: &mut OriginalBubbleDeltaMap, value: OriginalBubbleDeltaMap) {
+    *destination = value;
 }
 
-fn point_list<const N: usize>(points: &[Vec3]) -> BoundedList<Vec3,N> {
-    let mut result=BoundedList::new();
-    let mut i=0_usize;
-    while i<points.len() {
-        if let Some(point)=points.get(i) { assert!(result.push(*point)); }
-        i=i.saturating_add(1);
+fn point_list<const N: usize>(points: &[Vec3]) -> BoundedList<Vec3, N> {
+    let mut result = BoundedList::new();
+    let mut i = 0_usize;
+    while i < points.len() {
+        if let Some(point) = points.get(i) {
+            assert!(result.push(*point));
+        }
+        i = i.saturating_add(1);
     }
     result
 }
-fn points_exact_equal<const A:usize,const B:usize>(left:&BoundedList<Vec3,A>,right:&BoundedList<Vec3,B>) -> bool {
-    if left.len()!=right.len() { return false; }
-    let mut i=0;
-    while i<left.len() { if left.get(i)!=right.get(i) { return false; } i+=1; }
+fn points_exact_equal<const A: usize, const B: usize>(
+    left: &BoundedList<Vec3, A>,
+    right: &BoundedList<Vec3, B>,
+) -> bool {
+    if left.len() != right.len() {
+        return false;
+    }
+    let mut i = 0;
+    while i < left.len() {
+        if left.get(i) != right.get(i) {
+            return false;
+        }
+        i += 1;
+    }
     true
 }
-fn point_sets_equal<const A:usize,const B:usize>(left:&BoundedList<Vec3,A>,right:&BoundedList<Vec3,B>) -> bool {
-    let mut i=0;
-    while i<left.len() { let mut found=false;let mut j=0;
-        while j<right.len() { found|=left.get(i)==right.get(j);j+=1; }if !found { return false; }i+=1;
+fn point_sets_equal<const A: usize, const B: usize>(
+    left: &BoundedList<Vec3, A>,
+    right: &BoundedList<Vec3, B>,
+) -> bool {
+    let mut i = 0;
+    while i < left.len() {
+        let mut found = false;
+        let mut j = 0;
+        while j < right.len() {
+            found |= left.get(i) == right.get(j);
+            j += 1;
+        }
+        if !found {
+            return false;
+        }
+        i += 1;
     }
-    i=0;
-    while i<right.len() { let mut found=false;let mut j=0;
-        while j<left.len() { found|=right.get(i)==left.get(j);j+=1; }if !found { return false; }i+=1;
+    i = 0;
+    while i < right.len() {
+        let mut found = false;
+        let mut j = 0;
+        while j < left.len() {
+            found |= right.get(i) == left.get(j);
+            j += 1;
+        }
+        if !found {
+            return false;
+        }
+        i += 1;
     }
     true
 }
-fn sort_points<const N:usize>(values:&BoundedList<Vec3,N>) -> BoundedList<Vec3,N> {
-    let mut result=*values;let mut i=1;
-    while i<result.len() {
-        let point=result.get(i);assert!(point.is_some());
-        if let Some(point)=point { let mut j=i;
-            while j>0 { let previous=result.get(j-1);assert!(previous.is_some());
-                if let Some(previous)=previous {
-                    if (previous.x,previous.y,previous.z)<=(point.x,point.y,point.z) { break; }
-                    assert!(result.set(j,previous));
-                }j-=1;
-            }assert!(result.set(j,point));
-        }i+=1;
-    }result
+fn sort_points<const N: usize>(values: &BoundedList<Vec3, N>) -> BoundedList<Vec3, N> {
+    let mut result = *values;
+    let mut i = 1;
+    while i < result.len() {
+        let point = result.get(i);
+        assert!(point.is_some());
+        if let Some(point) = point {
+            let mut j = i;
+            while j > 0 {
+                let previous = result.get(j - 1);
+                assert!(previous.is_some());
+                if let Some(previous) = previous {
+                    if (previous.x, previous.y, previous.z) <= (point.x, point.y, point.z) {
+                        break;
+                    }
+                    assert!(result.set(j, previous));
+                }
+                j -= 1;
+            }
+            assert!(result.set(j, point));
+        }
+        i += 1;
+    }
+    result
 }
 // helpers.py:129..150 compares each rounded coordinate only for unequal
 // points, then checks list lengths. Preserve that order and all three axes.
-fn assert_points_rounded<const A:usize,const B:usize>(first:&BoundedList<Vec3,A>,second:&BoundedList<Vec3,B>,places:u32) {
-    let limit=first.len().min(second.len());
-    let mut i=0_usize;
-    while i<limit {
-        let left=first.get(i); let right=second.get(i);
+fn assert_points_rounded<const A: usize, const B: usize>(
+    first: &BoundedList<Vec3, A>,
+    second: &BoundedList<Vec3, B>,
+    places: u32,
+) {
+    let limit = first.len().min(second.len());
+    let mut i = 0_usize;
+    while i < limit {
+        let left = first.get(i);
+        let right = second.get(i);
         assert!(left.is_some() && right.is_some());
-        if let (Some(left),Some(right))=(left,right) {
-            if left!=right {
-                assert!(python_rounded_equal(left.x,right.x,places)==Some(true));
-                assert!(python_rounded_equal(left.y,right.y,places)==Some(true));
-                assert!(python_rounded_equal(left.z,right.z,places)==Some(true));
+        if let (Some(left), Some(right)) = (left, right) {
+            if left != right {
+                assert!(python_rounded_equal(left.x, right.x, places) == Some(true));
+                assert!(python_rounded_equal(left.y, right.y, places) == Some(true));
+                assert!(python_rounded_equal(left.z, right.z, places) == Some(true));
             }
         }
-        i=i.saturating_add(1);
+        i = i.saturating_add(1);
     }
-    assert!(first.len()==second.len());
+    assert!(first.len() == second.len());
 }
 
 fn id_list(values: &[i64]) -> BoundedList<i64, 8> {
     let mut result = BoundedList::new();
     let mut i = 0_usize;
     while i < values.len() {
-        if let Some(value) = values.get(i) { assert!(result.push(*value)); }
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
         i = i.saturating_add(1);
     }
     result
@@ -119,37 +216,53 @@ fn id_list(values: &[i64]) -> BoundedList<i64, 8> {
 fn ids_contain(values: &BoundedList<i64, 8>, id: i64) -> bool {
     let mut i = 0_usize;
     while i < values.len() {
-        if values.get(i) == Some(id) { return true; }
+        if values.get(i) == Some(id) {
+            return true;
+        }
         i = i.saturating_add(1);
     }
     false
 }
-fn distance_list(values:&[(f64,i64)]) -> BoundedList<(f64,i64),8> {
-    let mut result=BoundedList::new(); let mut i=0_usize;
-    while i<values.len() {
-        if let Some(value)=values.get(i) { assert!(result.push(*value)); }
-        i=i.saturating_add(1);
+fn distance_list(values: &[(f64, i64)]) -> BoundedList<(f64, i64), 8> {
+    let mut result = BoundedList::new();
+    let mut i = 0_usize;
+    while i < values.len() {
+        if let Some(value) = values.get(i) {
+            assert!(result.push(*value));
+        }
+        i = i.saturating_add(1);
     }
     result
 }
-fn query_ids(values:&BoundedList<(f64,i64),8>) -> BoundedList<i64,8> {
-    let mut result=BoundedList::new(); let mut i=0_usize;
-    while i<values.len() {
-        if let Some((_,id))=values.get(i) { assert!(result.push(id)); }
-        i=i.saturating_add(1);
+fn query_ids(values: &BoundedList<(f64, i64), 8>) -> BoundedList<i64, 8> {
+    let mut result = BoundedList::new();
+    let mut i = 0_usize;
+    while i < values.len() {
+        if let Some((_, id)) = values.get(i) {
+            assert!(result.push(id));
+        }
+        i = i.saturating_add(1);
     }
     result
 }
-fn id_sets_equal(left:&BoundedList<i64,8>,right:&BoundedList<i64,8>) -> bool {
-    let mut i=0_usize;
-    while i<left.len() {
-        if let Some(id)=left.get(i) { if !ids_contain(right,id) { return false; } }
-        i=i.saturating_add(1);
+fn id_sets_equal(left: &BoundedList<i64, 8>, right: &BoundedList<i64, 8>) -> bool {
+    let mut i = 0_usize;
+    while i < left.len() {
+        if let Some(id) = left.get(i) {
+            if !ids_contain(right, id) {
+                return false;
+            }
+        }
+        i = i.saturating_add(1);
     }
-    i=0;
-    while i<right.len() {
-        if let Some(id)=right.get(i) { if !ids_contain(left,id) { return false; } }
-        i=i.saturating_add(1);
+    i = 0;
+    while i < right.len() {
+        if let Some(id) = right.get(i) {
+            if !ids_contain(left, id) {
+                return false;
+            }
+        }
+        i = i.saturating_add(1);
     }
     true
 }
@@ -400,8 +513,7 @@ fn getters_and_setters__TestGetAccuracy__test_no_falloff() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetAccuracy__test_retur__c78ed1e98d187e6ba1f77d87()
-{
+fn getters_and_setters__TestGetAccuracy__test_retur__c78ed1e98d187e6ba1f77d87() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -531,8 +643,7 @@ fn getters_and_setters__TestGetCenterDist__test_center_distance_between_two_ball
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetCenterDist__test_cen__56fe3d4dceb262c1e9bf6aa8()
- {
+fn getters_and_setters__TestGetCenterDist__test_cen__56fe3d4dceb262c1e9bf6aa8() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -686,8 +797,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_euclidean_distance() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetSurfaceDist__test_su__001e1cc2265b641e8abae70d()
- {
+fn getters_and_setters__TestGetSurfaceDist__test_su__001e1cc2265b641e8abae70d() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -735,8 +845,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_su__001e1cc2265b641e8abae70d()
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetSurfaceDist__test_su__56b9245a7e85ba1146616721()
- {
+fn getters_and_setters__TestGetSurfaceDist__test_su__56b9245a7e85ba1146616721() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -766,8 +875,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_su__56b9245a7e85ba1146616721()
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestGetSurfaceDist__test_su__4609e7b60e4e969a265f9fc2()
- {
+fn getters_and_setters__TestGetSurfaceDist__test_su__4609e7b60e4e969a265f9fc2() {
     let mut park = OriginalParkProjection::default();
     let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -803,8 +911,7 @@ fn getters_and_setters__TestGetSurfaceDist__test_su__4609e7b60e4e969a265f9fc2()
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn getters_and_setters__TestSetBallFormation__test___54c2a023619ec83a0a2a8d10()
- {
+fn getters_and_setters__TestSetBallFormation__test___54c2a023619ec83a0a2a8d10() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -2335,8 +2442,7 @@ fn movement_controls__TestMissileFollow__test_can_not_follow_moribund_ball() {
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestMissileFollow__test_remov__497bf848c2ea7d2788225516()
- {
+fn movement_controls__TestMissileFollow__test_remov__497bf848c2ea7d2788225516() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -2372,8 +2478,7 @@ fn movement_controls__TestMissileFollow__test_remov__497bf848c2ea7d2788225516()
 #[cfg_attr(kani, kani::proof)]
 #[cfg_attr(kani, kani::unwind(17))]
 #[cfg_attr(test, test)]
-fn movement_controls__TestMissileFollow__test_sets___1c924032185d9e37b3c1b708()
- {
+fn movement_controls__TestMissileFollow__test_sets___1c924032185d9e37b3c1b708() {
     let mut park = OriginalParkProjection::default();
     let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
         id: (1.0_f64) as i64,
@@ -2810,12 +2915,20 @@ fn movement_controls__TestStop__test_stop_stopped_ball() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestWarpTo__test_can_warp() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
     let x = 1.0_f64;
     let y = 2.0_f64;
     let z = 3.0_f64;
-    park.warp_to(src, Vec3 { x: x, y: y, z: z }, 20000.0_f64, (20.0_f64) as i32);
+    park.warp_to(
+        src,
+        Vec3 { x: x, y: y, z: z },
+        20000.0_f64,
+        (20.0_f64) as i32,
+    );
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:74
     assert!(park.retained(src).mode == OriginalMode::Warp);
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:75
@@ -2828,7 +2941,10 @@ fn movement_controls__TestWarpTo__test_can_warp() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestWarpTo::test_if_warp_location_is_too_close_we_goto_it_instead
@@ -2838,12 +2954,25 @@ fn movement_controls__TestWarpTo__test_can_warp() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestWarpTo__test_if_warp_loca__d334086901da9bddc3965978() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
     let x = 1.0_f64;
     let y = 2.0_f64;
     let z = 3.0_f64;
-    park.warp_to(src, Vec3 { x: x, y: y, z: z }, 20000.0_f64, (20.0_f64) as i32);
+    park.warp_to(
+        src,
+        Vec3 { x: x, y: y, z: z },
+        20000.0_f64,
+        (20.0_f64) as i32,
+    );
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:93
     assert!(park.retained(src).mode == OriginalMode::Goto);
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:94
@@ -2856,7 +2985,10 @@ fn movement_controls__TestWarpTo__test_if_warp_loca__d334086901da9bddc3965978() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestWarpTo::test_minrange_and_warpfactor_are_stored_in_strange_places
@@ -3823,7 +3955,10 @@ fn ball__BallTest__test_add_proximity_sensor() {
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAddMushroom__test_mushroom_gets_created_correctly() {
     let mut park = OriginalParkProjection::default();
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let _range = 10.0_f64;
     let time = 1.0_f64;
@@ -3844,7 +3979,10 @@ fn lifecycle_management__TestAddMushroom__test_mushroom_gets_created_correctly()
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAddMushroom::test_mushroom_can_not_be_created_with_invalid_owner
@@ -3863,7 +4001,10 @@ fn lifecycle_management__TestAddMushroom__test_mush__15b113c160fc13a7ae832c62() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAddMushroom::test_mushroom_that_is_not_set_free_does_not_expand
@@ -3873,7 +4014,10 @@ fn lifecycle_management__TestAddMushroom__test_mush__15b113c160fc13a7ae832c62() 
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAddMushroom__test_mush__5e33fdb786cb7c731ea25b1a() {
     let mut park = OriginalParkProjection::default();
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let _range = 10.0_f64;
     let time = 5.0_f64;
@@ -3883,12 +4027,17 @@ fn lifecycle_management__TestAddMushroom__test_mush__5e33fdb786cb7c731ea25b1a() 
     assert!(park.evolve_owner_and_mushroom() == Ok(())); // original call must not raise
     assert!(park.evolve_owner_and_mushroom() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:217
-    assert!(python_almost_equal(f64::from(park.retained(mushroom).radius), 0.0_f64, 7) == Some(true));
+    assert!(
+        python_almost_equal(f64::from(park.retained(mushroom).radius), 0.0_f64, 7) == Some(true)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAddMushroom::test_mushroom_expands_correctly
@@ -3898,7 +4047,10 @@ fn lifecycle_management__TestAddMushroom__test_mush__5e33fdb786cb7c731ea25b1a() 
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAddMushroom__test_mushroom_expands_correctly() {
     let mut park = OriginalParkProjection::default();
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let _range = 10.0_f64;
     let time = 5.0_f64;
@@ -3913,24 +4065,57 @@ fn lifecycle_management__TestAddMushroom__test_mushroom_expands_correctly() {
     assert!(f64::from(park.retained(mushroom).radius) == 0.0_f64);
     assert!(park.evolve_owner_and_mushroom() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:230
-    assert!(python_almost_equal(f64::from(park.retained(mushroom).radius), 6.687403202056885_f64, 7) == Some(true));
+    assert!(
+        python_almost_equal(
+            f64::from(park.retained(mushroom).radius),
+            6.687403202056885_f64,
+            7
+        ) == Some(true)
+    );
     assert!(park.evolve_owner_and_mushroom() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:232
-    assert!(python_almost_equal(f64::from(park.retained(mushroom).radius), 7.952707290649414_f64, 7) == Some(true));
+    assert!(
+        python_almost_equal(
+            f64::from(park.retained(mushroom).radius),
+            7.952707290649414_f64,
+            7
+        ) == Some(true)
+    );
     assert!(park.evolve_owner_and_mushroom() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:234
-    assert!(python_almost_equal(f64::from(park.retained(mushroom).radius), 8.801117897033691_f64, 7) == Some(true));
+    assert!(
+        python_almost_equal(
+            f64::from(park.retained(mushroom).radius),
+            8.801117897033691_f64,
+            7
+        ) == Some(true)
+    );
     assert!(park.evolve_owner_and_mushroom() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:236
-    assert!(python_almost_equal(f64::from(park.retained(mushroom).radius), 9.457415580749512_f64, 7) == Some(true));
+    assert!(
+        python_almost_equal(
+            f64::from(park.retained(mushroom).radius),
+            9.457415580749512_f64,
+            7
+        ) == Some(true)
+    );
     assert!(park.evolve_owner_and_mushroom() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:238
-    assert!(python_almost_equal(f64::from(park.retained(mushroom).radius), 9.457415580749512_f64, 7) == Some(true));
+    assert!(
+        python_almost_equal(
+            f64::from(park.retained(mushroom).radius),
+            9.457415580749512_f64,
+            7
+        ) == Some(true)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAddMushroom::test_mushrooms_die_when_fully_expanded
@@ -3940,7 +4125,10 @@ fn lifecycle_management__TestAddMushroom__test_mushroom_expands_correctly() {
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAddMushroom__test_mushrooms_die_when_fully_expanded() {
     let mut park = OriginalParkProjection::default();
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let _range = 10.0_f64;
     let time = 1.0_f64;
@@ -3956,7 +4144,10 @@ fn lifecycle_management__TestAddMushroom__test_mushrooms_die_when_fully_expanded
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles
@@ -3966,7 +4157,10 @@ fn lifecycle_management__TestAddMushroom__test_mushrooms_die_when_fully_expanded
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestInitialize_bubbles__test_can_initialize_bubbles() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:11
     assert!((park.retained(ball).new_bubble) as f64 == -(1.0_f64));
@@ -3979,7 +4173,10 @@ fn boxes_and_bubbles__TestInitialize_bubbles__test_can_initialize_bubbles() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball
@@ -3989,9 +4186,15 @@ fn boxes_and_bubbles__TestInitialize_bubbles__test_can_initialize_bubbles() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestInitialize_bubbles__test___7a4cbd06ea1e5596e46cc05a() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other_ball) && !park.scope_error);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:18
     assert!((park.retained(ball).new_bubble) as f64 == -(1.0_f64));
@@ -4006,7 +4209,10 @@ fn boxes_and_bubbles__TestInitialize_bubbles__test___7a4cbd06ea1e5596e46cc05a() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInRange::test_get_ball_ids_in_range_for_ball_id
@@ -4016,12 +4222,18 @@ fn boxes_and_bubbles__TestInitialize_bubbles__test___7a4cbd06ea1e5596e46cc05a() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_ball_id() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_5=park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
+    let query_result_5 = park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
     assert!(query_result_5.is_ok()); // original query must not raise
     let result = query_ids(&query_result_5.unwrap_or_default());
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:30
@@ -4030,7 +4242,10 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_ball
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInRange::test_ball_on_edge_of_range_gets_included
@@ -4040,14 +4255,24 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_get_ball_ids_in_range_for_ball
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInRange__test_b__c485877a542b60fb1a867394() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (park.retained(other).position.x + 100.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_7=park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
+    let query_result_7 = park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
     assert!(query_result_7.is_ok()); // original query must not raise
     let result = query_ids(&query_result_7.unwrap_or_default());
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:37
@@ -4056,7 +4281,10 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_b__c485877a542b60fb1a867394() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInRange::test_ignores_out_of_range_balls
@@ -4066,14 +4294,24 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_b__c485877a542b60fb1a867394() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInRange__test_ignores_out_of_range_balls() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (park.retained(other).position.x + 100.1_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_7=park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
+    let query_result_7 = park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
     assert!(query_result_7.is_ok()); // original query must not raise
     let result = query_ids(&query_result_7.unwrap_or_default());
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:44
@@ -4082,7 +4320,10 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_ignores_out_of_range_balls() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInRange::test_get_ball_ids_in_range_for_location
@@ -4092,12 +4333,27 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_ignores_out_of_range_balls() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInRange__test_g__c0db64a80b1456d3ff3275bf() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_5=park.query_range(None, Vec3 { x: park.retained(ball).position.x, y: park.retained(ball).position.y, z: park.retained(ball).position.z }, 100.0_f64, false);
+    let query_result_5 = park.query_range(
+        None,
+        Vec3 {
+            x: park.retained(ball).position.x,
+            y: park.retained(ball).position.y,
+            z: park.retained(ball).position.z,
+        },
+        100.0_f64,
+        false,
+    );
     assert!(query_result_5.is_ok()); // original query must not raise
     let result = query_ids(&query_result_5.unwrap_or_default());
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:50
@@ -4106,7 +4362,10 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_g__c0db64a80b1456d3ff3275bf() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsAndDistInRange::test_get_ball_ids_in_range_for_ball_id
@@ -4116,12 +4375,18 @@ fn boxes_and_bubbles__TestGetBallIdsInRange__test_g__c0db64a80b1456d3ff3275bf() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsAndDistInRange___6fbf7e70b8d6533cfa362c66() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_5=park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
+    let query_result_5 = park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
     assert!(query_result_5.is_ok()); // original query must not raise
     let result = query_result_5.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:58
@@ -4130,7 +4395,10 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange___6fbf7e70b8d6533cfa362c66() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsAndDistInRange::test_returns_distance_squared
@@ -4140,14 +4408,24 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange___6fbf7e70b8d6533cfa362c66() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_returns_distance_squared() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (park.retained(other).position.x + 2.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_7=park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
+    let query_result_7 = park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
     assert!(query_result_7.is_ok()); // original query must not raise
     let result = query_result_7.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:65
@@ -4156,7 +4434,10 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_returns_distance_square
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsAndDistInRange::test_ball_on_edge_of_range
@@ -4166,14 +4447,24 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_returns_distance_square
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_ball_on_edge_of_range() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (park.retained(other).position.x + 100.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_7=park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
+    let query_result_7 = park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
     assert!(query_result_7.is_ok()); // original query must not raise
     let result = query_result_7.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:72
@@ -4182,7 +4473,10 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_ball_on_edge_of_range()
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsAndDistInRange::test_ignores_out_of_range_balls
@@ -4192,14 +4486,24 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_ball_on_edge_of_range()
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_ignores_out_of_range_balls() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (park.retained(other).position.x + 100.1_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_7=park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
+    let query_result_7 = park.query_range(Some(ball), Vec3::ZERO, 100.0_f64, false);
     assert!(query_result_7.is_ok()); // original query must not raise
     let result = query_result_7.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:79
@@ -4208,7 +4512,10 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_ignores_out_of_range_ba
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsAndDistInRange::test_get_ball_ids_in_range_for_location
@@ -4218,12 +4525,27 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange__test_ignores_out_of_range_ba
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsAndDistInRange___4848e8403e7f5de500ec8916() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_5=park.query_range(None, Vec3 { x: park.retained(ball).position.x, y: park.retained(ball).position.y, z: park.retained(ball).position.z }, 100.0_f64, false);
+    let query_result_5 = park.query_range(
+        None,
+        Vec3 {
+            x: park.retained(ball).position.x,
+            y: park.retained(ball).position.y,
+            z: park.retained(ball).position.z,
+        },
+        100.0_f64,
+        false,
+    );
     assert!(query_result_5.is_ok()); // original query must not raise
     let result = query_result_5.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:85
@@ -4232,7 +4554,10 @@ fn boxes_and_bubbles__TestGetBallIdsAndDistInRange___4848e8403e7f5de500ec8916() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_source_does_not_exist_raises_runtime_error
@@ -4245,12 +4570,30 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__1b99713e61b1a083fbfcb6b1() 
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let ballNotInPark = 12345.0_f64;
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:92
-    assert!(park.query_triangle((ballNotInPark) as i64, Vec3 { x: 10.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.0_f64, z: 0.0_f64 }, 5.0_f64) == Err(OriginalParkError::RuntimeError));
+    assert!(
+        park.query_triangle(
+            (ballNotInPark) as i64,
+            Vec3 {
+                x: 10.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 10.0_f64,
+                z: 0.0_f64
+            },
+            5.0_f64
+        ) == Err(OriginalParkError::RuntimeError)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_no_other_ball
@@ -4260,10 +4603,26 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__1b99713e61b1a083fbfcb6b1() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_no_other_ball() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_3=park.query_triangle(ball, Vec3 { x: 10.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.0_f64, z: 0.0_f64 }, 5.0_f64);
+    let query_result_3 = park.query_triangle(
+        ball,
+        Vec3 {
+            x: 10.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 10.0_f64,
+            z: 0.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_3.is_ok()); // original query must not raise
     let result = query_result_3.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:106
@@ -4272,7 +4631,10 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_no_other_ball() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_other_ball_in_triangle
@@ -4282,18 +4644,49 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_no_other_ball() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_in_triangle() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.x + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = (park.retained(other).position.y + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.y = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.y = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_11=park.query_triangle(ball, Vec3 { x: 10.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.0_f64, z: 0.0_f64 }, 5.0_f64);
+    let query_result_11 = park.query_triangle(
+        ball,
+        Vec3 {
+            x: 10.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 10.0_f64,
+            z: 0.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_11.is_ok()); // original query must not raise
     let result = query_result_11.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:119
@@ -4302,7 +4695,10 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_in_triangl
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_other_ball_out_of_range
@@ -4312,18 +4708,49 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_in_triangl
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_out_of_range() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.x + 10.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = (park.retained(other).position.y + 10.0_f64);
-    park.write_attribute_notified(other, |b| b.position.y = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.y = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_11=park.query_triangle(ball, Vec3 { x: 10.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.0_f64, z: 0.0_f64 }, 5.0_f64);
+    let query_result_11 = park.query_triangle(
+        ball,
+        Vec3 {
+            x: 10.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 10.0_f64,
+            z: 0.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_11.is_ok()); // original query must not raise
     let result = query_result_11.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:132
@@ -4332,7 +4759,10 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_out_of_ran
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_other_ball_on_edge_of_range
@@ -4342,16 +4772,43 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangle__test_other_ball_out_of_ran
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__42aaf44ac5e6bc901cd3c65b() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.x + 16.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_9=park.query_triangle(ball, Vec3 { x: 10.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.0_f64, z: 0.0_f64 }, 5.0_f64);
+    let query_result_9 = park.query_triangle(
+        ball,
+        Vec3 {
+            x: 10.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 10.0_f64,
+            z: 0.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_9.is_ok()); // original query must not raise
     let result = query_result_9.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:144
@@ -4360,7 +4817,10 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__42aaf44ac5e6bc901cd3c65b() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdInRangeOfTriangle::test_multiple_balls_in_triangle
@@ -4370,22 +4830,60 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__42aaf44ac5e6bc901cd3c65b() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__c3e40bc5d758b78e81d93eaa() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let a = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let a = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(a) && !park.scope_error);
-    let b = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let b = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(b) && !park.scope_error);
     let attribute_value_6 = (1.0_f64) as f32;
-    park.write_attribute_notified(a, |b| b.radius = attribute_value_6, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        a,
+        |b| b.radius = attribute_value_6,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_8 = (1.0_f64) as f32;
-    park.write_attribute_notified(b, |b| b.radius = attribute_value_8, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        b,
+        |b| b.radius = attribute_value_8,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_10 = (park.retained(a).position.x + 5.0_f64);
-    park.write_attribute_notified(a, |b| b.position.x = attribute_value_10, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        a,
+        |b| b.position.x = attribute_value_10,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_12 = (park.retained(b).position.y + 5.0_f64);
-    park.write_attribute_notified(b, |b| b.position.y = attribute_value_12, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        b,
+        |b| b.position.y = attribute_value_12,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_15=park.query_triangle(ball, Vec3 { x: 10.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.0_f64, z: 0.0_f64 }, 5.0_f64);
+    let query_result_15 = park.query_triangle(
+        ball,
+        Vec3 {
+            x: 10.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 10.0_f64,
+            z: 0.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_15.is_ok()); // original query must not raise
     let result = query_result_15.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:158
@@ -4394,7 +4892,10 @@ fn boxes_and_bubbles__TestGetBallIdInRangeOfTriangl__c3e40bc5d758b78e81d93eaa() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_source_does_not_exist_raises_runtime_error
@@ -4407,12 +4908,25 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__f4ededdc3b04869f5c446aa3() 
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let ballNotInPark = 12345.0_f64;
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:165
-    assert!(park.query_capsule((ballNotInPark) as i64, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64) == Err(OriginalParkError::RuntimeError));
+    assert!(
+        park.query_capsule(
+            (ballNotInPark) as i64,
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 10.0_f64
+            },
+            5.0_f64
+        ) == Err(OriginalParkError::RuntimeError)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_no_other_ball
@@ -4422,10 +4936,21 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__f4ededdc3b04869f5c446aa3() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_no_other_ball() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_3=park.query_capsule(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64);
+    let query_result_3 = park.query_capsule(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_3.is_ok()); // original query must not raise
     let result = query_result_3.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:177
@@ -4434,7 +4959,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_no_other_ball() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_other_ball_in_capsule
@@ -4444,16 +4972,38 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_no_other_ball() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.z + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_9=park.query_capsule(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64);
+    let query_result_9 = park.query_capsule(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_9.is_ok()); // original query must not raise
     let result = query_result_9.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:188
@@ -4462,7 +5012,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_other_ball_in_capsule_and_on_the_edge_of_one_side
@@ -4472,18 +5025,44 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_in_capsule() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__1a5ea967908869e53f3ffbbf() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.z + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = (park.retained(other).position.x + 6.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_11=park.query_capsule(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64);
+    let query_result_11 = park.query_capsule(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_11.is_ok()); // original query must not raise
     let result = query_result_11.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:200
@@ -4492,7 +5071,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__1a5ea967908869e53f3ffbbf() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_other_ball_not_in_capsule_too_far_from_the_edge_of_one_side
@@ -4502,18 +5084,44 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__1a5ea967908869e53f3ffbbf() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__f9d71474df7ae7eb3a729867() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.z + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = (park.retained(other).position.x + 7.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_11=park.query_capsule(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64);
+    let query_result_11 = park.query_capsule(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_11.is_ok()); // original query must not raise
     let result = query_result_11.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:212
@@ -4522,7 +5130,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__f9d71474df7ae7eb3a729867() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_other_ball_not_in_capsule
@@ -4532,18 +5143,44 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test__f9d71474df7ae7eb3a729867() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_not_in_capsule() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.x + 10.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = (park.retained(other).position.y + 10.0_f64);
-    park.write_attribute_notified(other, |b| b.position.y = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.y = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_11=park.query_capsule(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64);
+    let query_result_11 = park.query_capsule(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_11.is_ok()); // original query must not raise
     let result = query_result_11.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:224
@@ -4552,7 +5189,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_not_in_capsule() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_other_ball_on_edge_of_capsule
@@ -4562,16 +5202,38 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_not_in_capsule() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_on_edge_of_capsule() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.z + 16.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_9=park.query_capsule(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64);
+    let query_result_9 = park.query_capsule(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_9.is_ok()); // original query must not raise
     let result = query_result_9.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:235
@@ -4580,7 +5242,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_on_edge_of_capsul
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCapsule::test_multiple_balls_in_capsule
@@ -4590,22 +5255,55 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_other_ball_on_edge_of_capsul
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_multiple_balls_in_capsule() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let a = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let a = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(a) && !park.scope_error);
-    let b = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let b = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(b) && !park.scope_error);
     let attribute_value_6 = (1.0_f64) as f32;
-    park.write_attribute_notified(a, |b| b.radius = attribute_value_6, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        a,
+        |b| b.radius = attribute_value_6,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_8 = (1.0_f64) as f32;
-    park.write_attribute_notified(b, |b| b.radius = attribute_value_8, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        b,
+        |b| b.radius = attribute_value_8,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_10 = (park.retained(a).position.z + 0.0_f64);
-    park.write_attribute_notified(a, |b| b.position.z = attribute_value_10, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        a,
+        |b| b.position.z = attribute_value_10,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_12 = (park.retained(b).position.z + 10.0_f64);
-    park.write_attribute_notified(b, |b| b.position.z = attribute_value_12, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        b,
+        |b| b.position.z = attribute_value_12,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let query_result_15=park.query_capsule(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 5.0_f64);
+    let query_result_15 = park.query_capsule(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        5.0_f64,
+    );
     assert!(query_result_15.is_ok()); // original query must not raise
     let result = query_result_15.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:248
@@ -4614,7 +5312,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_multiple_balls_in_capsule() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_no_other_ball
@@ -4624,9 +5325,20 @@ fn boxes_and_bubbles__TestGetBallIdsInCapsule__test_multiple_balls_in_capsule() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCone__test_no_other_ball() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let query_result_2=park.query_cone(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 0.7853981633974483_f64);
+    let query_result_2 = park.query_cone(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        0.7853981633974483_f64,
+    );
     assert!(query_result_2.is_ok()); // original query must not raise
     let result = query_result_2.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:261
@@ -4635,7 +5347,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_no_other_ball() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_source_does_not_exist_raises_runtime_error
@@ -4648,12 +5363,25 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_so__172ffe8446d9d4b77172df0c() 
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let ballNotInPark = 12345.0_f64;
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:266
-    assert!(park.query_cone((ballNotInPark) as i64, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 0.7853981633974483_f64) == Err(OriginalParkError::RuntimeError));
+    assert!(
+        park.query_cone(
+            (ballNotInPark) as i64,
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 10.0_f64
+            },
+            0.7853981633974483_f64
+        ) == Err(OriginalParkError::RuntimeError)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_ball_in_cone
@@ -4663,16 +5391,38 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_so__172ffe8446d9d4b77172df0c() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_in_cone() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let attribute_value_5 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_5, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_5,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_7 = (park.retained(other).position.z + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_7, OriginalBallAttribute::Position);
-    let query_result_9=park.query_cone(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 0.7853981633974483_f64);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_7,
+        OriginalBallAttribute::Position,
+    );
+    let query_result_9 = park.query_cone(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        0.7853981633974483_f64,
+    );
     assert!(query_result_9.is_ok()); // original query must not raise
     let result = query_result_9.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:278
@@ -4681,7 +5431,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_in_cone() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_ball_too_far_away
@@ -4691,15 +5444,37 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_in_cone() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_too_far_away() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.z + 12.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
-    let query_result_8=park.query_cone(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 0.7853981633974483_f64);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
+    let query_result_8 = park.query_cone(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        0.7853981633974483_f64,
+    );
     assert!(query_result_8.is_ok()); // original query must not raise
     let result = query_result_8.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:285
@@ -4708,7 +5483,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_too_far_away() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_ball_intersects_front_of_cone
@@ -4718,16 +5496,38 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_too_far_away() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_intersects_front_of_cone() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let attribute_value_5 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_5, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_5,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_7 = (park.retained(other).position.z + 11.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_7, OriginalBallAttribute::Position);
-    let query_result_9=park.query_cone(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 0.7853981633974483_f64);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_7,
+        OriginalBallAttribute::Position,
+    );
+    let query_result_9 = park.query_cone(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        0.7853981633974483_f64,
+    );
     assert!(query_result_9.is_ok()); // original query must not raise
     let result = query_result_9.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:293
@@ -4736,7 +5536,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_intersects_front_of_cone()
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_ball_intersects_cone
@@ -4746,18 +5549,44 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_intersects_front_of_cone()
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_intersects_cone() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     let attribute_value_5 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_5, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_5,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_7 = (park.retained(other).position.z + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_7, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_7,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_9 = (park.retained(other).position.x + 6.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_9, OriginalBallAttribute::Position);
-    let query_result_11=park.query_cone(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 0.7853981633974483_f64);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_9,
+        OriginalBallAttribute::Position,
+    );
+    let query_result_11 = park.query_cone(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        0.7853981633974483_f64,
+    );
     assert!(query_result_11.is_ok()); // original query must not raise
     let result = query_result_11.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:302
@@ -4766,7 +5595,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_intersects_cone() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBallIdsInCone::test_ball_does_not_intersect_cone
@@ -4776,17 +5608,43 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_intersects_cone() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_does_not_intersect_cone() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (1.0_f64) as f32;
-    park.write_attribute_notified(other, |b| b.radius = attribute_value_4, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        other,
+        |b| b.radius = attribute_value_4,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_6 = (park.retained(other).position.z + 5.0_f64);
-    park.write_attribute_notified(other, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = (park.retained(other).position.x + 7.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_8, OriginalBallAttribute::Position);
-    let query_result_10=park.query_cone(ball, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }, 0.7853981633974483_f64);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
+    let query_result_10 = park.query_cone(
+        ball,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 10.0_f64,
+        },
+        0.7853981633974483_f64,
+    );
     assert!(query_result_10.is_ok()); // original query must not raise
     let result = query_result_10.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:310
@@ -4795,7 +5653,10 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_does_not_intersect_cone() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAdditionsAndDeletions::test_addition
@@ -4805,37 +5666,65 @@ fn boxes_and_bubbles__TestGetBallIdsInCone__test_ball_does_not_intersect_cone() 
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAdditionsAndDeletions__test_addition() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = true;
-    park.write_attribute_notified(ball, |b| b.is_interactive = attribute_value_2, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_interactive = attribute_value_2,
+        OriginalBallAttribute::NoHandler,
+    );
     let mut additions_per_player = delta_map(&[]);
     let mut deletions_per_player = delta_map(&[]);
     let mut additions_per_bubble = delta_map(&[]);
     let mut deletions_per_bubble = delta_map(&[]);
-    let user_ships=user_list(&[Some(ball)]);
+    let user_ships = user_list(&[Some(ball)]);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let bubble_update_result_10=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_10 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_10.is_ok()); // original native mutation must not raise
-    let bubble_update_result_10=bubble_update_result_10.unwrap_or_default();
-    additions_per_player=bubble_update_result_10.additions_per_player;
-    deletions_per_player=bubble_update_result_10.deletions_per_player;
-    additions_per_bubble=bubble_update_result_10.additions_per_bubble;
-    deletions_per_bubble=bubble_update_result_10.deletions_per_bubble;
+    let bubble_update_result_10 = bubble_update_result_10.unwrap_or_default();
+    additions_per_player = bubble_update_result_10.additions_per_player;
+    deletions_per_player = bubble_update_result_10.deletions_per_player;
+    additions_per_bubble = bubble_update_result_10.additions_per_bubble;
+    deletions_per_bubble = bubble_update_result_10.deletions_per_bubble;
     ();
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:74
-    assert!(delta_maps_equal(&additions_per_player,&delta_map(&[(ball,OriginalBubbleDelta::Balls(id_list(&[ball])))])));
+    assert!(delta_maps_equal(
+        &additions_per_player,
+        &delta_map(&[(ball, OriginalBubbleDelta::Balls(id_list(&[ball])))])
+    ));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:75
-    assert!(delta_maps_equal(&deletions_per_player,&delta_map(&[(ball,OriginalBubbleDelta::Balls(id_list(&[])))])));
+    assert!(delta_maps_equal(
+        &deletions_per_player,
+        &delta_map(&[(ball, OriginalBubbleDelta::Balls(id_list(&[])))])
+    ));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:76
-    assert!(delta_maps_equal(&additions_per_bubble,&delta_map(&[(park.retained(ball).new_bubble,OriginalBubbleDelta::Balls(id_list(&[ball])))])));
+    assert!(delta_maps_equal(
+        &additions_per_bubble,
+        &delta_map(&[(
+            park.retained(ball).new_bubble,
+            OriginalBubbleDelta::Balls(id_list(&[ball]))
+        )])
+    ));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:77
-    assert!(delta_maps_equal(&deletions_per_bubble,&delta_map(&[(park.retained(ball).new_bubble,OriginalBubbleDelta::Balls(id_list(&[])))])));
+    assert!(delta_maps_equal(
+        &deletions_per_bubble,
+        &delta_map(&[(
+            park.retained(ball).new_bubble,
+            OriginalBubbleDelta::Balls(id_list(&[]))
+        )])
+    ));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAdditionsAndDeletions::test_no_change
@@ -4845,46 +5734,104 @@ fn lifecycle_management__TestAdditionsAndDeletions__test_addition() {
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAdditionsAndDeletions__test_no_change() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = true;
-    park.write_attribute_notified(ball, |b| b.is_interactive = attribute_value_2, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_interactive = attribute_value_2,
+        OriginalBallAttribute::NoHandler,
+    );
     let mut additions_per_player = delta_map(&[]);
     let mut deletions_per_player = delta_map(&[]);
     let mut additions_per_bubble = delta_map(&[]);
     let mut deletions_per_bubble = delta_map(&[]);
-    let user_ships=user_list(&[Some(ball)]);
+    let user_ships = user_list(&[Some(ball)]);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let bubble_update_result_10=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_10 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_10.is_ok()); // original native mutation must not raise
-    let bubble_update_result_10=bubble_update_result_10.unwrap_or_default();
-    store_delta_map(&mut additions_per_player,bubble_update_result_10.additions_per_player);
-    store_delta_map(&mut deletions_per_player,bubble_update_result_10.deletions_per_player);
-    store_delta_map(&mut additions_per_bubble,bubble_update_result_10.additions_per_bubble);
-    store_delta_map(&mut deletions_per_bubble,bubble_update_result_10.deletions_per_bubble);
+    let bubble_update_result_10 = bubble_update_result_10.unwrap_or_default();
+    store_delta_map(
+        &mut additions_per_player,
+        bubble_update_result_10.additions_per_player,
+    );
+    store_delta_map(
+        &mut deletions_per_player,
+        bubble_update_result_10.deletions_per_player,
+    );
+    store_delta_map(
+        &mut additions_per_bubble,
+        bubble_update_result_10.additions_per_bubble,
+    );
+    store_delta_map(
+        &mut deletions_per_bubble,
+        bubble_update_result_10.deletions_per_bubble,
+    );
     ();
     assert!(park.copy_query_bubbles() == Ok(())); // original call must not raise
-    let bubble_update_result_19=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_19 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_19.is_ok()); // original native mutation must not raise
-    let bubble_update_result_19=bubble_update_result_19.unwrap_or_default();
-    store_delta_map(&mut additions_per_player,bubble_update_result_19.additions_per_player);
-    store_delta_map(&mut deletions_per_player,bubble_update_result_19.deletions_per_player);
-    store_delta_map(&mut additions_per_bubble,bubble_update_result_19.additions_per_bubble);
-    store_delta_map(&mut deletions_per_bubble,bubble_update_result_19.deletions_per_bubble);
+    let bubble_update_result_19 = bubble_update_result_19.unwrap_or_default();
+    store_delta_map(
+        &mut additions_per_player,
+        bubble_update_result_19.additions_per_player,
+    );
+    store_delta_map(
+        &mut deletions_per_player,
+        bubble_update_result_19.deletions_per_player,
+    );
+    store_delta_map(
+        &mut additions_per_bubble,
+        bubble_update_result_19.additions_per_bubble,
+    );
+    store_delta_map(
+        &mut deletions_per_bubble,
+        bubble_update_result_19.deletions_per_bubble,
+    );
     ();
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:91
-    assert!(delta_maps_equal(&additions_per_player,&delta_map(&[(ball,OriginalBubbleDelta::Bubble(park.retained(ball).new_bubble))])));
+    assert!(delta_maps_equal(
+        &additions_per_player,
+        &delta_map(&[(
+            ball,
+            OriginalBubbleDelta::Bubble(park.retained(ball).new_bubble)
+        )])
+    ));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:92
-    assert!(delta_maps_equal(&deletions_per_player,&delta_map(&[(ball,OriginalBubbleDelta::Bubble(park.retained(ball).new_bubble))])));
+    assert!(delta_maps_equal(
+        &deletions_per_player,
+        &delta_map(&[(
+            ball,
+            OriginalBubbleDelta::Bubble(park.retained(ball).new_bubble)
+        )])
+    ));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:93
-    assert!(delta_maps_equal(&additions_per_bubble,&delta_map(&[(park.retained(ball).new_bubble,OriginalBubbleDelta::Balls(id_list(&[])))])));
+    assert!(delta_maps_equal(
+        &additions_per_bubble,
+        &delta_map(&[(
+            park.retained(ball).new_bubble,
+            OriginalBubbleDelta::Balls(id_list(&[]))
+        )])
+    ));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:94
-    assert!(delta_maps_equal(&deletions_per_bubble,&delta_map(&[(park.retained(ball).new_bubble,OriginalBubbleDelta::Balls(id_list(&[])))])));
+    assert!(delta_maps_equal(
+        &deletions_per_bubble,
+        &delta_map(&[(
+            park.retained(ball).new_bubble,
+            OriginalBubbleDelta::Balls(id_list(&[]))
+        )])
+    ));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAdditionsAndDeletions::test_removal
@@ -4894,47 +5841,81 @@ fn lifecycle_management__TestAdditionsAndDeletions__test_no_change() {
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAdditionsAndDeletions__test_removal() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = true;
-    park.write_attribute_notified(ball, |b| b.is_interactive = attribute_value_2, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_interactive = attribute_value_2,
+        OriginalBallAttribute::NoHandler,
+    );
     let mut additions_per_player = delta_map(&[]);
     let mut deletions_per_player = delta_map(&[]);
     let mut additions_per_bubble = delta_map(&[]);
     let mut deletions_per_bubble = delta_map(&[]);
-    let user_ships=user_list(&[Some(ball)]);
+    let user_ships = user_list(&[Some(ball)]);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let bubble_update_result_10=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_10 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_10.is_ok()); // original native mutation must not raise
-    let bubble_update_result_10=bubble_update_result_10.unwrap_or_default();
-    store_delta_map(&mut additions_per_player,bubble_update_result_10.additions_per_player);
-    store_delta_map(&mut deletions_per_player,bubble_update_result_10.deletions_per_player);
-    store_delta_map(&mut additions_per_bubble,bubble_update_result_10.additions_per_bubble);
-    store_delta_map(&mut deletions_per_bubble,bubble_update_result_10.deletions_per_bubble);
+    let bubble_update_result_10 = bubble_update_result_10.unwrap_or_default();
+    store_delta_map(
+        &mut additions_per_player,
+        bubble_update_result_10.additions_per_player,
+    );
+    store_delta_map(
+        &mut deletions_per_player,
+        bubble_update_result_10.deletions_per_player,
+    );
+    store_delta_map(
+        &mut additions_per_bubble,
+        bubble_update_result_10.additions_per_bubble,
+    );
+    store_delta_map(
+        &mut deletions_per_bubble,
+        bubble_update_result_10.deletions_per_bubble,
+    );
     ();
     park.remove_ball(ball, (0.0_f64) as i32);
     assert!(park.copy_query_bubbles() == Ok(())); // original call must not raise
-    let bubble_update_result_20=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_20 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_20.is_ok()); // original native mutation must not raise
-    let bubble_update_result_20=bubble_update_result_20.unwrap_or_default();
-    store_delta_map(&mut additions_per_player,bubble_update_result_20.additions_per_player);
-    store_delta_map(&mut deletions_per_player,bubble_update_result_20.deletions_per_player);
-    store_delta_map(&mut additions_per_bubble,bubble_update_result_20.additions_per_bubble);
-    store_delta_map(&mut deletions_per_bubble,bubble_update_result_20.deletions_per_bubble);
+    let bubble_update_result_20 = bubble_update_result_20.unwrap_or_default();
+    store_delta_map(
+        &mut additions_per_player,
+        bubble_update_result_20.additions_per_player,
+    );
+    store_delta_map(
+        &mut deletions_per_player,
+        bubble_update_result_20.deletions_per_player,
+    );
+    store_delta_map(
+        &mut additions_per_bubble,
+        bubble_update_result_20.additions_per_bubble,
+    );
+    store_delta_map(
+        &mut deletions_per_bubble,
+        bubble_update_result_20.deletions_per_bubble,
+    );
     ();
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:111
-    assert!(delta_maps_equal(&additions_per_player,&delta_map(&[])));
+    assert!(delta_maps_equal(&additions_per_player, &delta_map(&[])));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:112
-    assert!(delta_maps_equal(&deletions_per_player,&delta_map(&[])));
+    assert!(delta_maps_equal(&deletions_per_player, &delta_map(&[])));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:113
-    assert!(delta_maps_equal(&additions_per_bubble,&delta_map(&[])));
+    assert!(delta_maps_equal(&additions_per_bubble, &delta_map(&[])));
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:114
-    assert!(delta_maps_equal(&deletions_per_bubble,&delta_map(&[])));
+    assert!(delta_maps_equal(&deletions_per_bubble, &delta_map(&[])));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestAdditionsAndDeletions::test_addition_of_invalid_ball_id_raises_typeerror
@@ -4944,15 +5925,22 @@ fn lifecycle_management__TestAdditionsAndDeletions__test_removal() {
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestAdditionsAndDeletions___3b33c1cce8349d40612fe2f6() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = true;
-    park.write_attribute_notified(ball, |b| b.is_interactive = attribute_value_2, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_interactive = attribute_value_2,
+        OriginalBallAttribute::NoHandler,
+    );
     let mut additions_per_player = delta_map(&[]);
     let mut deletions_per_player = delta_map(&[]);
     let mut additions_per_bubble = delta_map(&[]);
     let mut deletions_per_bubble = delta_map(&[]);
-    let user_ships=user_list(&[None::<i64>]);
+    let user_ships = user_list(&[None::<i64>]);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:54
     assert!(park.bubble_additions_and_deletions(&user_ships) == Err(OriginalParkError::TypeError));
@@ -4960,7 +5948,10 @@ fn lifecycle_management__TestAdditionsAndDeletions___3b33c1cce8349d40612fe2f6() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestBubbleTransitions::test_empty_bubble_transitions_list_is_sent_as_empty
@@ -4974,24 +5965,39 @@ fn lifecycle_management__TestBubbleTransitions__tes__c7298c73a094e732a56214f9() 
     let mut deletions_per_player = delta_map(&[]);
     let mut additions_per_bubble = delta_map(&[]);
     let mut deletions_per_bubble = delta_map(&[]);
-    let user_ships=user_list(&[]);
+    let user_ships = user_list(&[]);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let bubble_update_result_6=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_6 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_6.is_ok()); // original native mutation must not raise
-    let bubble_update_result_6=bubble_update_result_6.unwrap_or_default();
-    store_delta_map(&mut additions_per_player,bubble_update_result_6.additions_per_player);
-    store_delta_map(&mut deletions_per_player,bubble_update_result_6.deletions_per_player);
-    store_delta_map(&mut additions_per_bubble,bubble_update_result_6.additions_per_bubble);
-    store_delta_map(&mut deletions_per_bubble,bubble_update_result_6.deletions_per_bubble);
+    let bubble_update_result_6 = bubble_update_result_6.unwrap_or_default();
+    store_delta_map(
+        &mut additions_per_player,
+        bubble_update_result_6.additions_per_player,
+    );
+    store_delta_map(
+        &mut deletions_per_player,
+        bubble_update_result_6.deletions_per_player,
+    );
+    store_delta_map(
+        &mut additions_per_bubble,
+        bubble_update_result_6.additions_per_bubble,
+    );
+    store_delta_map(
+        &mut deletions_per_bubble,
+        bubble_update_result_6.deletions_per_bubble,
+    );
     ();
-    let expected_transitions=transition_list(&[]);
+    let expected_transitions = transition_list(&[]);
     // original-assertion: python/destiny/test/helpers.py:288
-    assert!(expected_transitions==park.bubble_transitions); // complete original helper assertion
+    assert!(expected_transitions == park.bubble_transitions); // complete original helper assertion
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestBubbleTransitions::test_adding_ball_transitions_it_to_bubble
@@ -5001,37 +6007,59 @@ fn lifecycle_management__TestBubbleTransitions__tes__c7298c73a094e732a56214f9() 
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestBubbleTransitions__tes__c736089673b0c1de5f0cc3dc() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = true;
-    park.write_attribute_notified(ball, |b| b.is_interactive = attribute_value_2, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_interactive = attribute_value_2,
+        OriginalBallAttribute::NoHandler,
+    );
     let ball_id = ball;
     let old_bubble_id = park.retained(ball).new_bubble;
     let mut additions_per_player = delta_map(&[]);
     let mut deletions_per_player = delta_map(&[]);
     let mut additions_per_bubble = delta_map(&[]);
     let mut deletions_per_bubble = delta_map(&[]);
-    let user_ships=user_list(&[Some(ball_id)]);
+    let user_ships = user_list(&[Some(ball_id)]);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let bubble_update_result_12=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_12 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_12.is_ok()); // original native mutation must not raise
-    let bubble_update_result_12=bubble_update_result_12.unwrap_or_default();
-    store_delta_map(&mut additions_per_player,bubble_update_result_12.additions_per_player);
-    store_delta_map(&mut deletions_per_player,bubble_update_result_12.deletions_per_player);
-    store_delta_map(&mut additions_per_bubble,bubble_update_result_12.additions_per_bubble);
-    store_delta_map(&mut deletions_per_bubble,bubble_update_result_12.deletions_per_bubble);
+    let bubble_update_result_12 = bubble_update_result_12.unwrap_or_default();
+    store_delta_map(
+        &mut additions_per_player,
+        bubble_update_result_12.additions_per_player,
+    );
+    store_delta_map(
+        &mut deletions_per_player,
+        bubble_update_result_12.deletions_per_player,
+    );
+    store_delta_map(
+        &mut additions_per_bubble,
+        bubble_update_result_12.additions_per_bubble,
+    );
+    store_delta_map(
+        &mut deletions_per_bubble,
+        bubble_update_result_12.deletions_per_bubble,
+    );
     ();
     let new_bubble_id = park.retained(ball).new_bubble;
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:151
     assert!(old_bubble_id != new_bubble_id);
-    let expected_transitions=transition_list(&[(ball_id, old_bubble_id, new_bubble_id)]);
+    let expected_transitions = transition_list(&[(ball_id, old_bubble_id, new_bubble_id)]);
     // original-assertion: python/destiny/test/helpers.py:288
-    assert!(expected_transitions==park.bubble_transitions); // complete original helper assertion
+    assert!(expected_transitions == park.bubble_transitions); // complete original helper assertion
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestBubbleTransitions::test_adding_two_balls_transition_them_to_bubble
@@ -5041,29 +6069,55 @@ fn lifecycle_management__TestBubbleTransitions__tes__c736089673b0c1de5f0cc3dc() 
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestBubbleTransitions__tes__f4c2197a913206aa13d3b49b() {
     let mut park = OriginalParkProjection::default();
-    let ball_1 = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball_1 = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball_1) && !park.scope_error);
-    let ball_2 = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball_2 = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball_2) && !park.scope_error);
     let attribute_value_4 = true;
-    park.write_attribute_notified(ball_1, |b| b.is_interactive = attribute_value_4, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball_1,
+        |b| b.is_interactive = attribute_value_4,
+        OriginalBallAttribute::NoHandler,
+    );
     let attribute_value_6 = true;
-    park.write_attribute_notified(ball_2, |b| b.is_interactive = attribute_value_6, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball_2,
+        |b| b.is_interactive = attribute_value_6,
+        OriginalBallAttribute::NoHandler,
+    );
     let old_bubble_id_1 = park.retained(ball_1).new_bubble;
     let old_bubble_id_2 = park.retained(ball_2).new_bubble;
     let mut additions_per_player = delta_map(&[]);
     let mut deletions_per_player = delta_map(&[]);
     let mut additions_per_bubble = delta_map(&[]);
     let mut deletions_per_bubble = delta_map(&[]);
-    let user_ships=user_list(&[Some(ball_1), Some(ball_2)]);
+    let user_ships = user_list(&[Some(ball_1), Some(ball_2)]);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let bubble_update_result_16=park.bubble_additions_and_deletions(&user_ships);
+    let bubble_update_result_16 = park.bubble_additions_and_deletions(&user_ships);
     assert!(bubble_update_result_16.is_ok()); // original native mutation must not raise
-    let bubble_update_result_16=bubble_update_result_16.unwrap_or_default();
-    store_delta_map(&mut additions_per_player,bubble_update_result_16.additions_per_player);
-    store_delta_map(&mut deletions_per_player,bubble_update_result_16.deletions_per_player);
-    store_delta_map(&mut additions_per_bubble,bubble_update_result_16.additions_per_bubble);
-    store_delta_map(&mut deletions_per_bubble,bubble_update_result_16.deletions_per_bubble);
+    let bubble_update_result_16 = bubble_update_result_16.unwrap_or_default();
+    store_delta_map(
+        &mut additions_per_player,
+        bubble_update_result_16.additions_per_player,
+    );
+    store_delta_map(
+        &mut deletions_per_player,
+        bubble_update_result_16.deletions_per_player,
+    );
+    store_delta_map(
+        &mut additions_per_bubble,
+        bubble_update_result_16.additions_per_bubble,
+    );
+    store_delta_map(
+        &mut deletions_per_bubble,
+        bubble_update_result_16.deletions_per_bubble,
+    );
     ();
     let new_bubble_id_1 = park.retained(ball_1).new_bubble;
     let new_bubble_id_2 = park.retained(ball_2).new_bubble;
@@ -5071,14 +6125,20 @@ fn lifecycle_management__TestBubbleTransitions__tes__f4c2197a913206aa13d3b49b() 
     assert!(old_bubble_id_1 != new_bubble_id_1);
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:178
     assert!(old_bubble_id_2 != new_bubble_id_2);
-    let expected_transitions=transition_list(&[(ball_1, old_bubble_id_1, new_bubble_id_1), (ball_2, old_bubble_id_2, new_bubble_id_2)]);
+    let expected_transitions = transition_list(&[
+        (ball_1, old_bubble_id_1, new_bubble_id_1),
+        (ball_2, old_bubble_id_2, new_bubble_id_2),
+    ]);
     // original-assertion: python/destiny/test/helpers.py:288
-    assert!(expected_transitions==park.bubble_transitions); // complete original helper assertion
+    assert!(expected_transitions == park.bubble_transitions); // complete original helper assertion
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_lifecycle_management.py::TestClearAll::test_clear_all_removes_ball_from_park
@@ -5088,18 +6148,32 @@ fn lifecycle_management__TestBubbleTransitions__tes__f4c2197a913206aa13d3b49b() 
 #[cfg_attr(test, test)]
 fn lifecycle_management__TestClearAll__test_clear_all_removes_ball_from_park() {
     let mut park = OriginalParkProjection::default();
-    let ignored_constructor_result_0 = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 1.0_f64, y: 2.0_f64, z: 3.0_f64 }, ..OriginalBallInit::default() });
+    let ignored_constructor_result_0 = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 1.0_f64,
+            y: 2.0_f64,
+            z: 3.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ignored_constructor_result_0) && !park.scope_error);
     park.clear_all();
     // original-assertion: python/destiny/test/ballpark/test_lifecycle_management.py:41
-    let query_result_4=park.query_bubble_at(Vec3 { x: 1.0_f64, y: 2.0_f64, z: 3.0_f64 });
+    let query_result_4 = park.query_bubble_at(Vec3 {
+        x: 1.0_f64,
+        y: 2.0_f64,
+        z: 3.0_f64,
+    });
     assert!(query_result_4.is_ok()); // original coordinate lookup must not raise
     assert!((query_result_4.unwrap_or(None)).is_none());
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestSetBallNotInParkCallback::test_gets_called_when_addminiball_is_called_on_ball_that_is_not_in_park
@@ -5109,17 +6183,30 @@ fn lifecycle_management__TestClearAll__test_clear_all_removes_ball_from_park() {
 #[cfg_attr(test, test)]
 fn callbacks__TestSetBallNotInParkCallback__test_ge__9ee1afa8ae5fd8cfd6d6d902() {
     let mut park = OriginalParkProjection::default();
-    park.ball_not_in_park_callback_called=false; // original self.called fixture initialization
+    park.ball_not_in_park_callback_called = false; // original self.called fixture initialization
     park.set_ball_not_in_park_callback(true);
     let mut b = OriginalParkBall::default();
-    assert!(park.add_detached_mini_ball(&mut b, Vec3 { x: 1.0_f64, y: 1.0_f64, z: 1.0_f64 }, (1.0_f64) as f32) == Ok(())); // original call must not raise
+    assert!(
+        park.add_detached_mini_ball(
+            &mut b,
+            Vec3 {
+                x: 1.0_f64,
+                y: 1.0_f64,
+                z: 1.0_f64
+            },
+            (1.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:197
     assert!((park.ball_not_in_park_callback_called));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestSetBallNotInParkCallback::test_does_not_get_called_when_addminiball_is_called_on_ball_that_is_in_park
@@ -5129,18 +6216,34 @@ fn callbacks__TestSetBallNotInParkCallback__test_ge__9ee1afa8ae5fd8cfd6d6d902() 
 #[cfg_attr(test, test)]
 fn callbacks__TestSetBallNotInParkCallback__test_do__40cfebf92111549ea1efe5a7() {
     let mut park = OriginalParkProjection::default();
-    park.ball_not_in_park_callback_called=false; // original self.called fixture initialization
+    park.ball_not_in_park_callback_called = false; // original self.called fixture initialization
     park.set_ball_not_in_park_callback(true);
-    let b = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let b = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(b) && !park.scope_error);
-    assert!(park.add_mini_ball(b, Vec3 { x: 1.0_f64, y: 1.0_f64, z: 1.0_f64 }, (1.0_f64) as f32) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_ball(
+            b,
+            Vec3 {
+                x: 1.0_f64,
+                y: 1.0_f64,
+                z: 1.0_f64
+            },
+            (1.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:203
     assert!(!(park.ball_not_in_park_callback_called));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestSetBallNotInParkCallback::test_remove_callback
@@ -5150,18 +6253,31 @@ fn callbacks__TestSetBallNotInParkCallback__test_do__40cfebf92111549ea1efe5a7() 
 #[cfg_attr(test, test)]
 fn callbacks__TestSetBallNotInParkCallback__test_remove_callback() {
     let mut park = OriginalParkProjection::default();
-    park.ball_not_in_park_callback_called=false; // original self.called fixture initialization
+    park.ball_not_in_park_callback_called = false; // original self.called fixture initialization
     park.set_ball_not_in_park_callback(true);
     park.set_ball_not_in_park_callback(false);
     let mut b = OriginalParkBall::default();
-    assert!(park.add_detached_mini_ball(&mut b, Vec3 { x: 1.0_f64, y: 1.0_f64, z: 1.0_f64 }, (1.0_f64) as f32) == Ok(())); // original call must not raise
+    assert!(
+        park.add_detached_mini_ball(
+            &mut b,
+            Vec3 {
+                x: 1.0_f64,
+                y: 1.0_f64,
+                z: 1.0_f64
+            },
+            (1.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:210
     assert!(!(park.ball_not_in_park_callback_called));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestNotificationRange::test_detects_ball_in_range_when_in_goto_mode
@@ -5171,12 +6287,30 @@ fn callbacks__TestSetBallNotInParkCallback__test_remove_callback() {
 #[cfg_attr(test, test)]
 fn callbacks__TestNotificationRange__test_detects_ball_in_range_when_in_goto_mode() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, position: Vec3 { x: (park.retained(ball).position.x + 1.0_f64), y: 10000000000.0_f64, z: 10000000000.0_f64 }, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        position: Vec3 {
+            x: (park.retained(ball).position.x + 1.0_f64),
+            y: 10000000000.0_f64,
+            z: 10000000000.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
-    park.goto_point(ball, Vec3 { x: park.retained(other).position.x, y: park.retained(other).position.y, z: park.retained(other).position.z });
+    park.goto_point(
+        ball,
+        Vec3 {
+            x: park.retained(other).position.x,
+            y: park.retained(other).position.y,
+            z: park.retained(other).position.z,
+        },
+    );
     park.set_notification_range(ball, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:117
@@ -5185,7 +6319,10 @@ fn callbacks__TestNotificationRange__test_detects_ball_in_range_when_in_goto_mod
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed
@@ -5195,33 +6332,62 @@ fn callbacks__TestNotificationRange__test_detects_ball_in_range_when_in_goto_mod
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_callback_g__581fde7c5485e7c9f1d3d542() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 2.0_f64;
     let shuffle = false;
     let onlyInteractives = false;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_14 = true;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_14, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_14,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:18
     assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[]));
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:20
-    assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[(regular_ball, (1.0_f64) as i64)]));
+    assert!(
+        park.retained(proximity_ball).proximity_callback_args
+            == proximity_events(&[(regular_ball, (1.0_f64) as i64)])
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called
@@ -5231,30 +6397,59 @@ fn callbacks__TestProximitySensors__test_callback_g__581fde7c5485e7c9f1d3d542() 
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_callback_gets_called() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 0.0_f64;
     let shuffle = false;
     let onlyInteractives = false;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_14 = true;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_14, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_14,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:32
-    assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[(regular_ball, (1.0_f64) as i64)]));
+    assert!(
+        park.retained(proximity_ball).proximity_callback_args
+            == proximity_events(&[(regular_ball, (1.0_f64) as i64)])
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ignores_balls_that_are_not_free
@@ -5264,22 +6459,45 @@ fn callbacks__TestProximitySensors__test_callback_gets_called() {
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_ignores_balls_that_are_not_free() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 0.0_f64;
     let shuffle = false;
     let onlyInteractives = false;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_14 = false;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_14, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_14,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:44
     assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[]));
@@ -5287,7 +6505,10 @@ fn callbacks__TestProximitySensors__test_ignores_balls_that_are_not_free() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_only_interactives_ignores_non_interactive_balls
@@ -5297,22 +6518,45 @@ fn callbacks__TestProximitySensors__test_ignores_balls_that_are_not_free() {
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_only_inter__45d62c0514e13f9dc6e190ca() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 0.0_f64;
     let shuffle = false;
     let onlyInteractives = true;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_14 = true;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_14, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_14,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:56
     assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[]));
@@ -5320,7 +6564,10 @@ fn callbacks__TestProximitySensors__test_only_inter__45d62c0514e13f9dc6e190ca() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_remove_proximity_sensor
@@ -5330,23 +6577,46 @@ fn callbacks__TestProximitySensors__test_only_inter__45d62c0514e13f9dc6e190ca() 
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_remove_proximity_sensor() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 0.0_f64;
     let shuffle = false;
     let onlyInteractives = false;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
     park.remove_proximity_sensor(proximity_ball);
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_15 = true;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_15, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_15,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:69
     assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[]));
@@ -5354,7 +6624,10 @@ fn callbacks__TestProximitySensors__test_remove_proximity_sensor() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_out_of_range
@@ -5364,22 +6637,50 @@ fn callbacks__TestProximitySensors__test_remove_proximity_sensor() {
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_ball_out_of_range() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 0.0_f64;
     let shuffle = false;
     let onlyInteractives = false;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, position: Vec3 { x: (park.retained(proximity_ball).position.x + 11.0_f64), y: 10000000000.0_f64, z: 10000000000.0_f64 }, ..OriginalBallInit::default() });
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        position: Vec3 {
+            x: (park.retained(proximity_ball).position.x + 11.0_f64),
+            y: 10000000000.0_f64,
+            z: 10000000000.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_14 = true;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_14, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_14,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:81
     assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[]));
@@ -5387,7 +6688,10 @@ fn callbacks__TestProximitySensors__test_ball_out_of_range() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_on_edge_of_range
@@ -5397,30 +6701,64 @@ fn callbacks__TestProximitySensors__test_ball_out_of_range() {
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_ball_on_edge_of_range() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 0.0_f64;
     let shuffle = false;
     let onlyInteractives = false;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, position: Vec3 { x: (park.retained(proximity_ball).position.x + 10.0_f64), y: 10000000000.0_f64, z: 10000000000.0_f64 }, ..OriginalBallInit::default() });
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        position: Vec3 {
+            x: (park.retained(proximity_ball).position.x + 10.0_f64),
+            y: 10000000000.0_f64,
+            z: 10000000000.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_14 = true;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_14, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_14,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:93
-    assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[(regular_ball, (1.0_f64) as i64)]));
+    assert!(
+        park.retained(proximity_ball).proximity_callback_args
+            == proximity_events(&[(regular_ball, (1.0_f64) as i64)])
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_leave_proximity
@@ -5430,33 +6768,69 @@ fn callbacks__TestProximitySensors__test_ball_on_edge_of_range() {
 #[cfg_attr(test, test)]
 fn callbacks__TestProximitySensors__test_leave_proximity() {
     let mut park = OriginalParkProjection::default();
-    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let proximity_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(proximity_ball) && !park.scope_error);
-    park.write_attribute(proximity_ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(proximity_ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     let range = 10.0_f64;
     let period = 0.0_f64;
     let shuffle = false;
     let onlyInteractives = false;
     // External rand() input; Linux RAND_MAX from the inspected C header is 2147483647.
-    #[cfg(kani)] let random_draw: u32 = kani::any();
-    #[cfg(kani)] kani::assume(random_draw <= 2_147_483_647);
-    #[cfg(test)] let random_draw: u32 = 0;
-    assert!(park.add_proximity_sensor(proximity_ball, (range) as f32, period, i32::from(shuffle), onlyInteractives, random_draw, 2_147_483_647) == Ok(())); // original call must not raise
-    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    #[cfg(kani)]
+    let random_draw: u32 = kani::any();
+    #[cfg(kani)]
+    kani::assume(random_draw <= 2_147_483_647);
+    #[cfg(test)]
+    let random_draw: u32 = 0;
+    assert!(
+        park.add_proximity_sensor(
+            proximity_ball,
+            (range) as f32,
+            period,
+            i32::from(shuffle),
+            onlyInteractives,
+            random_draw,
+            2_147_483_647
+        ) == Ok(())
+    ); // original call must not raise
+    let regular_ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(regular_ball) && !park.scope_error);
     let attribute_value_14 = true;
-    park.write_attribute_notified(regular_ball, |b| b.is_free = attribute_value_14, OriginalBallAttribute::Free);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.is_free = attribute_value_14,
+        OriginalBallAttribute::Free,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     let attribute_value_17 = (park.retained(regular_ball).position.x + 11.0_f64);
-    park.write_attribute_notified(regular_ball, |b| b.position.x = attribute_value_17, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        regular_ball,
+        |b| b.position.x = attribute_value_17,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:107
-    assert!(park.retained(proximity_ball).proximity_callback_args == proximity_events(&[(regular_ball, (1.0_f64) as i64), (regular_ball, (0.0_f64) as i64)]));
+    assert!(
+        park.retained(proximity_ball).proximity_callback_args
+            == proximity_events(&[
+                (regular_ball, (1.0_f64) as i64),
+                (regular_ball, (0.0_f64) as i64)
+            ])
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestNotificationRange::test_ignores_ball_on_edge_of_range
@@ -5466,12 +6840,31 @@ fn callbacks__TestProximitySensors__test_leave_proximity() {
 #[cfg_attr(test, test)]
 fn callbacks__TestNotificationRange__test_ignores_ball_on_edge_of_range() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, radius: (1.0_f64) as f32, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        radius: (1.0_f64) as f32,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, position: Vec3 { x: (park.retained(ball).position.x + 11.0_f64), y: 10000000000.0_f64, z: 10000000000.0_f64 }, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        position: Vec3 {
+            x: (park.retained(ball).position.x + 11.0_f64),
+            y: 10000000000.0_f64,
+            z: 10000000000.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
-    park.goto_point(ball, Vec3 { x: park.retained(other).position.x, y: park.retained(other).position.y, z: park.retained(other).position.z });
+    park.goto_point(
+        ball,
+        Vec3 {
+            x: park.retained(other).position.x,
+            y: park.retained(other).position.y,
+            z: park.retained(other).position.z,
+        },
+    );
     park.set_notification_range(ball, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:125
@@ -5480,7 +6873,10 @@ fn callbacks__TestNotificationRange__test_ignores_ball_on_edge_of_range() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestNotificationRange::test_ignores_ball_that_should_be_out_of_range
@@ -5490,12 +6886,30 @@ fn callbacks__TestNotificationRange__test_ignores_ball_on_edge_of_range() {
 #[cfg_attr(test, test)]
 fn callbacks__TestNotificationRange__test_ignores_ball_that_should_be_out_of_range() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, position: Vec3 { x: 10000000000.0_f64, y: (park.retained(ball).position.y + 100.0_f64), z: 10000000000.0_f64 }, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        position: Vec3 {
+            x: 10000000000.0_f64,
+            y: (park.retained(ball).position.y + 100.0_f64),
+            z: 10000000000.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
-    park.goto_point(ball, Vec3 { x: park.retained(other).position.x, y: park.retained(other).position.y, z: park.retained(other).position.z });
+    park.goto_point(
+        ball,
+        Vec3 {
+            x: park.retained(other).position.x,
+            y: park.retained(other).position.y,
+            z: park.retained(other).position.z,
+        },
+    );
     park.set_notification_range(ball, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:133
@@ -5504,7 +6918,10 @@ fn callbacks__TestNotificationRange__test_ignores_ball_that_should_be_out_of_ran
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestNotificationRange::test_ignores_ball_in_range_if_stopped
@@ -5514,10 +6931,16 @@ fn callbacks__TestNotificationRange__test_ignores_ball_that_should_be_out_of_ran
 #[cfg_attr(test, test)]
 fn callbacks__TestNotificationRange__test_ignores_ball_in_range_if_stopped() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let ignored_constructor_result_1 = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let ignored_constructor_result_1 = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ignored_constructor_result_1) && !park.scope_error);
     park.set_notification_range(ball, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
@@ -5527,7 +6950,10 @@ fn callbacks__TestNotificationRange__test_ignores_ball_in_range_if_stopped() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestNotificationRange::test_detects_ball_leaving_range
@@ -5537,24 +6963,46 @@ fn callbacks__TestNotificationRange__test_ignores_ball_in_range_if_stopped() {
 #[cfg_attr(test, test)]
 fn callbacks__TestNotificationRange__test_detects_ball_leaving_range() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
     park.set_notification_range(ball, 10.0_f64);
-    let ignored_constructor_result_1 = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    let ignored_constructor_result_1 = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ignored_constructor_result_1) && !park.scope_error);
-    park.goto_point(ball, Vec3 { x: (park.retained(ball).position.x + 1.0_f64), y: park.retained(ball).position.y, z: park.retained(ball).position.z });
+    park.goto_point(
+        ball,
+        Vec3 {
+            x: (park.retained(ball).position.x + 1.0_f64),
+            y: park.retained(ball).position.y,
+            z: park.retained(ball).position.z,
+        },
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     let attribute_value_8 = (park.retained(ball).position.x + 100.0_f64);
-    park.write_attribute_notified(ball, |b| b.position.x = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.x = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:150
-    assert!(park.retained(ball).range_callback_args == id_list(&[(1.0_f64) as i64, (0.0_f64) as i64]));
+    assert!(
+        park.retained(ball).range_callback_args == id_list(&[(1.0_f64) as i64, (0.0_f64) as i64])
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestSetTargetTracking::test_foo
@@ -5564,10 +7012,16 @@ fn callbacks__TestNotificationRange__test_detects_ball_leaving_range() {
 #[cfg_attr(test, test)]
 fn callbacks__TestSetTargetTracking__test_foo() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     park.set_target_tracking(ball, other, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
@@ -5577,7 +7031,10 @@ fn callbacks__TestSetTargetTracking__test_foo() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestSetTargetTracking::test_detects_target_on_edge_of_range
@@ -5587,10 +7044,21 @@ fn callbacks__TestSetTargetTracking__test_foo() {
 #[cfg_attr(test, test)]
 fn callbacks__TestSetTargetTracking__test_detects_target_on_edge_of_range() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, position: Vec3 { x: (park.retained(ball).position.x + 10.0_f64), y: 10000000000.0_f64, z: 10000000000.0_f64 }, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        position: Vec3 {
+            x: (park.retained(ball).position.x + 10.0_f64),
+            y: 10000000000.0_f64,
+            z: 10000000000.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     park.set_target_tracking(ball, other, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
@@ -5600,7 +7068,10 @@ fn callbacks__TestSetTargetTracking__test_detects_target_on_edge_of_range() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestSetTargetTracking::test_ignores_target_that_should_be_out_of_range
@@ -5610,10 +7081,21 @@ fn callbacks__TestSetTargetTracking__test_detects_target_on_edge_of_range() {
 #[cfg_attr(test, test)]
 fn callbacks__TestSetTargetTracking__test_ignores_t__6839b2352c589659e8620b97() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, position: Vec3 { x: (park.retained(ball).position.x + 11.0_f64), y: 10000000000.0_f64, z: 10000000000.0_f64 }, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        position: Vec3 {
+            x: (park.retained(ball).position.x + 11.0_f64),
+            y: 10000000000.0_f64,
+            z: 10000000000.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     park.set_target_tracking(ball, other, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
@@ -5623,7 +7105,10 @@ fn callbacks__TestSetTargetTracking__test_ignores_t__6839b2352c589659e8620b97() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_callbacks.py::TestSetTargetTracking::test_detects_target_leaving_range
@@ -5633,23 +7118,39 @@ fn callbacks__TestSetTargetTracking__test_ignores_t__6839b2352c589659e8620b97() 
 #[cfg_attr(test, test)]
 fn callbacks__TestSetTargetTracking__test_detects_target_leaving_range() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    park.write_attribute(ball,|b|b.event_spy=true); // original BallEventSpy wraps this same native ball and initializes its argument lists
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    park.write_attribute(ball, |b| b.event_spy = true); // original BallEventSpy wraps this same native ball and initializes its argument lists
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     park.set_target_tracking(ball, other, 10.0_f64);
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     let attribute_value_7 = (park.retained(other).position.x + 100.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_7, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_7,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_callbacks.py:182
-    assert!(park.retained(ball).target_tracking_callback_args == id_list(&[(1.0_f64) as i64, (0.0_f64) as i64]));
+    assert!(
+        park.retained(ball).target_tracking_callback_args
+            == id_list(&[(1.0_f64) as i64, (0.0_f64) as i64])
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_finds_following_ball
@@ -5659,16 +7160,26 @@ fn callbacks__TestSetTargetTracking__test_detects_target_leaving_range() {
 #[cfg_attr(test, test)]
 fn getters_and_setters__TestGetRemoteFollowers__test_finds_following_ball() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
     park.set_free(src, true);
     park.follow(src, dst, (1.0_f64) as f32, false);
     let attribute_value_6 = 0.0_f64;
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let remote_followers_result_9=park.remote_followers();
+    let remote_followers_result_9 = park.remote_followers();
     assert!(remote_followers_result_9.is_ok()); // original remote follower call must not raise
     let followers = remote_followers_result_9.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_getters_and_setters.py:345
@@ -5677,7 +7188,10 @@ fn getters_and_setters__TestGetRemoteFollowers__test_finds_following_ball() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_returns_empty_list_when_there_are_none
@@ -5687,7 +7201,7 @@ fn getters_and_setters__TestGetRemoteFollowers__test_finds_following_ball() {
 #[cfg_attr(test, test)]
 fn getters_and_setters__TestGetRemoteFollowers__tes__22c97b39189470afab29bfe3() {
     let mut park = OriginalParkProjection::default();
-    let remote_followers_result_0=park.remote_followers();
+    let remote_followers_result_0 = park.remote_followers();
     assert!(remote_followers_result_0.is_ok()); // original remote follower call must not raise
     let followers = remote_followers_result_0.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_getters_and_setters.py:327
@@ -5696,7 +7210,10 @@ fn getters_and_setters__TestGetRemoteFollowers__tes__22c97b39189470afab29bfe3() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_ignores_ball_that_is_not_free
@@ -5706,16 +7223,26 @@ fn getters_and_setters__TestGetRemoteFollowers__tes__22c97b39189470afab29bfe3() 
 #[cfg_attr(test, test)]
 fn getters_and_setters__TestGetRemoteFollowers__test_ignores_ball_that_is_not_free() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
     park.set_free(src, false);
     park.follow(src, dst, (1.0_f64) as f32, false);
     let attribute_value_6 = 0.0_f64;
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let remote_followers_result_9=park.remote_followers();
+    let remote_followers_result_9 = park.remote_followers();
     assert!(remote_followers_result_9.is_ok()); // original remote follower call must not raise
     let followers = remote_followers_result_9.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_getters_and_setters.py:336
@@ -5724,7 +7251,10 @@ fn getters_and_setters__TestGetRemoteFollowers__test_ignores_ball_that_is_not_fr
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_ignores_balls_that_are_not_following
@@ -5734,15 +7264,25 @@ fn getters_and_setters__TestGetRemoteFollowers__test_ignores_ball_that_is_not_fr
 #[cfg_attr(test, test)]
 fn getters_and_setters__TestGetRemoteFollowers__tes__daee8d26625110e74073445f() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
     park.set_free(src, true);
     let attribute_value_5 = 0.0_f64;
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_5, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_5,
+        OriginalBallAttribute::Position,
+    );
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let remote_followers_result_8=park.remote_followers();
+    let remote_followers_result_8 = park.remote_followers();
     assert!(remote_followers_result_8.is_ok()); // original remote follower call must not raise
     let followers = remote_followers_result_8.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_getters_and_setters.py:353
@@ -5751,7 +7291,10 @@ fn getters_and_setters__TestGetRemoteFollowers__tes__daee8d26625110e74073445f() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_getters_and_setters.py::TestGetRemoteFollowers::test_ignores_balls_that_are_in_the_same_bubble
@@ -5761,14 +7304,20 @@ fn getters_and_setters__TestGetRemoteFollowers__tes__daee8d26625110e74073445f() 
 #[cfg_attr(test, test)]
 fn getters_and_setters__TestGetRemoteFollowers__tes__0fc1bd85c43b2ab0fe6f837a() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
     park.set_free(src, true);
     park.follow(src, dst, (1.0_f64) as f32, false);
     assert!(park.initialize_query_bubbles(0_i64) == Ok(())); // original call must not raise
-    let remote_followers_result_7=park.remote_followers();
+    let remote_followers_result_7 = park.remote_followers();
     assert!(remote_followers_result_7.is_ok()); // original remote follower call must not raise
     let followers = remote_followers_result_7.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_getters_and_setters.py:361
@@ -5777,7 +7326,10 @@ fn getters_and_setters__TestGetRemoteFollowers__tes__0fc1bd85c43b2ab0fe6f837a() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCheckVisibility::test_returns_the_id_of_the_occluding_ball_when_there_is_an_occlusion
@@ -5787,20 +7339,45 @@ fn getters_and_setters__TestGetRemoteFollowers__tes__0fc1bd85c43b2ab0fe6f837a() 
 #[cfg_attr(test, test)]
 fn visibility__TestCheckVisibility__test_returns_th__426f23f3d1026353ca3ac3ae() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let occluder = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let occluder = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(occluder) && !park.scope_error);
     let attribute_value_6 = (25.0_f64) as f32;
-    park.write_attribute_notified(occluder, |b| b.radius = attribute_value_6, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.radius = attribute_value_6,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_8 = (park.retained(occluder).position.x + 50.0_f64);
-    park.write_attribute_notified(occluder, |b| b.position.x = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.position.x = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_10 = true;
-    park.write_attribute_notified(occluder, |b| b.is_massive = attribute_value_10, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.is_massive = attribute_value_10,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_12 = (park.retained(dst).position.x + 100.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_12, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_12,
+        OriginalBallAttribute::Position,
+    );
     let id = park.check_visibility(src, dst);
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:23
     assert!(id == occluder);
@@ -5808,7 +7385,10 @@ fn visibility__TestCheckVisibility__test_returns_th__426f23f3d1026353ca3ac3ae() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCheckVisibility::test_returns_zero_when_there_is_no_occlusion
@@ -5818,12 +7398,22 @@ fn visibility__TestCheckVisibility__test_returns_th__426f23f3d1026353ca3ac3ae() 
 #[cfg_attr(test, test)]
 fn visibility__TestCheckVisibility__test_returns_zero_when_there_is_no_occlusion() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
     let attribute_value_4 = (park.retained(dst).position.x + 100.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     let id = park.check_visibility(src, dst);
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:14
     assert!((id) as f64 == 0.0_f64);
@@ -5831,7 +7421,10 @@ fn visibility__TestCheckVisibility__test_returns_zero_when_there_is_no_occlusion
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCheckVisibility::test_ball_that_is_not_massive_is_not_an_occlusion
@@ -5841,20 +7434,45 @@ fn visibility__TestCheckVisibility__test_returns_zero_when_there_is_no_occlusion
 #[cfg_attr(test, test)]
 fn visibility__TestCheckVisibility__test_ball_that___e0c8093aabe84082ed220fd4() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let occluder = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let occluder = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(occluder) && !park.scope_error);
     let attribute_value_6 = (25.0_f64) as f32;
-    park.write_attribute_notified(occluder, |b| b.radius = attribute_value_6, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.radius = attribute_value_6,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_8 = (park.retained(occluder).position.x + 50.0_f64);
-    park.write_attribute_notified(occluder, |b| b.position.x = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.position.x = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_10 = false;
-    park.write_attribute_notified(occluder, |b| b.is_massive = attribute_value_10, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.is_massive = attribute_value_10,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_12 = (park.retained(dst).position.x + 100.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_12, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_12,
+        OriginalBallAttribute::Position,
+    );
     let id = park.check_visibility(src, dst);
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:32
     assert!(id != occluder);
@@ -5862,7 +7480,10 @@ fn visibility__TestCheckVisibility__test_ball_that___e0c8093aabe84082ed220fd4() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCheckVisibility::test_ball_that_is_cloaked_is_not_an_occlusion
@@ -5872,22 +7493,51 @@ fn visibility__TestCheckVisibility__test_ball_that___e0c8093aabe84082ed220fd4() 
 #[cfg_attr(test, test)]
 fn visibility__TestCheckVisibility__test_ball_that_is_cloaked_is_not_an_occlusion() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let occluder = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let occluder = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(occluder) && !park.scope_error);
     let attribute_value_6 = (25.0_f64) as f32;
-    park.write_attribute_notified(occluder, |b| b.radius = attribute_value_6, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.radius = attribute_value_6,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_8 = (park.retained(occluder).position.x + 50.0_f64);
-    park.write_attribute_notified(occluder, |b| b.position.x = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.position.x = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_10 = true;
-    park.write_attribute_notified(occluder, |b| b.is_massive = attribute_value_10, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.is_massive = attribute_value_10,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_12 = i8::from(true);
-    park.write_attribute_notified(occluder, |b| b.is_cloaked = attribute_value_12, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        occluder,
+        |b| b.is_cloaked = attribute_value_12,
+        OriginalBallAttribute::NoHandler,
+    );
     let attribute_value_14 = (park.retained(dst).position.x + 100.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_14, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_14,
+        OriginalBallAttribute::Position,
+    );
     let id = park.check_visibility(src, dst);
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:42
     assert!(id != occluder);
@@ -5895,7 +7545,10 @@ fn visibility__TestCheckVisibility__test_ball_that_is_cloaked_is_not_an_occlusio
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCloaking::test_cloaked_balls_are_cloaked
@@ -5905,7 +7558,10 @@ fn visibility__TestCheckVisibility__test_ball_that_is_cloaked_is_not_an_occlusio
 #[cfg_attr(test, test)]
 fn visibility__TestCloaking__test_cloaked_balls_are_cloaked() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     assert!(park.cloak_ball(ball, 1_i8, (2000.0_f64) as f32) == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:49
@@ -5914,7 +7570,10 @@ fn visibility__TestCloaking__test_cloaked_balls_are_cloaked() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCloaking::test_cloaked_balls_are_not_massive
@@ -5924,10 +7583,17 @@ fn visibility__TestCloaking__test_cloaked_balls_are_cloaked() {
 #[cfg_attr(test, test)]
 fn visibility__TestCloaking__test_cloaked_balls_are_not_massive() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = true;
-    park.write_attribute_notified(ball, |b| b.is_massive = attribute_value_2, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_massive = attribute_value_2,
+        OriginalBallAttribute::Massive,
+    );
     assert!(park.cloak_ball(ball, 1_i8, (2000.0_f64) as f32) == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:55
     assert!(!(park.retained(ball).is_massive));
@@ -5935,7 +7601,10 @@ fn visibility__TestCloaking__test_cloaked_balls_are_not_massive() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCloaking::test_uncloaked_balls_are_not_cloaked
@@ -5945,10 +7614,17 @@ fn visibility__TestCloaking__test_cloaked_balls_are_not_massive() {
 #[cfg_attr(test, test)]
 fn visibility__TestCloaking__test_uncloaked_balls_are_not_cloaked() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = i8::from(true);
-    park.write_attribute_notified(ball, |b| b.is_cloaked = attribute_value_2, OriginalBallAttribute::NoHandler);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_cloaked = attribute_value_2,
+        OriginalBallAttribute::NoHandler,
+    );
     park.uncloak_ball(ball);
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:61
     assert!(!(park.retained(ball).is_cloaked != 0));
@@ -5956,7 +7632,10 @@ fn visibility__TestCloaking__test_uncloaked_balls_are_not_cloaked() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCloaking::test_uncloaking_makes_a_ball_massive
@@ -5966,10 +7645,17 @@ fn visibility__TestCloaking__test_uncloaked_balls_are_not_cloaked() {
 #[cfg_attr(test, test)]
 fn visibility__TestCloaking__test_uncloaking_makes_a_ball_massive() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = false;
-    park.write_attribute_notified(ball, |b| b.is_massive = attribute_value_2, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_massive = attribute_value_2,
+        OriginalBallAttribute::Massive,
+    );
     park.uncloak_ball(ball);
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:67
     assert!((park.retained(ball).is_massive));
@@ -5977,7 +7663,10 @@ fn visibility__TestCloaking__test_uncloaking_makes_a_ball_massive() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestScanCone::test_scan_cone_finds_nothing_when_there_is_nothing_to_be_found
@@ -5987,16 +7676,19 @@ fn visibility__TestCloaking__test_uncloaking_makes_a_ball_massive() {
 #[cfg_attr(test, test)]
 fn visibility__TestScanCone__test_scan_cone_finds_n__edb60f9b7f646212b0b14e49() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let angle = 45.0_f64;
     let _range = 100.0_f64;
     let x = 1.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let scan_result_7=park.scan_cone(ball, angle, _range, Vec3 { x: x, y: y, z: z });
+    let scan_result_7 = park.scan_cone(ball, angle, _range, Vec3 { x: x, y: y, z: z });
     assert!(scan_result_7.is_ok()); // original scan must not raise
-    let scan_result_7=scan_result_7.unwrap_or(None);
+    let scan_result_7 = scan_result_7.unwrap_or(None);
     assert!(scan_result_7.is_some()); // original result is a list, not None
     let result = scan_result_7.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:92
@@ -6005,7 +7697,10 @@ fn visibility__TestScanCone__test_scan_cone_finds_n__edb60f9b7f646212b0b14e49() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestScanCone::test_scan_cone_finds_ball_when_it_is_in_the_cone
@@ -6015,20 +7710,30 @@ fn visibility__TestScanCone__test_scan_cone_finds_n__edb60f9b7f646212b0b14e49() 
 #[cfg_attr(test, test)]
 fn visibility__TestScanCone__test_scan_cone_finds_ball_when_it_is_in_the_cone() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let other = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(other) && !park.scope_error);
     let attribute_value_4 = (park.retained(other).position.x + 50.0_f64);
-    park.write_attribute_notified(other, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        other,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     let angle = (core::f64::consts::PI / 2.0_f64);
     let _range = 100.0_f64;
     let x = 1.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let scan_result_11=park.scan_cone(ball, angle, _range, Vec3 { x: x, y: y, z: z });
+    let scan_result_11 = park.scan_cone(ball, angle, _range, Vec3 { x: x, y: y, z: z });
     assert!(scan_result_11.is_ok()); // original scan must not raise
-    let scan_result_11=scan_result_11.unwrap_or(None);
+    let scan_result_11 = scan_result_11.unwrap_or(None);
     assert!(scan_result_11.is_some()); // original result is a list, not None
     let result = scan_result_11.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:101
@@ -6037,7 +7742,10 @@ fn visibility__TestScanCone__test_scan_cone_finds_ball_when_it_is_in_the_cone() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestScanCone::test_scan_cone_excludes_balls_not_in_cone
@@ -6047,36 +7755,74 @@ fn visibility__TestScanCone__test_scan_cone_finds_ball_when_it_is_in_the_cone() 
 #[cfg_attr(test, test)]
 fn visibility__TestScanCone__test_scan_cone_excludes_balls_not_in_cone() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let left = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let left = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(left) && !park.scope_error);
-    let up = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let up = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(up) && !park.scope_error);
-    let down = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (4.0_f64) as i64, ..OriginalBallInit::default() });
+    let down = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (4.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(down) && !park.scope_error);
-    let forward = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (5.0_f64) as i64, ..OriginalBallInit::default() });
+    let forward = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (5.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(forward) && !park.scope_error);
-    let back = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (6.0_f64) as i64, ..OriginalBallInit::default() });
+    let back = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (6.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(back) && !park.scope_error);
     let attribute_value_12 = (park.retained(left).position.x - 50.0_f64);
-    park.write_attribute_notified(left, |b| b.position.x = attribute_value_12, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        left,
+        |b| b.position.x = attribute_value_12,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_14 = (park.retained(up).position.y + 50.0_f64);
-    park.write_attribute_notified(up, |b| b.position.y = attribute_value_14, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        up,
+        |b| b.position.y = attribute_value_14,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_16 = (park.retained(down).position.y - 50.0_f64);
-    park.write_attribute_notified(down, |b| b.position.y = attribute_value_16, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        down,
+        |b| b.position.y = attribute_value_16,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_18 = (park.retained(forward).position.z + 50.0_f64);
-    park.write_attribute_notified(forward, |b| b.position.z = attribute_value_18, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        forward,
+        |b| b.position.z = attribute_value_18,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_20 = (park.retained(back).position.z - 50.0_f64);
-    park.write_attribute_notified(back, |b| b.position.z = attribute_value_20, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        back,
+        |b| b.position.z = attribute_value_20,
+        OriginalBallAttribute::Position,
+    );
     let angle = (core::f64::consts::PI / 2.0_f64);
     let _range = 100.0_f64;
     let x = 1.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let scan_result_27=park.scan_cone(ball, angle, _range, Vec3 { x: x, y: y, z: z });
+    let scan_result_27 = park.scan_cone(ball, angle, _range, Vec3 { x: x, y: y, z: z });
     assert!(scan_result_27.is_ok()); // original scan must not raise
-    let scan_result_27=scan_result_27.unwrap_or(None);
+    let scan_result_27 = scan_result_27.unwrap_or(None);
     assert!(scan_result_27.is_some()); // original result is a list, not None
     let result = scan_result_27.unwrap_or_default();
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:114
@@ -6085,7 +7831,10 @@ fn visibility__TestScanCone__test_scan_cone_excludes_balls_not_in_cone() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero
@@ -6095,19 +7844,34 @@ fn visibility__TestScanCone__test_scan_cone_excludes_balls_not_in_cone() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestBallBox__test_box_zero_zero_zero() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.x = attribute_value_2, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.x = attribute_value_2,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_4 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.y = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.y = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_6 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
-    let box_result_8=park.get_ball_box(ball);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
+    let box_result_8 = park.get_ball_box(ball);
     assert!(box_result_8.is_ok()); // original box query must not raise
-    let box_result_8=box_result_8.unwrap_or(None);
+    let box_result_8 = box_result_8.unwrap_or(None);
     assert!(box_result_8.is_some()); // original tuple unpacking requires a box
-    let (box_width,(x,y,z))=box_result_8.unwrap_or((0.0,(0.0,0.0,0.0)));
+    let (box_width, (x, y, z)) = box_result_8.unwrap_or((0.0, (0.0, 0.0, 0.0)));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:320
     assert!(box_width == 480.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:321
@@ -6120,7 +7884,10 @@ fn boxes_and_bubbles__TestBallBox__test_box_zero_zero_zero() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one
@@ -6130,19 +7897,34 @@ fn boxes_and_bubbles__TestBallBox__test_box_zero_zero_zero() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestBallBox__test_box_zero_zero_one() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.x = attribute_value_2, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.x = attribute_value_2,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_4 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.y = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.y = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_6 = (480.0_f64 + 1.0_f64);
-    park.write_attribute_notified(ball, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
-    let box_result_8=park.get_ball_box(ball);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
+    let box_result_8 = park.get_ball_box(ball);
     assert!(box_result_8.is_ok()); // original box query must not raise
-    let box_result_8=box_result_8.unwrap_or(None);
+    let box_result_8 = box_result_8.unwrap_or(None);
     assert!(box_result_8.is_some()); // original tuple unpacking requires a box
-    let (box_width,(x,y,z))=box_result_8.unwrap_or((0.0,(0.0,0.0,0.0)));
+    let (box_width, (x, y, z)) = box_result_8.unwrap_or((0.0, (0.0, 0.0, 0.0)));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:331
     assert!(box_width == 480.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:332
@@ -6155,7 +7937,10 @@ fn boxes_and_bubbles__TestBallBox__test_box_zero_zero_one() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetActiveBoxes::test_returns_none_when_there_are_no_active_boxes
@@ -6166,7 +7951,7 @@ fn boxes_and_bubbles__TestBallBox__test_box_zero_zero_one() {
 fn boxes_and_bubbles__TestGetActiveBoxes__test_retu__ba07096bc5678e4d66149aaf() {
     let mut park = OriginalParkProjection::default();
     let level = 0.0_f64;
-    let boxes_result_1=park.get_single_active_box((level) as i32);
+    let boxes_result_1 = park.get_single_active_box((level) as i32);
     assert!(boxes_result_1.is_ok()); // native order is represented exactly for zero/one cell
     let active_boxes = boxes_result_1.unwrap_or(None);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:454
@@ -6175,7 +7960,10 @@ fn boxes_and_bubbles__TestGetActiveBoxes__test_retu__ba07096bc5678e4d66149aaf() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetActiveBoxes::test_returns_list_of_boxes_when_there_are_active_boxes
@@ -6185,29 +7973,55 @@ fn boxes_and_bubbles__TestGetActiveBoxes__test_retu__ba07096bc5678e4d66149aaf() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetActiveBoxes__test_retu__b0591051042beb7e4a35eb17() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.x = attribute_value_2, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.x = attribute_value_2,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_4 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.y = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.y = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_6 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let level = 7.0_f64;
-    let boxes_result_9=park.get_single_active_box((level) as i32);
+    let boxes_result_9 = park.get_single_active_box((level) as i32);
     assert!(boxes_result_9.is_ok()); // native order is represented exactly for zero/one cell
-    let box_unpack_11=boxes_result_9.unwrap_or(None);
+    let box_unpack_11 = boxes_result_9.unwrap_or(None);
     assert!(box_unpack_11.is_some()); // original tuple unpacking requires a value
-    let (level_width, box_low_coord_list)=box_unpack_11.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
+    let (level_width, box_low_coord_list) =
+        box_unpack_11.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:463
     assert!(level_width == 480.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:464
-    assert!(points_exact_equal(&box_low_coord_list,&point_list::<1>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }])));
+    assert!(points_exact_equal(
+        &box_low_coord_list,
+        &point_list::<1>(&[Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64
+        }])
+    ));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBoxCenter::test_get_box_on_topmost_level
@@ -6221,16 +8035,26 @@ fn boxes_and_bubbles__TestGetBoxCenter__test_get_box_on_topmost_level() {
     let y = 0.0_f64;
     let z = 0.0_f64;
     let topmost_level = 7.0_f64;
-    let center_result_4=park.get_grid_center((topmost_level) as i32,Vec3 { x: x, y: y, z: z });
+    let center_result_4 = park.get_grid_center((topmost_level) as i32, Vec3 { x: x, y: y, z: z });
     assert!(center_result_4.is_ok()); // source level/coordinate conversion must be defined
-    let center_of_box = center_result_4.unwrap_or((0.0,0.0,0.0));
+    let center_of_box = center_result_4.unwrap_or((0.0, 0.0, 0.0));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:639
-    assert!(center_of_box == ((480.0_f64 / 2.0_f64), (480.0_f64 / 2.0_f64), (480.0_f64 / 2.0_f64)));
+    assert!(
+        center_of_box
+            == (
+                (480.0_f64 / 2.0_f64),
+                (480.0_f64 / 2.0_f64),
+                (480.0_f64 / 2.0_f64)
+            )
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBubbleAtCoordinates::test_get_bubble_where_none_exists_returns_none
@@ -6243,7 +8067,7 @@ fn boxes_and_bubbles__TestGetBubbleAtCoordinates__t__67b1e797cf00e890a0c9b1df() 
     let x = 0.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let query_result_3=park.query_bubble_at(Vec3 { x: x, y: y, z: z });
+    let query_result_3 = park.query_bubble_at(Vec3 { x: x, y: y, z: z });
     assert!(query_result_3.is_ok()); // original coordinate lookup must not raise
     let bubble = query_result_3.unwrap_or(None);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:646
@@ -6252,7 +8076,10 @@ fn boxes_and_bubbles__TestGetBubbleAtCoordinates__t__67b1e797cf00e890a0c9b1df() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetBubbleAtCoordinates::test_get_existing_bubble
@@ -6265,9 +8092,12 @@ fn boxes_and_bubbles__TestGetBubbleAtCoordinates__test_get_existing_bubble() {
     let x = 0.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: x, y: y, z: z }, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 { x: x, y: y, z: z },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
-    let query_result_5=park.query_bubble_at(Vec3 { x: x, y: y, z: z });
+    let query_result_5 = park.query_bubble_at(Vec3 { x: x, y: y, z: z });
     assert!(query_result_5.is_ok()); // original coordinate lookup must not raise
     let bubble = query_result_5.unwrap_or(None);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:652
@@ -6276,7 +8106,10 @@ fn boxes_and_bubbles__TestGetBubbleAtCoordinates__test_get_existing_bubble() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetAndSetBoxObject::test_setting_object_on_existing_box_succeeds
@@ -6289,24 +8122,42 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test___f7e6fcaa6815a0eeeec66764() 
     let x = 0.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_5 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.x = attribute_value_5, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.x = attribute_value_5,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_7 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.y = attribute_value_7, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.y = attribute_value_7,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_9 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.z = attribute_value_9, OriginalBallAttribute::Position);
-    let d = box_object(&[(OriginalBoxObjectKey::Foo,ActionValue::Float(3.14_f64))]);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.z = attribute_value_9,
+        OriginalBallAttribute::Position,
+    );
+    let d = box_object(&[(OriginalBoxObjectKey::Foo, ActionValue::Float(3.14_f64))]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:613
-    let object_set_13=park.set_box_object(Vec3 { x: x, y: y, z: z },d);
+    let object_set_13 = park.set_box_object(Vec3 { x: x, y: y, z: z }, d);
     assert!(object_set_13.is_ok()); // original object setter must not raise
     assert!((object_set_13.unwrap_or(false)));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetAndSetBoxObject::test_setting_object_on_nonexisting_box_fails
@@ -6319,16 +8170,19 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test___983492f584f1c79b4b32682a() 
     let x = 0.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let d = box_object(&[(OriginalBoxObjectKey::Foo,ActionValue::Float(3.14_f64))]);
+    let d = box_object(&[(OriginalBoxObjectKey::Foo, ActionValue::Float(3.14_f64))]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:618
-    let object_set_5=park.set_box_object(Vec3 { x: x, y: y, z: z },d);
+    let object_set_5 = park.set_box_object(Vec3 { x: x, y: y, z: z }, d);
     assert!(object_set_5.is_ok()); // original object setter must not raise
     assert!(!(object_set_5.unwrap_or(false)));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetAndSetBoxObject::test_getting_object_that_has_not_been_set_returns_none
@@ -6339,14 +8193,21 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test___983492f584f1c79b4b32682a() 
 fn boxes_and_bubbles__TestGetAndSetBoxObject__test___d540d83a64224d07a57f1415() {
     let mut park = OriginalParkProjection::default();
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:621
-    let object_get_1=park.get_box_object(Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 });
+    let object_get_1 = park.get_box_object(Vec3 {
+        x: 0.0_f64,
+        y: 0.0_f64,
+        z: 0.0_f64,
+    });
     assert!(object_get_1.is_ok()); // original object getter must not raise
     assert!(object_get_1.unwrap_or(None) == None::<OriginalBoxObject>);
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetAndSetBoxObject::test_can_retrieve_stored_object
@@ -6359,27 +8220,49 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test_can_retrieve_stored_object() 
     let x = 0.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_5 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.x = attribute_value_5, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.x = attribute_value_5,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_7 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.y = attribute_value_7, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.y = attribute_value_7,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_9 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.z = attribute_value_9, OriginalBallAttribute::Position);
-    let d = box_object(&[(OriginalBoxObjectKey::Foo,ActionValue::Float(3.14_f64))]);
-    let object_set_12=park.set_box_object(Vec3 { x: x, y: y, z: z },d);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.z = attribute_value_9,
+        OriginalBallAttribute::Position,
+    );
+    let d = box_object(&[(OriginalBoxObjectKey::Foo, ActionValue::Float(3.14_f64))]);
+    let object_set_12 = park.set_box_object(Vec3 { x: x, y: y, z: z }, d);
     assert!(object_set_12.is_ok()); // original object setter must not raise
-    let _original_ignored_success=object_set_12.unwrap_or(false); // ignored original return; no-unexpected-exception check retained
+    let _original_ignored_success = object_set_12.unwrap_or(false); // ignored original return; no-unexpected-exception check retained
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:631
-    let object_get_16=park.get_box_object(Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 });
+    let object_get_16 = park.get_box_object(Vec3 {
+        x: 0.0_f64,
+        y: 0.0_f64,
+        z: 0.0_f64,
+    });
     assert!(object_get_16.is_ok()); // original object getter must not raise
     assert!(object_get_16.unwrap_or(None) == Some(d));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_capsule_in_box_zero_zero_zero
@@ -6389,17 +8272,49 @@ fn boxes_and_bubbles__TestGetAndSetBoxObject__test_can_retrieve_stored_object() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetStaticCollidableBox__t__c365d0bd469e19c8e800fea1() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_capsule(parentBall, Vec3 { x: 1.0_f64, y: 1.0_f64, z: 1.0_f64 }, Vec3 { x: 2.0_f64, y: 2.0_f64, z: 2.0_f64 }, (1.0_f64) as f32) == Ok(())); // original call must not raise
-    let child_access_3 = (park.retained(parentBall).mini_capsules).get((park.retained(parentBall).mini_capsules).len().saturating_sub(1));
+    assert!(
+        park.add_mini_capsule(
+            parentBall,
+            Vec3 {
+                x: 1.0_f64,
+                y: 1.0_f64,
+                z: 1.0_f64
+            },
+            Vec3 {
+                x: 2.0_f64,
+                y: 2.0_f64,
+                z: 2.0_f64
+            },
+            (1.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
+    let child_access_3 = (park.retained(parentBall).mini_capsules).get(
+        (park.retained(parentBall).mini_capsules)
+            .len()
+            .saturating_sub(1),
+    );
     assert!(child_access_3.is_some()); // original list index must exist
-    let capsule = child_access_3.unwrap_or(OriginalMiniCapsule { id: 0, parent_id: 0, a: Vec3::ZERO, b: Vec3::ZERO, radius: 0.0 });
-    let box_result_6=park.get_static_collidable_box(capsule.id);
+    let capsule = child_access_3.unwrap_or(OriginalMiniCapsule {
+        id: 0,
+        parent_id: 0,
+        a: Vec3::ZERO,
+        b: Vec3::ZERO,
+        radius: 0.0,
+    });
+    let box_result_6 = park.get_static_collidable_box(capsule.id);
     assert!(box_result_6.is_ok()); // original box query must not raise
-    let box_result_6=box_result_6.unwrap_or(None);
+    let box_result_6 = box_result_6.unwrap_or(None);
     assert!(box_result_6.is_some()); // original tuple unpacking requires a box
-    let (box_width,(x,y,z))=box_result_6.unwrap_or((0.0,(0.0,0.0,0.0)));
+    let (box_width, (x, y, z)) = box_result_6.unwrap_or((0.0, (0.0, 0.0, 0.0)));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:347
     assert!(box_width == 480.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:348
@@ -6412,7 +8327,10 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__c365d0bd469e19c8e800fea1() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_capsule_in_box_zero_zero_one
@@ -6422,17 +8340,49 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__c365d0bd469e19c8e800fea1() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetStaticCollidableBox__test_capsule_in_box_zero_zero_one() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_capsule(parentBall, Vec3 { x: 1.0_f64, y: 1.0_f64, z: (480.0_f64 + 1.0_f64) }, Vec3 { x: 1.0_f64, y: 1.0_f64, z: (480.0_f64 + 3.0_f64) }, (1.0_f64) as f32) == Ok(())); // original call must not raise
-    let child_access_3 = (park.retained(parentBall).mini_capsules).get((park.retained(parentBall).mini_capsules).len().saturating_sub(1));
+    assert!(
+        park.add_mini_capsule(
+            parentBall,
+            Vec3 {
+                x: 1.0_f64,
+                y: 1.0_f64,
+                z: (480.0_f64 + 1.0_f64)
+            },
+            Vec3 {
+                x: 1.0_f64,
+                y: 1.0_f64,
+                z: (480.0_f64 + 3.0_f64)
+            },
+            (1.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
+    let child_access_3 = (park.retained(parentBall).mini_capsules).get(
+        (park.retained(parentBall).mini_capsules)
+            .len()
+            .saturating_sub(1),
+    );
     assert!(child_access_3.is_some()); // original list index must exist
-    let capsule = child_access_3.unwrap_or(OriginalMiniCapsule { id: 0, parent_id: 0, a: Vec3::ZERO, b: Vec3::ZERO, radius: 0.0 });
-    let box_result_6=park.get_static_collidable_box(capsule.id);
+    let capsule = child_access_3.unwrap_or(OriginalMiniCapsule {
+        id: 0,
+        parent_id: 0,
+        a: Vec3::ZERO,
+        b: Vec3::ZERO,
+        radius: 0.0,
+    });
+    let box_result_6 = park.get_static_collidable_box(capsule.id);
     assert!(box_result_6.is_ok()); // original box query must not raise
-    let box_result_6=box_result_6.unwrap_or(None);
+    let box_result_6 = box_result_6.unwrap_or(None);
     assert!(box_result_6.is_some()); // original tuple unpacking requires a box
-    let (box_width,(x,y,z))=box_result_6.unwrap_or((0.0,(0.0,0.0,0.0)));
+    let (box_width, (x, y, z)) = box_result_6.unwrap_or((0.0, (0.0, 0.0, 0.0)));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:361
     assert!(box_width == 480.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:362
@@ -6445,7 +8395,10 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_capsule_in_box_zero_zero_
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_oriented_box_in_box_zero_zero_zero
@@ -6455,17 +8408,59 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__test_capsule_in_box_zero_zero_
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetStaticCollidableBox__t__74e7e249be8101bcd6fa234e() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: (480.0_f64 / 4.0_f64), y: (480.0_f64 / 4.0_f64), z: (480.0_f64 / 4.0_f64) }, Vec3 { x: 1.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 1.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 1.0_f64 }) == Ok(())); // original call must not raise
-    let child_access_3 = (park.retained(parentBall).mini_boxes).get((park.retained(parentBall).mini_boxes).len().saturating_sub(1));
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: (480.0_f64 / 4.0_f64),
+                y: (480.0_f64 / 4.0_f64),
+                z: (480.0_f64 / 4.0_f64)
+            },
+            Vec3 {
+                x: 1.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 1.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 1.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
+    let child_access_3 = (park.retained(parentBall).mini_boxes).get(
+        (park.retained(parentBall).mini_boxes)
+            .len()
+            .saturating_sub(1),
+    );
     assert!(child_access_3.is_some()); // original list index must exist
-    let obb = child_access_3.unwrap_or(OriginalMiniBox { id: 0, parent_id: 0, corner: Vec3::ZERO, x: Vec3::ZERO, y: Vec3::ZERO, z: Vec3::ZERO });
-    let box_result_6=park.get_static_collidable_box(obb.id);
+    let obb = child_access_3.unwrap_or(OriginalMiniBox {
+        id: 0,
+        parent_id: 0,
+        corner: Vec3::ZERO,
+        x: Vec3::ZERO,
+        y: Vec3::ZERO,
+        z: Vec3::ZERO,
+    });
+    let box_result_6 = park.get_static_collidable_box(obb.id);
     assert!(box_result_6.is_ok()); // original box query must not raise
-    let box_result_6=box_result_6.unwrap_or(None);
+    let box_result_6 = box_result_6.unwrap_or(None);
     assert!(box_result_6.is_some()); // original tuple unpacking requires a box
-    let (box_width,(x,y,z))=box_result_6.unwrap_or((0.0,(0.0,0.0,0.0)));
+    let (box_width, (x, y, z)) = box_result_6.unwrap_or((0.0, (0.0, 0.0, 0.0)));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:376
     assert!(box_width == 480.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:377
@@ -6478,7 +8473,10 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__74e7e249be8101bcd6fa234e() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_oriented_box_in_box_zero_zero_one
@@ -6488,17 +8486,59 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__74e7e249be8101bcd6fa234e() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetStaticCollidableBox__t__10a654df0f219a6cd4ed2ceb() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: (480.0_f64 / 4.0_f64), y: (480.0_f64 / 4.0_f64), z: (480.0_f64 * 1.5_f64) }, Vec3 { x: 1.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 1.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 1.0_f64 }) == Ok(())); // original call must not raise
-    let child_access_3 = (park.retained(parentBall).mini_boxes).get((park.retained(parentBall).mini_boxes).len().saturating_sub(1));
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: (480.0_f64 / 4.0_f64),
+                y: (480.0_f64 / 4.0_f64),
+                z: (480.0_f64 * 1.5_f64)
+            },
+            Vec3 {
+                x: 1.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 1.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 1.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
+    let child_access_3 = (park.retained(parentBall).mini_boxes).get(
+        (park.retained(parentBall).mini_boxes)
+            .len()
+            .saturating_sub(1),
+    );
     assert!(child_access_3.is_some()); // original list index must exist
-    let obb = child_access_3.unwrap_or(OriginalMiniBox { id: 0, parent_id: 0, corner: Vec3::ZERO, x: Vec3::ZERO, y: Vec3::ZERO, z: Vec3::ZERO });
-    let box_result_6=park.get_static_collidable_box(obb.id);
+    let obb = child_access_3.unwrap_or(OriginalMiniBox {
+        id: 0,
+        parent_id: 0,
+        corner: Vec3::ZERO,
+        x: Vec3::ZERO,
+        y: Vec3::ZERO,
+        z: Vec3::ZERO,
+    });
+    let box_result_6 = park.get_static_collidable_box(obb.id);
     assert!(box_result_6.is_ok()); // original box query must not raise
-    let box_result_6=box_result_6.unwrap_or(None);
+    let box_result_6 = box_result_6.unwrap_or(None);
     assert!(box_result_6.is_some()); // original tuple unpacking requires a box
-    let (box_width,(x,y,z))=box_result_6.unwrap_or((0.0,(0.0,0.0,0.0)));
+    let (box_width, (x, y, z)) = box_result_6.unwrap_or((0.0, (0.0, 0.0, 0.0)));
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:391
     assert!(box_width == 480.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:392
@@ -6511,7 +8551,10 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__10a654df0f219a6cd4ed2ceb() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_adding_a_capsule_makes_a_box_active
@@ -6521,23 +8564,52 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__10a654df0f219a6cd4ed2ceb() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetStaticCollidableBox__t__8a5a1ee9c90c5367ecae5e92() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_capsule(parentBall, Vec3 { x: 2.0_f64, y: 2.0_f64, z: 2.0_f64 }, Vec3 { x: 3.0_f64, y: 3.0_f64, z: 3.0_f64 }, (1.0_f64) as f32) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_capsule(
+            parentBall,
+            Vec3 {
+                x: 2.0_f64,
+                y: 2.0_f64,
+                z: 2.0_f64
+            },
+            Vec3 {
+                x: 3.0_f64,
+                y: 3.0_f64,
+                z: 3.0_f64
+            },
+            (1.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,false);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, false);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<1>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<1>(&[Vec3 {
+        x: 0.0_f64,
+        y: 0.0_f64,
+        z: 0.0_f64,
+    }]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:406
-    assert!(points_exact_equal(&active_boxes,&expected_active_boxes));
+    assert!(points_exact_equal(&active_boxes, &expected_active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_adding_a_large_capsule_makes_adjecent_boxes_active
@@ -6547,23 +8619,92 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__8a5a1ee9c90c5367ecae5e92() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetStaticCollidableBox__t__5327b1a6bdd7427a3f9b2b0b() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_capsule(parentBall, Vec3 { x: 1.0_f64, y: 1.0_f64, z: 1.0_f64 }, Vec3 { x: 2.0_f64, y: 2.0_f64, z: 2.0_f64 }, (2.0_f64) as f32) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_capsule(
+            parentBall,
+            Vec3 {
+                x: 1.0_f64,
+                y: 1.0_f64,
+                z: 1.0_f64
+            },
+            Vec3 {
+                x: 2.0_f64,
+                y: 2.0_f64,
+                z: 2.0_f64
+            },
+            (2.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<8>(&[Vec3 { x: -(480.0_f64), y: -(480.0_f64), z: -(480.0_f64) }, Vec3 { x: -(480.0_f64), y: -(480.0_f64), z: 0.0_f64 }, Vec3 { x: -(480.0_f64), y: 0.0_f64, z: -(480.0_f64) }, Vec3 { x: -(480.0_f64), y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: -(480.0_f64), z: -(480.0_f64) }, Vec3 { x: 0.0_f64, y: -(480.0_f64), z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: -(480.0_f64) }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<8>(&[
+        Vec3 {
+            x: -(480.0_f64),
+            y: -(480.0_f64),
+            z: -(480.0_f64),
+        },
+        Vec3 {
+            x: -(480.0_f64),
+            y: -(480.0_f64),
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: -(480.0_f64),
+            y: 0.0_f64,
+            z: -(480.0_f64),
+        },
+        Vec3 {
+            x: -(480.0_f64),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: -(480.0_f64),
+            z: -(480.0_f64),
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: -(480.0_f64),
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: -(480.0_f64),
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:427
-    assert!(points_exact_equal(&sort_points(&active_boxes),&expected_active_boxes));
+    assert!(points_exact_equal(
+        &sort_points(&active_boxes),
+        &expected_active_boxes
+    ));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestGetStaticCollidableBox::test_adding_a_long_capsule_makes_adjecent_boxes_active
@@ -6573,23 +8714,87 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__5327b1a6bdd7427a3f9b2b0b() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestGetStaticCollidableBox__t__532151085bcf0de5e6911225() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_capsule(parentBall, Vec3 { x: (480.0_f64 / 2.0_f64), y: (480.0_f64 / 2.0_f64), z: (480.0_f64 / 2.0_f64) }, Vec3 { x: (480.0_f64 * 6.0_f64), y: (480.0_f64 / 2.0_f64), z: (480.0_f64 / 2.0_f64) }, ((480.0_f64 / 3.0_f64)) as f32) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_capsule(
+            parentBall,
+            Vec3 {
+                x: (480.0_f64 / 2.0_f64),
+                y: (480.0_f64 / 2.0_f64),
+                z: (480.0_f64 / 2.0_f64)
+            },
+            Vec3 {
+                x: (480.0_f64 * 6.0_f64),
+                y: (480.0_f64 / 2.0_f64),
+                z: (480.0_f64 / 2.0_f64)
+            },
+            (480.0_f64 / 3.0_f64) as f32
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<7>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 480.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: (480.0_f64 * 2.0_f64), y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: (480.0_f64 * 3.0_f64), y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: (480.0_f64 * 4.0_f64), y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: (480.0_f64 * 5.0_f64), y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: (480.0_f64 * 6.0_f64), y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<7>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 480.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: (480.0_f64 * 2.0_f64),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: (480.0_f64 * 3.0_f64),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: (480.0_f64 * 4.0_f64),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: (480.0_f64 * 5.0_f64),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: (480.0_f64 * 6.0_f64),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:447
-    assert!(points_exact_equal(&sort_points(&active_boxes),&expected_active_boxes));
+    assert!(points_exact_equal(
+        &sort_points(&active_boxes),
+        &expected_active_boxes
+    ));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_adding_a_box_makes_a_box_active
@@ -6599,23 +8804,62 @@ fn boxes_and_bubbles__TestGetStaticCollidableBox__t__532151085bcf0de5e6911225() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__ab33ace90f2d3108d183c144() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { radius: (500.0_f64) as f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        radius: (500.0_f64) as f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: 2.0_f64, y: 2.0_f64, z: 2.0_f64 }, Vec3 { x: 1.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 1.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 1.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: 2.0_f64,
+                y: 2.0_f64,
+                z: 2.0_f64
+            },
+            Vec3 {
+                x: 1.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 1.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 1.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,false);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, false);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<1>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<1>(&[Vec3 {
+        x: 0.0_f64,
+        y: 0.0_f64,
+        z: 0.0_f64,
+    }]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:479
-    assert!(points_exact_equal(&expected_active_boxes,&active_boxes));
+    assert!(points_exact_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_tight_fit
@@ -6625,23 +8869,61 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__ab33ace90f2d3108d183c144() 
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_tight_fit() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 10.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 10.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 10.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 10.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,false);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, false);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<1>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<1>(&[Vec3 {
+        x: 0.0_f64,
+        y: 0.0_f64,
+        z: 0.0_f64,
+    }]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:492
-    assert!(points_exact_equal(&expected_active_boxes,&active_boxes));
+    assert!(points_exact_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_level_six
@@ -6651,23 +8933,61 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_tight_fit() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_level_six() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 10.1_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 10.1_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 10.1_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 10.1_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 10.1_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 10.1_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 6.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,false);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, false);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<1>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<1>(&[Vec3 {
+        x: 0.0_f64,
+        y: 0.0_f64,
+        z: 0.0_f64,
+    }]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:505
-    assert!(points_exact_equal(&expected_active_boxes,&active_boxes));
+    assert!(points_exact_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_intersect_left
@@ -6677,23 +8997,68 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_level_six() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_left() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: -(1.0_f64), y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 5.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 5.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 5.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: -(1.0_f64),
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 5.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 5.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 5.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<2>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: -(480.0_f64), y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<2>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: -(480.0_f64),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:518
-    assert!(point_sets_equal(&expected_active_boxes,&active_boxes));
+    assert!(point_sets_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_intersect_right
@@ -6703,23 +9068,68 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_left() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_right() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: (480.0_f64 - 4.0_f64), y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 5.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 5.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 5.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: (480.0_f64 - 4.0_f64),
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 5.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 5.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 5.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<2>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 480.0_f64, y: 0.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<2>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 480.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:531
-    assert!(point_sets_equal(&expected_active_boxes,&active_boxes));
+    assert!(point_sets_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_intersect_bottom
@@ -6729,23 +9139,68 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_right() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_bottom() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: 0.0_f64, y: -(1.0_f64), z: 0.0_f64 }, Vec3 { x: 5.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 5.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 5.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: 0.0_f64,
+                y: -(1.0_f64),
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 5.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 5.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 5.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<2>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: -(480.0_f64), z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<2>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: -(480.0_f64),
+            z: 0.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:544
-    assert!(point_sets_equal(&expected_active_boxes,&active_boxes));
+    assert!(point_sets_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_intersect_top
@@ -6755,23 +9210,68 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_bottom() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_top() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: 0.0_f64, y: (480.0_f64 - 4.0_f64), z: 0.0_f64 }, Vec3 { x: 5.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 5.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 5.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: 0.0_f64,
+                y: (480.0_f64 - 4.0_f64),
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 5.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 5.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 5.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<2>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 480.0_f64, z: 0.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<2>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 480.0_f64,
+            z: 0.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:557
-    assert!(point_sets_equal(&expected_active_boxes,&active_boxes));
+    assert!(point_sets_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_intersect_back
@@ -6781,23 +9281,68 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_top() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_back() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: 0.0_f64, y: 0.0_f64, z: -(1.0_f64) }, Vec3 { x: 5.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 5.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 5.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: -(1.0_f64)
+            },
+            Vec3 {
+                x: 5.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 5.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 5.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<2>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: -(480.0_f64) }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<2>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: -(480.0_f64),
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:570
-    assert!(point_sets_equal(&expected_active_boxes,&active_boxes));
+    assert!(point_sets_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_intersect_front
@@ -6807,23 +9352,68 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_back() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_front() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: 0.0_f64, y: 0.0_f64, z: (480.0_f64 - 4.0_f64) }, Vec3 { x: 5.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 5.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 5.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: (480.0_f64 - 4.0_f64)
+            },
+            Vec3 {
+                x: 5.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 5.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 5.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<2>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 480.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<2>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 480.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:583
-    assert!(point_sets_equal(&expected_active_boxes,&active_boxes));
+    assert!(point_sets_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestActiveBoxesForOrientedBox::test_intersect_top_front_right
@@ -6833,23 +9423,98 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_front() {
 #[cfg_attr(test, test)]
 fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_top_front_right() {
     let mut park = OriginalParkProjection::default();
-    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit { position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let parentBall = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(parentBall) && !park.scope_error);
-    assert!(park.add_mini_box(parentBall, Vec3 { x: (480.0_f64 - 4.0_f64), y: (480.0_f64 - 4.0_f64), z: (480.0_f64 - 4.0_f64) }, Vec3 { x: 5.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 5.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 5.0_f64 }) == Ok(())); // original call must not raise
+    assert!(
+        park.add_mini_box(
+            parentBall,
+            Vec3 {
+                x: (480.0_f64 - 4.0_f64),
+                y: (480.0_f64 - 4.0_f64),
+                z: (480.0_f64 - 4.0_f64)
+            },
+            Vec3 {
+                x: 5.0_f64,
+                y: 0.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 5.0_f64,
+                z: 0.0_f64
+            },
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 5.0_f64
+            }
+        ) == Ok(())
+    ); // original call must not raise
     let level = 7.0_f64;
-    let boxes_result_4=park.get_active_box_view((level) as i32,true);
+    let boxes_result_4 = park.get_active_box_view((level) as i32, true);
     assert!(boxes_result_4.is_ok()); // exact order for zero/one cell; otherwise declared set/sorted view
-    let box_unpack_6=boxes_result_4.unwrap_or(None);
+    let box_unpack_6 = boxes_result_4.unwrap_or(None);
     assert!(box_unpack_6.is_some()); // original tuple unpacking requires a value
-    let (level_width, active_boxes)=box_unpack_6.unwrap_or((0.0,BoundedList::<Vec3,64>::new()));
-    let expected_active_boxes = point_list::<8>(&[Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 480.0_f64, y: 0.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 480.0_f64, z: 0.0_f64 }, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 480.0_f64 }, Vec3 { x: 0.0_f64, y: 480.0_f64, z: 480.0_f64 }, Vec3 { x: 480.0_f64, y: 480.0_f64, z: 0.0_f64 }, Vec3 { x: 480.0_f64, y: 0.0_f64, z: 480.0_f64 }, Vec3 { x: 480.0_f64, y: 480.0_f64, z: 480.0_f64 }]);
+    let (level_width, active_boxes) = box_unpack_6.unwrap_or((0.0, BoundedList::<Vec3, 64>::new()));
+    let expected_active_boxes = point_list::<8>(&[
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 480.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 480.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 480.0_f64,
+        },
+        Vec3 {
+            x: 0.0_f64,
+            y: 480.0_f64,
+            z: 480.0_f64,
+        },
+        Vec3 {
+            x: 480.0_f64,
+            y: 480.0_f64,
+            z: 0.0_f64,
+        },
+        Vec3 {
+            x: 480.0_f64,
+            y: 0.0_f64,
+            z: 480.0_f64,
+        },
+        Vec3 {
+            x: 480.0_f64,
+            y: 480.0_f64,
+            z: 480.0_f64,
+        },
+    ]);
     // original-assertion: python/destiny/test/ballpark/test_boxes_and_bubbles.py:603
-    assert!(point_sets_equal(&expected_active_boxes,&active_boxes));
+    assert!(point_sets_equal(&expected_active_boxes, &active_boxes));
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_src_gets_launched_at_dst
@@ -6859,15 +9524,26 @@ fn boxes_and_bubbles__TestActiveBoxesForOrientedBox__test_intersect_top_front_ri
 #[cfg_attr(test, test)]
 fn movement_controls__TestLaunchMissile__test_src_gets_launched_at_dst() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let aimed_launch = false;
     let massive = false;
-    assert!(park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())); // original call must not raise
+    assert!(
+        park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:290
     assert!(park.retained(src).mode == OriginalMode::Missile);
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:291
@@ -6876,7 +9552,10 @@ fn movement_controls__TestLaunchMissile__test_src_gets_launched_at_dst() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_owner_of_missile_is_correct
@@ -6886,22 +9565,36 @@ fn movement_controls__TestLaunchMissile__test_src_gets_launched_at_dst() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestLaunchMissile__test_owner_of_missile_is_correct() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let aimed_launch = false;
     let massive = false;
-    assert!(park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())); // original call must not raise
+    assert!(
+        park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:298
     assert!(park.retained(src).owner_id == owner);
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_massive_missile
@@ -6911,22 +9604,36 @@ fn movement_controls__TestLaunchMissile__test_owner_of_missile_is_correct() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestLaunchMissile__test_massive_missile() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let aimed_launch = false;
     let massive = true;
-    assert!(park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())); // original call must not raise
+    assert!(
+        park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:305
     assert!(park.retained(src).is_massive == true);
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_direction_of_non_aimed_missiles
@@ -6936,17 +9643,32 @@ fn movement_controls__TestLaunchMissile__test_massive_missile() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestLaunchMissile__test_direction_of_non_aimed_missiles() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let attribute_value_6 = (park.retained(dst).position.x + 10000.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let aimed_launch = false;
     let massive = false;
-    assert!(park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())); // original call must not raise
+    assert!(
+        park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:313
     assert!(park.retained(src).velocity.x == 0.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:314
@@ -6957,7 +9679,10 @@ fn movement_controls__TestLaunchMissile__test_direction_of_non_aimed_missiles() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_additional_velocity_of_missile_is_the_same_as_the_max_velocity_of_its_owner_if_above_limit
@@ -6967,18 +9692,33 @@ fn movement_controls__TestLaunchMissile__test_direction_of_non_aimed_missiles() 
 #[cfg_attr(test, test)]
 fn movement_controls__TestLaunchMissile__test_addit__e644bbb51f63be5235cb007c() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let attribute_value_6 = (park.retained(dst).position.x + 10000.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let aimed_launch = false;
     let massive = false;
     park.set_max_speed(owner, (1234.0_f64) as f32);
-    assert!(park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())); // original call must not raise
+    assert!(
+        park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:324
     assert!(park.retained(src).velocity.x == 0.0_f64);
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:325
@@ -6989,7 +9729,10 @@ fn movement_controls__TestLaunchMissile__test_addit__e644bbb51f63be5235cb007c() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_initial_velocity_of_owner_has_impact_of_non_aimed_missile_direction_and_speed
@@ -6999,26 +9742,54 @@ fn movement_controls__TestLaunchMissile__test_addit__e644bbb51f63be5235cb007c() 
 #[cfg_attr(test, test)]
 fn movement_controls__TestLaunchMissile__test_initi__8b4e8f1177e0ebdf44b7f320() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let attribute_value_6 = (park.retained(dst).position.x + 10000.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let aimed_launch = false;
     let massive = false;
     let attribute_value_10 = 100.0_f64;
-    park.write_attribute_notified(owner, |b| b.velocity.x = attribute_value_10, OriginalBallAttribute::Velocity);
-    assert!(park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())); // original call must not raise
+    park.write_attribute_notified(
+        owner,
+        |b| b.velocity.x = attribute_value_10,
+        OriginalBallAttribute::Velocity,
+    );
+    assert!(
+        park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:335
-    assert!((park.retained(src).velocity.x, park.retained(src).velocity.y, park.retained(src).velocity.z) == (250.0_f64, 0.0_f64, 0.0_f64));
+    assert!(
+        (
+            park.retained(src).velocity.x,
+            park.retained(src).velocity.y,
+            park.retained(src).velocity.z
+        ) == (250.0_f64, 0.0_f64, 0.0_f64)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestLaunchMissile::test_direction_of_aimed_missiles
@@ -7028,24 +9799,48 @@ fn movement_controls__TestLaunchMissile__test_initi__8b4e8f1177e0ebdf44b7f320() 
 #[cfg_attr(test, test)]
 fn movement_controls__TestLaunchMissile__test_direction_of_aimed_missiles() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
-    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let dst = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(dst) && !park.scope_error);
-    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (3.0_f64) as i64, ..OriginalBallInit::default() });
+    let owner = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (3.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(owner) && !park.scope_error);
     let attribute_value_6 = (park.retained(dst).position.x + 10000.0_f64);
-    park.write_attribute_notified(dst, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        dst,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let aimed_launch = true;
     let massive = false;
-    assert!(park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())); // original call must not raise
+    assert!(
+        park.launch_missile(src, dst, owner, i8::from(aimed_launch), i8::from(massive)) == Ok(())
+    ); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:343
-    assert!((park.retained(src).velocity.x, park.retained(src).velocity.y, park.retained(src).velocity.z) == (1.0_f64, 0.0_f64, 0.0_f64));
+    assert!(
+        (
+            park.retained(src).velocity.x,
+            park.retained(src).velocity.y,
+            park.retained(src).velocity.z
+        ) == (1.0_f64, 0.0_f64, 0.0_f64)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestOrbit::test_can_not_orbit_cloaked_ball
@@ -7055,9 +9850,15 @@ fn movement_controls__TestLaunchMissile__test_direction_of_aimed_missiles() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestOrbit__test_can_not_orbit_cloaked_ball() {
     let mut park = OriginalParkProjection::default();
-    let first = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let first = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(first) && !park.scope_error);
-    let second = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let second = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(second) && !park.scope_error);
     assert!(park.cloak_ball(second, 1_i8, (2000.0_f64) as f32) == Ok(())); // original call must not raise
     park.follow(first, second, (1.0_f64) as f32, true);
@@ -7073,7 +9874,10 @@ fn movement_controls__TestOrbit__test_can_not_orbit_cloaked_ball() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestOrbit::test_can_not_orbit_ball_in_different_bubble
@@ -7083,9 +9887,15 @@ fn movement_controls__TestOrbit__test_can_not_orbit_cloaked_ball() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestOrbit__test_can_not_orbit_ball_in_different_bubble() {
     let mut park = OriginalParkProjection::default();
-    let first = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let first = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(first) && !park.scope_error);
-    let second = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (2.0_f64) as i64, ..OriginalBallInit::default() });
+    let second = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (2.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(second) && !park.scope_error);
     assert!(park.initialize_query_bubbles(second) == Ok(())); // original call must not raise
     park.follow(first, second, (1.0_f64) as f32, true);
@@ -7103,7 +9913,10 @@ fn movement_controls__TestOrbit__test_can_not_orbit_ball_in_different_bubble() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestEntityWarpIn::test_warps_immediately
@@ -7113,20 +9926,26 @@ fn movement_controls__TestOrbit__test_can_not_orbit_ball_in_different_bubble() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestEntityWarpIn__test_warps_immediately() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
     let x = 0.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
     let warpFactor = 1.0_f64;
-    assert!(park.entity_warp_in(src,Vec3 { x: x, y: y, z: z },(warpFactor) as i32) == Ok(())); // original call must not raise
+    assert!(park.entity_warp_in(src, Vec3 { x: x, y: y, z: z }, (warpFactor) as i32) == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:363
     assert!(park.retained(src).mode == OriginalMode::Warp);
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestEntityWarpIn::test_velocity_is_approximately_one_au
@@ -7136,26 +9955,46 @@ fn movement_controls__TestEntityWarpIn__test_warps_immediately() {
 #[cfg_attr(test, test)]
 fn movement_controls__TestEntityWarpIn__test_velocity_is_approximately_one_au() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
     let attribute_value_2 = 0.0_f64;
-    park.write_attribute_notified(src, |b| b.position.x = attribute_value_2, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        src,
+        |b| b.position.x = attribute_value_2,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_4 = 0.0_f64;
-    park.write_attribute_notified(src, |b| b.position.y = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        src,
+        |b| b.position.y = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_6 = 0.0_f64;
-    park.write_attribute_notified(src, |b| b.position.z = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        src,
+        |b| b.position.z = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let x = 1e10_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
     let warpFactor = 1.0_f64;
-    assert!(park.entity_warp_in(src,Vec3 { x: x, y: y, z: z },(warpFactor) as i32) == Ok(())); // original call must not raise
+    assert!(park.entity_warp_in(src, Vec3 { x: x, y: y, z: z }, (warpFactor) as i32) == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:371
-    assert!(python_almost_equal(park.retained(src).velocity.x, 149_597_870_700.0_f64, 7) == Some(true));
+    assert!(
+        python_almost_equal(park.retained(src).velocity.x, 149_597_870_700.0_f64, 7) == Some(true)
+    );
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_movement_controls.py::TestEntityWarpIn::test_ball_in_goto_mode_does_not_warp
@@ -7165,27 +10004,45 @@ fn movement_controls__TestEntityWarpIn__test_velocity_is_approximately_one_au() 
 #[cfg_attr(test, test)]
 fn movement_controls__TestEntityWarpIn__test_ball_in_goto_mode_does_not_warp() {
     let mut park = OriginalParkProjection::default();
-    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let src = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(src) && !park.scope_error);
     let x = 0.0_f64;
     let y = 0.0_f64;
     let z = 0.0_f64;
     let warpFactor = 1.0_f64;
     let attribute_value_6 = 1.0_f64;
-    park.write_attribute_notified(src, |b| b.position.x = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        src,
+        |b| b.position.x = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = 0.0_f64;
-    park.write_attribute_notified(src, |b| b.position.y = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        src,
+        |b| b.position.y = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_10 = 0.0_f64;
-    park.write_attribute_notified(src, |b| b.position.z = attribute_value_10, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        src,
+        |b| b.position.z = attribute_value_10,
+        OriginalBallAttribute::Position,
+    );
     park.goto_point(src, Vec3 { x: x, y: y, z: z });
-    assert!(park.entity_warp_in(src,Vec3 { x: x, y: y, z: z },(warpFactor) as i32) == Ok(())); // original call must not raise
+    assert!(park.entity_warp_in(src, Vec3 { x: x, y: y, z: z }, (warpFactor) as i32) == Ok(())); // original call must not raise
     // original-assertion: python/destiny/test/ballpark/test_movement_controls.py:380
     assert!(park.retained(src).mode != OriginalMode::Warp);
     assert!(!park.scope_error);
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/test_visibility.py::TestCloaking::test_uncloaking_a_ball_in_warp_does_not_make_it_massive
@@ -7195,22 +10052,58 @@ fn movement_controls__TestEntityWarpIn__test_ball_in_goto_mode_does_not_warp() {
 #[cfg_attr(test, test)]
 fn visibility__TestCloaking__test_uncloaking_a_ball__0c28ef41d4ca5862af85cdc4() {
     let mut park = OriginalParkProjection::default();
-    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: (1.0_f64) as i64, ..OriginalBallInit::default() });
+    let ball = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: (1.0_f64) as i64,
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(ball) && !park.scope_error);
     let attribute_value_2 = false;
-    park.write_attribute_notified(ball, |b| b.is_massive = attribute_value_2, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        ball,
+        |b| b.is_massive = attribute_value_2,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_4 = 0.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.x = attribute_value_4, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.x = attribute_value_4,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_6 = 0.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.y = attribute_value_6, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.y = attribute_value_6,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_8 = 0.0_f64;
-    park.write_attribute_notified(ball, |b| b.position.z = attribute_value_8, OriginalBallAttribute::Position);
+    park.write_attribute_notified(
+        ball,
+        |b| b.position.z = attribute_value_8,
+        OriginalBallAttribute::Position,
+    );
     let attribute_value_10 = (1.0_f64) as f32;
-    park.write_attribute_notified(ball, |b| b.max_velocity = attribute_value_10, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        ball,
+        |b| b.max_velocity = attribute_value_10,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_12 = 1.0_f64;
-    park.write_attribute_notified(ball, |b| b.velocity.x = attribute_value_12, OriginalBallAttribute::Velocity);
+    park.write_attribute_notified(
+        ball,
+        |b| b.velocity.x = attribute_value_12,
+        OriginalBallAttribute::Velocity,
+    );
     park.set_free(ball, true);
-    park.warp_to(ball, Vec3 { x: 1e10_f64, y: 0.0_f64, z: 0.0_f64 }, 20000.0_f64, (20.0_f64) as i32);
+    park.warp_to(
+        ball,
+        Vec3 {
+            x: 1e10_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        20000.0_f64,
+        (20.0_f64) as i32,
+    );
     assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
     park.uncloak_ball(ball);
     // original-assertion: python/destiny/test/ballpark/test_visibility.py:82
@@ -7219,6 +10112,8 @@ fn visibility__TestCloaking__test_uncloaking_a_ball__0c28ef41d4ca5862af85cdc4() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original park projection scenario and teardown completed");
+    kani::cover!(
+        true,
+        "original park projection scenario and teardown completed"
+    );
 }
-

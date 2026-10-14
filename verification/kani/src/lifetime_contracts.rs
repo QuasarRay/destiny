@@ -4,211 +4,254 @@
 // Native type registration, initial global counts, Python wrapper caching,
 // atomic concurrency/aliases and class-name lookup remain correspondence duties.
 #![allow(non_snake_case)]
-use destiny_original_spec::{OriginalObjectClass,OriginalLifetimeProjection};
+use destiny_original_spec::{OriginalLifetimeProjection, OriginalObjectClass};
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_initial_count_is_zero
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_initial_count_is_zero() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
     // original-assertion: python/destiny/test/test_cleanup.py:29; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::Ball)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::Ball) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:30; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::Park)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::Park) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:31; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::ClientBall)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::ClientBall) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:32; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBall)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::MiniBall) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:33; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBox)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::MiniBox) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:34; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniCapsule)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::MiniCapsule) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_balls_get_counted
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_balls_get_counted() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(true)==Ok(()));
-    let result=world.add_cleanup_ball();assert!(result.is_ok());
-    let ball=result.expect("checked original AddBall construction");
+    assert!(world.create_park(true) == Ok(()));
+    let result = world.add_cleanup_ball();
+    assert!(result.is_ok());
+    let ball = result.expect("checked original AddBall construction");
     // original-assertion: python/destiny/test/test_cleanup.py:88; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::Ball)==Some(1_i32));
-    assert!(world.remove_ball(ball.id,0)==Ok(()));
-    assert!(world.evolve()==Ok(()));
-    assert!(world.drop_ball_reference(ball)==Ok(()));
+    assert!(world.live_count(OriginalObjectClass::Ball) == Some(1_i32));
+    assert!(world.remove_ball(ball.id, 0) == Ok(()));
+    assert!(world.evolve() == Ok(()));
+    assert!(world.drop_ball_reference(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:92; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::Ball)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::Ball) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_clear_all_resets_counts
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_clear_all_resets_counts() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(true)==Ok(()));
-    let result=world.add_cleanup_ball();assert!(result.is_ok());
-    let ball=result.expect("checked original AddBall construction");
-    assert!(world.add_mini_ball(ball)==Ok(()));
-    assert!(world.add_mini_box(ball)==Ok(()));
-    assert!(world.add_mini_capsule(ball)==Ok(()));
-    assert!(world.clear_all()==Ok(()));
-    assert!(world.drop_ball_reference(ball)==Ok(()));
+    assert!(world.create_park(true) == Ok(()));
+    let result = world.add_cleanup_ball();
+    assert!(result.is_ok());
+    let ball = result.expect("checked original AddBall construction");
+    assert!(world.add_mini_ball(ball) == Ok(()));
+    assert!(world.add_mini_box(ball) == Ok(()));
+    assert!(world.add_mini_capsule(ball) == Ok(()));
+    assert!(world.clear_all() == Ok(()));
+    assert!(world.drop_ball_reference(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:134; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::Ball)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::Ball) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:135; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBall)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::MiniBall) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:136; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBox)==Some(0_i32));
+    assert!(world.live_count(OriginalObjectClass::MiniBox) == Some(0_i32));
     // original-assertion: python/destiny/test/test_cleanup.py:137; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniCapsule)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::MiniCapsule) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_clientballs_get_cleared
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_clientballs_get_cleared() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(false)==Ok(()));
-    let result=world.add_cleanup_ball();assert!(result.is_ok());
-    let ball=result.expect("checked original AddBall construction");
+    assert!(world.create_park(false) == Ok(()));
+    let result = world.add_cleanup_ball();
+    assert!(result.is_ok());
+    let ball = result.expect("checked original AddBall construction");
     // original-assertion: python/destiny/test/test_cleanup.py:153; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::ClientBall)==Some(1_i32));
-    assert!(world.clear_all()==Ok(()));
-    assert!(world.drop_ball_reference(ball)==Ok(()));
+    assert!(world.live_count(OriginalObjectClass::ClientBall) == Some(1_i32));
+    assert!(world.clear_all() == Ok(()));
+    assert!(world.drop_ball_reference(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:156; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::ClientBall)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::ClientBall) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_clientballs_get_counted
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_clientballs_get_counted() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(false)==Ok(()));
-    let result=world.add_cleanup_ball();assert!(result.is_ok());
-    let ball=result.expect("checked original AddBall construction");
+    assert!(world.create_park(false) == Ok(()));
+    let result = world.add_cleanup_ball();
+    assert!(result.is_ok());
+    let ball = result.expect("checked original AddBall construction");
     // original-assertion: python/destiny/test/test_cleanup.py:142; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::ClientBall)==Some(1_i32));
-    let ball_id=ball.id;
-    assert!(world.remove_ball(ball_id,0)==Ok(()));
-    assert!(world.evolve()==Ok(()));
-    assert!(world.drop_ball_reference(ball)==Ok(()));
+    assert!(world.live_count(OriginalObjectClass::ClientBall) == Some(1_i32));
+    let ball_id = ball.id;
+    assert!(world.remove_ball(ball_id, 0) == Ok(()));
+    assert!(world.evolve() == Ok(()));
+    assert!(world.drop_ball_reference(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:147; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::ClientBall)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::ClientBall) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_miniballs_get_counted
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_miniballs_get_counted() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(true)==Ok(()));
-    let result=world.add_cleanup_ball();assert!(result.is_ok());
-    let ball=result.expect("checked original AddBall construction");
-    assert!(world.add_mini_ball(ball)==Ok(()));
+    assert!(world.create_park(true) == Ok(()));
+    let result = world.add_cleanup_ball();
+    assert!(result.is_ok());
+    let ball = result.expect("checked original AddBall construction");
+    assert!(world.add_mini_ball(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:98; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBall)==Some(1_i32));
-    let ball_id=ball.id;
-    assert!(world.remove_ball(ball_id,0)==Ok(()));
-    assert!(world.evolve()==Ok(()));
-    assert!(world.drop_ball_reference(ball)==Ok(()));
+    assert!(world.live_count(OriginalObjectClass::MiniBall) == Some(1_i32));
+    let ball_id = ball.id;
+    assert!(world.remove_ball(ball_id, 0) == Ok(()));
+    assert!(world.evolve() == Ok(()));
+    assert!(world.drop_ball_reference(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:103; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBall)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::MiniBall) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_miniboxes_get_counted
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_miniboxes_get_counted() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(true)==Ok(()));
-    let result=world.add_cleanup_ball();assert!(result.is_ok());
-    let ball=result.expect("checked original AddBall construction");
-    assert!(world.add_mini_box(ball)==Ok(()));
+    assert!(world.create_park(true) == Ok(()));
+    let result = world.add_cleanup_ball();
+    assert!(result.is_ok());
+    let ball = result.expect("checked original AddBall construction");
+    assert!(world.add_mini_box(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:109; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBox)==Some(1_i32));
-    let ball_id=ball.id;
-    assert!(world.remove_ball(ball_id,0)==Ok(()));
-    assert!(world.evolve()==Ok(()));
-    assert!(world.drop_ball_reference(ball)==Ok(()));
+    assert!(world.live_count(OriginalObjectClass::MiniBox) == Some(1_i32));
+    let ball_id = ball.id;
+    assert!(world.remove_ball(ball_id, 0) == Ok(()));
+    assert!(world.evolve() == Ok(()));
+    assert!(world.drop_ball_reference(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:114; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniBox)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::MiniBox) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_minicapsules_get_counted
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_minicapsules_get_counted() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(true)==Ok(()));
-    let result=world.add_cleanup_ball();assert!(result.is_ok());
-    let ball=result.expect("checked original AddBall construction");
-    assert!(world.add_mini_capsule(ball)==Ok(()));
+    assert!(world.create_park(true) == Ok(()));
+    let result = world.add_cleanup_ball();
+    assert!(result.is_ok());
+    let ball = result.expect("checked original AddBall construction");
+    assert!(world.add_mini_capsule(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:120; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniCapsule)==Some(1_i32));
-    let ball_id=ball.id;
-    assert!(world.remove_ball(ball_id,1)==Ok(()));
-    assert!(world.drop_ball_reference(ball)==Ok(()));
+    assert!(world.live_count(OriginalObjectClass::MiniCapsule) == Some(1_i32));
+    let ball_id = ball.id;
+    assert!(world.remove_ball(ball_id, 1) == Ok(()));
+    assert!(world.drop_ball_reference(ball) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:124; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::MiniCapsule)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::MiniCapsule) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }
 
 // original-case: python/destiny/test/test_cleanup.py::TestLiveCount::test_parks_get_counted
 // original-source-sha256: 8a0e900877d7c0a778c54d0bce65082a754f7a673a323318a354203eb98c2bac
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(129))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(129))]
+#[cfg_attr(test, test)]
 fn TestLiveCount__test_parks_get_counted() {
-    let mut world=OriginalLifetimeProjection::default();
+    let mut world = OriginalLifetimeProjection::default();
     world.register_destiny_classes(); // typed relation of original module registration; native execution remains pending
-    assert!(world.create_park(true)==Ok(()));
+    assert!(world.create_park(true) == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:39; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::Park)==Some(1_i32));
-    assert!(world.drop_park_reference()==Ok(()));
+    assert!(world.live_count(OriginalObjectClass::Park) == Some(1_i32));
+    assert!(world.drop_park_reference() == Ok(()));
     // original-assertion: python/destiny/test/test_cleanup.py:41; full helper python/destiny/test/test_cleanup.py:46
-    assert!(world.live_count(OriginalObjectClass::Park)==Some(0_i32));
-    assert!(world.finish_scope()==Ok(())); // original remaining local references leave scope
-    #[cfg(kani)] kani::cover!(true,"complete source-derived ownership/count scenario reached; native correspondence pending");
+    assert!(world.live_count(OriginalObjectClass::Park) == Some(0_i32));
+    assert!(world.finish_scope() == Ok(())); // original remaining local references leave scope
+    #[cfg(kani)]
+    kani::cover!(
+        true,
+        "complete source-derived ownership/count scenario reached; native correspondence pending"
+    );
 }

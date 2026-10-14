@@ -4,363 +4,758 @@
 // calls. CPython 3.12.9 sum compensation and the original inclusive delta are
 // retained; interpreter/libm/native/global-setting correspondence is required.
 #![allow(non_snake_case)]
-use destiny_original_spec::{OriginalParkProjection,OriginalBallInit,OriginalBallAttribute,
-    OriginalMode,OriginalGlobalSettings,Vec3,python_almost_equal_delta,python_sum_three_floats};
-fn sum_squares(values:[f64;3]) -> f64 {
-    python_sum_three_floats([values[0].powf(2.0),values[1].powf(2.0),values[2].powf(2.0)])
+use destiny_original_spec::{
+    OriginalBallAttribute, OriginalBallInit, OriginalGlobalSettings, OriginalMode,
+    OriginalParkProjection, Vec3, python_almost_equal_delta, python_sum_three_floats,
+};
+fn sum_squares(values: [f64; 3]) -> f64 {
+    python_sum_three_floats([
+        values[0].powf(2.0),
+        values[1].powf(2.0),
+        values[2].powf(2.0),
+    ])
 }
-fn sum_products(left:[f64;3],right:[f64;3]) -> f64 {
-    python_sum_three_floats([left[0]*right[0],left[1]*right[1],left[2]*right[2]])
+fn sum_products(left: [f64; 3], right: [f64; 3]) -> f64 {
+    python_sum_three_floats([left[0] * right[0], left[1] * right[1], left[2] * right[2]])
 }
 
 // original-case: python/destiny/test/ballpark/evolve/test_orbit.py::TestNewOrbit::test_orbit_stopped_ball_starting_right_distance
 // original-source-sha256: 813029bedae13ff9928a9055c6f4e59334924c1048d28074be134e8b1b242466
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(101))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(101))]
+#[cfg_attr(test, test)]
 fn test_orbit_stopped_ball_starting_right_distance() {
-    let mut settings=OriginalGlobalSettings::default();
-    let mut configured=settings.get();
-    configured.use_new_orbit=true;
+    let mut settings = OriginalGlobalSettings::default();
+    let mut configured = settings.get();
+    configured.use_new_orbit = true;
     settings.apply(configured);
-    let mut park=OriginalParkProjection::default();
-    park.use_new_orbit=settings.get().use_new_orbit;
-    let mut next_space_object_id=1_i64; // original fixture resets the helper global counter
-    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let mut park = OriginalParkProjection::default();
+    park.use_new_orbit = settings.get().use_new_orbit;
+    let mut next_space_object_id = 1_i64; // original fixture resets the helper global counter
+    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbitee) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbitee, true);
     let attribute_value_7 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.max_velocity = attribute_value_7, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.max_velocity = attribute_value_7,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_9 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.agility = attribute_value_9, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.agility = attribute_value_9,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_11 = 13000000.0_f64;
-    park.write_attribute_notified(orbitee, |b| b.mass = attribute_value_11, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.mass = attribute_value_11,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_13 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.radius = attribute_value_13, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.radius = attribute_value_13,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_15 = true;
-    park.write_attribute_notified(orbitee, |b| b.is_massive = attribute_value_15, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.is_massive = attribute_value_15,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_17 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.speed_fraction = attribute_value_17, OriginalBallAttribute::SpeedFraction);
-    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 10.0_f64, y: (0_i64) as f64, z: (0_i64) as f64 }, ..OriginalBallInit::default() });
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.speed_fraction = attribute_value_17,
+        OriginalBallAttribute::SpeedFraction,
+    );
+    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 10.0_f64,
+            y: (0_i64) as f64,
+            z: (0_i64) as f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbiter) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbiter, true);
     let attribute_value_25 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.max_velocity = attribute_value_25, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.max_velocity = attribute_value_25,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_27 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.agility = attribute_value_27, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.agility = attribute_value_27,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_29 = 13000000.0_f64;
-    park.write_attribute_notified(orbiter, |b| b.mass = attribute_value_29, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.mass = attribute_value_29,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_31 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.radius = attribute_value_31, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.radius = attribute_value_31,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_33 = true;
-    park.write_attribute_notified(orbiter, |b| b.is_massive = attribute_value_33, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.is_massive = attribute_value_33,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_35 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.speed_fraction = attribute_value_35, OriginalBallAttribute::SpeedFraction);
-    let original_stop_37=[100.0_f64,500.0_f64,1000.0_f64,2000.0_f64];
-    let mut original_counter_37=0_usize;
-    while original_counter_37<original_stop_37.len() {
-        let orbit=original_stop_37[original_counter_37];
-        let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius)) + f64::from(park.retained(orbiter).radius));
-        park.set_position(orbiter, Vec3 { x: expected_distance, y: 0.0_f64, z: 0.0_f64 });
-        park.set_velocity(orbiter, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 1.0_f64 });
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.speed_fraction = attribute_value_35,
+        OriginalBallAttribute::SpeedFraction,
+    );
+    let original_stop_37 = [100.0_f64, 500.0_f64, 1000.0_f64, 2000.0_f64];
+    let mut original_counter_37 = 0_usize;
+    while original_counter_37 < original_stop_37.len() {
+        let orbit = original_stop_37[original_counter_37];
+        let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius))
+            + f64::from(park.retained(orbiter).radius));
+        park.set_position(
+            orbiter,
+            Vec3 {
+                x: expected_distance,
+                y: 0.0_f64,
+                z: 0.0_f64,
+            },
+        );
+        park.set_velocity(
+            orbiter,
+            Vec3 {
+                x: 0.0_f64,
+                y: 0.0_f64,
+                z: 1.0_f64,
+            },
+        );
         park.follow(orbiter, orbitee, (orbit) as f32, true);
-        let original_stop_45=100_i64; // Python range evaluates its bound exactly once
-        let mut original_counter_45=0_i64;
-        while original_counter_45<original_stop_45 {
-            let i=original_counter_45;
+        let original_stop_45 = 100_i64; // Python range evaluates its bound exactly once
+        let mut original_counter_45 = 0_i64;
+        while original_counter_45 < original_stop_45 {
+            let i = original_counter_45;
             assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
-            let tovector = [(park.retained(orbiter).position.x - park.retained(orbitee).position.x), (park.retained(orbiter).position.y - park.retained(orbitee).position.y), (park.retained(orbiter).position.z - park.retained(orbitee).position.z)];
+            let tovector = [
+                (park.retained(orbiter).position.x - park.retained(orbitee).position.x),
+                (park.retained(orbiter).position.y - park.retained(orbitee).position.y),
+                (park.retained(orbiter).position.z - park.retained(orbitee).position.z),
+            ];
             let distance = (sum_squares(tovector)).sqrt();
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:70
-            assert!(python_almost_equal_delta(distance, expected_distance, (20_i64) as f64));
-            let velocity = [park.retained(orbiter).velocity.x, park.retained(orbiter).velocity.y, park.retained(orbiter).velocity.z];
+            assert!(python_almost_equal_delta(
+                distance,
+                expected_distance,
+                (20_i64) as f64
+            ));
+            let velocity = [
+                park.retained(orbiter).velocity.x,
+                park.retained(orbiter).velocity.y,
+                park.retained(orbiter).velocity.z,
+            ];
             let speed = (sum_squares(velocity)).sqrt();
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:76
-            assert!((((sum_products(velocity, tovector)).abs() < ((0.2_f64 * speed) * distance))));
-            original_counter_45+=1;
+            assert!(((sum_products(velocity, tovector)).abs() < ((0.2_f64 * speed) * distance)));
+            original_counter_45 += 1;
         }
-        original_counter_37+=1;
+        original_counter_37 += 1;
     }
     settings.reset();
-    park.use_new_orbit=settings.get().use_new_orbit;
+    park.use_new_orbit = settings.get().use_new_orbit;
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"every original new Orbit iteration and assertion completed, including fixture teardown");
+    kani::cover!(
+        true,
+        "every original new Orbit iteration and assertion completed, including fixture teardown"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/evolve/test_orbit.py::TestNewOrbit::test_orbit_stopped_ball_starting_outside
 // original-source-sha256: 813029bedae13ff9928a9055c6f4e59334924c1048d28074be134e8b1b242466
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(2001))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(2001))]
+#[cfg_attr(test, test)]
 fn test_orbit_stopped_ball_starting_outside() {
-    let mut settings=OriginalGlobalSettings::default();
-    let mut configured=settings.get();
-    configured.use_new_orbit=true;
+    let mut settings = OriginalGlobalSettings::default();
+    let mut configured = settings.get();
+    configured.use_new_orbit = true;
     settings.apply(configured);
-    let mut park=OriginalParkProjection::default();
-    park.use_new_orbit=settings.get().use_new_orbit;
-    let mut next_space_object_id=1_i64; // original fixture resets the helper global counter
-    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let mut park = OriginalParkProjection::default();
+    park.use_new_orbit = settings.get().use_new_orbit;
+    let mut next_space_object_id = 1_i64; // original fixture resets the helper global counter
+    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbitee) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbitee, true);
     let attribute_value_7 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.max_velocity = attribute_value_7, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.max_velocity = attribute_value_7,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_9 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.agility = attribute_value_9, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.agility = attribute_value_9,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_11 = 13000000.0_f64;
-    park.write_attribute_notified(orbitee, |b| b.mass = attribute_value_11, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.mass = attribute_value_11,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_13 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.radius = attribute_value_13, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.radius = attribute_value_13,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_15 = true;
-    park.write_attribute_notified(orbitee, |b| b.is_massive = attribute_value_15, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.is_massive = attribute_value_15,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_17 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.speed_fraction = attribute_value_17, OriginalBallAttribute::SpeedFraction);
-    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 10.0_f64, y: (0_i64) as f64, z: (0_i64) as f64 }, ..OriginalBallInit::default() });
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.speed_fraction = attribute_value_17,
+        OriginalBallAttribute::SpeedFraction,
+    );
+    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 10.0_f64,
+            y: (0_i64) as f64,
+            z: (0_i64) as f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbiter) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbiter, true);
     let attribute_value_25 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.max_velocity = attribute_value_25, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.max_velocity = attribute_value_25,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_27 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.agility = attribute_value_27, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.agility = attribute_value_27,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_29 = 13000000.0_f64;
-    park.write_attribute_notified(orbiter, |b| b.mass = attribute_value_29, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.mass = attribute_value_29,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_31 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.radius = attribute_value_31, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.radius = attribute_value_31,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_33 = true;
-    park.write_attribute_notified(orbiter, |b| b.is_massive = attribute_value_33, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.is_massive = attribute_value_33,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_35 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.speed_fraction = attribute_value_35, OriginalBallAttribute::SpeedFraction);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.speed_fraction = attribute_value_35,
+        OriginalBallAttribute::SpeedFraction,
+    );
     let orbit = 1000.0_f64;
-    let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius)) + f64::from(park.retained(orbiter).radius));
-    park.set_position(orbiter, Vec3 { x: (1.5_f64 * expected_distance), y: 0.0_f64, z: 0.0_f64 });
-    park.set_velocity(orbiter, Vec3 { x: -(1.0_f64), y: 0.0_f64, z: 1.0_f64 });
+    let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius))
+        + f64::from(park.retained(orbiter).radius));
+    park.set_position(
+        orbiter,
+        Vec3 {
+            x: (1.5_f64 * expected_distance),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    );
+    park.set_velocity(
+        orbiter,
+        Vec3 {
+            x: -(1.0_f64),
+            y: 0.0_f64,
+            z: 1.0_f64,
+        },
+    );
     park.follow(orbiter, orbitee, (orbit) as f32, true);
-    let mut previous_distance=park.retained(orbiter).position.x;
-    let mut iorbit=2000_i64;
-    let original_stop_44=iorbit; // Python range evaluates its bound exactly once
-    let mut original_counter_44=0_i64;
-    while original_counter_44<original_stop_44 {
-        let i=original_counter_44;
-        let _=i; // retain the source loop binding even when only a comprehension shadows it
+    let mut previous_distance = park.retained(orbiter).position.x;
+    let mut iorbit = 2000_i64;
+    let original_stop_44 = iorbit; // Python range evaluates its bound exactly once
+    let mut original_counter_44 = 0_i64;
+    while original_counter_44 < original_stop_44 {
+        let i = original_counter_44;
+        let _ = i; // retain the source loop binding even when only a comprehension shadows it
         assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
-        let tovector = [(park.retained(orbiter).position.x - park.retained(orbitee).position.x), (park.retained(orbiter).position.y - park.retained(orbitee).position.y), (park.retained(orbiter).position.z - park.retained(orbitee).position.z)];
+        let tovector = [
+            (park.retained(orbiter).position.x - park.retained(orbitee).position.x),
+            (park.retained(orbiter).position.y - park.retained(orbitee).position.y),
+            (park.retained(orbiter).position.z - park.retained(orbitee).position.z),
+        ];
         let distance = (sum_squares(tovector)).sqrt();
-        if (distance) > ((expected_distance + (10_i64) as f64)) {
+        if (distance) > (expected_distance + (10_i64) as f64) {
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:99
             assert!(((distance) < (previous_distance)));
-            previous_distance=distance;
-            let velocity = [park.retained(orbiter).velocity.x, park.retained(orbiter).velocity.y, park.retained(orbiter).velocity.z];
+            previous_distance = distance;
+            let velocity = [
+                park.retained(orbiter).velocity.x,
+                park.retained(orbiter).velocity.y,
+                park.retained(orbiter).velocity.z,
+            ];
             let speed = (sum_squares(velocity)).sqrt();
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:106
-            assert!((((sum_products(velocity, tovector)).abs()) < (((0.8_f64 * speed) * distance))));
-        }
-        else {
+            assert!((((sum_products(velocity, tovector)).abs()) < ((0.8_f64 * speed) * distance)));
+        } else {
             if iorbit > i {
-                iorbit=i;
+                iorbit = i;
             }
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:113
-            assert!(python_almost_equal_delta(distance, expected_distance, (10_i64) as f64));
+            assert!(python_almost_equal_delta(
+                distance,
+                expected_distance,
+                (10_i64) as f64
+            ));
         }
-        original_counter_44+=1;
+        original_counter_44 += 1;
     }
     // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:115
     assert!((iorbit < 2000_i64));
-    let _final_helper_counter=next_space_object_id;
+    let _final_helper_counter = next_space_object_id;
     settings.reset();
-    park.use_new_orbit=settings.get().use_new_orbit;
+    park.use_new_orbit = settings.get().use_new_orbit;
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"every original new Orbit iteration and assertion completed, including fixture teardown");
+    kani::cover!(
+        true,
+        "every original new Orbit iteration and assertion completed, including fixture teardown"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/evolve/test_orbit.py::TestNewOrbit::test_orbit_stopped_ball_starting_inside
 // original-source-sha256: 813029bedae13ff9928a9055c6f4e59334924c1048d28074be134e8b1b242466
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(2001))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(2001))]
+#[cfg_attr(test, test)]
 fn test_orbit_stopped_ball_starting_inside() {
-    let mut settings=OriginalGlobalSettings::default();
-    let mut configured=settings.get();
-    configured.use_new_orbit=true;
+    let mut settings = OriginalGlobalSettings::default();
+    let mut configured = settings.get();
+    configured.use_new_orbit = true;
     settings.apply(configured);
-    let mut park=OriginalParkProjection::default();
-    park.use_new_orbit=settings.get().use_new_orbit;
-    let mut next_space_object_id=1_i64; // original fixture resets the helper global counter
-    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let mut park = OriginalParkProjection::default();
+    park.use_new_orbit = settings.get().use_new_orbit;
+    let mut next_space_object_id = 1_i64; // original fixture resets the helper global counter
+    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbitee) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbitee, true);
     let attribute_value_7 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.max_velocity = attribute_value_7, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.max_velocity = attribute_value_7,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_9 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.agility = attribute_value_9, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.agility = attribute_value_9,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_11 = 13000000.0_f64;
-    park.write_attribute_notified(orbitee, |b| b.mass = attribute_value_11, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.mass = attribute_value_11,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_13 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.radius = attribute_value_13, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.radius = attribute_value_13,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_15 = true;
-    park.write_attribute_notified(orbitee, |b| b.is_massive = attribute_value_15, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.is_massive = attribute_value_15,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_17 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.speed_fraction = attribute_value_17, OriginalBallAttribute::SpeedFraction);
-    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 10.0_f64, y: (0_i64) as f64, z: (0_i64) as f64 }, ..OriginalBallInit::default() });
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.speed_fraction = attribute_value_17,
+        OriginalBallAttribute::SpeedFraction,
+    );
+    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 10.0_f64,
+            y: (0_i64) as f64,
+            z: (0_i64) as f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbiter) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbiter, true);
     let attribute_value_25 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.max_velocity = attribute_value_25, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.max_velocity = attribute_value_25,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_27 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.agility = attribute_value_27, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.agility = attribute_value_27,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_29 = 13000000.0_f64;
-    park.write_attribute_notified(orbiter, |b| b.mass = attribute_value_29, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.mass = attribute_value_29,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_31 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.radius = attribute_value_31, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.radius = attribute_value_31,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_33 = true;
-    park.write_attribute_notified(orbiter, |b| b.is_massive = attribute_value_33, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.is_massive = attribute_value_33,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_35 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.speed_fraction = attribute_value_35, OriginalBallAttribute::SpeedFraction);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.speed_fraction = attribute_value_35,
+        OriginalBallAttribute::SpeedFraction,
+    );
     let orbit = 1000.0_f64;
-    let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius)) + f64::from(park.retained(orbiter).radius));
-    park.set_position(orbiter, Vec3 { x: (0.5_f64 * expected_distance), y: 0.0_f64, z: 0.0_f64 });
-    park.set_velocity(orbiter, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 1.0_f64 });
+    let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius))
+        + f64::from(park.retained(orbiter).radius));
+    park.set_position(
+        orbiter,
+        Vec3 {
+            x: (0.5_f64 * expected_distance),
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    );
+    park.set_velocity(
+        orbiter,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 1.0_f64,
+        },
+    );
     park.follow(orbiter, orbitee, (orbit) as f32, true);
-    let mut previous_distance=park.retained(orbiter).position.x;
-    let mut iorbit=2000_i64;
-    let original_stop_44=iorbit; // Python range evaluates its bound exactly once
-    let mut original_counter_44=0_i64;
-    while original_counter_44<original_stop_44 {
-        let i=original_counter_44;
-        let _=i; // retain the source loop binding even when only a comprehension shadows it
+    let mut previous_distance = park.retained(orbiter).position.x;
+    let mut iorbit = 2000_i64;
+    let original_stop_44 = iorbit; // Python range evaluates its bound exactly once
+    let mut original_counter_44 = 0_i64;
+    while original_counter_44 < original_stop_44 {
+        let i = original_counter_44;
+        let _ = i; // retain the source loop binding even when only a comprehension shadows it
         assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
-        let tovector = [(park.retained(orbiter).position.x - park.retained(orbitee).position.x), (park.retained(orbiter).position.y - park.retained(orbitee).position.y), (park.retained(orbiter).position.z - park.retained(orbitee).position.z)];
+        let tovector = [
+            (park.retained(orbiter).position.x - park.retained(orbitee).position.x),
+            (park.retained(orbiter).position.y - park.retained(orbitee).position.y),
+            (park.retained(orbiter).position.z - park.retained(orbitee).position.z),
+        ];
         let distance = (sum_squares(tovector)).sqrt();
-        if (distance) < ((expected_distance - (20_i64) as f64)) {
+        if (distance) < (expected_distance - (20_i64) as f64) {
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:138
             assert!(((distance) > (previous_distance)));
-            previous_distance=distance;
-            let velocity = [park.retained(orbiter).velocity.x, park.retained(orbiter).velocity.y, park.retained(orbiter).velocity.z];
+            previous_distance = distance;
+            let velocity = [
+                park.retained(orbiter).velocity.x,
+                park.retained(orbiter).velocity.y,
+                park.retained(orbiter).velocity.z,
+            ];
             let speed = (sum_squares(velocity)).sqrt();
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:144
-            assert!((((sum_products(velocity, tovector)).abs()) < (((0.85_f64 * speed) * distance))));
-        }
-        else {
+            assert!((((sum_products(velocity, tovector)).abs()) < ((0.85_f64 * speed) * distance)));
+        } else {
             if iorbit > i {
-                iorbit=i;
+                iorbit = i;
             }
             // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:151
-            assert!(python_almost_equal_delta(distance, expected_distance, (20_i64) as f64));
+            assert!(python_almost_equal_delta(
+                distance,
+                expected_distance,
+                (20_i64) as f64
+            ));
         }
-        original_counter_44+=1;
+        original_counter_44 += 1;
     }
     // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:153
     assert!((iorbit < 2000_i64));
-    let _final_helper_counter=next_space_object_id;
+    let _final_helper_counter = next_space_object_id;
     settings.reset();
-    park.use_new_orbit=settings.get().use_new_orbit;
+    park.use_new_orbit = settings.get().use_new_orbit;
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"every original new Orbit iteration and assertion completed, including fixture teardown");
+    kani::cover!(
+        true,
+        "every original new Orbit iteration and assertion completed, including fixture teardown"
+    );
 }
 
 // original-case: python/destiny/test/ballpark/evolve/test_orbit.py::TestNewOrbit::test_orbit_moving_ball_starting_right_distance
 // original-source-sha256: 813029bedae13ff9928a9055c6f4e59334924c1048d28074be134e8b1b242466
-#[cfg_attr(kani,kani::proof)]
-#[cfg_attr(kani,kani::unwind(201))]
-#[cfg_attr(test,test)]
+#[cfg_attr(kani, kani::proof)]
+#[cfg_attr(kani, kani::unwind(201))]
+#[cfg_attr(test, test)]
 fn test_orbit_moving_ball_starting_right_distance() {
-    let mut settings=OriginalGlobalSettings::default();
-    let mut configured=settings.get();
-    configured.use_new_orbit=true;
+    let mut settings = OriginalGlobalSettings::default();
+    let mut configured = settings.get();
+    configured.use_new_orbit = true;
     settings.apply(configured);
-    let mut park=OriginalParkProjection::default();
-    park.use_new_orbit=settings.get().use_new_orbit;
-    let mut next_space_object_id=1_i64; // original fixture resets the helper global counter
-    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, ..OriginalBallInit::default() });
+    let mut park = OriginalParkProjection::default();
+    park.use_new_orbit = settings.get().use_new_orbit;
+    let mut next_space_object_id = 1_i64; // original fixture resets the helper global counter
+    let orbitee = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbitee) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbitee, true);
     let attribute_value_7 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.max_velocity = attribute_value_7, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.max_velocity = attribute_value_7,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_9 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.agility = attribute_value_9, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.agility = attribute_value_9,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_11 = 13000000.0_f64;
-    park.write_attribute_notified(orbitee, |b| b.mass = attribute_value_11, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.mass = attribute_value_11,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_13 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.radius = attribute_value_13, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.radius = attribute_value_13,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_15 = true;
-    park.write_attribute_notified(orbitee, |b| b.is_massive = attribute_value_15, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.is_massive = attribute_value_15,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_17 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.speed_fraction = attribute_value_17, OriginalBallAttribute::SpeedFraction);
-    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit { id: next_space_object_id, position: Vec3 { x: 10.0_f64, y: (0_i64) as f64, z: (0_i64) as f64 }, ..OriginalBallInit::default() });
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.speed_fraction = attribute_value_17,
+        OriginalBallAttribute::SpeedFraction,
+    );
+    let orbiter = park.add_nonpositive_time_factor_ball(OriginalBallInit {
+        id: next_space_object_id,
+        position: Vec3 {
+            x: 10.0_f64,
+            y: (0_i64) as f64,
+            z: (0_i64) as f64,
+        },
+        ..OriginalBallInit::default()
+    });
     assert!(park.contains(orbiter) && !park.scope_error);
     let next_id = next_space_object_id.checked_add(1);
     assert!(next_id.is_some()); // explicit int64 adapter scope, no iteration omitted
     next_space_object_id = next_id.unwrap_or(next_space_object_id);
     park.set_free(orbiter, true);
     let attribute_value_25 = (10.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.max_velocity = attribute_value_25, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.max_velocity = attribute_value_25,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_27 = (0.9_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.agility = attribute_value_27, OriginalBallAttribute::Agility);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.agility = attribute_value_27,
+        OriginalBallAttribute::Agility,
+    );
     let attribute_value_29 = 13000000.0_f64;
-    park.write_attribute_notified(orbiter, |b| b.mass = attribute_value_29, OriginalBallAttribute::Mass);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.mass = attribute_value_29,
+        OriginalBallAttribute::Mass,
+    );
     let attribute_value_31 = (2.0_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.radius = attribute_value_31, OriginalBallAttribute::Radius);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.radius = attribute_value_31,
+        OriginalBallAttribute::Radius,
+    );
     let attribute_value_33 = true;
-    park.write_attribute_notified(orbiter, |b| b.is_massive = attribute_value_33, OriginalBallAttribute::Massive);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.is_massive = attribute_value_33,
+        OriginalBallAttribute::Massive,
+    );
     let attribute_value_35 = (0.95_f64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.speed_fraction = attribute_value_35, OriginalBallAttribute::SpeedFraction);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.speed_fraction = attribute_value_35,
+        OriginalBallAttribute::SpeedFraction,
+    );
     let orbit = 2000.0_f64;
-    let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius)) + f64::from(park.retained(orbiter).radius));
+    let expected_distance = ((orbit + f64::from(park.retained(orbitee).radius))
+        + f64::from(park.retained(orbiter).radius));
     let attribute_value_39 = (200_i64) as f32;
-    park.write_attribute_notified(orbiter, |b| b.max_velocity = attribute_value_39, OriginalBallAttribute::MaxSpeed);
+    park.write_attribute_notified(
+        orbiter,
+        |b| b.max_velocity = attribute_value_39,
+        OriginalBallAttribute::MaxSpeed,
+    );
     let attribute_value_41 = (50_i64) as f32;
-    park.write_attribute_notified(orbitee, |b| b.max_velocity = attribute_value_41, OriginalBallAttribute::MaxSpeed);
-    park.goto_direction(orbitee, Vec3 { x: 1.0_f64, y: 1.0_f64, z: 1.0_f64 });
-    park.set_position(orbiter, Vec3 { x: expected_distance, y: 0.0_f64, z: 0.0_f64 });
-    park.set_velocity(orbiter, Vec3 { x: 0.0_f64, y: 0.0_f64, z: 1.0_f64 });
+    park.write_attribute_notified(
+        orbitee,
+        |b| b.max_velocity = attribute_value_41,
+        OriginalBallAttribute::MaxSpeed,
+    );
+    park.goto_direction(
+        orbitee,
+        Vec3 {
+            x: 1.0_f64,
+            y: 1.0_f64,
+            z: 1.0_f64,
+        },
+    );
+    park.set_position(
+        orbiter,
+        Vec3 {
+            x: expected_distance,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    );
+    park.set_velocity(
+        orbiter,
+        Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 1.0_f64,
+        },
+    );
     park.follow(orbiter, orbitee, (orbit) as f32, true);
-    let original_stop_47=200_i64; // Python range evaluates its bound exactly once
-    let mut original_counter_47=0_i64;
-    while original_counter_47<original_stop_47 {
-        let i=original_counter_47;
-        let _=i; // retain the source loop binding even when only a comprehension shadows it
+    let original_stop_47 = 200_i64; // Python range evaluates its bound exactly once
+    let mut original_counter_47 = 0_i64;
+    while original_counter_47 < original_stop_47 {
+        let i = original_counter_47;
+        let _ = i; // retain the source loop binding even when only a comprehension shadows it
         assert!(park.evolve_two_spherical_bodies() == Ok(())); // original call must not raise
-        let tovector = [(park.retained(orbiter).position.x - park.retained(orbitee).position.x), (park.retained(orbiter).position.y - park.retained(orbitee).position.y), (park.retained(orbiter).position.z - park.retained(orbitee).position.z)];
+        let tovector = [
+            (park.retained(orbiter).position.x - park.retained(orbitee).position.x),
+            (park.retained(orbiter).position.y - park.retained(orbitee).position.y),
+            (park.retained(orbiter).position.z - park.retained(orbitee).position.z),
+        ];
         let distance = (sum_squares(tovector)).sqrt();
         // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:178
-        assert!(python_almost_equal_delta(distance, expected_distance, (700_i64) as f64));
-        let velocity = [(park.retained(orbiter).velocity.x - park.retained(orbitee).velocity.x), (park.retained(orbiter).velocity.y - park.retained(orbitee).velocity.y), (park.retained(orbiter).velocity.z - park.retained(orbitee).velocity.z)];
+        assert!(python_almost_equal_delta(
+            distance,
+            expected_distance,
+            (700_i64) as f64
+        ));
+        let velocity = [
+            (park.retained(orbiter).velocity.x - park.retained(orbitee).velocity.x),
+            (park.retained(orbiter).velocity.y - park.retained(orbitee).velocity.y),
+            (park.retained(orbiter).velocity.z - park.retained(orbitee).velocity.z),
+        ];
         let speed = (sum_squares(velocity)).sqrt();
         // original-assertion: python/destiny/test/ballpark/evolve/test_orbit.py:185
-        assert!((((sum_products(velocity, tovector)).abs()) < (((0.4_f64 * speed) * distance))));
-        original_counter_47+=1;
+        assert!((((sum_products(velocity, tovector)).abs()) < ((0.4_f64 * speed) * distance)));
+        original_counter_47 += 1;
     }
-    let _final_helper_counter=next_space_object_id;
+    let _final_helper_counter = next_space_object_id;
     settings.reset();
-    park.use_new_orbit=settings.get().use_new_orbit;
+    park.use_new_orbit = settings.get().use_new_orbit;
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true,"every original new Orbit iteration and assertion completed, including fixture teardown");
+    kani::cover!(
+        true,
+        "every original new Orbit iteration and assertion completed, including fixture teardown"
+    );
 }

@@ -37,7 +37,9 @@ impl<T: Copy, const N: usize> BoundedList<T, N> {
     }
 
     #[must_use]
-    pub const fn capacity(&self) -> usize { N }
+    pub const fn capacity(&self) -> usize {
+        N
+    }
 
     #[must_use]
     pub const fn is_empty(&self) -> bool {

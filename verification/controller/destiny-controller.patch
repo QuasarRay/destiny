@@ -53,7 +53,7 @@ index 0527754..f43b248 100644
          for n in ast.walk(node):
              if not isinstance(n, ast.Attribute) or not isinstance(n.value, ast.Name):
 diff --git a/infra/agentinfra/destiny.py b/infra/agentinfra/destiny.py
-index 34ce86e..8a29b33 100644
+index 34ce86e..601af69 100644
 --- a/infra/agentinfra/destiny.py
 +++ b/infra/agentinfra/destiny.py
 @@ -15,6 +15,7 @@ from pathlib import Path, PurePosixPath
@@ -114,7 +114,7 @@ index 34ce86e..8a29b33 100644
      env.update({"RUSTUP_AUTO_INSTALL": "0", "CARGO_NET_OFFLINE": "false" if allow_network else "true",
                  "CARGO_TERM_COLOR": "never", "NO_COLOR": "1", "GIT_TERMINAL_PROMPT": "0"})
      return env
-@@ -278,6 +298,101 @@ def executable_identities(commands, env):
+@@ -278,6 +298,133 @@ def executable_identities(commands, env):
      return result
  
  
@@ -213,10 +213,62 @@ index 34ce86e..8a29b33 100644
 +    return {str(p.resolve(strict=True)): sha256_file(p) for p in sorted(paths)}
 +
 +
++def scoped_verus_commands(commands, entry, replacements):
++    """Select one registered configuration without dropping verifier flags."""
++    selected = [command for command in commands if command[-1] == entry]
++    if len(selected) != 1:
++        raise ValueError("scoped Verus requires one unique registered command")
++    return expand_commands(selected, replacements)
++
++
++def scoped_kani_commands(commands, manifest, harness):
++    """Retain reviewed features/contract flags while selecting one exact proof."""
++    if len(commands) != 1 or commands[0][:2] != ["cargo", "kani"]:
++        raise ValueError("scoped Kani requires one registered cargo kani configuration")
++    command = commands[0]
++    retained = command[:2]
++    index = 2
++    while index < len(command):
++        argument = command[index]
++        if argument in {"--manifest-path", "--output-format"}:
++            if index + 1 >= len(command):
++                raise ValueError("incomplete registered Kani option")
++            index += 2
++        elif argument.startswith(("--manifest-path=", "--output-format=")):
++            index += 1
++        elif argument in {"--harness", "--exact", "--force-build"} or argument.startswith("--harness="):
++            raise ValueError("registered Kani command must not preselect a harness")
++        else:
++            retained.append(argument)
++            index += 1
++    return [retained + ["--manifest-path", manifest, "--harness", harness,
++                        "--exact", "--force-build", "--output-format", "regular"]]
++
++
  def run_check(root, profile, args):
      if args.check not in profile["checks"]:
          raise ValueError(f"unknown verification check: {args.check}")
-@@ -347,10 +462,12 @@ def run_check(root, profile, args):
+@@ -323,14 +470,16 @@ def run_check(root, profile, args):
+         manifest = getattr(args, "manifest", None) or "verification/kani/Cargo.toml"
+         if relative_path(manifest) != manifest or Path(manifest).name != "Cargo.toml":
+             raise ValueError("canonical Cargo.toml manifest required")
+-        commands = [["cargo", "kani", "--manifest-path", manifest, "--harness", args.harness,
+-                     "--exact", "--force-build", "--output-format", "regular"]]
++        commands = scoped_kani_commands(commands, manifest, args.harness)
+         obligation = {"method": "kani", "entry": args.harness, "expected_checks": 1, "manifest": manifest}
+     if args.entry or args.expected_checks is not None:
+         permitted = {command[-1] for command in spec["commands"]} if args.check == "verus" else set()
+         if args.entry not in permitted or type(args.expected_checks) is not int or args.expected_checks < 1:
+             raise ValueError("scoped Verus requires a profile entry and positive --expected-checks")
+-        commands = [[replacements["verus"], "--crate-type=lib", args.entry]]
++        # Preserve the registered target's flags (including feature/model and
++        # diagnostic controls). Rebuilding a generic command silently drops
++        # the reviewed configuration and its generated-symbol inventory.
++        commands = scoped_verus_commands(spec["commands"], args.entry, replacements)
+         obligation = {"method": "verus", "entry": args.entry, "expected_checks": args.expected_checks}
+     if args.check in {"kani", "verus"} and not obligation and not getattr(args, "full_suite", False):
+         return {"status": "SCOPE_REQUIRED", "executed": False,
+@@ -347,10 +496,12 @@ def run_check(root, profile, args):
      try:
          before = source_snapshot(root, spec.get("read_globs", []))
          tools_before = executable_identities(identity_commands, env)
@@ -229,7 +281,39 @@ index 34ce86e..8a29b33 100644
                      "profile": sha256_file(PROFILE), "runner": sha256_file(Path(__file__)),
                      "python": {"version": sys.version, "executable": sha256_file(Path(sys.executable))},
                      "environment": digest(env), "allow_network": bool(args.allow_network),
-@@ -407,7 +524,8 @@ def run_check(root, profile, args):
+@@ -385,11 +536,16 @@ def run_check(root, profile, args):
+                 return {"status": "UNAVAILABLE", "id": args.check, "executed": False,
+                         "reason": "pinned tool version unavailable", "probes": observations}
+         outputs, returncode, status = [], 0, "OBSERVED_SUCCESS"
++        run_id = uuid.uuid4().hex
++        verus_inventory = None
+         for argv in commands:
+             remaining = spec["timeout"] - (time.monotonic() - start)
+             if remaining <= 0:
+                 status, returncode = "TIMEOUT", 124
+                 break
++            if obligation and obligation["method"] == "verus":
++                from .verus_evidence import prepare_log
++                prepare_log(root, argv)
+             result = run_process(argv, cwd=root, env=env, timeout=remaining,
+                                  capture_limit=profile["economy"]["output_bytes"])
+             outputs.append({"argv": argv, "returncode": result.returncode, "stdout": result.stdout,
+@@ -397,6 +553,14 @@ def run_check(root, profile, args):
+                             "stderr_sha256": result.stderr_sha256, "stdout_bytes": result.stdout_bytes,
+                             "stderr_bytes": result.stderr_bytes, "stdout_truncated": result.stdout_truncated,
+                             "stderr_truncated": result.stderr_truncated, "timed_out": result.timed_out})
++            if obligation and obligation["method"] == "verus":
++                from .verus_evidence import capture
++                try:
++                    verus_inventory = capture(root, argv, run_id)
++                except (ValueError, OSError) as error:
++                    status, returncode = "INCOMPLETE_EVIDENCE", 1
++                    outputs[-1]["inventory_error"] = str(error)
++                    break
+             if result.timed_out or result.returncode:
+                 status = "TIMEOUT" if result.timed_out else "FAILED"
+                 returncode = result.returncode or 124
+@@ -407,15 +571,18 @@ def run_check(root, profile, args):
          after = source_snapshot(root, spec.get("read_globs", []))
          external_after = {name: sha256_file(Path(replacements[name])) if name == "library" else source_snapshot(Path(replacements[name]))
                            for name in external}
@@ -239,6 +323,17 @@ index 34ce86e..8a29b33 100644
              status, returncode = "INPUTS_CHANGED", 1
          record = {"schema": 1, "id": args.check, "key": key, "identity": identity,
                    "claim": spec["claim"], "status": status, "returncode": returncode, "probes": observations,
+                   "proof_output_checked": bool(obligation and status == "OBSERVED_SUCCESS"),
+                   "commands": outputs, "reason": args.reason, "source_after": after,
+                   "created_at": datetime.now(timezone.utc).isoformat(), "duration_seconds": time.monotonic() - start}
++        if obligation and obligation["method"] == "verus":
++            record["verus_inventory"] = verus_inventory
+         record["sha256"] = digest(record)
+-        receipt = f"{CONTROL}/receipts/{uuid.uuid4().hex}.json"
++        receipt = f"{CONTROL}/receipts/{run_id}.json"
+         atomic_write_json(confined_path(root, receipt), record)
+         if cacheable and status in {"OBSERVED_SUCCESS", "FAILED"}:
+             atomic_write_json(index_path, {"receipt": receipt, "sha256": record["sha256"]})
 diff --git a/infra/agentinfra/evidence.py b/infra/agentinfra/evidence.py
 index 1d309b5..d3aac9d 100644
 --- a/infra/agentinfra/evidence.py
@@ -475,7 +570,7 @@ index 3c9a8d8..2809163 100644
          plan = self.call("plan", "--changed", "src/runtime.rs", "--changed", "src/runtime.rs")
          ids = [row["id"] for row in plan["checks"]]
 diff --git a/infra/tests/test_destiny_hardening.py b/infra/tests/test_destiny_hardening.py
-index 49116aa..fc01d44 100644
+index 49116aa..e66f2d9 100644
 --- a/infra/tests/test_destiny_hardening.py
 +++ b/infra/tests/test_destiny_hardening.py
 @@ -1,7 +1,11 @@
@@ -490,7 +585,7 @@ index 49116aa..fc01d44 100644
  import sys
  import unittest
  
-@@ -10,6 +14,8 @@ from test_destiny import DestinyFixture
+@@ -10,9 +14,33 @@ from test_destiny import DestinyFixture
  sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
  from agentinfra.destiny_reuse import checked_output
  from agentinfra.process import run_process
@@ -499,7 +594,32 @@ index 49116aa..fc01d44 100644
  
  
  class TestBranchVerifierReuse(unittest.TestCase):
-@@ -30,6 +36,70 @@ class TestBranchVerifierReuse(unittest.TestCase):
++    def test_scoped_kani_preserves_features_contracts_and_exact_selection(self):
++        from agentinfra.destiny import scoped_kani_commands
++        commands=[["cargo","kani","-Z","function-contracts","--features","production-kernels",
++            "--manifest-path","old/Cargo.toml","--output-format=terse"]]
++        self.assertEqual(scoped_kani_commands(commands,"verification/kani/Cargo.toml","module::contract"),
++            [["cargo","kani","-Z","function-contracts","--features","production-kernels",
++              "--manifest-path","verification/kani/Cargo.toml","--harness","module::contract",
++              "--exact","--force-build","--output-format","regular"]])
++        for invalid in ([],commands+commands,[["kani"]],[["cargo","kani","--harness","other"]],
++                        [["cargo","kani","--output-format"]]):
++            with self.assertRaises(ValueError):scoped_kani_commands(invalid,"Cargo.toml","module::contract")
++
++    def test_scoped_verus_preserves_registered_configuration_and_exact_entry(self):
++        from agentinfra.destiny import scoped_verus_commands
++        entry="verification/verus/concurrent.rs"
++        configured=["{verus}","--crate-type=lib","--cfg","checked_model","--log","vir",entry]
++        commands=[configured,["{verus}","--crate-type=lib","other.rs"]]
++        self.assertEqual(scoped_verus_commands(commands,entry,{"verus":"/verified/verus"}),
++                         [["/verified/verus",*configured[1:]]])
++        for invalid in ([],[configured,configured]):
++            with self.assertRaises(ValueError):scoped_verus_commands(invalid,entry,{"verus":"/verified/verus"})
++
+     def test_exact_nonvacuous_kani_and_verus_inventory(self):
+         result = run_process([sys.executable, "-c", "pass"], cwd=Path.cwd())
+         obligation = {"method": "kani", "entry": "proofs::formation", "expected_checks": 1}
+@@ -30,6 +58,70 @@ class TestBranchVerifierReuse(unittest.TestCase):
  
  
  class TestDestinyHardening(DestinyFixture):
@@ -640,21 +760,52 @@ index c8a2578..9b051ab 100644
          self.write(".gitignore", ".aegis/\nverification/verus/proofs.rs\n")
          self.bind()
 diff --git a/modules/destiny/profile.toml b/modules/destiny/profile.toml
-index a1a3200..f5dedb6 100644
+index a1a3200..cf7feca 100644
 --- a/modules/destiny/profile.toml
 +++ b/modules/destiny/profile.toml
-@@ -13,7 +13,10 @@ verus = "0.2026.09.20.aef82ed"
+@@ -13,7 +13,11 @@ verus = "0.2026.09.20.aef82ed"
  [economy]
  context_bytes = 12000
  max_context_bytes = 64000
 -output_bytes = 16000
 +# Regular Kani property inventories must be retained in full for review.
-+# Evolve's observed regular inventory is 884222 bytes. Keep a bounded full
-+# inventory without disabling safety/reachability checks or discarding entries.
-+output_bytes = 2000000
++# The concrete proximity-period inventory is 2223404 stdout bytes. Retain it
++# completely within the formal receipt's 6 MB limit, including both streams,
++# without disabling safety/reachability checks or discarding properties.
++output_bytes = 2500000
  default_budget_seconds = 900
  max_attempts_per_input = 2
  
+@@ -111,7 +115,7 @@ timeout = 180
+ claim = "ordinary-tests-not-kani-proofs"
+ 
+ [checks.kani]
+-commands = [["cargo", "kani", "--manifest-path", "verification/kani/Cargo.toml", "--output-format=terse"]]
++commands = [["cargo", "kani", "-Z", "function-contracts", "-Z", "stubbing", "--manifest-path", "verification/kani/Cargo.toml", "--output-format=terse"]]
+ probes = [["cargo", "kani", "--version"]]
+ expect = ["0.68.0"]
+ requires = ["kani-regression"]
+@@ -121,12 +125,14 @@ claim = "kani-harness-execution-bounded-by-harness-assumptions"
+ 
+ [checks.verus]
+ commands = [
+-  ["{verus}", "--crate-type=lib", "verification/verus/proofs.rs"],
+-  ["{verus}", "--crate-type=lib", "verification/verus/state_contracts.rs"],
+-  ["{verus}", "--crate-type=lib", "verification/verus/lifecycle_contracts.rs"],
+-  ["{verus}", "--crate-type=lib", "verification/verus/ball_contracts.rs"],
+-  ["{verus}", "--crate-type=lib", "verification/verus/visibility_contracts.rs"],
+-  ["{verus}", "--crate-type=lib", "verification/verus/geometry_contracts.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-proofs-logs", "verification/verus/proofs.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-state_contracts-logs", "verification/verus/state_contracts.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-lifecycle_contracts-logs", "verification/verus/lifecycle_contracts.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-ball_contracts-logs", "verification/verus/ball_contracts.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-visibility_contracts-logs", "verification/verus/visibility_contracts.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-geometry_contracts-logs", "verification/verus/geometry_contracts.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-ffi-logs", "verification/verus/ffi_lifecycle.rs"],
++  ["{verus}", "--crate-type=lib", "--log", "vir", "--log-dir", ".aegis/destiny/verus-evolution-logs", "verification/verus/evolution_callbacks.rs"],
+ ]
+ probes = [["{verus}", "--version"]]
+ expect = ["0.2026.09.20.aef82ed"]
 diff --git a/infra/agentinfra/coverage.py b/infra/agentinfra/coverage.py
 new file mode 100644
 index 0000000..9eb7494
@@ -848,3 +999,265 @@ index 0000000..4053a45
 +
 +if __name__ == "__main__":
 +    unittest.main()
+diff --git a/infra/agentinfra/verus_evidence.py b/infra/agentinfra/verus_evidence.py
+new file mode 100644
+index 0000000..1e741fb
+--- /dev/null
++++ b/infra/agentinfra/verus_evidence.py
+@@ -0,0 +1,146 @@
++"""Pinned Verus VIR inventory; separate from Kani property classification.
++
++An inventory identifies executed proof input. It cannot review the behavioral
++adequacy of a theorem, or turn an external primitive contract into a proof.
++"""
++from pathlib import Path
++import re
++import shutil
++
++from .destiny_reuse import digest, require
++from .security import confined_path
++
++SCHEMA = 1
++MAX_VIR_BYTES = 6_000_000
++
++def inventory(text, entry):
++    require(isinstance(text, str) and len(text.encode()) <= MAX_VIR_BYTES, "incomplete or oversized Verus inventory")
++    # This is the textual VIR format emitted by the pinned --log vir. Function
++    # headers and bodies are separately identified; a nested CallTarget's
++    # ':body None' does not mean its enclosing theorem has no body.
++    require(re.search(r'\(arch_word_bits \(ArchWordBits (?:Either32Or64|Exactly \d+)\)\)\s*\Z', text),
++            "missing VIR footer; incomplete inventory")
++    prefix = Path(entry).stem + "::"
++    checked, trusted, names = [], [], set()
++    for block in re.split(r'(?m)(?=^\(@ )', text):
++        header = re.match(r'^\(@ "([^"]+)" \(Function\s', block)
++        if not header:
++            continue
++        name = re.search(r':name \(Fun :path ([^)]+)\)', block)
++        require(name, "unrecognized pinned VIR Function name")
++        if not name[1].startswith(prefix):
++            continue
++        mode = re.search(r':mode (Spec|Proof|Exec)\b', block)
++        external = re.search(r':is_external_body (true|false)\b', block)
++        body = re.search(r':is_async (?:true|false)\s*\)\s*:body (None|\(@@? "([^"]+)")', block)
++        require(name and mode and external and body, "unrecognized pinned VIR Function header")
++        require(name[1] not in names, "duplicate Verus symbol")
++        names.add(name[1])
++        flags = {flag: bool(re.search(r':' + flag + r' true\b', block)) for flag in
++                 ('exec_assume_termination', 'exec_allows_no_decreases_clause')}
++        row = {'symbol': name[1], 'mode': mode[1], 'declaration': header[1],
++               'body': body[2], 'external_body': external[1] == 'true', 'flags': flags}
++        if row['external_body']:
++            trusted.append(row)
++        elif row['mode'] in ('Proof', 'Exec'):
++            require(row['body'] is not None, "nonexternal theorem/exec has no body")
++            require(not any(flags.values()), "unchecked termination attributes require separate reviewed scope")
++            require(not re.search(r'\b(?:verus_builtin|builtin)::(?:assume|admit)\b', block),
++                    "local behavior uses an unchecked assumption")
++            checked.append(row)
++    require(checked, "empty Verus theorem/exec inventory")
++    return {'schema': SCHEMA, 'entry': entry, 'checked': sorted(checked, key=lambda r:r['symbol']),
++            'generated_trusted': sorted(trusted, key=lambda r:r['symbol']),
++            'arch_word_bits': re.search(r'^\(arch_word_bits (.+)\)\s*$', text, re.M)[1]}
++
++def log_path(root, argv):
++    if '--log' not in argv or '--log-dir' not in argv:
++        return None
++    require(argv[argv.index('--log')+1] == 'vir', "reviewed Verus inventory requires --log vir")
++    name = argv[argv.index('--log-dir')+1]
++    require(name.startswith('.aegis/destiny/'), "Verus logs must be confined runtime artifacts")
++    return confined_path(root, name + '/crate.vir')
++
++def prepare_log(root, argv):
++    path = log_path(root, argv)
++    if path is not None:
++        # Failures must never reuse a prior successful execution's VIR.
++        path.unlink(missing_ok=True)
++
++def capture(root, argv, run_id):
++    path = log_path(root, argv)
++    if path is None or not path.is_file():
++        return None
++    require(path.stat().st_size <= MAX_VIR_BYTES, "Verus VIR capture exceeds bound")
++    parsed = inventory(path.read_text(), argv[-1])
++    artifact = '.aegis/destiny/verus-artifacts/' + run_id + '.vir'
++    target = confined_path(root, artifact)
++    target.parent.mkdir(parents=True, exist_ok=True)
++    shutil.copyfile(path, target)
++    return {**parsed, 'artifact': artifact, 'artifact_sha256': digest(target.read_bytes())}
++
++def current_inventory(root, receipt, obligation):
++    from .evidence import proof_output
++    from types import SimpleNamespace
++    require(receipt['id'] == 'verus' and receipt['proof_output_checked'], "not a counted successful Verus observation")
++    require(receipt['status']=='OBSERVED_SUCCESS' and receipt['returncode']==0, "failed Verus observation")
++    require(receipt['identity']['obligation'] == {
++        'method':'verus', 'entry':obligation['entry'], 'expected_checks':obligation['expected_checks']},
++        "Verus entry/count differs")
++    commands=receipt['commands']
++    require(len(commands)==1 and [c['argv'] for c in commands]==receipt['identity']['commands'], "wrong/empty Verus command inventory")
++    command=commands[0]
++    require(command['returncode']==0 and not any(command[k] for k in ('timed_out','stdout_truncated','stderr_truncated')),
++            "failed or incomplete Verus output")
++    require(not set(command['argv']) & {'--no-verify','--verify-function','--verify-module','--verify-only-module'},
++            "verification disabled or narrowed")
++    require(proof_output(receipt['identity']['obligation'],SimpleNamespace(**command)), "zero/wrong/failed Verus result")
++    value = receipt.get('verus_inventory')
++    require(value and value['schema'] == SCHEMA and value['entry'] == obligation['entry'], "missing or wrong Verus inventory")
++    artifact = confined_path(root, value['artifact'], must_exist=True)
++    require(value['artifact'].startswith('.aegis/destiny/verus-artifacts/'), "inventory artifact escaped runtime state")
++    require(digest(artifact.read_bytes()) == value['artifact_sha256'], "changed/incomplete VIR artifact")
++    actual = inventory(artifact.read_text(), obligation['entry'])
++    require(all(actual[key] == value[key] for key in actual), "recorded Verus symbols differ from actual VIR")
++    require(len(actual['checked']) == obligation['expected_checks'] > 0, "unexpected theorem/exec inventory")
++    return actual
++
++def validate_symbol_mapping(actual, declared):
++    require(declared['schema'] == SCHEMA and declared['entry'] == actual['entry'], "symbol mapping entry/schema differs")
++    expected = {row['symbol']: row for row in actual['checked']}
++    rows = declared['symbols']
++    require(rows and len(rows) == len(expected) and len({r['symbol'] for r in rows}) == len(rows), "empty/wrong/duplicate symbol mapping")
++    require({r['symbol'] for r in rows} == set(expected), "missing or unreferenced theorem/exec symbol")
++    for row in rows:
++        require(row['mode'] == expected[row['symbol']]['mode'], "mapped symbol mode differs")
++        require(row['obligations'] and row['relation'].strip() and row['review'].strip(), "unreviewed symbol or missing semantic relation")
++    return set(expected)
++
++def validate_case_map(catalog, source_inventory, mapped):
++    """Preserve qualified assertion/setup accounting without granting credit."""
++    ids={row['id'] for row in catalog}
++    require((len(catalog),len(ids),len({(r['source'],r['test']) for r in catalog}),
++             len({r['source'] for r in catalog}))==(531,531,509,34), "catalog denominator differs")
++    originals={row['id']:row for row in source_inventory['cases']}
++    rows={row['id']:row for row in mapped['cases']}
++    require(len(source_inventory['cases'])==len(originals)==len(mapped['cases'])==len(rows)==531,
++            "omitted/duplicate qualified case")
++    require(set(originals)==set(rows)==ids, "omitted or ambiguous qualified identity")
++    require(mapped['original_commit']==source_inventory['original_commit']==catalog[0]['original_commit'], "original pin differs")
++    groups=mapped['obligations']
++    require(groups, "empty concurrency obligation inventory")
++    for authority in catalog:
++        row=rows[authority['id']];source=originals[authority['id']]
++        require(row['original_source_sha256']==source['original_source_sha256']==authority['original_source_sha256'],
++                "original hash differs")
++        for lane,field in (('assertion','assertion_ids'),('dependency','dependency_ids')):
++            mapped_sites=row[lane+'_mappings']
++            require(row[field]==source[field] and len(mapped_sites)==len(source[field])
++                    and {m['id'] for m in mapped_sites}==set(source[field]), "missing/ambiguous "+lane+" mapping")
++        require(row['execution_obligation']['required'] is True and row['execution_obligation']['relation'].strip(),
++                "missing setup/execution/no-unexpected-error obligation")
++        requirements=row['required_obligations']
++        require(len(requirements)==len(set(requirements)) and all(r in groups for r in requirements), "unknown/duplicate derived obligation")
++        if row['concurrency_relevance']=='required_concurrency_obligation':
++            require(requirements and row['applicability_rationale'].strip(), "missing required concurrency relation")
++    return rows
+diff --git a/infra/tests/test_verus_evidence.py b/infra/tests/test_verus_evidence.py
+new file mode 100644
+index 0000000..188e3c9
+--- /dev/null
++++ b/infra/tests/test_verus_evidence.py
+@@ -0,0 +1,104 @@
++"""Synthetic acceptance regressions. These confer no Destiny proof credit."""
++import copy
++from pathlib import Path
++import tempfile
++import unittest
++
++from agentinfra.destiny_reuse import digest
++from agentinfra.verus_evidence import inventory, current_inventory, validate_symbol_mapping, validate_case_map
++
++ENTRY='verification/verus/example.rs'
++VIR='''(@ "verification/verus/example.rs:1:1: 1:70 (#0)" (Function
++ :name (Fun :path example::transition) :owning_module example:: :mode Exec
++ :attrs (FunctionAttrs :is_external_body false :exec_assume_termination false
++ :exec_allows_no_decreases_clause false :is_async false)
++ :body (@@ "src/transition.rs:1:1: 1:30 (#0)" (Block :body None))))
++(arch_word_bits (ArchWordBits Either32Or64))
++'''
++
++class VerusInventoryTests(unittest.TestCase):
++    def setUp(self):
++        self.folder=tempfile.TemporaryDirectory()
++        self.root=Path(self.folder.name)
++        self.artifact='.aegis/destiny/verus-artifacts/run.vir'
++        path=self.root/self.artifact;path.parent.mkdir(parents=True);path.write_text(VIR)
++        self.actual=inventory(VIR,ENTRY)
++        self.obligation={'entry':ENTRY,'expected_checks':1}
++        self.command={'argv':['/pinned/verus','--crate-type=lib',ENTRY],'returncode':0,
++            'stdout':'verification results:: 1 verified, 0 errors\n','stderr':'',
++            'timed_out':False,'stdout_truncated':False,'stderr_truncated':False}
++        self.receipt={'id':'verus','status':'OBSERVED_SUCCESS','returncode':0,'proof_output_checked':True,
++            'identity':{'obligation':{'method':'verus',**self.obligation},'commands':[self.command['argv']]},
++            'commands':[self.command], 'verus_inventory':{**self.actual,
++                'artifact':self.artifact,'artifact_sha256':digest(path.read_bytes())}}
++        self.mapping={'schema':1,'entry':ENTRY,'symbols':[{'symbol':'example::transition','mode':'Exec',
++            'obligations':['derived-state'],'relation':'Changed state corresponds to the specification transition.',
++            'review':'Original definition and actual shared production body reviewed.'}]}
++
++    def tearDown(self):self.folder.cleanup()
++
++    def test_real_body_is_not_confused_with_a_nested_body_none(self):
++        value=current_inventory(self.root,self.receipt,self.obligation)
++        self.assertEqual(validate_symbol_mapping(value,self.mapping),{'example::transition'})
++        self.assertEqual(value['checked'][0]['body'],'src/transition.rs:1:1: 1:30 (#0)')
++
++    def test_missing_or_unreferenced_or_unreviewed_theorem_is_rejected(self):
++        for mutate in (
++            lambda d:d.update(symbols=[]),
++            lambda d:d['symbols'][0].update(symbol='example::unrelated'),
++            lambda d:d['symbols'][0].update(obligations=[]),
++            lambda d:d['symbols'][0].update(review=''),
++        ):
++            d=copy.deepcopy(self.mapping);mutate(d)
++            with self.assertRaises(ValueError):validate_symbol_mapping(self.actual,d)
++
++    def test_zero_wrong_count_failure_success_shaped_log_and_truncation_are_rejected(self):
++        for mutate in (
++            lambda r:r['commands'][0].update(stdout='verification results:: 0 verified, 0 errors\n'),
++            lambda r:r['commands'][0].update(stdout='verification results:: 2 verified, 0 errors\n'),
++            lambda r:r['commands'][0].update(returncode=1),
++            lambda r:r['commands'][0].update(stdout='verification results:: 1 verified, 1 errors\n'),
++            lambda r:r['commands'][0].update(stdout_truncated=True),
++            lambda r:r['commands'][0].update(timed_out=True),
++        ):
++            r=copy.deepcopy(self.receipt);mutate(r)
++            with self.assertRaises(ValueError):current_inventory(self.root,r,self.obligation)
++
++    def test_missing_changed_or_incomplete_inventory_is_rejected(self):
++        r=copy.deepcopy(self.receipt);r['verus_inventory']=None
++        with self.assertRaises(ValueError):current_inventory(self.root,r,self.obligation)
++        (self.root/self.artifact).write_text(VIR.replace('transition','changed'))
++        with self.assertRaises(ValueError):current_inventory(self.root,self.receipt,self.obligation)
++        with self.assertRaises(ValueError):inventory(VIR.split('(arch_word_bits')[0],ENTRY)
++
++    def test_empty_external_and_unchecked_behavior_are_rejected(self):
++        for text in (VIR.replace('example::transition','other::transition'),
++                     VIR.replace(':is_external_body false',':is_external_body true'),
++                     VIR.replace(':exec_assume_termination false',':exec_assume_termination true')):
++            with self.assertRaises(ValueError):inventory(text,ENTRY)
++
++    def test_qualified_catalog_join_rejects_omitted_case_and_assertion(self):
++        catalog=[];cases=[];mapped=[]
++        for i in range(531):
++            j=i if i<509 else i-509
++            source=f'source{j%34}.py';test=f'test_{j}';fixture='Test' if i<509 else 'SecondFixture'
++            identity=f'{source}::{fixture}::{test}'
++            assertion=f'{source}:{j+1}'
++            authority={'id':identity,'source':source,'test':test,'original_commit':'pin','original_source_sha256':'hash'}
++            catalog.append(authority)
++            case={**authority,'assertion_ids':[assertion],'dependency_ids':[]}
++            cases.append(case)
++            mapped.append({**case,'assertion_mappings':[{'id':assertion}], 'dependency_mappings':[],
++                'execution_obligation':{'required':True,'relation':'Original setup executes.'},
++                'required_obligations':['derived-state'],'concurrency_relevance':'required_concurrency_obligation',
++                'applicability_rationale':'Shared state accessed by admitted callers.'})
++        source_inventory={'original_commit':'pin','cases':cases}
++        value={'original_commit':'pin','cases':mapped,'obligations':{'derived-state':{}}}
++        self.assertEqual(len(validate_case_map(catalog,source_inventory,value)),531)
++        for mutation in ('omitted','assertion','ambiguous'):
++            changed=copy.deepcopy(value)
++            if mutation=='omitted':changed['cases'].pop()
++            elif mutation=='assertion':changed['cases'][0]['assertion_mappings']=[]
++            else:changed['cases'][509]['id']=changed['cases'][0]['id']
++            with self.assertRaises(ValueError):validate_case_map(catalog,source_inventory,changed)
++

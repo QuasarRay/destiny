@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::{HashMap, HashSet, VecDeque},
     fmt,
     io::{self, Write},
     time::Duration,
@@ -16,8 +16,11 @@ use bevy::{
     time::TimeUpdateStrategy,
 };
 use destiny_original_spec::{
-    NO_FORMATION, adjust_time, assign_formation, clamp_speed_fraction, non_negative_setter_accepts,
-    positive_setter_accepts, surface_distance_from_center,
+    NO_FORMATION, OriginalMode, OriginalParkBall, Vec3 as OriginalVec3, adjust_time,
+    assign_formation, clamp_speed_fraction, non_negative_setter_accepts, original_aligned_for_warp,
+    original_follow_thrust_with_environment, original_goto_thrust, original_integrate_duration,
+    original_new_orbit_thrust_with_environment, original_old_orbit_thrust_with_friction,
+    original_warp_distance, positive_setter_accepts, surface_distance_from_center,
 };
 use serde::{
     Deserialize, Serialize,
@@ -222,6 +225,8 @@ fn default_operation() -> String {
 
 #[derive(Debug, Error)]
 pub enum CompatError {
+    #[error("{0}")]
+    ValueError(String),
     #[error("invalid request: {0}")]
     InvalidRequest(String),
     #[error("ball {0} is not in the ballpark")]
@@ -237,6 +242,7 @@ pub enum CompatError {
 impl CompatError {
     pub fn payload(&self) -> Value {
         match self {
+            Self::ValueError(_) => json!({"code":"value_error","message":self.to_string()}),
             Self::BallNotFound(ball_id) => json!({
                 "code": "ball_not_found",
                 "message": self.to_string(),
@@ -317,6 +323,10 @@ pub struct DestinyBallMetadata {
     #[serde(default)]
     pub massive_before_cloak: Option<bool>,
     pub minis: Vec<Value>,
+    #[serde(default)]
+    pub mini_ids: Vec<i64>,
+    #[serde(default)]
+    pub owner_id: i64,
     pub sensors: Vec<Value>,
 }
 
@@ -350,7 +360,37 @@ pub struct BallSnapshot {
     pub formation_slots: u16,
     pub massive_before_cloak: Option<bool>,
     pub minis: Vec<Value>,
+    #[serde(default)]
+    pub mini_ids: Vec<i64>,
+    #[serde(default)]
+    pub owner_id: i64,
     pub sensors: Vec<Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub motion: Option<MotionSnapshot>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notifications: Option<RangeNotificationSnapshot>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MotionSnapshot {
+    pub mode: u8,
+    pub destination: [f64; 3],
+    pub min_range: f64,
+    pub warp_factor: i32,
+    pub warp_distance: f64,
+    pub follow_id: Option<i64>,
+    pub follow_range: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RangeNotificationSnapshot {
+    pub range: f64,
+    pub within: bool,
+    pub target: Option<i64>,
+    pub tracking_range: f64,
+    pub tracking_within: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -378,6 +418,10 @@ struct ParkSnapshotMetadata {
     tick_interval_ms: f64,
     friction: f64,
     current_time: i64,
+    #[serde(default = "default_local_counter")]
+    local_counter: i64,
+    #[serde(default = "default_local_high_counter")]
+    local_high_counter: i64,
     time: i64,
     ego: i64,
     collision_substeps: u32,
@@ -423,6 +467,8 @@ struct CompatLimits {
 struct ParkMetadata {
     is_master: bool,
     current_time: i64,
+    local_counter: i64,
+    local_high_counter: i64,
     time: i64,
     ego: i64,
     network_components: bool,
@@ -459,6 +505,7 @@ struct EvolutionBallCheckpoint {
 }
 
 struct EvolutionCheckpoint {
+    follower_sets: HashMap<u64, HashSet<i64>>,
     balls: Vec<EvolutionBallCheckpoint>,
     current_time: i64,
     time: i64,
@@ -467,6 +514,180 @@ struct EvolutionCheckpoint {
     substeps_time: Time<Substeps>,
     proximity_events: ProximityEventOutbox,
     network_outbox: CarbonNetworkOutbox,
+    motion: HashMap<i64, MotionControl>,
+    notifications: HashMap<i64, RangeNotifications>,
+}
+
+#[derive(Clone, Debug)]
+struct MotionControl {
+    mode: OriginalMode,
+    destination: OriginalVec3,
+    min_range: f64,
+    warp_factor: i32,
+    warp_distance: f64,
+    follow_id: Option<i64>,
+    follow_range: f32,
+}
+
+impl Default for MotionControl {
+    fn default() -> Self {
+        Self {
+            mode: OriginalMode::Stop,
+            destination: OriginalVec3::ZERO,
+            min_range: 0.0,
+            warp_factor: 20,
+            warp_distance: -1.0,
+            follow_id: None,
+            follow_range: 10.0,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct ModeCallback {
+    pub(crate) ball_id: i64,
+    generation: u64,
+    pub(crate) old_mode: u8,
+    pub(crate) new_mode: u8,
+    new: OriginalMode,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum CallCallback {
+    Mode(ModeCallback),
+    Park {
+        kind: u32,
+        arguments: Value,
+    },
+    Ball {
+        ball_id: i64,
+        generation: u64,
+        kind: u32,
+        arguments: Value,
+    },
+    Remove {
+        ball_id: i64,
+        generation: u64,
+        delay: i64,
+        step: RemovalStep,
+        arrival: Option<OriginalVec3>,
+    },
+    GotoPoint {
+        ball_id: i64,
+        generation: u64,
+        point: OriginalVec3,
+    },
+    Follow {
+        ball_id: i64,
+        generation: u64,
+        target: i64,
+        target_generation: u64,
+        kind: FollowKind,
+    },
+    RegisterFollower {
+        id: i64,
+        target: i64,
+        target_generation: u64,
+    },
+    WarpStart {
+        id: i64,
+        generation: u64,
+        point: OriginalVec3,
+        min_range: f64,
+        factor: i32,
+    },
+    EntityArrival {
+        id: i64,
+        generation: u64,
+        point: OriginalVec3,
+    },
+    SetMode {
+        id: i64,
+        generation: u64,
+        mode: OriginalMode,
+        troll_delay: Option<i32>,
+    },
+    FormationChange {
+        id: i64,
+        generation: u64,
+        formation: u8,
+        remaining: VecDeque<(i64, u64)>,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum FollowKind {
+    Follow(f32),
+    Orbit(f32),
+    Missile(i64),
+    Formation(i8),
+}
+
+#[derive(Clone, Debug)]
+pub(crate) enum RemovalStep {
+    Followers,
+    NextFollower(VecDeque<i64>),
+    Mark,
+    Detach,
+}
+
+struct PendingTick {
+    force: bool,
+    results: Vec<PreparedMotion>,
+}
+
+#[derive(Clone, Copy)]
+struct PreparedMotion {
+    id: i64,
+    position: OriginalVec3,
+    velocity: OriginalVec3,
+    acceleration: OriginalVec3,
+    in_warp: bool,
+}
+
+#[derive(Default, Clone)]
+struct RangeNotifications {
+    range: f64,
+    within: bool,
+    target: Option<i64>,
+    tracking_range: f64,
+    tracking_within: bool,
+}
+
+// The enclosing operation owns this continuation. Nested calls cannot take
+// its remaining work. Each candidate is inspected only when reached, after
+// the preceding synchronous callback has returned.
+pub(crate) struct NotificationPass {
+    owners: VecDeque<(i64, Entity)>,
+    owner: Option<(i64, Entity)>,
+    stage: u8,
+    sensors: VecDeque<bool>,
+    sensor: Option<SensorPass>,
+    work: usize,
+}
+
+struct SensorPass {
+    cloak: bool,
+    candidates: VecDeque<(i64, Entity)>,
+    vanished: VecDeque<i64>,
+}
+
+fn mode_number(mode: OriginalMode) -> u8 {
+    match mode {
+        OriginalMode::Goto => 0,
+        OriginalMode::Follow => 1,
+        OriginalMode::Stop => 2,
+        OriginalMode::Warp => 3,
+        OriginalMode::Orbit => 4,
+        OriginalMode::Missile => 5,
+        OriginalMode::Formation => 12,
+        OriginalMode::Mushroom => 6,
+        OriginalMode::Boid => 7,
+        OriginalMode::Troll => 8,
+        OriginalMode::Miniball => 9,
+        OriginalMode::Field => 10,
+        OriginalMode::Rigid => 11,
+    }
 }
 
 #[derive(SystemParam)]
@@ -501,8 +722,72 @@ impl CollisionHooks for DestinyBubbleCollisionHooks<'_, '_> {
 pub struct CompatRuntime {
     app: App,
     balls: HashMap<i64, Entity>,
+    ball_generations: HashMap<i64, u64>,
+    follower_sets: HashMap<u64, HashSet<i64>>,
+    next_ball_generation: u64,
+    retained_balls: HashMap<u64, RetainedBall>,
     park: ParkMetadata,
     terminal_error: Option<String>,
+    motion: HashMap<i64, MotionControl>,
+    mode_callbacks: VecDeque<CallCallback>,
+    original_bubbles: Option<crate::bubbles::Tracking>,
+    evolution_phase: u8,
+    pending_tick: Option<PendingTick>,
+    pending_tick_time: Option<i64>,
+    range_notifications: HashMap<i64, RangeNotifications>,
+}
+
+struct RetainedBall {
+    id: i64,
+    attached: bool,
+    moribund: bool,
+    references: usize,
+    detached: Option<BallSnapshot>,
+    client: bool,
+    identity_fields: [i64; 3],
+}
+
+type SweptBoundComponents = (
+    &'static DestinyBallMetadata,
+    &'static Collider,
+    &'static Position,
+    &'static Rotation,
+    &'static LinearVelocity,
+    &'static avian3d::collider_tree::ColliderTreeProxyKey,
+    &'static mut ColliderAabb,
+    &'static mut avian3d::collision::collider::EnlargedAabb,
+);
+
+fn prepare_destiny_swept_bounds(
+    mut bodies: Query<SweptBoundComponents, Without<ColliderDisabled>>,
+    time: Res<Time<Physics>>,
+    length_unit: Res<PhysicsLengthUnit>,
+    config: Res<NarrowPhaseConfig>,
+    mut trees: ResMut<avian3d::collider_tree::ColliderTrees>,
+    mut moved: ResMut<avian3d::collider_tree::MovedProxies>,
+) {
+    use avian3d::collision::collider::SimpleCollider;
+    let dt = time.delta_secs_f64();
+    for (metadata, collider, position, rotation, velocity, key, mut aabb, mut enlarged) in
+        &mut bodies
+    {
+        if !metadata.is_free {
+            continue;
+        }
+        // Root free colliders are spheres; rotation does not change their
+        // bounds. Include the whole linear path before broad-phase selection,
+        // also for newly added bodies and velocity changes before this tick.
+        let end = position.0 + velocity.0 * dt;
+        *aabb = collider
+            .swept_aabb(position.0, *rotation, end, *rotation)
+            .grow(DVec3::splat(length_unit.0 * config.contact_tolerance));
+        if enlarged.update(&aabb, 0.0) {
+            trees
+                .tree_for_type_mut(key.tree_type())
+                .resize_proxy_aabb(key.id(), enlarged.get().into());
+            moved.insert(*key);
+        }
+    }
 }
 
 impl CompatRuntime {
@@ -547,11 +832,6 @@ impl CompatRuntime {
                     .into(),
             ));
         }
-        if options.use_new_orbit {
-            return Err(CompatError::InvalidRequest(
-                "use_new_orbit is unsupported because Orbit is not implemented by this compatibility subset".into(),
-            ));
-        }
         if options.disable_dynamical_orientation_for_missiles {
             return Err(CompatError::InvalidRequest(
                 "disable_dynamical_orientation_for_missiles requires missile classification that this subset does not expose".into(),
@@ -591,6 +871,12 @@ impl CompatRuntime {
         }));
         app.init_resource::<CarbonNetworkOutbox>();
         app.init_resource::<ProximityEventOutbox>();
+        app.add_systems(
+            PhysicsSchedule,
+            prepare_destiny_swept_bounds
+                .after(avian3d::collider_tree::ColliderTreeSystems::UpdateAabbs)
+                .before(BroadPhaseSystems::CollectCollisions),
+        );
         app.insert_resource(DestinySpaceFriction(1_000_000.0));
         {
             let mut transform_config = app.world_mut().resource_mut::<PhysicsTransformConfig>();
@@ -632,10 +918,23 @@ impl CompatRuntime {
         Ok(Self {
             app,
             balls: HashMap::new(),
+            ball_generations: HashMap::new(),
+            follower_sets: HashMap::new(),
+            next_ball_generation: 1,
+            retained_balls: HashMap::new(),
             terminal_error: None,
+            motion: HashMap::new(),
+            mode_callbacks: VecDeque::new(),
+            original_bubbles: None,
+            evolution_phase: 0,
+            pending_tick: None,
+            pending_tick_time: None,
+            range_notifications: HashMap::new(),
             park: ParkMetadata {
                 is_master: options.is_master,
                 current_time: 0,
+                local_counter: default_local_counter(),
+                local_high_counter: default_local_high_counter(),
                 time: 0,
                 ego: 0,
                 network_components: options.enable_network_components,
@@ -659,6 +958,42 @@ impl CompatRuntime {
     }
 
     pub fn dispatch(&mut self, request: CompatRequest) -> Result<Value, CompatError> {
+        let (result, finish_tick, mut callbacks) = self.dispatch_yielding(request)?;
+        while let Some(event) = callbacks.pop_front() {
+            self.complete_mode_callback(event)?;
+            self.prepend_callback_continuations(&mut callbacks);
+        }
+        if finish_tick {
+            self.complete_callback_tick()?;
+        }
+        Ok(result)
+    }
+
+    pub(crate) fn dispatch_yielding(
+        &mut self,
+        request: CompatRequest,
+    ) -> Result<(Value, bool, VecDeque<CallCallback>), CompatError> {
+        let finish_tick = request.title == "destiny.Ballpark.Evolve" && request.operation == "call";
+        let start = self.mode_callbacks.len();
+        match self.dispatch_inner(request) {
+            Ok(value) => {
+                let callbacks =
+                    crate::notification_batch::take_notifications(&mut self.mode_callbacks, start)
+                        .ok_or_else(|| {
+                            CompatError::Engine(
+                                "operation removed its caller's pending notifications".into(),
+                            )
+                        })?;
+                Ok((value, finish_tick, callbacks))
+            }
+            Err(error) => {
+                self.mode_callbacks.truncate(start);
+                Err(error)
+            }
+        }
+    }
+
+    fn dispatch_inner(&mut self, request: CompatRequest) -> Result<Value, CompatError> {
         if let Some(error) = &self.terminal_error {
             return Err(CompatError::Engine(format!(
                 "runtime is unavailable after a terminal physics failure: {error}"
@@ -701,7 +1036,7 @@ impl CompatRuntime {
                     .map(|value| value_bool(Some(value), "isMaster"))
                     .transpose()?
                     .unwrap_or(false);
-                self.clear_all();
+                self.clear_all()?;
                 self.park.formations.clear();
                 self.park.is_master = is_master;
                 self.park.current_time = 0;
@@ -723,6 +1058,38 @@ impl CompatRuntime {
                     || title.starts_with("destiny.ClientBall.") =>
             {
                 let ball_id = parse_ball_target(request.target.as_deref())?;
+                if let Some(generation) = parse_ball_generation(request.target.as_deref())? {
+                    let retained = self
+                        .retained_balls
+                        .get(&generation)
+                        .filter(|ball| ball.id == ball_id && ball.references > 0)
+                        .ok_or(CompatError::BallNotFound(ball_id))?;
+                    if title.starts_with("destiny.ClientBall.") && !retained.client {
+                        return Err(CompatError::UnsupportedTitle(title.into()));
+                    }
+                    if !retained.attached {
+                        if request.operation == "get" {
+                            require_arity(&request.args, &[0], title)?;
+                            return retained_ball_property(
+                                retained,
+                                title.rsplit('.').next().unwrap_or(title),
+                            );
+                        }
+                        if request.operation == "call" {
+                            return retained_ball_call(
+                                retained,
+                                title.rsplit('.').next().unwrap_or(title),
+                                &request.args,
+                            );
+                        }
+                        return Err(CompatError::InvalidRequest(
+                            "detached property mutation remains unimplemented".into(),
+                        ));
+                    }
+                    if self.ball_generations.get(&ball_id) != Some(&generation) {
+                        return Err(CompatError::BallNotFound(ball_id));
+                    }
+                }
                 self.dispatch_ball(title, &request.operation, ball_id, &request.args)
             }
             title if title.starts_with("destiny.Ballpark.") => {
@@ -763,7 +1130,1031 @@ impl CompatRuntime {
         Ok(json!({"current_time": self.park.current_time}))
     }
 
+    pub(crate) fn begin_callback_tick(&mut self, force: bool) -> Result<(), CompatError> {
+        let phase = crate::evolution_phase::begin_tick(self.evolution_phase).ok_or_else(|| {
+            CompatError::InvalidRequest("Evolve cannot reenter an active evolution".into())
+        })?;
+        let should_step = force || self.is_running();
+        if should_step {
+            self.validate_authoritative_world(true)?;
+            // Preflight time before changing any control or entering the phase.
+            self.park
+                .current_time
+                .checked_add(1)
+                .ok_or_else(|| CompatError::InvalidRequest("current time overflow".into()))?;
+        }
+        self.evolution_phase = phase;
+        let prepared = if should_step {
+            self.prepare_motion_tick()
+        } else {
+            Ok(Vec::new())
+        };
+        match prepared {
+            Ok(results) => {
+                self.pending_tick = Some(PendingTick {
+                    force: should_step,
+                    results,
+                });
+                Ok(())
+            }
+            Err(error) => {
+                self.evolution_phase = 0;
+                Err(error)
+            }
+        }
+    }
+
+    pub(crate) fn take_mode_callback(&mut self) -> Option<CallCallback> {
+        self.mode_callbacks.pop_front()
+    }
+
+    pub(crate) fn callback_is_live(&self, event: &CallCallback) -> bool {
+        match event {
+            CallCallback::Mode(event) => {
+                self.ball_generations.get(&event.ball_id) == Some(&event.generation)
+            }
+            CallCallback::Ball {
+                ball_id,
+                generation,
+                ..
+            } => self.ball_generations.get(ball_id) == Some(generation),
+            _ => true,
+        }
+    }
+
+    pub(crate) fn prepend_callback_continuations(
+        &mut self,
+        callbacks: &mut VecDeque<CallCallback>,
+    ) {
+        crate::notification_batch::prepend(&mut self.mode_callbacks, callbacks);
+    }
+
+    pub(crate) fn enter_mode_callback(&mut self) -> bool {
+        if let Some(phase) = crate::evolution_phase::enter_callback(self.evolution_phase) {
+            self.evolution_phase = phase;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub(crate) fn leave_mode_callback(&mut self, entered: bool) -> Result<(), CompatError> {
+        if entered {
+            self.evolution_phase = crate::evolution_phase::leave_callback(self.evolution_phase)
+                .ok_or_else(|| CompatError::Engine("callback lost its evolution phase".into()))?;
+        }
+        Ok(())
+    }
+
+    pub(crate) fn complete_mode_callback(
+        &mut self,
+        event: CallCallback,
+    ) -> Result<(), CompatError> {
+        // Ball::SetMode sends the synchronous notification BEFORE storing mode.
+        // Callback-time removal is deferred, so the ball remains live here.
+        match event {
+            CallCallback::Mode(event)
+                if self.ball_generations.get(&event.ball_id) == Some(&event.generation) =>
+            {
+                self.motion.entry(event.ball_id).or_default().mode = event.new;
+            }
+            CallCallback::Remove {
+                ball_id,
+                generation,
+                delay,
+                step,
+                arrival,
+            } if self.ball_generations.get(&ball_id) == Some(&generation) => {
+                self.resume_removal(ball_id, generation, delay, step, arrival)?;
+            }
+            CallCallback::GotoPoint {
+                ball_id,
+                generation,
+                point,
+            } if self.ball_generations.get(&ball_id) == Some(&generation) => {
+                self.motion.entry(ball_id).or_default().destination = point;
+                if self.metadata(ball_id)?.speed_fraction == 0.0 {
+                    self.metadata_mut(ball_id)?.speed_fraction = 1.0;
+                }
+                self.queue_mode_change(ball_id, OriginalMode::Goto);
+            }
+            CallCallback::Follow {
+                ball_id,
+                generation,
+                target,
+                target_generation,
+                kind,
+            } if self.ball_generations.get(&ball_id) == Some(&generation)
+                && self.ball_generations.get(&target) == Some(&target_generation) =>
+            {
+                let after_stop_check =
+                    matches!(kind, FollowKind::Missile(_) | FollowKind::Formation(_));
+                if after_stop_check
+                    && (self.metadata(ball_id)?.new_bubble_id
+                        != self.metadata(target)?.new_bubble_id
+                        || self.metadata(target)?.is_cloaked != 0)
+                {
+                    return Ok(());
+                }
+                let mode = match kind {
+                    FollowKind::Follow(range) | FollowKind::Orbit(range) => {
+                        self.motion.entry(ball_id).or_default().follow_range = range;
+                        if matches!(kind, FollowKind::Follow(_)) {
+                            OriginalMode::Follow
+                        } else {
+                            OriginalMode::Orbit
+                        }
+                    }
+                    FollowKind::Missile(owner) => {
+                        let velocity = self
+                            .app
+                            .world()
+                            .get::<LinearVelocity>(self.entity(ball_id)?)
+                            .ok_or_else(|| CompatError::Engine("missing missile velocity".into()))?
+                            .0;
+                        let fields = crate::missile::follow_fields(
+                            target,
+                            owner,
+                            self.park.current_time,
+                            self.metadata(ball_id)?.radius as f32,
+                            self.metadata(target)?.radius as f32,
+                            OriginalVec3 {
+                                x: velocity.x,
+                                y: velocity.y,
+                                z: velocity.z,
+                            },
+                        );
+                        let control = self.motion.entry(ball_id).or_default();
+                        control.follow_id = Some(fields.follow_id);
+                        control.follow_range = fields.follow_range;
+                        control.destination = fields.destination;
+                        let mut metadata = self.metadata_mut(ball_id)?;
+                        metadata.owner_id = fields.owner_id;
+                        metadata.effect_stamp = fields.effect_stamp;
+                        metadata.speed_fraction = f64::from(fields.speed_fraction);
+                        OriginalMode::Missile
+                    }
+                    FollowKind::Formation(slot) => {
+                        self.metadata_mut(ball_id)?.effect_stamp = i64::from(slot);
+                        OriginalMode::Formation
+                    }
+                };
+                self.motion.entry(ball_id).or_default().follow_id = Some(target);
+                self.queue_mode_change(ball_id, mode);
+                self.mode_callbacks
+                    .push_back(CallCallback::RegisterFollower {
+                        id: ball_id,
+                        target,
+                        target_generation,
+                    });
+            }
+            CallCallback::RegisterFollower {
+                id,
+                target,
+                target_generation,
+            } if self.ball_generations.get(&target) == Some(&target_generation) => {
+                self.follower_sets
+                    .entry(target_generation)
+                    .or_default()
+                    .insert(id);
+            }
+            CallCallback::WarpStart {
+                id,
+                generation,
+                point,
+                min_range,
+                factor,
+            } if self.ball_generations.get(&id) == Some(&generation) => {
+                let control = self.motion.entry(id).or_default();
+                control.destination = point;
+                control.min_range = min_range;
+                control.warp_factor = factor;
+                control.follow_range = 0.0;
+                self.metadata_mut(id)?.effect_stamp = -1;
+                self.metadata_mut(id)?.owner_id = i64::from(factor);
+                self.queue_mode_change(id, OriginalMode::Warp);
+            }
+            CallCallback::EntityArrival {
+                id,
+                generation,
+                point,
+            } if self.ball_generations.get(&id) == Some(&generation) => {
+                if self
+                    .motion
+                    .get(&id)
+                    .is_some_and(|control| control.mode == OriginalMode::Goto)
+                {
+                    return Ok(());
+                }
+                self.mode_callbacks.push_back(CallCallback::Remove {
+                    ball_id: id,
+                    generation,
+                    delay: 0,
+                    step: RemovalStep::Followers,
+                    arrival: Some(point),
+                });
+            }
+            CallCallback::SetMode {
+                id,
+                generation,
+                mode,
+                troll_delay,
+            } if self.ball_generations.get(&id) == Some(&generation) => {
+                if let Some(delay) = troll_delay {
+                    self.set_free(id, true)?;
+                    self.set_interactive(id, true)?;
+                    let stamp = self
+                        .park
+                        .current_time
+                        .checked_add(i64::from(delay.max(1)))
+                        .ok_or_else(|| {
+                            CompatError::InvalidRequest("Troll delay overflows time".into())
+                        })?;
+                    self.metadata_mut(id)?.effect_stamp = stamp;
+                }
+                self.queue_mode_change(id, mode);
+            }
+            CallCallback::FormationChange {
+                id,
+                generation,
+                formation,
+                mut remaining,
+            } if self.ball_generations.get(&id) == Some(&generation) => {
+                if let Some((follower, follower_generation)) = remaining.pop_front() {
+                    if self.ball_generations.get(&follower) == Some(&follower_generation) {
+                        if formation == NO_FORMATION {
+                            let control = self.motion.get(&follower).cloned().unwrap_or_default();
+                            let action = crate::ball_lifecycle::follower_action(
+                                true,
+                                control.follow_id == Some(id),
+                                mode_number(control.mode),
+                                self.metadata(follower)?.is_interactive,
+                            );
+                            if action >= 2 {
+                                if action == 3 {
+                                    self.set_massive(follower, false)?;
+                                }
+                                let velocity = self
+                                    .app
+                                    .world()
+                                    .get::<LinearVelocity>(self.entity(follower)?)
+                                    .ok_or_else(|| {
+                                        CompatError::Engine("missing follower velocity".into())
+                                    })?
+                                    .0;
+                                self.begin_goto_direction(
+                                    follower,
+                                    OriginalVec3 {
+                                        x: velocity.x,
+                                        y: velocity.y,
+                                        z: velocity.z,
+                                    },
+                                )?;
+                            } else if action == 1 {
+                                self.stop_command(follower)?;
+                            } else if let Some(followers) = self.follower_sets.get_mut(&generation)
+                            {
+                                followers.remove(&follower);
+                            }
+                        } else {
+                            self.stop_command(follower)?;
+                        }
+                    }
+                    self.mode_callbacks
+                        .push_back(CallCallback::FormationChange {
+                            id,
+                            generation,
+                            formation,
+                            remaining,
+                        });
+                } else {
+                    let mut metadata = self.metadata_mut(id)?;
+                    metadata.formation_id = formation;
+                    if formation == NO_FORMATION {
+                        metadata.formation_slots = 0;
+                    }
+                }
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    pub(crate) fn complete_callback_tick(&mut self) -> Result<(), CompatError> {
+        self.advance_callback_tick()?;
+        let mut callbacks = std::mem::take(&mut self.mode_callbacks);
+        while let Some(event) = callbacks.pop_front() {
+            self.complete_mode_callback(event)?;
+            self.prepend_callback_continuations(&mut callbacks);
+        }
+        let mut pass = self.begin_notification_pass();
+        while self.next_tick_notification(&mut pass)?.is_some() {}
+        self.finish_callback_tick()
+    }
+
+    pub(crate) fn advance_callback_tick(&mut self) -> Result<(), CompatError> {
+        let pending = self
+            .pending_tick
+            .take()
+            .ok_or_else(|| CompatError::Engine("evolution continuation is missing".into()))?;
+        let result = self.advance_one_tick_with_motion(pending.force, &pending.results);
+        if result.is_err() {
+            self.evolution_phase = 0;
+        }
+        result
+    }
+
+    pub(crate) fn finish_callback_tick(&mut self) -> Result<(), CompatError> {
+        let stepped = self.pending_tick_time.is_some();
+        if let Some(time) = self.pending_tick_time.take() {
+            self.park.current_time = time;
+        }
+        self.evolution_phase = crate::evolution_phase::finish_tick(self.evolution_phase)
+            .ok_or_else(|| {
+                CompatError::Engine("evolution phase did not return from callbacks".into())
+            })?;
+        if stepped {
+            self.remove_due_balls();
+        }
+        Ok(())
+    }
+
+    pub(crate) fn proximity_callback_is_live(&self, event: &Value) -> bool {
+        let Some(owner) = event.get("owner_id").and_then(Value::as_i64) else {
+            return false;
+        };
+        if self.park.pending_removals.contains_key(&owner) {
+            return false;
+        }
+        let Ok(metadata) = self.metadata(owner) else {
+            return false;
+        };
+        if event.get("kind").and_then(Value::as_str) == Some("range") {
+            return self.range_notifications.contains_key(&owner);
+        }
+        let Some(index) = event.get("sensor_index").and_then(Value::as_u64) else {
+            return false;
+        };
+        metadata.sensors.get(index as usize).is_some()
+    }
+
+    fn queue_mode_change(&mut self, id: i64, new: OriginalMode) {
+        let old = self.motion.entry(id).or_default().mode;
+        if old != new {
+            self.mode_callbacks
+                .push_back(CallCallback::Mode(ModeCallback {
+                    ball_id: id,
+                    generation: self.ball_generations[&id],
+                    old_mode: mode_number(old),
+                    new_mode: mode_number(new),
+                    new,
+                }));
+        }
+    }
+
+    fn stop_command(&mut self, id: i64) -> Result<(), CompatError> {
+        if !self.balls.contains_key(&id) {
+            return Ok(());
+        }
+        let mode = self
+            .motion
+            .get(&id)
+            .map_or(OriginalMode::Stop, |control| control.mode);
+        if mode == OriginalMode::Stop {
+            return Ok(());
+        }
+        if matches!(
+            mode,
+            OriginalMode::Follow
+                | OriginalMode::Orbit
+                | OriginalMode::Missile
+                | OriginalMode::Formation
+        ) {
+            if let Some(generation) = self
+                .motion
+                .get(&id)
+                .and_then(|control| control.follow_id)
+                .and_then(|target| self.ball_generations.get(&target))
+                .copied()
+                && let Some(followers) = self.follower_sets.get_mut(&generation)
+            {
+                followers.remove(&id);
+            }
+            if self.park.is_master && mode == OriginalMode::Formation {
+                let target = self.motion.get(&id).and_then(|control| control.follow_id);
+                let slot = self.metadata(id)?.effect_stamp;
+                if let Some(target) = target.filter(|target| self.balls.contains_key(target)) {
+                    let count = self.formation_slot_count(target)?;
+                    let mut metadata = self.metadata_mut(target)?;
+                    metadata.formation_slots =
+                        free_formation_slot(metadata.formation_slots, count, slot);
+                }
+            }
+            let control = self.motion.entry(id).or_default();
+            control.follow_id = None;
+            control.follow_range = 0.0;
+            let mut metadata = self.metadata_mut(id)?;
+            metadata.effect_stamp = 0;
+            metadata.owner_id = 0;
+        }
+        self.queue_mode_change(id, OriginalMode::Stop);
+        Ok(())
+    }
+
+    fn followers(&self, target: i64) -> Vec<i64> {
+        let mut ids = self
+            .ball_generations
+            .get(&target)
+            .and_then(|generation| self.follower_sets.get(generation))
+            .map(|followers| followers.iter().copied().collect::<Vec<_>>())
+            .unwrap_or_default();
+        ids.sort_unstable();
+        ids
+    }
+
+    fn rebuild_follower_sets(&mut self) {
+        self.follower_sets.clear();
+        for (id, control) in &self.motion {
+            if matches!(
+                control.mode,
+                OriginalMode::Follow
+                    | OriginalMode::Orbit
+                    | OriginalMode::Missile
+                    | OriginalMode::Formation
+            ) && let Some(generation) = control
+                .follow_id
+                .and_then(|target| self.ball_generations.get(&target))
+                .copied()
+            {
+                self.follower_sets
+                    .entry(generation)
+                    .or_default()
+                    .insert(*id);
+            }
+        }
+    }
+
+    fn begin_follow(&mut self, id: i64, target: i64, kind: FollowKind) -> Result<(), CompatError> {
+        self.stop_command(id)?;
+        self.mode_callbacks.push_back(CallCallback::Follow {
+            ball_id: id,
+            generation: self.ball_generations[&id],
+            target,
+            target_generation: self.ball_generations[&target],
+            kind,
+        });
+        Ok(())
+    }
+
+    fn begin_goto_point(&mut self, id: i64, point: OriginalVec3) -> Result<(), CompatError> {
+        if !self.balls.contains_key(&id) {
+            return Ok(());
+        }
+        self.stop_command(id)?;
+        self.mode_callbacks.push_back(CallCallback::GotoPoint {
+            ball_id: id,
+            generation: self.ball_generations[&id],
+            point,
+        });
+        Ok(())
+    }
+
+    fn begin_goto_direction(
+        &mut self,
+        id: i64,
+        direction: OriginalVec3,
+    ) -> Result<(), CompatError> {
+        if !self.balls.contains_key(&id) {
+            return Ok(());
+        }
+        let position = self.position(id)?;
+        let point = OriginalVec3 {
+            x: position.x,
+            y: position.y,
+            z: position.z,
+        }
+        .add(direction.normalize().scale(1e17));
+        self.begin_goto_point(id, point)
+    }
+
+    fn begin_warp(
+        &mut self,
+        id: i64,
+        point: OriginalVec3,
+        min_range: f64,
+        factor: i32,
+    ) -> Result<(), CompatError> {
+        if !self.balls.contains_key(&id) {
+            return Ok(());
+        }
+        let position = self.position(id)?;
+        let distance_squared = (OriginalVec3 {
+            x: position.x,
+            y: position.y,
+            z: position.z,
+        })
+        .sub(point)
+        .norm_squared();
+        let control = self.motion.get(&id).cloned().unwrap_or_default();
+        let action = crate::warp_entry::command_action(
+            distance_squared,
+            control.mode == OriginalMode::Warp,
+            control.destination == point,
+        );
+        if action == 1 {
+            return self.begin_goto_point(id, point);
+        }
+        if action == 0 {
+            return Ok(());
+        }
+        self.stop_command(id)?;
+        self.mode_callbacks.push_back(CallCallback::WarpStart {
+            id,
+            generation: self.ball_generations[&id],
+            point,
+            min_range,
+            factor,
+        });
+        Ok(())
+    }
+
+    fn finish_entity_warp(&mut self, id: i64, point: OriginalVec3) -> Result<(), CompatError> {
+        let position = self.position(id)?;
+        let control = self.motion.get(&id).cloned().unwrap_or_default();
+        let (destination, velocity, effect, distance) = crate::warp_entry::arrival(
+            point,
+            OriginalVec3 {
+                x: position.x,
+                y: position.y,
+                z: position.z,
+            },
+            control.destination,
+            control.min_range,
+            self.park.current_time,
+        )
+        .ok_or_else(|| {
+            CompatError::InvalidRequest("EntityWarpIn start time overflows i64".into())
+        })?;
+        self.set_massive(id, false)?;
+        self.set_velocity(id, DVec3::new(velocity.x, velocity.y, velocity.z))?;
+        self.metadata_mut(id)?.effect_stamp = effect;
+        let control = self.motion.entry(id).or_default();
+        control.destination = destination;
+        control.warp_distance = distance;
+        for sensor in &mut self.metadata_mut(id)?.sensors {
+            if sensor.get("cloak_sensor").and_then(Value::as_bool) == Some(false) {
+                sensor["active"] = json!(false);
+            }
+        }
+        // Master PostEvent, dynamical SnapOrientation and complete original
+        // sensor/engine correspondence remain required boundaries.
+        Ok(())
+    }
+
+    fn original_motion_input(
+        &self,
+        id: i64,
+        control: &MotionControl,
+    ) -> Result<OriginalParkBall, CompatError> {
+        let entity = self.entity(id)?;
+        let metadata = self.metadata(id)?;
+        let position = self.position(id)?;
+        let velocity = self
+            .app
+            .world()
+            .get::<LinearVelocity>(entity)
+            .ok_or_else(|| CompatError::Engine("missing LinearVelocity".into()))?
+            .0;
+        let max_velocity = self
+            .app
+            .world()
+            .get::<MaxLinearSpeed>(entity)
+            .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?
+            .0;
+        let mass = self
+            .app
+            .world()
+            .get::<DestinyMass>(entity)
+            .ok_or_else(|| CompatError::Engine("missing DestinyMass".into()))?
+            .0;
+        let agility = metadata.agility as f32;
+        let effective_mass = mass * f64::from(agility);
+        let friction = self.app.world().resource::<DestinySpaceFriction>().0;
+        let dt = self
+            .app
+            .world()
+            .resource::<Time<Fixed>>()
+            .timestep()
+            .as_secs_f64();
+        let time_factor = if effective_mass <= 0.0 {
+            0.0
+        } else {
+            (-friction * dt / effective_mass).exp()
+        };
+        Ok(OriginalParkBall {
+            id,
+            in_park: true,
+            mode: control.mode,
+            position: OriginalVec3 {
+                x: position.x,
+                y: position.y,
+                z: position.z,
+            },
+            velocity: OriginalVec3 {
+                x: velocity.x,
+                y: velocity.y,
+                z: velocity.z,
+            },
+            mass,
+            radius: metadata.radius as f32,
+            time_factor,
+            max_velocity: max_velocity as f32,
+            agility,
+            speed_fraction: metadata.speed_fraction as f32,
+            goto: control.destination,
+            effect_stamp: metadata.effect_stamp,
+            owner_id: if control.mode == OriginalMode::Warp {
+                i64::from(control.warp_factor)
+            } else {
+                metadata.owner_id
+            },
+            last_collision: control.warp_distance,
+            follow_id: control.follow_id.unwrap_or(0),
+            follow_range: control.follow_range,
+            ..OriginalParkBall::default()
+        })
+    }
+
+    fn prepare_motion_tick(&mut self) -> Result<Vec<PreparedMotion>, CompatError> {
+        // Ordered controls retain the source's ID order. Numerical work is not
+        // split across workers or reduced in a different floating-point order.
+        let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
+        ids.sort_unstable();
+        let dt = self
+            .app
+            .world()
+            .resource::<Time<Fixed>>()
+            .timestep()
+            .as_secs_f64();
+        let friction = self.app.world().resource::<DestinySpaceFriction>().0;
+        let mut results = Vec::new();
+        for id in ids {
+            if !self.balls.contains_key(&id)
+                || self.park.pending_removals.contains_key(&id)
+                || !self.metadata(id)?.is_free
+            {
+                continue;
+            }
+            let mut control = self.motion.get(&id).cloned().unwrap_or_default();
+            let mut ball = self.original_motion_input(id, &control)?;
+            if control.mode == OriginalMode::Stop {
+                if !self.park.use_dynamical_orientation {
+                    // EvolveStop is distinct from the Stop command: the old
+                    // source damps only Y before gradient/integration work.
+                    let velocity = destiny_original_spec::original_stop_velocity(ball.velocity);
+                    self.set_velocity(id, DVec3::new(velocity.x, velocity.y, velocity.z))?;
+                }
+                continue;
+            }
+            if control.mode == OriginalMode::Mushroom {
+                continue;
+            }
+            if control.mode == OriginalMode::Warp && ball.effect_stamp < 0 {
+                if original_aligned_for_warp(&ball) {
+                    let offset = ball
+                        .position
+                        .sub(ball.goto)
+                        .normalize()
+                        .scale(control.min_range);
+                    ball.goto = ball.goto.add(offset);
+                    ball.effect_stamp = self.park.current_time;
+                    ball.last_collision = ball.goto.sub(ball.position).length();
+                    control.destination = ball.goto;
+                    control.warp_distance = ball.last_collision;
+                    self.metadata_mut(id)?.effect_stamp = ball.effect_stamp;
+                    self.set_massive(id, false)?;
+                } else {
+                    ball.effect_stamp = ball.effect_stamp.checked_sub(1).ok_or_else(|| {
+                        CompatError::InvalidRequest("warp alignment counter overflow".into())
+                    })?;
+                    self.metadata_mut(id)?.effect_stamp = ball.effect_stamp;
+                }
+                self.motion.insert(id, control.clone());
+            }
+            let in_warp = control.mode == OriginalMode::Warp && ball.effect_stamp >= 0;
+            let mut acceleration = OriginalVec3::ZERO;
+            let (position, velocity) = if in_warp {
+                let elapsed = self
+                    .park
+                    .current_time
+                    .checked_sub(ball.effect_stamp)
+                    .ok_or_else(|| {
+                        CompatError::InvalidRequest("warp elapsed time overflow".into())
+                    })?;
+                let (position, velocity, stop) = original_warp_distance(&ball, elapsed as f64 * dt);
+                if stop {
+                    self.set_massive(id, true)?;
+                    self.queue_mode_change(id, OriginalMode::Stop);
+                    original_integrate_duration(
+                        position,
+                        velocity,
+                        OriginalVec3::ZERO,
+                        ball.mass * f64::from(ball.agility),
+                        friction,
+                        ball.time_factor,
+                        dt,
+                        dt,
+                    )
+                } else {
+                    (position, velocity)
+                }
+            } else {
+                acceleration = if matches!(control.mode, OriginalMode::Follow | OriginalMode::Orbit)
+                {
+                    let target = control.follow_id.ok_or_else(|| {
+                        CompatError::Engine("following mode lost its target".into())
+                    })?;
+                    if !self.balls.contains_key(&target) {
+                        self.queue_mode_change(id, OriginalMode::Stop);
+                        OriginalVec3::ZERO
+                    } else {
+                        let target_control = self.motion.get(&target).cloned().unwrap_or_default();
+                        let other = self.original_motion_input(target, &target_control)?;
+                        let acceleration = if control.mode == OriginalMode::Follow {
+                            original_follow_thrust_with_environment(&mut ball, &other, friction, dt)
+                        } else if self.park.use_new_orbit {
+                            original_new_orbit_thrust_with_environment(
+                                &mut ball,
+                                &other,
+                                self.park.current_time,
+                                friction,
+                                dt,
+                            )
+                            .map_err(|error| {
+                                CompatError::InvalidRequest(format!(
+                                    "original new orbit kernel rejected state: {error:?}"
+                                ))
+                            })?
+                        } else {
+                            original_old_orbit_thrust_with_friction(
+                                &mut ball,
+                                &other,
+                                self.park.current_time,
+                                friction,
+                            )
+                            .map_err(|error| {
+                                CompatError::InvalidRequest(format!(
+                                    "original orbit kernel rejected state: {error:?}"
+                                ))
+                            })?
+                        };
+                        control.destination = ball.goto;
+                        self.motion.insert(id, control.clone());
+                        acceleration
+                    }
+                } else if control.mode == OriginalMode::Goto {
+                    original_goto_thrust(&ball, ball.goto, friction, dt, false)
+                } else {
+                    OriginalVec3::ZERO
+                };
+                original_integrate_duration(
+                    ball.position,
+                    ball.velocity,
+                    acceleration,
+                    ball.mass * f64::from(ball.agility),
+                    friction,
+                    ball.time_factor,
+                    dt,
+                    dt,
+                )
+            };
+            if !solver_safe_vec3(
+                DVec3::new(position.x, position.y, position.z),
+                MAX_COORDINATE,
+            ) || !solver_safe_vec3(DVec3::new(velocity.x, velocity.y, velocity.z), MAX_VELOCITY)
+            {
+                return Err(CompatError::InvalidRequest(
+                    "motion result exceeds the solver-safe envelope".into(),
+                ));
+            }
+            results.push(PreparedMotion {
+                id,
+                position,
+                velocity,
+                acceleration,
+                in_warp,
+            });
+        }
+        Ok(results)
+    }
+
     fn advance_one_tick(&mut self, force: bool) -> Result<(), CompatError> {
+        self.begin_callback_tick(force)?;
+        let mut callbacks = std::mem::take(&mut self.mode_callbacks);
+        while let Some(event) = callbacks.pop_front() {
+            self.complete_mode_callback(event)?;
+            self.prepend_callback_continuations(&mut callbacks);
+        }
+        self.complete_callback_tick()
+    }
+
+    fn prepare_iterative_sphere_tick(
+        &self,
+        motion: &[PreparedMotion],
+    ) -> Result<Option<Vec<PreparedMotion>>, CompatError> {
+        // In the pinned old-orientation iterative path, GetNextCollisionStatic
+        // and GetNextCollisionFree test parent spheres, including parents with
+        // mini balls. Capsules/boxes are separate static collidables attached
+        // only to fixed parents, using translation rather than ship rotation.
+        if self.park.use_dynamical_orientation {
+            return Ok(None);
+        }
+        let dt = self
+            .app
+            .world()
+            .resource::<Time<Fixed>>()
+            .timestep()
+            .as_secs_f64();
+        let friction = self.app.world().resource::<DestinySpaceFriction>().0;
+        if friction == 0.0
+            || friction > f64::MAX.sqrt()
+            || self
+                .balls
+                .keys()
+                .any(|id| self.metadata(*id).is_ok_and(|m| m.new_bubble_id > 0))
+        {
+            // Keep the established native zero/extreme-friction and host-bubble
+            // paths. Source arithmetic/partition correspondence for these
+            // partitions remains explicit; they receive no original proof credit.
+            return Ok(None);
+        }
+        let iterations = self.app.world().resource::<SubstepCount>().0 as usize;
+        let prepared: HashMap<_, _> = motion.iter().map(|step| (step.id, *step)).collect();
+        let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
+        ids.sort_unstable();
+        let mut bodies = Vec::with_capacity(ids.len());
+        let mut statics = Vec::new();
+        for &id in &ids {
+            let control = self.motion.get(&id).cloned().unwrap_or_default();
+            let ball = self.original_motion_input(id, &control)?;
+            let metadata = self.metadata(id)?;
+            let step = prepared.get(&id);
+            bodies.push(crate::iterative_collision::Body {
+                id,
+                position: ball.position,
+                velocity: ball.velocity,
+                acceleration: step.map_or(OriginalVec3::ZERO, |s| s.acceleration),
+                collision_acceleration: OriginalVec3::ZERO,
+                mass: ball.mass,
+                agility: ball.agility,
+                radius: ball.radius,
+                max_velocity: ball.max_velocity,
+                time_factor: ball.time_factor,
+                is_free: metadata.is_free,
+                is_massive: metadata.is_massive,
+                is_cloaked: metadata.is_cloaked != 0,
+                is_global: metadata.is_global,
+                is_space_junk: metadata.is_space_junk,
+                is_moribund: self.park.pending_removals.contains_key(&id),
+                bubble: metadata.new_bubble_id,
+                mode: control.mode,
+                owner_id: ball.owner_id,
+                follow_id: ball.follow_id,
+            });
+            if !metadata.is_free && !self.park.pending_removals.contains_key(&id) {
+                for (mini_index, mini) in metadata.minis.iter().enumerate() {
+                    let collider_id = metadata.mini_ids.get(mini_index).copied().unwrap_or(0);
+                    let convert = |v: DVec3| OriginalVec3 {
+                        x: v.x,
+                        y: v.y,
+                        z: v.z,
+                    };
+                    let shape = match mini.get("kind").and_then(Value::as_str) {
+                        Some("capsule") => {
+                            let a = ball
+                                .position
+                                .add(convert(value_vec3(mini.get("a"), "capsule a")?));
+                            let b = ball
+                                .position
+                                .add(convert(value_vec3(mini.get("b"), "capsule b")?));
+                            let position = a.add(b).scale(0.5);
+                            destiny_original_spec::OriginalStaticCollisionShape::Capsule(
+                                destiny_original_spec::OriginalCapsule {
+                                    id: collider_id,
+                                    parent_id: id,
+                                    a,
+                                    b,
+                                    radius: value_f64(mini.get("radius"), "capsule radius")? as f32,
+                                    ab: b.sub(a),
+                                    position,
+                                    old_position: position,
+                                },
+                            )
+                        }
+                        Some("box") => {
+                            let values =
+                                mini.get("basis").and_then(Value::as_array).ok_or_else(|| {
+                                    CompatError::Engine("missing mini box basis".into())
+                                })?;
+                            let triple = |index: usize| -> Result<OriginalVec3, CompatError> {
+                                Ok(OriginalVec3 {
+                                    x: value_f64(values.get(index), "box x")?,
+                                    y: value_f64(values.get(index + 1), "box y")?,
+                                    z: value_f64(values.get(index + 2), "box z")?,
+                                })
+                            };
+                            let shape = destiny_original_spec::BoxShape::new(
+                                ball.position.add(triple(0)?),
+                                triple(3)?,
+                                triple(6)?,
+                                triple(9)?,
+                            );
+                            let position = shape.center();
+                            let mut aabb = destiny_original_spec::Aabb::new(
+                                shape.corners[0],
+                                shape.corners[0],
+                            );
+                            for &corner in &shape.corners[1..] {
+                                aabb.update(corner);
+                            }
+                            destiny_original_spec::OriginalStaticCollisionShape::Box(
+                                destiny_original_spec::OriginalOrientedBox {
+                                    id: collider_id,
+                                    parent_id: id,
+                                    bounding_radius: shape.bounding_radius() as f32,
+                                    position,
+                                    old_position: position,
+                                    aabb,
+                                    shape,
+                                },
+                            )
+                        }
+                        Some("sphere") => continue,
+                        _ => {
+                            return Err(CompatError::Engine(
+                                "unknown native mini geometry kind".into(),
+                            ));
+                        }
+                    };
+                    statics.push(crate::iterative_collision::StaticGeometry { owner: id, shape });
+                }
+            }
+        }
+        statics.sort_by_key(|geometry| geometry.shape.id());
+        let results = if self.park.use_iterative_collision {
+            crate::iterative_collision::resolve(
+                &mut bodies,
+                &statics,
+                friction,
+                dt,
+                iterations,
+                self.park.is_master,
+            )
+        } else {
+            crate::noniterative_collision::resolve(
+                &bodies,
+                &statics,
+                friction,
+                dt,
+                self.park.is_master,
+            )
+            .map_err(|error| {
+                CompatError::Engine(format!("source gradient rejected scratch state: {error:?}"))
+            })?
+        };
+        let mut publication = Vec::with_capacity(results.len());
+        for (id, result) in ids.into_iter().zip(results) {
+            if let Some(step) = prepared.get(&id).filter(|step| step.in_warp) {
+                publication.push(*step);
+            } else if let Some((position, velocity)) = result {
+                if !solver_safe_vec3(
+                    DVec3::new(position.x, position.y, position.z),
+                    MAX_COORDINATE,
+                ) || !solver_safe_vec3(
+                    DVec3::new(velocity.x, velocity.y, velocity.z),
+                    MAX_VELOCITY,
+                ) {
+                    return Err(CompatError::InvalidRequest(
+                        "original sphere result exceeds solver-safe envelope".into(),
+                    ));
+                }
+                publication.push(PreparedMotion {
+                    id,
+                    position,
+                    velocity,
+                    acceleration: OriginalVec3::ZERO,
+                    in_warp: false,
+                });
+            }
+        }
+        Ok(Some(publication))
+    }
+
+    fn advance_one_tick_with_motion(
+        &mut self,
+        force: bool,
+        motion: &[PreparedMotion],
+    ) -> Result<(), CompatError> {
         let was_paused = !self.is_running();
         let should_step = force || !was_paused;
         let next_time = should_step
@@ -781,8 +2172,22 @@ impl CompatRuntime {
             None
         };
         if should_step {
+            // Pair filtering needs the standalone park's first compatibility
+            // bubble before the solver runs. Assigning it only afterward made
+            // every first-tick pair with sentinel -1 fail the collision hook.
+            self.update_single_compatibility_bubble();
             self.configure_destiny_space_damping()?;
         }
+        let iterative = if should_step {
+            self.prepare_iterative_sphere_tick(motion)?
+        } else {
+            None
+        };
+        let mushrooms = if should_step {
+            self.prepare_mushroom_tick()?
+        } else {
+            Vec::new()
+        };
         if force && was_paused {
             self.app
                 .world_mut()
@@ -793,6 +2198,39 @@ impl CompatRuntime {
         if should_step {
             let step_result = if let Some(checkpoint) = checkpoint.as_ref() {
                 self.correct_collision_free_analytic_motion(checkpoint)
+                    .and_then(|()| {
+                        for &PreparedMotion {
+                            id,
+                            position,
+                            velocity,
+                            ..
+                        } in iterative.as_deref().unwrap_or(motion)
+                        {
+                            if self.balls.contains_key(&id)
+                                && !self.park.pending_removals.contains_key(&id)
+                                && !self
+                                    .motion
+                                    .get(&id)
+                                    .is_some_and(|control| control.mode == OriginalMode::Mushroom)
+                            {
+                                self.set_position(
+                                    id,
+                                    DVec3::new(position.x, position.y, position.z),
+                                )?;
+                                self.set_velocity(
+                                    id,
+                                    DVec3::new(velocity.x, velocity.y, velocity.z),
+                                )?;
+                            }
+                        }
+                        for (id, radius) in &mushrooms {
+                            match radius {
+                                Some(radius) => self.set_radius(*id, f64::from(*radius))?,
+                                None => self.schedule_remove_ball(*id, 0)?,
+                            }
+                        }
+                        Ok(())
+                    })
                     .and_then(|()| self.validate_authoritative_world(false))
             } else {
                 self.validate_authoritative_world(false)
@@ -820,12 +2258,10 @@ impl CompatRuntime {
                 return Err(CompatError::Engine(message));
             }
             self.sync_visual_transforms();
-            self.run_proximity_checks();
-            self.park.current_time = next_time.ok_or_else(|| {
-                CompatError::Engine("stepping update lost its validated time".into())
-            })?;
             self.update_single_compatibility_bubble();
-            self.remove_due_balls();
+            self.pending_tick_time = Some(next_time.ok_or_else(|| {
+                CompatError::Engine("stepping update lost its validated time".into())
+            })?);
         }
         if force && was_paused {
             self.app
@@ -853,6 +2289,204 @@ impl CompatRuntime {
                 metadata.new_bubble_id = 0;
             }
         }
+    }
+
+    fn prepare_mushroom_tick(&self) -> Result<Vec<(i64, Option<f32>)>, CompatError> {
+        let mut ids = self
+            .motion
+            .iter()
+            .filter_map(|(id, control)| {
+                (control.mode == OriginalMode::Mushroom
+                    && self.balls.contains_key(id)
+                    && !self.park.pending_removals.contains_key(id))
+                .then_some(*id)
+            })
+            .collect::<Vec<_>>();
+        ids.sort_unstable();
+        if ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let interval = self
+            .app
+            .world()
+            .resource::<Time<Fixed>>()
+            .timestep()
+            .as_secs_f64()
+            * 1000.0;
+        if !interval.is_finite() || interval > i32::MAX as f64 {
+            return Err(CompatError::InvalidRequest(
+                "mushroom tick interval exceeds original i32 domain".into(),
+            ));
+        }
+        let mut updates = Vec::new();
+        for id in ids {
+            let metadata = self.metadata(id)?;
+            if metadata.is_free {
+                let control = &self.motion[&id];
+                let radius = crate::mushroom::radius_at_tick(
+                    self.park.current_time,
+                    metadata.effect_stamp,
+                    interval as i32,
+                    control.follow_range,
+                    control.destination.x,
+                )
+                .map_err(|error| CompatError::InvalidRequest(error.into()))?;
+                if radius.is_some_and(|value| {
+                    !value.is_finite() || value < 0.0 || f64::from(value) > MAX_RADIUS
+                }) {
+                    return Err(CompatError::InvalidRequest(
+                        "mushroom radius exceeds solver envelope".into(),
+                    ));
+                }
+                updates.push((id, radius));
+            }
+        }
+        Ok(updates)
+    }
+
+    fn source_bubble_ball(&self, id: i64) -> Result<crate::bubbles::Ball, CompatError> {
+        let metadata = self.metadata(id)?;
+        Ok(crate::bubbles::Ball {
+            id,
+            old: metadata.old_bubble_id,
+            new: metadata.new_bubble_id,
+            interactive: metadata.is_interactive,
+            global: metadata.is_global,
+            cloaked: metadata.is_cloaked != 0,
+            troll: self
+                .motion
+                .get(&id)
+                .is_some_and(|control| control.mode == OriginalMode::Troll),
+        })
+    }
+
+    fn initialize_source_bubbles(&mut self) -> Result<(), CompatError> {
+        if self.park.is_master {
+            return Err(CompatError::InvalidRequest(
+                "source master partition insertion remains unimplemented".into(),
+            ));
+        }
+        let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
+        ids.sort_unstable();
+        let mut spheres = Vec::with_capacity(ids.len());
+        for id in ids {
+            let metadata = self.metadata(id)?;
+            if metadata.minis.iter().any(|mini| mini["kind"] != "sphere") {
+                return Err(CompatError::InvalidRequest(
+                    "source static-shape partition insertion remains unimplemented".into(),
+                ));
+            }
+            let control = self.motion.get(&id).cloned().unwrap_or_default();
+            let ball = self.original_motion_input(id, &control)?;
+            let inflated = if metadata.is_free {
+                let m = ball.mass * f64::from(ball.agility);
+                let friction = self.app.world().resource::<DestinySpaceFriction>().0;
+                let acceleration =
+                    friction * f64::from(ball.speed_fraction) * f64::from(ball.max_velocity) / m;
+                f64::from(ball.radius)
+                    + (m * acceleration
+                        - (m * acceleration - ball.velocity.length() * friction) * ball.time_factor)
+                        / friction
+            } else {
+                f64::from(ball.radius)
+            };
+            spheres.push((id, ball.position, ball.radius, inflated));
+        }
+        let (mut tracking, labels) = crate::bubbles::initialize(&spheres)
+            .map_err(|error| CompatError::InvalidRequest(error.into()))?;
+        for (id, label) in labels {
+            let mut ball = self.source_bubble_ball(id)?;
+            ball.old = ball.new;
+            ball.new = label;
+            tracking.transition(ball);
+            let mut metadata = self.metadata_mut(id)?;
+            metadata.old_bubble_id = ball.old;
+            metadata.new_bubble_id = label;
+        }
+        self.original_bubbles = Some(tracking);
+        Ok(())
+    }
+
+    fn update_source_ball_bubble(&mut self, id: i64) -> Result<(), CompatError> {
+        if !self.balls.contains_key(&id) {
+            return Ok(());
+        }
+        let position = self.position(id)?;
+        let mut label = self.metadata(id)?.new_bubble_id;
+        let mut high = -1_i64;
+        let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
+        ids.sort_unstable();
+        for other in ids {
+            let other_label = self.metadata(other)?.new_bubble_id;
+            high = high.max(other_label);
+            if other == id || other_label == -1 {
+                continue;
+            }
+            let point = self.position(other)?;
+            let dx = position.x - point.x;
+            let dy = position.y - point.y;
+            let dz = position.z - point.z;
+            if dx * dx + dy * dy + dz * dz < 7_864_320.0 * 7_864_320.0 {
+                label = other_label;
+                break;
+            }
+        }
+        if label == -1 {
+            label = high
+                .checked_add(1)
+                .ok_or_else(|| CompatError::InvalidRequest("bubble ID overflow".into()))?;
+        }
+        // Source UpdateBallBubble changes neither oldBubble nor Python bubble
+        // tracking dictionaries. Full InitializeBubbles is a different path.
+        self.metadata_mut(id)?.new_bubble_id = label;
+        Ok(())
+    }
+
+    fn source_bubble_updates(
+        &mut self,
+        users: &[Value],
+        aliases: [usize; 4],
+    ) -> Result<Value, CompatError> {
+        let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
+        ids.sort_unstable();
+        let mut balls = ids
+            .into_iter()
+            .map(|id| self.source_bubble_ball(id))
+            .collect::<Result<Vec<_>, _>>()?;
+        let users = users.iter().map(Value::as_i64).collect::<Vec<_>>();
+        let tracking = self
+            .original_bubbles
+            .as_ref()
+            .ok_or_else(|| CompatError::InvalidRequest("Bubbles not initialized yet".into()))?;
+        let updates = if aliases == [0, 1, 2, 3] {
+            tracking.updates(&mut balls, &users)
+        } else {
+            tracking
+                .updates_with_aliases(&mut balls, &users, aliases)
+                .map_err(|error| CompatError::InvalidRequest(error.into()))?
+        };
+        for ball in balls {
+            self.metadata_mut(ball.id)?.old_bubble_id = ball.old;
+        }
+        let dictionaries = updates.dictionaries.map(|map| {
+            map.into_iter()
+                .map(|(id, delta)| {
+                    let value = match delta {
+                        crate::bubbles::Delta::Bubble(bubble) => json!(bubble),
+                        crate::bubbles::Delta::Balls(ids) => json!(ids),
+                    };
+                    json!([id, value])
+                })
+                .collect::<Vec<_>>()
+        });
+        let payload = json!({"dictionaries":dictionaries,"transitions":updates.transitions,"invalid_user_index":updates.invalid_user_index});
+        if updates.invalid_user_index.is_none() {
+            self.mode_callbacks.push_back(CallCallback::Park {
+                kind: 14,
+                arguments: json!([payload["transitions"], payload["dictionaries"]]),
+            });
+        }
+        Ok(payload)
     }
 
     /// Exposes the finalized compatibility app for inspection.
@@ -958,8 +2592,12 @@ impl CompatRuntime {
         Ok(Value::Null)
     }
 
-    fn is_running(&self) -> bool {
+    pub(crate) fn is_running(&self) -> bool {
         !self.app.world().resource::<Time<Physics>>().is_paused()
+    }
+
+    pub(crate) fn current_time(&self) -> i64 {
+        self.park.current_time
     }
 
     fn configure_destiny_space_damping(&mut self) -> Result<(), CompatError> {
@@ -1111,6 +2749,7 @@ impl CompatRuntime {
             });
         }
         Ok(EvolutionCheckpoint {
+            follower_sets: self.follower_sets.clone(),
             balls,
             current_time: self.park.current_time,
             time: self.park.time,
@@ -1119,6 +2758,8 @@ impl CompatRuntime {
             substeps_time: *world.resource::<Time<Substeps>>(),
             proximity_events: world.resource::<ProximityEventOutbox>().clone(),
             network_outbox: world.resource::<CarbonNetworkOutbox>().clone(),
+            motion: self.motion.clone(),
+            notifications: self.range_notifications.clone(),
         })
     }
 
@@ -1126,6 +2767,9 @@ impl CompatRuntime {
         &mut self,
         checkpoint: &EvolutionCheckpoint,
     ) -> Result<(), CompatError> {
+        self.motion = checkpoint.motion.clone();
+        self.follower_sets = checkpoint.follower_sets.clone();
+        self.range_notifications = checkpoint.notifications.clone();
         let world = self.app.world_mut();
         *world.resource_mut::<Time<Fixed>>() = checkpoint.fixed_time;
         *world.resource_mut::<Time<Physics>>() = checkpoint.physics_time;
@@ -1396,154 +3040,382 @@ impl CompatRuntime {
         }
     }
 
-    fn run_proximity_checks(&mut self) {
+    pub(crate) fn begin_notification_pass(&self) -> NotificationPass {
+        let mut owners = self
+            .balls
+            .iter()
+            .map(|(&id, &entity)| (id, entity))
+            .collect::<Vec<_>>();
+        owners.sort_unstable_by_key(|&(id, _)| id);
+        NotificationPass {
+            owners: owners.into(),
+            owner: None,
+            stage: 0,
+            sensors: VecDeque::new(),
+            sensor: None,
+            work: 0,
+        }
+    }
+
+    fn sensor_index(&self, owner: i64, cloak: bool) -> Option<usize> {
+        self.metadata(owner)
+            .ok()?
+            .sensors
+            .iter()
+            .position(|sensor| {
+                sensor
+                    .get("cloak_sensor")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false)
+                    == cloak
+            })
+    }
+
+    fn begin_sensor_pass(
+        &mut self,
+        owner: i64,
+        cloak: bool,
+        work: &mut usize,
+    ) -> Result<Option<SensorPass>, CompatError> {
+        let Some(index) = self.sensor_index(owner, cloak) else {
+            return Ok(None);
+        };
+        if self.metadata(owner)?.sensors[index]
+            .get("active")
+            .and_then(Value::as_bool)
+            == Some(false)
+        {
+            return Ok(None);
+        }
         let dt = self
             .app
             .world()
             .resource::<Time<Fixed>>()
             .timestep()
             .as_secs_f64();
-        let mut ids: Vec<_> = self
-            .balls
-            .keys()
-            .filter(|id| !self.park.pending_removals.contains_key(id))
-            .copied()
-            .collect();
-        ids.sort_unstable();
-        let candidates = ids
-            .iter()
-            .filter_map(|id| {
-                let metadata = self.metadata(*id).ok()?;
-                Some((
-                    *id,
-                    self.position(*id).ok()?,
-                    metadata.is_cloaked,
-                    metadata.is_interactive,
-                    metadata.is_global,
-                    metadata.new_bubble_id,
-                    metadata.radius,
-                ))
-            })
-            .collect::<Vec<_>>();
-        let mut events = Vec::new();
-        let mut work = 0usize;
-        let max_events = self.park.limits.max_outbox_messages;
-        let already_queued = self.app.world().resource::<ProximityEventOutbox>().0.len();
-        let available_events = max_events.saturating_sub(already_queued);
-
-        for owner_id in ids {
-            let owner_position = match self.position(owner_id) {
-                Ok(position) => position,
-                Err(_) => continue,
-            };
-            let (owner_bubble, owner_radius) = match self.metadata(owner_id) {
-                Ok(metadata) => (metadata.new_bubble_id, metadata.radius),
-                Err(_) => continue,
-            };
-            if owner_bubble < 0 {
-                continue;
-            }
-            let tick = self.park.current_time.saturating_add(1);
-            let mut metadata = match self.metadata_mut(owner_id) {
-                Ok(metadata) => metadata,
-                Err(_) => continue,
-            };
-            for (sensor_index, sensor) in metadata.sensors.iter_mut().enumerate() {
-                let Some(object) = sensor.as_object_mut() else {
-                    continue;
-                };
-                let range = object.get("range").and_then(Value::as_f64).unwrap_or(0.0);
-                let period = object.get("period").and_then(Value::as_f64).unwrap_or(2.0);
-                let prior_elapsed = object.get("elapsed").and_then(Value::as_f64).unwrap_or(0.0);
-                let elapsed = prior_elapsed + dt;
-                if owner_radius + range < 0.0 || period <= 0.0 || elapsed + 1e-12 < period {
-                    object.insert(
-                        "elapsed".into(),
-                        json!(elapsed.min(period.max(f64::EPSILON))),
-                    );
-                    continue;
-                }
-                if work.saturating_add(candidates.len()) > MAX_PROXIMITY_WORK_PER_TICK {
-                    if events.len() < available_events {
-                        events.push(json!({
-                            "kind": "overflow",
-                            "owner_id": owner_id,
-                            "sensor_index": sensor_index,
-                            "tick": tick,
-                            "reason": "work_budget",
-                        }));
-                    }
-                    continue;
-                }
-                work = work.saturating_add(candidates.len());
-                let only_interactives = object
-                    .get("only_interactives")
-                    .and_then(Value::as_bool)
-                    .unwrap_or(false);
-                let old_members = object
-                    .get("members")
-                    .and_then(Value::as_array)
-                    .into_iter()
-                    .flatten()
-                    .filter_map(Value::as_i64)
-                    .collect::<HashSet<_>>();
-                let new_members = candidates
-                    .iter()
-                    .filter(
-                        |(id, position, is_cloaked, is_interactive, is_global, bubble, radius)| {
-                            *id != owner_id
-                                && *is_cloaked == 0
-                                && (!only_interactives || *is_interactive)
-                                && (*is_global || *bubble == owner_bubble)
-                                && {
-                                    let reach = owner_radius + range + *radius;
-                                    reach.is_finite()
-                                        && stable_vec3_length(owner_position - *position) <= reach
-                                }
-                        },
-                    )
-                    .map(|(id, ..)| *id)
-                    .collect::<HashSet<_>>();
-                let mut transitions = Vec::new();
-                for (entering, members) in [
-                    (true, new_members.difference(&old_members)),
-                    (false, old_members.difference(&new_members)),
-                ] {
-                    let mut changed = members.copied().collect::<Vec<_>>();
-                    changed.sort_unstable();
-                    for other_id in changed {
-                        transitions.push(json!({
-                            "kind": "transition",
-                            "owner_id": owner_id,
-                            "other_id": other_id,
-                            "sensor_index": sensor_index,
-                            "entering": entering,
-                            "tick": tick,
-                        }));
-                    }
-                }
-                if events.len().saturating_add(transitions.len()) > available_events {
-                    if events.len() < available_events {
-                        events.push(json!({
-                            "kind": "overflow",
-                            "owner_id": owner_id,
-                            "sensor_index": sensor_index,
-                            "required_events": transitions.len(),
-                            "tick": tick,
-                            "reason": "event_backpressure",
-                        }));
-                    }
-                    continue;
-                }
-                let mut sorted_members = new_members.iter().copied().collect::<Vec<_>>();
-                sorted_members.sort_unstable();
-                object.insert("members".into(), json!(sorted_members));
-                object.insert("elapsed".into(), json!(elapsed % period));
-                events.extend(transitions);
+        let sensor = &self.metadata(owner)?.sensors[index];
+        let prior = sensor["elapsed"].as_f64().unwrap_or(0.0);
+        let period = sensor["period"].as_f64().unwrap_or(2.0);
+        let (elapsed, due) =
+            crate::proximity::sensor_elapsed_step(prior, dt, period).ok_or_else(|| {
+                CompatError::InvalidRequest("invalid sensor clock or timestep".into())
+            })?;
+        self.metadata_mut(owner)?.sensors[index]["elapsed"] = json!(elapsed);
+        if !due {
+            return Ok(None);
+        }
+        let metadata = self.metadata(owner)?;
+        if metadata.new_bubble_id < 0 {
+            return Ok(None);
+        }
+        let only = metadata.sensors[index]["only_interactives"]
+            .as_bool()
+            .unwrap_or(false);
+        let mut candidates = Vec::new();
+        for (&id, &entity) in &self.balls {
+            let other = self.metadata(id)?;
+            if crate::proximity::candidate_admitted(
+                metadata.is_cloaked != 0,
+                other.is_free,
+                other.is_interactive,
+                only,
+                self.park.is_master,
+                metadata.new_bubble_id == other.new_bubble_id,
+                other.is_global,
+            ) {
+                candidates.push((id, entity));
             }
         }
+        *work = work
+            .checked_add(candidates.len())
+            .ok_or_else(|| CompatError::InvalidRequest("proximity work overflow".into()))?;
+        if *work > MAX_PROXIMITY_WORK_PER_TICK {
+            return Err(CompatError::InvalidRequest(
+                "proximity work exceeds the runtime limit; no completed tick is claimed".into(),
+            ));
+        }
+        candidates.sort_unstable_by_key(|&(id, _)| id);
+        let nearby = candidates.iter().map(|&(id, _)| id).collect::<HashSet<_>>();
+        let mut vanished = metadata.sensors[index]["members"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(Value::as_i64)
+            .filter(|id| *id != owner && !nearby.contains(id))
+            .collect::<Vec<_>>();
+        vanished.sort_unstable();
+        Ok(Some(SensorPass {
+            cloak,
+            candidates: candidates.into(),
+            vanished: vanished.into(),
+        }))
+    }
+
+    fn set_sensor_member(
+        &mut self,
+        owner: i64,
+        index: usize,
+        other: i64,
+        inside: bool,
+    ) -> Result<bool, CompatError> {
+        let mut metadata = self.metadata_mut(owner)?;
+        let sensor = metadata.sensors.get_mut(index).ok_or_else(|| {
+            CompatError::Engine("sensor disappeared during owned transition".into())
+        })?;
+        let mut members = sensor["members"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(Value::as_i64)
+            .collect::<Vec<_>>();
+        let prior = members.contains(&other);
+        if prior == inside {
+            return Ok(false);
+        }
+        if inside {
+            members.push(other);
+            members.sort_unstable();
+        } else {
+            members.retain(|&id| id != other);
+        }
+        sensor["members"] = json!(members);
+        Ok(true)
+    }
+
+    fn sensor_event(&mut self, owner: i64, index: usize, other: i64, entering: bool) -> Value {
+        let event = json!({"kind":"transition","owner_id":owner,"other_id":other,
+            "sensor_index":index,"entering":entering,"tick":self.park.current_time.saturating_add(1)});
+        // The diagnostic queue is bounded independently. Backpressure does not
+        // cancel a synchronous original callback or roll back its membership.
+        let limit = self.park.limits.max_outbox_messages;
         let mut outbox = self.app.world_mut().resource_mut::<ProximityEventOutbox>();
-        outbox.0.extend(events);
+        if outbox.0.len() < limit {
+            outbox.0.push(event.clone());
+        } else if limit > 0 {
+            let last = outbox.0.len() - 1;
+            outbox.0[last] = json!({"kind":"overflow","tick":self.park.current_time.saturating_add(1),"reason":"event_backpressure"});
+        }
+        event
+    }
+
+    fn range_notification(
+        &mut self,
+        owner: i64,
+        tracking: bool,
+    ) -> Result<Option<Value>, CompatError> {
+        let Some(state) = self.range_notifications.get(&owner).cloned() else {
+            return Ok(None);
+        };
+        let position = self.position(owner)?;
+        let radius = self.metadata(owner)?.radius;
+        let (prior, inside, enabled, kind) = if tracking {
+            let Some(target) = state.target.filter(|id| self.balls.contains_key(id)) else {
+                return Ok(None);
+            };
+            if state.tracking_range < 0.00001 {
+                return Ok(None);
+            }
+            let other = self.position(target)?;
+            let delta = OriginalVec3 {
+                x: position.x - other.x,
+                y: position.y - other.y,
+                z: position.z - other.z,
+            };
+            let inside = crate::proximity::strict_range_contains(
+                delta.norm_squared(),
+                state.tracking_range + radius,
+            )
+            .ok_or_else(|| CompatError::InvalidRequest("invalid target tracking state".into()))?;
+            (state.tracking_within, inside, true, 13)
+        } else {
+            if state.range == 0.0 {
+                return Ok(None);
+            }
+            let inside = match self.motion.get(&owner) {
+                Some(control) if control.mode == OriginalMode::Goto => {
+                    let delta = OriginalVec3 {
+                        x: position.x,
+                        y: position.y,
+                        z: position.z,
+                    }
+                    .sub(control.destination);
+                    crate::proximity::strict_range_contains(
+                        delta.norm_squared(),
+                        state.range + radius,
+                    )
+                    .ok_or_else(|| {
+                        CompatError::InvalidRequest("invalid notification range state".into())
+                    })?
+                }
+                Some(control)
+                    if matches!(
+                        control.mode,
+                        OriginalMode::Follow | OriginalMode::Orbit | OriginalMode::Missile
+                    ) =>
+                {
+                    if let Some(target) = control.follow_id.filter(|id| self.balls.contains_key(id))
+                    {
+                        let other = self.position(target)?;
+                        let delta = OriginalVec3 {
+                            x: position.x - other.x,
+                            y: position.y - other.y,
+                            z: position.z - other.z,
+                        };
+                        let hi = self.metadata(target)?.radius
+                            + f64::from(control.follow_range)
+                            + state.range
+                            + radius;
+                        crate::proximity::annular_range_contains(
+                            delta.norm_squared(),
+                            hi,
+                            state.range,
+                        )
+                        .ok_or_else(|| {
+                            CompatError::InvalidRequest(
+                                "invalid follow notification range state".into(),
+                            )
+                        })?
+                    } else {
+                        false
+                    }
+                }
+                _ => false,
+            };
+            (state.within, inside, true, 7)
+        };
+        let (within, send) = crate::proximity::notification_transition(prior, inside, enabled);
+        let current = self
+            .range_notifications
+            .get_mut(&owner)
+            .ok_or_else(|| CompatError::Engine("notification state lost under ownership".into()))?;
+        if tracking {
+            current.tracking_within = within;
+        } else {
+            current.within = within;
+        }
+        Ok(send.then(||json!({"kind":"range","owner_id":owner,"event_kind":kind,"arguments":[if inside {1}else{0}]})))
+    }
+
+    pub(crate) fn next_tick_notification(
+        &mut self,
+        pass: &mut NotificationPass,
+    ) -> Result<Option<Value>, CompatError> {
+        if self.pending_tick_time.is_none() {
+            return Ok(None);
+        }
+        loop {
+            if pass.owner.is_none() {
+                pass.owner = crate::notification_batch::take_next(&mut pass.owners);
+                pass.stage = 0;
+                pass.sensor = None;
+                pass.sensors.clear();
+            }
+            let Some((owner, entity)) = pass.owner else {
+                return Ok(None);
+            };
+            if self.balls.get(&owner) != Some(&entity)
+                || self.park.pending_removals.contains_key(&owner)
+            {
+                pass.owner = None;
+                continue;
+            }
+            match pass.stage {
+                0 => {
+                    pass.stage = 1;
+                    if let Some(event) = self.range_notification(owner, false)? {
+                        return Ok(Some(event));
+                    }
+                }
+                1 => {
+                    pass.stage = 2;
+                    if let Some(event) = self.range_notification(owner, true)? {
+                        return Ok(Some(event));
+                    }
+                }
+                2 => {
+                    pass.stage = 3;
+                    pass.sensors = self
+                        .metadata(owner)?
+                        .sensors
+                        .iter()
+                        .map(|sensor| {
+                            sensor
+                                .get("cloak_sensor")
+                                .and_then(Value::as_bool)
+                                .unwrap_or(false)
+                        })
+                        .collect();
+                }
+                3 => {
+                    if pass.sensor.is_none() {
+                        let Some(cloak) = crate::notification_batch::take_next(&mut pass.sensors)
+                        else {
+                            pass.owner = None;
+                            continue;
+                        };
+                        pass.sensor = self.begin_sensor_pass(owner, cloak, &mut pass.work)?;
+                        if pass.sensor.is_none() {
+                            continue;
+                        }
+                    }
+                    let sensor = pass
+                        .sensor
+                        .as_mut()
+                        .ok_or_else(|| CompatError::Engine("sensor continuation lost".into()))?;
+                    // Removal cancels remaining work. Replacement reuses the
+                    // same logical sensor, as Ball::AddProximitySensor does.
+                    let Some(index) = self.sensor_index(owner, sensor.cloak) else {
+                        pass.sensor = None;
+                        continue;
+                    };
+                    if let Some(other) = crate::notification_batch::take_next(&mut sensor.vanished)
+                    {
+                        if self.set_sensor_member(owner, index, other, false)? {
+                            return Ok(Some(self.sensor_event(owner, index, other, false)));
+                        }
+                        continue;
+                    }
+                    let Some((other, other_entity)) =
+                        crate::notification_batch::take_next(&mut sensor.candidates)
+                    else {
+                        pass.sensor = None;
+                        continue;
+                    };
+                    if other == owner
+                        || self.balls.get(&other) != Some(&other_entity)
+                        || self.park.pending_removals.contains_key(&other)
+                    {
+                        continue;
+                    }
+                    // Keep the candidate list fixed, but read positions, radii,
+                    // sensor range and membership after every prior callback.
+                    let owner_position = self.position(owner)?;
+                    let other_position = self.position(other)?;
+                    let metadata = self.metadata(owner)?;
+                    let reach = metadata.sensors[index]["range"].as_f64().unwrap_or(0.0)
+                        + self.metadata(other)?.radius
+                        + metadata.radius;
+                    let delta = OriginalVec3 {
+                        x: owner_position.x - other_position.x,
+                        y: owner_position.y - other_position.y,
+                        z: owner_position.z - other_position.z,
+                    };
+                    let inside =
+                        crate::proximity::inclusive_range_contains(delta.norm_squared(), reach)
+                            .ok_or_else(|| {
+                                CompatError::InvalidRequest("invalid sensor geometry state".into())
+                            })?;
+                    if self.set_sensor_member(owner, index, other, inside)? {
+                        return Ok(Some(self.sensor_event(owner, index, other, inside)));
+                    }
+                }
+                _ => {
+                    return Err(CompatError::Engine(
+                        "invalid notification continuation stage".into(),
+                    ));
+                }
+            }
+        }
     }
 
     fn bubble_membership_value(&self) -> Result<Value, CompatError> {
@@ -1643,10 +3515,142 @@ impl CompatRuntime {
             )));
         }
         match title {
+            "dbc.compat.Runtime.Configure" => {
+                require_arity(args, &[3, 5], title)?;
+                let iterations = value_i64(args.first(), "collisionMaxIterations")?;
+                let iterative = value_bool(args.get(1), "useIterativeCollision")?;
+                let new_orbit = value_bool(args.get(2), "useNewOrbit")?;
+                let dynamical = args
+                    .get(3)
+                    .map_or(Ok(self.park.use_dynamical_orientation), |value| {
+                        value_bool(Some(value), "useDynamicalOrientation")
+                    })?;
+                let disable_missiles = args.get(4).map_or(
+                    Ok(self.park.disable_dynamical_orientation_for_missiles),
+                    |value| value_bool(Some(value), "disableDynamicalOrientationForMissiles"),
+                )?;
+                if !(1..=i64::from(MAX_COLLISION_SUBSTEPS)).contains(&iterations) {
+                    return Err(CompatError::InvalidRequest(
+                        "invalid collisionMaxIterations".into(),
+                    ));
+                }
+                let mut count = self
+                    .app
+                    .world_mut()
+                    .get_resource_mut::<SubstepCount>()
+                    .ok_or_else(|| CompatError::Engine("missing SubstepCount".into()))?;
+                count.0 = if iterative { iterations as u32 } else { 1 };
+                self.park.collision_substeps = iterations as u32;
+                self.park.use_iterative_collision = iterative;
+                self.park.use_new_orbit = new_orbit;
+                self.park.use_dynamical_orientation = dynamical;
+                self.park.disable_dynamical_orientation_for_missiles = disable_missiles;
+                Ok(Value::Null)
+            }
             "dbc.compat.Ballpark.HasBall" => {
                 require_arity(args, &[1], title)?;
                 let id = value_i64(args.first(), "ball_id")?;
                 Ok(json!(self.balls.contains_key(&id)))
+            }
+            "dbc.compat.Ballpark.ObjectGeneration" => {
+                require_arity(args, &[1], title)?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let generation = self
+                    .ball_generations
+                    .get(&id)
+                    .ok_or(CompatError::BallNotFound(id))?;
+                Ok(json!(generation))
+            }
+            "dbc.compat.Ballpark.NewDetachedBall" => {
+                require_arity(args, &[1], title)?;
+                let client = value_bool(args.first(), "client")?;
+                let fields = crate::ball_defaults::detached_fields(client);
+                let generation = self.next_ball_generation;
+                let next = generation.checked_add(1).ok_or_else(|| {
+                    CompatError::InvalidRequest("object generation exhausted".into())
+                })?;
+                let snapshot = BallSnapshot {
+                    id: fields.id,
+                    mass: fields.mass,
+                    radius: f64::from(fields.radius),
+                    max_velocity: f64::from(fields.max_velocity),
+                    is_free: fields.is_free,
+                    is_global: fields.is_global,
+                    is_massive: fields.is_massive,
+                    is_interactive: fields.is_interactive,
+                    is_space_junk: fields.is_space_junk,
+                    position: vec![fields.position.x, fields.position.y, fields.position.z],
+                    velocity: vec![fields.velocity.x, fields.velocity.y, fields.velocity.z],
+                    agility: f64::from(fields.agility),
+                    speed_fraction: f64::from(fields.speed_fraction),
+                    max_angular_velocity: f64::from(fields.max_angular_velocity),
+                    angular_agility: f64::from(fields.rotational_agility),
+                    angular_velocity: fields
+                        .angular_velocity
+                        .iter()
+                        .map(|value| f64::from(*value))
+                        .collect(),
+                    rotation: fields
+                        .rotation
+                        .iter()
+                        .map(|value| f64::from(*value))
+                        .collect(),
+                    is_cloaked: i32::from(fields.is_cloaked),
+                    new_bubble_id: fields.new_bubble,
+                    old_bubble_id: fields.old_bubble,
+                    effect_stamp: fields.effect_stamp,
+                    formation_id: NO_FORMATION,
+                    formation_slots: fields.formation_slots,
+                    massive_before_cloak: None,
+                    minis: Vec::new(),
+                    mini_ids: Vec::new(),
+                    owner_id: fields.owner_id,
+                    sensors: Vec::new(),
+                    motion: Some(MotionSnapshot {
+                        mode: mode_number(fields.mode),
+                        destination: [fields.goto.x, fields.goto.y, fields.goto.z],
+                        min_range: 0.0,
+                        warp_factor: 20,
+                        warp_distance: fields.last_collision,
+                        follow_id: None,
+                        follow_range: fields.follow_range,
+                    }),
+                    notifications: Some(RangeNotificationSnapshot {
+                        range: fields.notification_range,
+                        within: fields.within_range,
+                        target: fields.tracking_id,
+                        tracking_range: fields.tracking_range,
+                        tracking_within: fields.within_tracking_range,
+                    }),
+                };
+                self.retained_balls.insert(
+                    generation,
+                    RetainedBall {
+                        id: 0,
+                        attached: false,
+                        moribund: false,
+                        references: 1,
+                        detached: Some(snapshot),
+                        client,
+                        identity_fields: [
+                            fields.harmonic,
+                            i64::from(fields.corporation_id),
+                            i64::from(fields.alliance_id),
+                        ],
+                    },
+                );
+                self.next_ball_generation = next;
+                Ok(json!(generation))
+            }
+            "dbc.compat.Ballpark.RetainBall" | "dbc.compat.Ballpark.ReleaseBall" => {
+                require_arity(args, &[2], title)?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let generation = args[1]
+                    .as_u64()
+                    .ok_or_else(|| CompatError::InvalidRequest("generation must fit u64".into()))?;
+                let event = if title.ends_with("RetainBall") { 0 } else { 1 };
+                self.transition_retained_ball(id, generation, event)?;
+                Ok(Value::Null)
             }
             "dbc.compat.Ballpark.ListBalls" => {
                 require_arity(args, &[0], title)?;
@@ -1751,16 +3755,109 @@ impl CompatRuntime {
             .ok_or(CompatError::BallNotFound(ball_id))
     }
 
-    fn clear_all(&mut self) {
+    fn transition_retained_ball(
+        &mut self,
+        id: i64,
+        generation: u64,
+        event: u8,
+    ) -> Result<(), CompatError> {
+        let ball = self
+            .retained_balls
+            .get_mut(&generation)
+            .filter(|ball| ball.id == id)
+            .ok_or(CompatError::BallNotFound(id))?;
+        let (attached, moribund, references) =
+            crate::ball_lifecycle::transition(ball.attached, ball.moribund, ball.references, event)
+                .ok_or_else(|| {
+                    CompatError::InvalidRequest("invalid retained ball lifecycle transition".into())
+                })?;
+        ball.attached = attached;
+        ball.moribund = moribund;
+        ball.references = references;
+        if !attached && references == 0 {
+            self.retained_balls.remove(&generation);
+        }
+        Ok(())
+    }
+
+    fn detach_retained_ball(&mut self, id: i64, removed: bool) -> Result<(), CompatError> {
+        let generation = *self
+            .ball_generations
+            .get(&id)
+            .ok_or(CompatError::BallNotFound(id))?;
+        if self
+            .retained_balls
+            .get(&generation)
+            .is_some_and(|ball| ball.references > 0)
+        {
+            let mut snapshot = self.ball_snapshot(id)?;
+            if removed {
+                if let Some(motion) = &mut snapshot.motion {
+                    motion.mode = mode_number(OriginalMode::Stop);
+                }
+                snapshot.old_bubble_id = snapshot.new_bubble_id;
+                snapshot.new_bubble_id = -1;
+                if !snapshot.is_free {
+                    snapshot.minis.clear();
+                    snapshot.mini_ids.clear();
+                }
+            }
+            self.retained_balls
+                .get_mut(&generation)
+                .expect("live generation")
+                .detached = Some(snapshot);
+        }
+        self.transition_retained_ball(id, generation, if removed { 2 } else { 3 })?;
+        self.ball_generations.remove(&id);
+        Ok(())
+    }
+
+    fn clear_all(&mut self) -> Result<(), CompatError> {
+        // Capture every retained object's state before removing components.
+        let snapshots = self
+            .ball_generations
+            .iter()
+            .filter_map(|(id, generation)| {
+                self.retained_balls
+                    .get(generation)
+                    .filter(|ball| ball.references > 0)
+                    .map(|_| {
+                        self.ball_snapshot(*id)
+                            .map(|snapshot| (*generation, snapshot))
+                    })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        for (generation, snapshot) in snapshots {
+            self.retained_balls
+                .get_mut(&generation)
+                .expect("live generation")
+                .detached = Some(snapshot);
+        }
+        let identities = self
+            .ball_generations
+            .iter()
+            .map(|(id, generation)| (*id, *generation))
+            .collect::<Vec<_>>();
+        for (id, generation) in identities {
+            self.transition_retained_ball(id, generation, 3)?;
+        }
+        self.ball_generations.clear();
+        self.original_bubbles = None;
         let balls: Vec<_> = self.balls.drain().map(|(_, entity)| entity).collect();
         self.park.pending_removals.clear();
         self.park.ego = 0;
+        self.park.local_counter = default_local_counter();
+        self.park.local_high_counter = default_local_high_counter();
+        self.motion.clear();
+        self.follower_sets.clear();
+        self.range_notifications.clear();
         let world = self.app.world_mut();
         for entity in balls {
             let _ = world.despawn(entity);
         }
         world.resource_mut::<ProximityEventOutbox>().0.clear();
         *world.resource_mut::<CarbonNetworkOutbox>() = CarbonNetworkOutbox::default();
+        Ok(())
     }
 
     fn remove_ball(&mut self, ball_id: i64) -> Result<(), CompatError> {
@@ -1772,6 +3869,18 @@ impl CompatRuntime {
         ball_id: i64,
         scrub_related_state: bool,
     ) -> Result<(), CompatError> {
+        let children = self.metadata(ball_id)?.mini_ids.clone();
+        for child in children {
+            if self.balls.contains_key(&child)
+                && self.metadata(child)?.owner_id == ball_id
+                && self
+                    .motion
+                    .get(&child)
+                    .is_some_and(|control| control.mode == OriginalMode::Miniball)
+            {
+                self.remove_ball_internal(child, scrub_related_state)?;
+            }
+        }
         let entity = self
             .balls
             .get(&ball_id)
@@ -1780,7 +3889,19 @@ impl CompatRuntime {
         if scrub_related_state {
             self.remove_from_sensor_members(ball_id)?;
         }
+        let bubble_ball = self.source_bubble_ball(ball_id)?;
+        if let Some(tracking) = &mut self.original_bubbles {
+            tracking.transition(crate::bubbles::Ball {
+                old: bubble_ball.new,
+                new: -1,
+                ..bubble_ball
+            });
+        }
+        self.follower_sets.remove(&self.ball_generations[&ball_id]);
+        self.detach_retained_ball(ball_id, true)?;
         self.balls.remove(&ball_id);
+        self.motion.remove(&ball_id);
+        self.range_notifications.remove(&ball_id);
         self.park.pending_removals.remove(&ball_id);
         if scrub_related_state && self.park.ego == ball_id {
             self.park.ego = 0;
@@ -1808,15 +3929,11 @@ impl CompatRuntime {
         if !self.balls.contains_key(&ball_id) {
             return Ok(());
         }
-        if delay == 0 {
-            return self.remove_ball(ball_id);
-        }
-        let due =
-            self.park.current_time.checked_add(delay).ok_or_else(|| {
-                CompatError::InvalidRequest("removal delay overflows time".into())
-            })?;
+        self.park
+            .current_time
+            .checked_add(delay)
+            .ok_or_else(|| CompatError::InvalidRequest("removal delay overflows time".into()))?;
         let entity = self.entity(ball_id)?;
-        let mut metadata = self.metadata(ball_id)?.clone();
         let world = self.app.world();
         if world.get::<LinearVelocity>(entity).is_none()
             || world.get::<AngularVelocity>(entity).is_none()
@@ -1825,12 +3942,120 @@ impl CompatRuntime {
                 "ball is missing LinearVelocity or AngularVelocity".into(),
             ));
         }
+        self.stop_command(ball_id)?;
+        self.mode_callbacks.push_back(CallCallback::Remove {
+            ball_id,
+            generation: self.ball_generations[&ball_id],
+            delay,
+            step: RemovalStep::Followers,
+            arrival: None,
+        });
+        Ok(())
+    }
+
+    fn resume_removal(
+        &mut self,
+        ball_id: i64,
+        generation: u64,
+        delay: i64,
+        step: RemovalStep,
+        arrival: Option<OriginalVec3>,
+    ) -> Result<(), CompatError> {
+        // Ballpark::RemoveBall resumes only after each synchronous mode event.
+        // The source copies an unordered follower-ID set, then resolves each
+        // live follower again. Reentrant changes are therefore observed here.
+        let next = match step {
+            RemovalStep::Followers => RemovalStep::NextFollower(self.followers(ball_id).into()),
+            RemovalStep::NextFollower(mut followers) => {
+                if let Some(follower) = followers.pop_front() {
+                    let live = self.balls.contains_key(&follower);
+                    let follows = self
+                        .motion
+                        .get(&follower)
+                        .is_some_and(|control| control.follow_id == Some(ball_id));
+                    let mode = self
+                        .motion
+                        .get(&follower)
+                        .map_or(OriginalMode::Stop, |control| control.mode);
+                    let interactive = live && self.metadata(follower)?.is_interactive;
+                    let action = crate::ball_lifecycle::follower_action(
+                        live,
+                        follows,
+                        mode_number(mode),
+                        interactive,
+                    );
+                    if action != 0 {
+                        if action >= 2 {
+                            if action == 3 {
+                                self.set_massive(follower, false)?;
+                            }
+                            let velocity = self
+                                .app
+                                .world()
+                                .get::<LinearVelocity>(self.entity(follower)?)
+                                .ok_or_else(|| {
+                                    CompatError::Engine("missing follower velocity".into())
+                                })?
+                                .0;
+                            self.begin_goto_direction(
+                                follower,
+                                OriginalVec3 {
+                                    x: velocity.x,
+                                    y: velocity.y,
+                                    z: velocity.z,
+                                },
+                            )?;
+                        } else {
+                            self.stop_command(follower)?;
+                        }
+                    } else if let Some(followers) = self.follower_sets.get_mut(&generation) {
+                        followers.remove(&follower);
+                    }
+                    RemovalStep::NextFollower(followers)
+                } else {
+                    RemovalStep::Mark
+                }
+            }
+            RemovalStep::Mark => {
+                if let Some(point) = arrival {
+                    return self.finish_entity_warp(ball_id, point);
+                }
+                self.transition_retained_ball(ball_id, generation, 5)?;
+                if delay == 0 && self.evolution_phase == 0 {
+                    self.mode_callbacks.push_back(CallCallback::Ball {
+                        ball_id,
+                        generation,
+                        kind: 15,
+                        arguments: json!([]),
+                    });
+                    RemovalStep::Detach
+                } else {
+                    return self.mark_pending_removal(ball_id, delay);
+                }
+            }
+            RemovalStep::Detach => return self.remove_ball(ball_id),
+        };
+        self.mode_callbacks.push_back(CallCallback::Remove {
+            ball_id,
+            generation,
+            delay,
+            step: next,
+            arrival,
+        });
+        Ok(())
+    }
+
+    fn mark_pending_removal(&mut self, ball_id: i64, delay: i64) -> Result<(), CompatError> {
+        let due =
+            self.park.current_time.checked_add(delay).ok_or_else(|| {
+                CompatError::InvalidRequest("removal delay overflows time".into())
+            })?;
+        let entity = self.entity(ball_id)?;
+        let mut metadata = self.metadata(ball_id)?.clone();
         metadata.effect_stamp = due;
         metadata.is_massive = false;
         self.app.world_mut().entity_mut(entity).insert((
             metadata,
-            LinearVelocity(DVec3::ZERO),
-            AngularVelocity(DVec3::ZERO),
             ColliderDisabled,
             DestinyPendingRemoval {
                 due_tick: due,
@@ -1838,6 +4063,8 @@ impl CompatRuntime {
             },
         ));
         self.park.pending_removals.insert(ball_id, due);
+        let generation = self.ball_generations[&ball_id];
+        self.transition_retained_ball(ball_id, generation, 5)?;
         Ok(())
     }
 
@@ -1855,6 +4082,19 @@ impl CompatRuntime {
     }
 
     fn add_ball(&mut self, args: &[Value]) -> Result<String, CompatError> {
+        self.add_ball_with_identity(args, None)
+    }
+
+    fn add_ball_with_identity(
+        &mut self,
+        args: &[Value],
+        preserved_id: Option<i64>,
+    ) -> Result<String, CompatError> {
+        if preserved_id.is_none() && !crate::evolution_phase::add_allowed(self.evolution_phase) {
+            return Err(CompatError::InvalidRequest(
+                "Can not add ball during Evolve().".into(),
+            ));
+        }
         let expected = if self.park.use_dynamical_orientation {
             19
         } else {
@@ -1867,7 +4107,21 @@ impl CompatRuntime {
                 args.len(),
             )));
         }
-        let id = value_i64(args.first(), "srcId")?;
+        let requested_id = value_i64(args.first(), "srcId")?;
+        let allocation = preserved_id
+            .map(|id| (id, self.park.local_counter, self.park.local_high_counter))
+            .or_else(|| {
+                crate::collision_identity::allocate_collision_id(
+                    self.park.is_master,
+                    requested_id,
+                    self.park.local_counter,
+                    self.park.local_high_counter,
+                )
+            })
+            .ok_or_else(|| {
+                CompatError::InvalidRequest("collision identity counter exhausted".into())
+            })?;
+        let id = allocation.0;
         let mass = value_f64(args.get(1), "mass")?.max(0.0);
         let radius = value_f64(args.get(2), "radius")?.max(0.0);
         let max_velocity = value_f64(args.get(3), "maxVel")?.max(0.0);
@@ -1914,6 +4168,8 @@ impl CompatRuntime {
                 "AddBall arguments exceed the solver-safe envelope".into(),
             ));
         }
+        self.park.local_counter = allocation.1;
+        self.park.local_high_counter = allocation.2;
         if self.balls.contains_key(&id) {
             let existing_cloak = self.metadata(id)?.is_cloaked;
             let mut staged_metadata = self.metadata(id)?.clone();
@@ -1979,6 +4235,7 @@ impl CompatRuntime {
                 .world_mut()
                 .entity_mut(entity)
                 .remove::<DestinyPendingRemoval>();
+            self.transition_retained_ball(id, self.ball_generations[&id], 4)?;
             return Ok(format!("ball:{id}"));
         }
 
@@ -1987,6 +4244,10 @@ impl CompatRuntime {
                 "live ball capacity exceeded".into(),
             ));
         }
+        let generation = self.next_ball_generation;
+        let following_generation = generation.checked_add(1).ok_or_else(|| {
+            CompatError::InvalidRequest("ball object generation exhausted".into())
+        })?;
 
         let rigid_body = if is_free {
             RigidBody::Dynamic
@@ -2018,6 +4279,8 @@ impl CompatRuntime {
             formation_slots: 0,
             massive_before_cloak: None,
             minis: Vec::new(),
+            mini_ids: Vec::new(),
+            owner_id: 0,
             sensors: Vec::new(),
         };
         // Bevy's tuple Bundle implementations are arity-limited. Keep the
@@ -2070,6 +4333,20 @@ impl CompatRuntime {
 
         self.park.pending_removals.remove(&id);
         self.balls.insert(id, entity);
+        self.next_ball_generation = following_generation;
+        self.ball_generations.insert(id, generation);
+        self.retained_balls.insert(
+            generation,
+            RetainedBall {
+                id,
+                attached: true,
+                moribund: false,
+                references: 0,
+                detached: None,
+                client: !self.park.is_master,
+                identity_fields: [-1; 3],
+            },
+        );
         Ok(format!("ball:{id}"))
     }
 
@@ -2182,6 +4459,8 @@ impl CompatRuntime {
                     * 1000.0,
                 friction: self.app.world().resource::<DestinySpaceFriction>().0,
                 current_time: self.park.current_time,
+                local_counter: self.park.local_counter,
+                local_high_counter: self.park.local_high_counter,
                 time: self.park.time,
                 // Filtered/subset snapshots must be independently restorable;
                 // never serialize an ego reference to an omitted ball.
@@ -2280,11 +4559,42 @@ impl CompatRuntime {
             formation_slots: metadata.formation_slots,
             massive_before_cloak: metadata.massive_before_cloak,
             minis: metadata.minis.clone(),
+            mini_ids: metadata.mini_ids.clone(),
+            owner_id: metadata.owner_id,
             sensors: metadata.sensors.clone(),
+            motion: self.motion.get(&id).map(|control| MotionSnapshot {
+                mode: mode_number(control.mode),
+                destination: [
+                    control.destination.x,
+                    control.destination.y,
+                    control.destination.z,
+                ],
+                min_range: control.min_range,
+                warp_factor: control.warp_factor,
+                warp_distance: control.warp_distance,
+                follow_id: control.follow_id,
+                follow_range: control.follow_range,
+            }),
+            notifications: self.range_notifications.get(&id).map(|state| {
+                RangeNotificationSnapshot {
+                    range: state.range,
+                    within: state.within,
+                    target: state.target,
+                    tracking_range: state.tracking_range,
+                    tracking_within: state.tracking_within,
+                }
+            }),
         })
     }
 
     fn deserialize_snapshot(&mut self, encoded: &str, partial: i64) -> Result<(), CompatError> {
+        // Restore must not replace the live objects behind an operation-owned
+        // callback batch. Validate this boundary before any entity is changed.
+        if self.evolution_phase != 0 {
+            return Err(CompatError::InvalidRequest(
+                "cannot restore a snapshot during Evolve".into(),
+            ));
+        }
         let encoded_limit = self
             .park
             .limits
@@ -2341,12 +4651,10 @@ impl CompatRuntime {
             ));
         }
         if snapshot.park.use_dynamical_orientation
-            || snapshot.park.use_new_orbit
             || snapshot.park.disable_dynamical_orientation_for_missiles
         {
             return Err(CompatError::InvalidRequest(
-                "snapshot enables an unsupported orientation, orbit, or missile-orientation mode"
-                    .into(),
+                "snapshot enables an unsupported orientation or missile-orientation mode".into(),
             ));
         }
         if snapshot.park.snapshot_semantics != "logical-authoritative" {
@@ -2383,7 +4691,55 @@ impl CompatRuntime {
                 ));
             }
         }
+        let incoming_by_id: HashMap<_, _> =
+            snapshot.balls.iter().map(|ball| (ball.id, ball)).collect();
+        let mut mini_owners = HashMap::new();
         for ball in &snapshot.balls {
+            for (index, &mini_id) in ball.mini_ids.iter().enumerate() {
+                if mini_id == 0 {
+                    continue;
+                }
+                if mini_id == ball.id || mini_owners.insert(mini_id, ball.id).is_some() {
+                    return Err(CompatError::InvalidRequest(
+                        "snapshot has aliased/self mini identity".into(),
+                    ));
+                }
+                if let Some(child) = incoming_by_id.get(&mini_id)
+                    && (ball
+                        .minis
+                        .get(index)
+                        .and_then(|mini| mini.get("kind"))
+                        .and_then(Value::as_str)
+                        != Some("sphere")
+                        || child.owner_id != ball.id
+                        || child
+                            .motion
+                            .as_ref()
+                            .is_none_or(|control| control.mode != 9))
+                {
+                    return Err(CompatError::InvalidRequest(
+                        "snapshot mini identity references unrelated ball".into(),
+                    ));
+                }
+            }
+            if let Some(motion) = &ball.motion
+                && let Some(target) = motion.follow_id
+                && (!(ids.contains(&target) || partial == 2 && self.balls.contains_key(&target))
+                    || (matches!(motion.mode, 1 | 4) && target == ball.id))
+            {
+                return Err(CompatError::InvalidRequest(
+                    "snapshot motion references missing/self target".into(),
+                ));
+            }
+            if let Some(state) = &ball.notifications
+                && let Some(target) = state.target
+                && !ids.contains(&target)
+                && !(partial == 2 && self.balls.contains_key(&target))
+            {
+                return Err(CompatError::InvalidRequest(
+                    "snapshot tracking references a missing target".into(),
+                ));
+            }
             for sensor in &ball.sensors {
                 let mut members = HashSet::new();
                 for member in sensor
@@ -2519,11 +4875,34 @@ impl CompatRuntime {
             self.validate_authoritative_world(false)?;
         }
 
+        let preserved_generations = self
+            .ball_generations
+            .iter()
+            .filter(|(id, _)| ids.contains(id))
+            .map(|(id, generation)| {
+                (
+                    *id,
+                    (
+                        *generation,
+                        self.retained_balls[generation].references,
+                        self.retained_balls[generation].client,
+                        self.retained_balls[generation].identity_fields,
+                    ),
+                )
+            })
+            .collect::<HashMap<_, _>>();
+        self.next_ball_generation
+            .checked_add(snapshot.balls.len() as u64)
+            .ok_or_else(|| {
+                CompatError::InvalidRequest("restored object generations exhausted".into())
+            })?;
         // Everything above is detached parsing/validation. No live state is
         // mutated before the complete envelope passes those checks.
         if partial == 0 {
-            self.clear_all();
+            self.clear_all()?;
             self.park.is_master = snapshot.park.is_master;
+            self.park.local_counter = snapshot.park.local_counter;
+            self.park.local_high_counter = snapshot.park.local_high_counter;
             self.park.use_iterative_collision = snapshot.park.use_iterative_collision;
             self.park.collision_substeps = snapshot.park.collision_substeps;
             self.park.use_dynamical_orientation = snapshot.park.use_dynamical_orientation;
@@ -2630,7 +5009,31 @@ impl CompatRuntime {
                     json!(ball.angular_agility),
                 ]);
             }
-            self.add_ball(&args)?;
+            self.add_ball_with_identity(&args, Some(ball.id))?;
+            if let Some((generation, references, client, identity_fields)) =
+                preserved_generations.get(&ball.id)
+            {
+                let temporary = self
+                    .ball_generations
+                    .insert(ball.id, *generation)
+                    .expect("restored object");
+                if temporary != *generation {
+                    self.retained_balls.remove(&temporary);
+                }
+                self.retained_balls.insert(
+                    *generation,
+                    RetainedBall {
+                        id: ball.id,
+                        attached: true,
+                        moribund: false,
+                        references: *references,
+                        detached: None,
+                        client: *client,
+                        identity_fields: *identity_fields,
+                    },
+                );
+            }
+            self.metadata_mut(ball.id)?.mini_ids = ball.mini_ids.clone();
             self.set_max_angular_velocity(ball.id, ball.max_angular_velocity)?;
             self.set_rotation(ball.id, quat_from_slice(&ball.rotation)?)?;
             self.set_angular_velocity(
@@ -2655,11 +5058,68 @@ impl CompatRuntime {
                 metadata.formation_slots = ball.formation_slots;
                 metadata.massive_before_cloak = ball.massive_before_cloak;
                 metadata.angular_agility = ball.angular_agility;
+                metadata.agility = ball.agility;
+                metadata.owner_id = ball.owner_id;
+                metadata.mini_ids = ball.mini_ids.clone();
                 if let Some(sensors) = partial_one_sensors {
                     metadata.sensors = sensors;
                 }
             }
             self.set_massive(ball.id, ball.is_cloaked == 0 && ball.is_massive)?;
+            if let Some(control) = ball.motion {
+                let mode = match control.mode {
+                    0 => OriginalMode::Goto,
+                    1 => OriginalMode::Follow,
+                    2 => OriginalMode::Stop,
+                    3 => OriginalMode::Warp,
+                    4 => OriginalMode::Orbit,
+                    5 => OriginalMode::Missile,
+                    6 => OriginalMode::Mushroom,
+                    7 => OriginalMode::Boid,
+                    8 => OriginalMode::Troll,
+                    9 => OriginalMode::Miniball,
+                    10 => OriginalMode::Field,
+                    11 => OriginalMode::Rigid,
+                    12 => OriginalMode::Formation,
+                    _ => {
+                        return Err(CompatError::InvalidRequest(
+                            "unsupported restored motion mode".into(),
+                        ));
+                    }
+                };
+                self.motion.insert(
+                    ball.id,
+                    MotionControl {
+                        mode,
+                        destination: OriginalVec3 {
+                            x: control.destination[0],
+                            y: control.destination[1],
+                            z: control.destination[2],
+                        },
+                        min_range: control.min_range,
+                        warp_factor: control.warp_factor,
+                        warp_distance: control.warp_distance,
+                        follow_id: control.follow_id,
+                        follow_range: control.follow_range,
+                    },
+                );
+            } else {
+                self.motion.remove(&ball.id);
+            }
+            if let Some(state) = ball.notifications {
+                self.range_notifications.insert(
+                    ball.id,
+                    RangeNotifications {
+                        range: state.range,
+                        within: state.within,
+                        target: state.target,
+                        tracking_range: state.tracking_range,
+                        tracking_within: state.tracking_within,
+                    },
+                );
+            } else {
+                self.range_notifications.remove(&ball.id);
+            }
         }
         if matches!(partial, 0 | 1) {
             self.park.pending_removals.clear();
@@ -2672,6 +5132,7 @@ impl CompatRuntime {
             }
             for (ball_id, due_tick) in pending {
                 self.park.pending_removals.insert(ball_id, due_tick);
+                self.transition_retained_ball(ball_id, self.ball_generations[&ball_id], 5)?;
                 let entity = self.entity(ball_id)?;
                 self.app
                     .world_mut()
@@ -2709,6 +5170,7 @@ impl CompatRuntime {
             }
             for (ball_id, due_tick) in pending {
                 self.park.pending_removals.insert(ball_id, due_tick);
+                self.transition_retained_ball(ball_id, self.ball_generations[&ball_id], 5)?;
                 let entity = self.entity(ball_id)?;
                 self.app
                     .world_mut()
@@ -2719,6 +5181,7 @@ impl CompatRuntime {
                     });
             }
         }
+        self.rebuild_follower_sets();
         self.sync_visual_transforms();
         Ok(())
     }
@@ -2959,6 +5422,7 @@ impl CompatRuntime {
                 mini_collider(&descriptor)?;
                 self.ensure_child_descriptor_budget(ball_id, &descriptor, false, false)?;
                 self.metadata_mut(ball_id)?.minis.push(descriptor);
+                self.register_fixed_mini_objects(ball_id)?;
                 if let Err(error) = self.rebuild_root_collider(ball_id) {
                     self.metadata_mut(ball_id)?.minis.pop();
                     return Err(error);
@@ -2981,7 +5445,10 @@ impl CompatRuntime {
                     value_f64(args.get(4), "by")?,
                     value_f64(args.get(5), "bz")?,
                 );
-                let radius = value_f64(args.get(6), "radius")?;
+                let radius = f64::from(value_f64(args.get(6), "radius")? as f32);
+                if radius <= 0.0 {
+                    return Err(CompatError::ValueError("Radius must be positive".into()));
+                }
                 self.entity(ball_id)?;
                 if self.metadata(ball_id)?.minis.len() + self.metadata(ball_id)?.sensors.len()
                     >= self.park.limits.max_child_shapes_per_ball
@@ -2995,6 +5462,7 @@ impl CompatRuntime {
                 mini_collider(&descriptor)?;
                 self.ensure_child_descriptor_budget(ball_id, &descriptor, false, false)?;
                 self.metadata_mut(ball_id)?.minis.push(descriptor);
+                self.register_fixed_mini_objects(ball_id)?;
                 if let Err(error) = self.rebuild_root_collider(ball_id) {
                     self.metadata_mut(ball_id)?.minis.pop();
                     return Err(error);
@@ -3064,6 +5532,7 @@ impl CompatRuntime {
                 mini_collider(&descriptor)?;
                 self.ensure_child_descriptor_budget(ball_id, &descriptor, false, false)?;
                 self.metadata_mut(ball_id)?.minis.push(descriptor);
+                self.register_fixed_mini_objects(ball_id)?;
                 if let Err(error) = self.rebuild_root_collider(ball_id) {
                     self.metadata_mut(ball_id)?.minis.pop();
                     return Err(error);
@@ -3143,6 +5612,68 @@ impl CompatRuntime {
             .ok_or_else(|| CompatError::Engine("missing DestinyBallMetadata".into()))?;
         match name {
             "id" => Ok(json!(ball_id)),
+            "harmonic" | "corporationID" | "allianceID" => {
+                let retained = &self.retained_balls[&self.ball_generations[&ball_id]];
+                Ok(json!(
+                    retained.identity_fields[match name {
+                        "harmonic" => 0,
+                        "corporationID" => 1,
+                        _ => 2,
+                    }]
+                ))
+            }
+            "isMoribund" => Ok(json!(
+                self.retained_balls[&self.ball_generations[&ball_id]].moribund
+            )),
+            "ownerId" => Ok(json!(metadata.owner_id)),
+            "followId" => Ok(json!(self.motion.get(&ball_id).map_or(0, |control| {
+                if control.mode == OriginalMode::Warp {
+                    control.min_range.to_bits() as i64
+                } else {
+                    control.follow_id.unwrap_or(0)
+                }
+            }))),
+            "followRange" => json_number(
+                self.motion
+                    .get(&ball_id)
+                    .map_or(10.0, |control| f64::from(control.follow_range)),
+            ),
+            "gotoX" | "gotoY" | "gotoZ" => {
+                let point = self
+                    .motion
+                    .get(&ball_id)
+                    .map_or(OriginalVec3::ZERO, |control| control.destination);
+                json_number(match name {
+                    "gotoX" => point.x,
+                    "gotoY" => point.y,
+                    _ => point.z,
+                })
+            }
+            "miniBalls" | "miniCapsules" | "miniBoxes" => {
+                let kind = match name {
+                    "miniBalls" => "sphere",
+                    "miniCapsules" => "capsule",
+                    _ => "box",
+                };
+                Ok(Value::Array(
+                    metadata
+                        .minis
+                        .iter()
+                        .enumerate()
+                        .filter(|(_, mini)| mini.get("kind").and_then(Value::as_str) == Some(kind))
+                        .map(|(index, mini)| {
+                            let mut row = mini.clone();
+                            row["id"] = json!(metadata.mini_ids.get(index).copied().unwrap_or(0));
+                            row
+                        })
+                        .collect(),
+                ))
+            }
+            "mode" => Ok(json!(mode_number(
+                self.motion
+                    .get(&ball_id)
+                    .map_or(OriginalMode::Stop, |control| control.mode)
+            ))),
             "ballpark" => Ok(json!("park:0")),
             "centerDist" | "surfaceDist" => {
                 if self.park.ego <= 0
@@ -3351,7 +5882,7 @@ impl CompatRuntime {
             "isGlobal" => self.metadata_mut(ball_id)?.is_global = value_bool(value, "isGlobal")?,
             "isMassive" => self.set_massive(ball_id, value_bool(value, "isMassive")?)?,
             "isInteractive" => {
-                self.metadata_mut(ball_id)?.is_interactive = value_bool(value, "isInteractive")?
+                self.set_interactive(ball_id, value_bool(value, "isInteractive")?)?
             }
             "isCloaked" => {
                 let mode = value_i64(value, "isCloaked")?;
@@ -3387,6 +5918,15 @@ impl CompatRuntime {
             }
         }
         Ok(Value::Null)
+    }
+
+    fn set_interactive(&mut self, id: i64, enabled: bool) -> Result<(), CompatError> {
+        let bubble = self.metadata(id)?.new_bubble_id;
+        self.metadata_mut(id)?.is_interactive = enabled;
+        if let Some(tracking) = &mut self.original_bubbles {
+            tracking.interactive(id, bubble, enabled);
+        }
+        Ok(())
     }
 
     fn metadata_mut(&mut self, ball_id: i64) -> Result<Mut<'_, DestinyBallMetadata>, CompatError> {
@@ -3556,6 +6096,92 @@ impl CompatRuntime {
         Ok(())
     }
 
+    fn allocate_mini_identity(&mut self) -> Result<i64, CompatError> {
+        let (id, local, high) = crate::collision_identity::allocate_collision_id(
+            self.park.is_master,
+            -1,
+            self.park.local_counter,
+            self.park.local_high_counter,
+        )
+        .ok_or_else(|| {
+            CompatError::InvalidRequest("mini collision identity counter exhausted".into())
+        })?;
+        self.park.local_counter = local;
+        self.park.local_high_counter = high;
+        Ok(id)
+    }
+
+    fn register_fixed_mini_objects(&mut self, parent_id: i64) -> Result<(), CompatError> {
+        let metadata = self.metadata(parent_id)?.clone();
+        if metadata.is_free {
+            return Ok(());
+        }
+        let position = self.position(parent_id)?;
+        let mass = self
+            .app
+            .world()
+            .get::<DestinyMass>(self.entity(parent_id)?)
+            .ok_or_else(|| CompatError::Engine("mini parent is missing mass".into()))?
+            .0;
+        for (index, mini) in metadata.minis.iter().enumerate() {
+            let mut id = self
+                .metadata(parent_id)?
+                .mini_ids
+                .get(index)
+                .copied()
+                .unwrap_or(0);
+            if id == 0 {
+                id = self.allocate_mini_identity()?;
+            }
+            if mini.get("kind").and_then(Value::as_str) == Some("sphere") {
+                let local = value_vec3(mini.get("position"), "mini ball position")?;
+                let absolute = position + local;
+                let radius = value_f64(mini.get("radius"), "mini ball radius")?;
+                if !self.balls.contains_key(&id) {
+                    let args = vec![
+                        json!(id),
+                        json!(mass),
+                        json!(radius),
+                        json!(0.0),
+                        json!(false),
+                        json!(false),
+                        json!(true),
+                        json!(false),
+                        json!(false),
+                        json!(absolute.x),
+                        json!(absolute.y),
+                        json!(absolute.z),
+                        json!(0.0),
+                        json!(0.0),
+                        json!(0.0),
+                        json!(0.0),
+                        json!(0.0),
+                    ];
+                    // AddMiniball in source bypasses the public AddBall evolve
+                    // guard. This private identity path is also used by a
+                    // prevalidated restore; public callers never supply it.
+                    self.add_ball_with_identity(&args, Some(id))?;
+                    let control = MotionControl {
+                        mode: OriginalMode::Miniball,
+                        ..MotionControl::default()
+                    };
+                    self.motion.insert(id, control);
+                }
+                self.set_position(id, absolute)?;
+                let mut child = self.metadata_mut(id)?;
+                child.owner_id = parent_id;
+                child.agility = 0.0;
+            }
+            let mut parent = self.metadata_mut(parent_id)?;
+            if parent.mini_ids.len() < parent.minis.len() {
+                let size = parent.minis.len();
+                parent.mini_ids.resize(size, 0);
+            }
+            parent.mini_ids[index] = id;
+        }
+        Ok(())
+    }
+
     /// Rebuilds the one authoritative Avian collider for a ball. Destiny mini
     /// shapes are represented as an f64 compound collider instead of Bevy
     /// transform children, whose local transforms are limited to f32.
@@ -3626,6 +6252,26 @@ impl CompatRuntime {
             self.app.world_mut().entity_mut(entity).insert(collider);
         }
         self.metadata_mut(ball_id)?.is_free = is_free;
+        if was_free != is_free {
+            if is_free {
+                let children = self.metadata(ball_id)?.mini_ids.clone();
+                for child in children {
+                    if self.balls.contains_key(&child)
+                        && self.metadata(child)?.owner_id == ball_id
+                        && self
+                            .motion
+                            .get(&child)
+                            .is_some_and(|control| control.mode == OriginalMode::Miniball)
+                    {
+                        self.remove_ball_internal(child, true)?;
+                    }
+                }
+            } else {
+                self.metadata_mut(ball_id)?.mini_ids.clear();
+                self.register_fixed_mini_objects(ball_id)?;
+                self.rebuild_root_collider(ball_id)?;
+            }
+        }
         if !is_free {
             self.set_velocity(ball_id, DVec3::ZERO)?;
             self.set_angular_velocity(ball_id, DVec3::ZERO)?;
@@ -3854,11 +6500,6 @@ impl CompatRuntime {
         let only_interactives = args.get(3).map_or(Ok(false), |value| {
             value_bool(Some(value), "onlyInteractives")
         })?;
-        if !period.is_finite() || period <= 0.0 {
-            return Err(CompatError::InvalidRequest(
-                "sensor period must be positive".into(),
-            ));
-        }
         let existing_sensor_count = self.metadata(ball_id)?.sensors.len();
         let has_user_sensor = self.metadata(ball_id)?.sensors.iter().any(|sensor| {
             !sensor
@@ -3874,7 +6515,20 @@ impl CompatRuntime {
             return Err(CompatError::InvalidRequest("sensor limit exceeded".into()));
         }
         let elapsed = if shuffle == 0 {
-            0.0
+            // The original replacement clears members but retains elapsed
+            // unless shuffle explicitly chooses a new initial phase.
+            self.metadata(ball_id)?
+                .sensors
+                .iter()
+                .find(|sensor| {
+                    !sensor
+                        .get("cloak_sensor")
+                        .and_then(Value::as_bool)
+                        .unwrap_or(false)
+                })
+                .and_then(|sensor| sensor.get("elapsed"))
+                .and_then(Value::as_f64)
+                .unwrap_or(0.0)
         } else {
             deterministic_sensor_phase(ball_id, period)
         };
@@ -3978,7 +6632,8 @@ impl CompatRuntime {
                 }
                 "time" => self.park.time = value_i64(args.first(), name)?,
                 "ego" => self.park.ego = value_i64(args.first(), "ego")?,
-                "isRunning" | "currentTime" | "isMaster" => {
+                "isMaster" => self.park.is_master = value_bool(args.first(), "isMaster")?,
+                "isRunning" | "currentTime" => {
                     return Err(CompatError::InvalidRequest(format!(
                         "destiny.Ballpark.{name} is read-only"
                     )));
@@ -4033,18 +6688,70 @@ impl CompatRuntime {
                 let requested = value_i64(args.get(1), "formation_id")?;
                 if self.balls.contains_key(&ball_id) {
                     let count = self.park.formations.len();
-                    let mut metadata = self.metadata_mut(ball_id)?;
-                    (metadata.formation_id, metadata.formation_slots) = assign_formation(
-                        metadata.formation_id,
-                        metadata.formation_slots,
+                    let old = self.metadata(ball_id)?.formation_id;
+                    let (formation, _) = assign_formation(
+                        old,
+                        self.metadata(ball_id)?.formation_slots,
                         requested,
                         count,
                     );
+                    if formation == old {
+                        return Ok(Value::Null);
+                    }
+                    let mut remaining = VecDeque::new();
+                    if old != NO_FORMATION {
+                        let old_length = self
+                            .park
+                            .formations
+                            .get(usize::from(old))
+                            .map(Vec::len)
+                            .unwrap_or(0);
+                        let new_length = self
+                            .park
+                            .formations
+                            .get(usize::from(formation))
+                            .map(Vec::len)
+                            .unwrap_or(0);
+                        for follower in self.followers(ball_id) {
+                            if self.balls.contains_key(&follower)
+                                && (formation == NO_FORMATION
+                                    || crate::formation::oversized_follower(
+                                        old_length,
+                                        new_length,
+                                        mode_number(
+                                            self.motion
+                                                .get(&follower)
+                                                .map_or(OriginalMode::Stop, |control| control.mode),
+                                        ),
+                                        self.metadata(follower)?.effect_stamp,
+                                    )
+                                    .ok_or_else(|| {
+                                        CompatError::InvalidRequest(
+                                            "formation count exceeds C int representation".into(),
+                                        )
+                                    })?)
+                            {
+                                remaining.push_back((follower, self.ball_generations[&follower]));
+                            }
+                        }
+                    }
+                    self.mode_callbacks
+                        .push_back(CallCallback::FormationChange {
+                            id: ball_id,
+                            generation: self.ball_generations[&ball_id],
+                            formation,
+                            remaining,
+                        });
                 }
                 Ok(Value::Null)
             }
             "ClearAll" => {
-                self.clear_all();
+                if self.evolution_phase != 0 {
+                    return Err(CompatError::InvalidRequest(
+                        "Can not clear ballpark during Evolve().".into(),
+                    ));
+                }
+                self.clear_all()?;
                 Ok(Value::Null)
             }
             "RemoveBall" => {
@@ -4053,6 +6760,131 @@ impl CompatRuntime {
                     .get(1)
                     .map_or(Ok(0), |value| value_i64(Some(value), "delay"))?;
                 self.schedule_remove_ball(ball_id, delay)?;
+                Ok(Value::Null)
+            }
+            "InitializeBubbles" => {
+                require_arity(args, &[0, 1], title)?;
+                let source = args
+                    .first()
+                    .map_or(Ok(0), |value| value_i64(Some(value), "sourceId"))?;
+                if source != 0 {
+                    self.update_source_ball_bubble(source)?;
+                } else {
+                    self.initialize_source_bubbles()?;
+                }
+                Ok(Value::Null)
+            }
+            "CopyBubbles" => {
+                require_arity(args, &[0], title)?;
+                if let Some(tracking) = &mut self.original_bubbles {
+                    tracking.copy();
+                }
+                Ok(Value::Null)
+            }
+            "GetBubbleAtCoordinates" => {
+                require_arity(args, &[3], title)?;
+                let point = OriginalVec3 {
+                    x: value_f64(args.first(), "x")?,
+                    y: value_f64(args.get(1), "y")?,
+                    z: value_f64(args.get(2), "z")?,
+                };
+                match &self.original_bubbles {
+                    Some(tracking) => {
+                        Ok(json!(tracking.bubble_at(point).map_err(|error| {
+                            CompatError::InvalidRequest(error.into())
+                        })?))
+                    }
+                    None if self.balls.is_empty() => Ok(Value::Null),
+                    None => Err(CompatError::InvalidRequest(
+                        "source uninitialized partition query remains unimplemented".into(),
+                    )),
+                }
+            }
+            "AdditionsAndDeletions" => {
+                require_arity(args, &[1, 2], title)?;
+                let users = args[0].as_array().ok_or_else(|| {
+                    CompatError::InvalidRequest("userShips must be a list".into())
+                })?;
+                let mut aliases = [0usize, 1, 2, 3];
+                if let Some(value) = args.get(1) {
+                    let values = value
+                        .as_array()
+                        .filter(|values| values.len() == 4)
+                        .ok_or_else(|| {
+                            CompatError::InvalidRequest("four dictionary aliases required".into())
+                        })?;
+                    for (index, value) in values.iter().enumerate() {
+                        aliases[index] = value
+                            .as_u64()
+                            .filter(|value| *value <= index as u64)
+                            .ok_or_else(|| {
+                                CompatError::InvalidRequest("invalid dictionary alias index".into())
+                            })? as usize;
+                    }
+                }
+                self.source_bubble_updates(users, aliases)
+            }
+            "AddMushroom" => {
+                require_arity(args, &[3], title)?;
+                let owner = value_i64(args.first(), "ownerId")?;
+                let range = value_f64(args.get(1), "range")? as f32;
+                let duration = value_f64(args.get(2), "time")?;
+                if range <= 0.0 || duration <= 0.0 || !self.balls.contains_key(&owner) {
+                    return Ok(Value::Null);
+                }
+                if !range.is_finite() || f64::from(range) > MAX_RADIUS {
+                    return Err(CompatError::InvalidRequest(
+                        "mushroom range exceeds solver envelope".into(),
+                    ));
+                }
+                let position = self.position(owner)?;
+                let initial = crate::mushroom::initial_ball(OriginalVec3 {
+                    x: position.x,
+                    y: position.y,
+                    z: position.z,
+                });
+                let mut parameters = vec![
+                    json!(initial.id),
+                    json!(initial.mass),
+                    json!(initial.radius),
+                    json!(initial.max_velocity),
+                    json!(initial.is_free),
+                    json!(initial.is_global),
+                    json!(initial.is_massive),
+                    json!(initial.is_interactive),
+                    json!(initial.is_space_junk),
+                    json!(position.x),
+                    json!(position.y),
+                    json!(position.z),
+                    json!(0.0),
+                    json!(0.0),
+                    json!(0.0),
+                    json!(1.0),
+                    json!(1.0),
+                ];
+                if self.park.use_dynamical_orientation {
+                    parameters.extend([json!(0.0), json!(1.0)]);
+                }
+                let handle = self.add_ball(&parameters)?;
+                let id = parse_ball_target(Some(&handle))?;
+                self.motion.insert(
+                    id,
+                    MotionControl {
+                        mode: OriginalMode::Stop,
+                        destination: OriginalVec3 {
+                            x: duration,
+                            y: 0.0,
+                            z: 0.0,
+                        },
+                        follow_range: range,
+                        ..MotionControl::default()
+                    },
+                );
+                let started = self.park.current_time;
+                let mut metadata = self.metadata_mut(id)?;
+                metadata.owner_id = owner;
+                metadata.effect_stamp = started;
+                self.queue_mode_change(id, OriginalMode::Mushroom);
                 Ok(Value::Null)
             }
             "Pause" => {
@@ -4067,7 +6899,348 @@ impl CompatRuntime {
                 Ok(Value::Null)
             }
             "Evolve" => {
-                self.advance_one_tick(true)?;
+                self.begin_callback_tick(true)?;
+                Ok(Value::Null)
+            }
+            "WarpTo" => {
+                require_arity(args, &[4, 5, 6], title)?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let point = OriginalVec3 {
+                    x: value_f64(args.get(1), "x")?,
+                    y: value_f64(args.get(2), "y")?,
+                    z: value_f64(args.get(3), "z")?,
+                };
+                let min_range = args
+                    .get(4)
+                    .map(|v| value_f64(Some(v), "minRange"))
+                    .transpose()?
+                    .unwrap_or(20_000.0);
+                let min_range = if min_range < 0.0 { 0.0 } else { min_range };
+                let factor = args
+                    .get(5)
+                    .map(|v| value_i64(Some(v), "warpFactor"))
+                    .transpose()?
+                    .unwrap_or(20)
+                    .max(1);
+                let factor = i32::try_from(factor)
+                    .map_err(|_| CompatError::InvalidRequest("warpFactor exceeds i32".into()))?;
+                if !self.balls.contains_key(&id) {
+                    return Ok(Value::Null);
+                }
+                self.begin_warp(id, point, min_range, factor)?;
+                Ok(Value::Null)
+            }
+            "EntityWarpIn" => {
+                require_arity(args, &[5], title)?;
+                let id = value_i64(args.first(), "srcId")?;
+                let point = OriginalVec3 {
+                    x: value_f64(args.get(1), "x")?,
+                    y: value_f64(args.get(2), "y")?,
+                    z: value_f64(args.get(3), "z")?,
+                };
+                let factor = i32::try_from(value_i64(args.get(4), "warpFactor")?)
+                    .map_err(|_| CompatError::InvalidRequest("warpFactor exceeds C int".into()))?
+                    .max(1);
+                if self.balls.contains_key(&id) {
+                    self.begin_warp(id, point, 0.0, factor)?;
+                    self.mode_callbacks.push_back(CallCallback::EntityArrival {
+                        id,
+                        generation: self.ball_generations[&id],
+                        point,
+                    });
+                }
+                Ok(Value::Null)
+            }
+            "GotoPoint" | "GotoDirection" => {
+                require_arity(args, &[4], title)?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let point = OriginalVec3 {
+                    x: value_f64(args.get(1), "x")?,
+                    y: value_f64(args.get(2), "y")?,
+                    z: value_f64(args.get(3), "z")?,
+                };
+                if !self.balls.contains_key(&id) {
+                    return Ok(Value::Null);
+                }
+                if name == "GotoDirection" {
+                    self.begin_goto_direction(id, point)?;
+                } else {
+                    self.begin_goto_point(id, point)?;
+                }
+                Ok(Value::Null)
+            }
+            "SetNotificationRange" => {
+                require_arity(args, &[2], title)?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let range = value_f64(args.get(1), "notificationRange")?;
+                if range >= 0.0 && self.balls.contains_key(&id) {
+                    let state = self.range_notifications.entry(id).or_default();
+                    state.range = range;
+                    state.within = false;
+                }
+                Ok(Value::Null)
+            }
+            "SetTargetTracking" => {
+                require_arity(args, &[3], title)?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let target = value_i64(args.get(1), "target_id")?;
+                let range = value_f64(args.get(2), "trackingRange")?;
+                if self.balls.contains_key(&id) {
+                    if range <= 0.0 || target == 0 {
+                        let state = self.range_notifications.entry(id).or_default();
+                        state.target = None;
+                        state.tracking_range = 0.0;
+                    } else if self.balls.contains_key(&target) {
+                        let state = self.range_notifications.entry(id).or_default();
+                        state.target = Some(target);
+                        state.tracking_range = range;
+                        state.tracking_within = false;
+                    }
+                }
+                Ok(Value::Null)
+            }
+            "FollowBall" | "Orbit" => {
+                require_arity(args, &[2, 3], title)?;
+                let id = value_i64(args.first(), "ball_id")?;
+                let target = value_i64(args.get(1), "target_id")?;
+                let range = args
+                    .get(2)
+                    .map(|v| value_source_float(Some(v), "range"))
+                    .transpose()?
+                    .unwrap_or(1.0) as f32;
+                // The original method receives float after the Python cast;
+                // nonfinite float range is ignored by FollowBall/Orbit.
+                if !range.is_finite()
+                    || id == target
+                    || !self.balls.contains_key(&id)
+                    || !self.balls.contains_key(&target)
+                    || self
+                        .ball_generations
+                        .get(&target)
+                        .is_some_and(|generation| self.retained_balls[generation].moribund)
+                {
+                    return Ok(Value::Null);
+                }
+                let owner = self.metadata(id)?;
+                let other = self.metadata(target)?;
+                if owner.new_bubble_id != other.new_bubble_id || other.is_cloaked != 0 {
+                    return Ok(Value::Null);
+                }
+                self.begin_follow(
+                    id,
+                    target,
+                    if name == "Orbit" {
+                        FollowKind::Orbit(range)
+                    } else {
+                        FollowKind::Follow(range)
+                    },
+                )?;
+                Ok(Value::Null)
+            }
+            "MissileFollow" => {
+                require_arity(args, &[3], title)?;
+                let id = value_i64(args.first(), "srcId")?;
+                let target = value_i64(args.get(1), "dstId")?;
+                let owner = value_i64(args.get(2), "ownerId")?;
+                let moribund = self
+                    .ball_generations
+                    .get(&target)
+                    .is_some_and(|generation| self.retained_balls[generation].moribund);
+                if crate::missile::admitted(
+                    id,
+                    target,
+                    owner,
+                    self.balls.contains_key(&id),
+                    self.balls.contains_key(&target),
+                    moribund,
+                ) {
+                    self.begin_follow(id, target, FollowKind::Missile(owner))?;
+                }
+                Ok(Value::Null)
+            }
+            "LaunchMissile" => {
+                require_arity(args, &[5], title)?;
+                let id = value_i64(args.first(), "srcID")?;
+                let target = value_i64(args.get(1), "dstID")?;
+                let owner = value_i64(args.get(2), "ownerID")?;
+                let aimed = value_u8(args.get(3), "aimedLaunch")?;
+                let massive = value_u8(args.get(4), "massive")?;
+                if target < 0 {
+                    return Err(CompatError::InvalidRequest(
+                        "Can not launch missile on a negative ballID".into(),
+                    ));
+                }
+                let owner_check = owner.checked_abs().ok_or_else(|| {
+                    CompatError::InvalidRequest("owner absolute ID overflows i64".into())
+                })?;
+                if !self.balls.contains_key(&owner_check) {
+                    return Ok(Value::Null);
+                }
+                let launcher = self.entity(owner_check)?;
+                let position = self.position(owner_check)?;
+                let velocity = self
+                    .app
+                    .world()
+                    .get::<LinearVelocity>(launcher)
+                    .ok_or_else(|| CompatError::Engine("missing launcher velocity".into()))?
+                    .0;
+                let maximum = self
+                    .app
+                    .world()
+                    .get::<MaxLinearSpeed>(launcher)
+                    .ok_or_else(|| CompatError::Engine("missing launcher max speed".into()))?
+                    .0 as f32;
+                let rotation = self
+                    .app
+                    .world()
+                    .get::<Rotation>(launcher)
+                    .ok_or_else(|| CompatError::Engine("missing launcher rotation".into()))?
+                    .0;
+                let stationary = rotation * -DVec3::Z;
+                let has_target = target != owner && self.balls.contains_key(&target);
+                let target_cloaked = has_target && self.metadata(target)?.is_cloaked != 0;
+                let offset = if has_target {
+                    let delta = self.position(target)? - position;
+                    Some(OriginalVec3 {
+                        x: delta.x,
+                        y: delta.y,
+                        z: delta.z,
+                    })
+                } else {
+                    None
+                };
+                let (initial_velocity, max_velocity) = crate::missile::launch_velocity(
+                    OriginalVec3 {
+                        x: velocity.x,
+                        y: velocity.y,
+                        z: velocity.z,
+                    },
+                    maximum,
+                    OriginalVec3 {
+                        x: stationary.x,
+                        y: stationary.y,
+                        z: stationary.z,
+                    },
+                    offset,
+                    aimed,
+                    target_cloaked,
+                );
+                if self.balls.contains_key(&id) {
+                    if massive != 0 {
+                        self.set_massive(id, true)?;
+                    }
+                    self.set_position(id, position)?;
+                    self.set_velocity(
+                        id,
+                        DVec3::new(initial_velocity.x, initial_velocity.y, initial_velocity.z),
+                    )?;
+                    if !target_cloaked {
+                        if !has_target {
+                            if max_velocity > 0.0 {
+                                self.begin_goto_direction(id, initial_velocity)?;
+                            }
+                        } else {
+                            let moribund =
+                                self.retained_balls[&self.ball_generations[&target]].moribund;
+                            if crate::missile::admitted(id, target, owner, true, true, moribund) {
+                                self.begin_follow(id, target, FollowKind::Missile(owner))?;
+                            }
+                        }
+                    }
+                }
+                Ok(Value::Null)
+            }
+            "FormationFollow" => {
+                require_arity(args, &[3], title)?;
+                let id = value_i64(args.first(), "srcId")?;
+                let target = value_i64(args.get(1), "dstId")?;
+                let slot = i32::try_from(value_i64(args.get(2), "slot")?)
+                    .map_err(|_| CompatError::InvalidRequest("slot exceeds C int".into()))?
+                    as i8;
+                if id != target
+                    && self.balls.contains_key(&id)
+                    && self.balls.contains_key(&target)
+                    && self
+                        .formation_slot_count(target)?
+                        .is_some_and(|count| i64::from(slot) < count as i64)
+                {
+                    self.begin_follow(id, target, FollowKind::Formation(slot))?;
+                }
+                Ok(Value::Null)
+            }
+            "SetBallHarmonic" => {
+                require_arity(args, &[5], title)?;
+                let id = value_i64(args.first(), "srcId")?;
+                let harmonic = value_i64(args.get(1), "harmonic")?;
+                let corporation = value_c_int(args.get(2), "corporationID")?;
+                let alliance = value_c_int(args.get(3), "allianceID")?;
+                let field = value_c_int(args.get(4), "field")? != 0;
+                if self.balls.contains_key(&id) {
+                    let generation = self.ball_generations[&id];
+                    self.retained_balls
+                        .get_mut(&generation)
+                        .expect("live identity")
+                        .identity_fields = crate::harmonic::fields(harmonic, corporation, alliance);
+                    let action = crate::harmonic::action(
+                        mode_number(
+                            self.motion
+                                .get(&id)
+                                .map_or(OriginalMode::Stop, |control| control.mode),
+                        ),
+                        field,
+                    );
+                    if action == 10 {
+                        self.stop_command(id)?;
+                        self.mode_callbacks.push_back(CallCallback::SetMode {
+                            id,
+                            generation,
+                            mode: OriginalMode::Field,
+                            troll_delay: None,
+                        });
+                    } else if action == 2 {
+                        self.stop_command(id)?;
+                    }
+                }
+                Ok(Value::Null)
+            }
+            "SetBoid" => {
+                require_arity(args, &[2], title)?;
+                let id = value_i64(args.first(), "srcId")?;
+                let enabled = value_c_int(args.get(1), "turnOn")? != 0;
+                if self.balls.contains_key(&id) {
+                    if enabled {
+                        self.queue_mode_change(id, OriginalMode::Boid);
+                    } else {
+                        self.stop_command(id)?;
+                    }
+                }
+                Ok(Value::Null)
+            }
+            "SetBallRigid" | "SetBallTroll" => {
+                require_arity(
+                    args,
+                    if name == "SetBallTroll" { &[2] } else { &[1] },
+                    title,
+                )?;
+                let id = value_i64(args.first(), "srcId")?;
+                let troll_delay = if name == "SetBallTroll" {
+                    Some(value_c_int(args.get(1), "delay")?)
+                } else {
+                    None
+                };
+                if self.balls.contains_key(&id) {
+                    self.stop_command(id)?;
+                    self.mode_callbacks.push_back(CallCallback::SetMode {
+                        id,
+                        generation: self.ball_generations[&id],
+                        mode: if troll_delay.is_some() {
+                            OriginalMode::Troll
+                        } else {
+                            OriginalMode::Rigid
+                        },
+                        troll_delay,
+                    });
+                }
                 Ok(Value::Null)
             }
             "AdjustTimes" => {
@@ -4180,7 +7353,7 @@ impl CompatRuntime {
             }
             "SetBallInteractive" => {
                 let id = value_i64(args.first(), "ball_id")?;
-                self.metadata_mut(id)?.is_interactive = value_bool(args.get(1), "is_interactive")?;
+                self.set_interactive(id, value_bool(args.get(1), "is_interactive")?)?;
                 Ok(Value::Null)
             }
             "SetSpeedFraction" => {
@@ -4204,9 +7377,87 @@ impl CompatRuntime {
             }
             "Stop" => {
                 let id = value_i64(args.first(), "ball_id")?;
-                self.set_velocity(id, DVec3::ZERO)?;
-                self.set_angular_velocity(id, DVec3::ZERO)?;
+                self.stop_command(id)?;
                 Ok(Value::Null)
+            }
+            "GetFollowers" => {
+                require_arity(args, &[1], title)?;
+                let target = value_i64(args.first(), "targetId")?;
+                self.entity(target)?;
+                Ok(json!(
+                    self.followers(target)
+                        .into_iter()
+                        .filter(|id| self.balls.contains_key(id))
+                        .collect::<Vec<_>>()
+                ))
+            }
+            "GetAccuracy" => {
+                require_arity(args, &[7], title)?;
+                let src = value_i64(args.first(), "srcId")?;
+                let dst = value_i64(args.get(1), "dstId")?;
+                let mut parameters = [0.0; 5];
+                for (index, value) in parameters.iter_mut().enumerate() {
+                    *value = value_f64(args.get(index + 2), "accuracy parameter")?;
+                }
+                let project = |id| -> Result<Option<crate::accuracy::Ball>, CompatError> {
+                    if !self.balls.contains_key(&id) {
+                        return Ok(None);
+                    }
+                    let position = self.position(id)?;
+                    let velocity = self
+                        .app
+                        .world()
+                        .get::<LinearVelocity>(self.entity(id)?)
+                        .ok_or_else(|| CompatError::Engine("missing accuracy velocity".into()))?
+                        .0;
+                    Ok(Some(crate::accuracy::Ball {
+                        position: OriginalVec3 {
+                            x: position.x,
+                            y: position.y,
+                            z: position.z,
+                        },
+                        velocity: OriginalVec3 {
+                            x: velocity.x,
+                            y: velocity.y,
+                            z: velocity.z,
+                        },
+                        radius: self.metadata(id)?.radius as f32,
+                    }))
+                };
+                Ok(json!(crate::accuracy::values(
+                    src == dst,
+                    project(src)?,
+                    project(dst)?,
+                    parameters
+                )))
+            }
+            "GetRemoteFollowers" => {
+                require_arity(args, &[0], title)?;
+                let mut result = Vec::new();
+                for (&id, control) in &self.motion {
+                    if !self.balls.contains_key(&id) {
+                        continue;
+                    }
+                    let target = control
+                        .follow_id
+                        .and_then(|target| self.balls.get(&target).map(|_| target));
+                    let same = match target {
+                        Some(target) => {
+                            self.metadata(id)?.new_bubble_id == self.metadata(target)?.new_bubble_id
+                        }
+                        None => false,
+                    };
+                    if crate::ball_lifecycle::remote_follower(
+                        self.metadata(id)?.is_free,
+                        mode_number(control.mode),
+                        target.is_some(),
+                        same,
+                    ) {
+                        result.push(id);
+                    }
+                }
+                result.sort_unstable();
+                Ok(json!(result))
             }
             "GetCenterDist" => {
                 let first_id = value_i64(args.first(), "first_id")?;
@@ -4715,6 +7966,13 @@ fn avian_mass(value: f64) -> f32 {
     }
 }
 
+fn default_local_counter() -> i64 {
+    -1
+}
+fn default_local_high_counter() -> i64 {
+    -(1_i64 << 30)
+}
+
 fn visual_vec3(value: DVec3) -> Vec3 {
     let project = |component: f64| component.clamp(-(f32::MAX as f64), f32::MAX as f64) as f32;
     Vec3::new(project(value.x), project(value.y), project(value.z))
@@ -4892,10 +8150,19 @@ fn root_collider_for_metadata(metadata: &DestinyBallMetadata) -> Result<Collider
         Rotation(DQuat::IDENTITY),
         Collider::sphere(metadata.radius),
     )];
-    for descriptor in &metadata.minis {
+    for (index, descriptor) in metadata.minis.iter().enumerate() {
+        if descriptor.get("kind").and_then(Value::as_str) == Some("sphere")
+            && metadata.mini_ids.get(index).copied().unwrap_or(0) != 0
+        {
+            continue; // This source mini sphere has its own registered fixed body.
+        }
         shapes.push(mini_collider(descriptor)?);
     }
-    Ok(Collider::compound(shapes))
+    if shapes.len() == 1 {
+        Ok(Collider::sphere(metadata.radius))
+    } else {
+        Ok(Collider::compound(shapes))
+    }
 }
 
 fn mini_collider(value: &Value) -> Result<(Position, Rotation, Collider), CompatError> {
@@ -4929,17 +8196,26 @@ fn mini_collider(value: &Value) -> Result<(Position, Rotation, Collider), Compat
                 || !solver_safe_vec3(a, MAX_COORDINATE)
                 || !solver_safe_vec3(b, MAX_COORDINATE)
                 || !segment_length.is_finite()
-                || segment_length == 0.0
             {
                 return Err(CompatError::InvalidRequest(
-                    "mini capsule needs a positive radius and finite distinct endpoints".into(),
+                    "mini capsule needs a positive radius and finite endpoints".into(),
                 ));
             }
-            Ok((
-                Position(DVec3::ZERO),
-                Rotation(DQuat::IDENTITY),
-                Collider::capsule_endpoints(radius, a, b),
-            ))
+            if segment_length == 0.0 {
+                // Original Capsule::CheckCollision explicitly treats a zero
+                // length axis as a sphere. Avoid a degenerate Avian capsule.
+                Ok((
+                    Position(a),
+                    Rotation(DQuat::IDENTITY),
+                    Collider::sphere(radius),
+                ))
+            } else {
+                Ok((
+                    Position(DVec3::ZERO),
+                    Rotation(DQuat::IDENTITY),
+                    Collider::capsule_endpoints(radius, a, b),
+                ))
+            }
         }
         Some("box") => {
             require_exact_object_keys(object, &["kind", "basis"], "mini box")?;
@@ -5037,7 +8313,18 @@ fn validate_sensor_descriptor(value: &Value) -> Result<(), CompatError> {
         "members",
         "cloak_sensor",
     ];
-    require_exact_object_keys(object, SENSOR_KEYS, "sensor descriptor")?;
+    if let Some(active) = object.get("active") {
+        if !active.is_boolean() {
+            return Err(CompatError::InvalidRequest(
+                "sensor active must be boolean".into(),
+            ));
+        }
+        let mut keys = SENSOR_KEYS.to_vec();
+        keys.push("active");
+        require_exact_object_keys(object, &keys, "sensor descriptor")?;
+    } else {
+        require_exact_object_keys(object, SENSOR_KEYS, "sensor descriptor")?;
+    }
     let range = value_f64(object.get("range"), "sensor range")?;
     if range.abs() > MAX_COORDINATE {
         return Err(CompatError::InvalidRequest(
@@ -5046,11 +8333,6 @@ fn validate_sensor_descriptor(value: &Value) -> Result<(), CompatError> {
     }
     let period = value_f64(object.get("period"), "sensor period")?;
     value_i64(object.get("shuffle"), "sensor shuffle")?;
-    if period <= 0.0 {
-        return Err(CompatError::InvalidRequest(
-            "sensor period must be positive".into(),
-        ));
-    }
     if !object
         .get("only_interactives")
         .is_some_and(Value::is_boolean)
@@ -5065,7 +8347,7 @@ fn validate_sensor_descriptor(value: &Value) -> Result<(), CompatError> {
         ));
     }
     let elapsed = value_f64(object.get("elapsed"), "sensor elapsed")?;
-    if elapsed < 0.0 || elapsed >= period {
+    if elapsed < 0.0 || (period > 0.0 && elapsed >= period) {
         return Err(CompatError::InvalidRequest(
             "sensor elapsed must be in [0, period)".into(),
         ));
@@ -5127,6 +8409,48 @@ fn validate_formations(formations: &[Vec<[f64; 3]>]) -> Result<(), CompatError> 
 }
 
 fn validate_ball_snapshot(ball: &BallSnapshot, max_children: usize) -> Result<(), CompatError> {
+    if !ball.mini_ids.is_empty() && ball.mini_ids.len() != ball.minis.len() {
+        return Err(CompatError::InvalidRequest(
+            "mini identity list does not match descriptors".into(),
+        ));
+    }
+    if ball
+        .motion
+        .as_ref()
+        .is_some_and(|control| control.mode == 9)
+        && (ball.is_free || ball.owner_id == ball.id || !ball.minis.is_empty())
+    {
+        return Err(CompatError::InvalidRequest(
+            "invalid mini ball ownership or lifecycle".into(),
+        ));
+    }
+    if let Some(control) = &ball.motion
+        && (!matches!(control.mode, 0..=12)
+            || control.warp_factor <= 0
+            || !control.min_range.is_finite()
+            || control.min_range < 0.0
+            || !control.warp_distance.is_finite()
+            || !control.follow_range.is_finite()
+            || control
+                .destination
+                .iter()
+                .any(|value| !value.is_finite() || value.abs() > MAX_COORDINATE)
+            || (matches!(control.mode, 1 | 4 | 5 | 12) && control.follow_id.is_none()))
+    {
+        return Err(CompatError::InvalidRequest(
+            "invalid snapshot motion control".into(),
+        ));
+    }
+    if let Some(state) = &ball.notifications
+        && (!state.range.is_finite()
+            || state.range < 0.0
+            || !state.tracking_range.is_finite()
+            || state.tracking_range < 0.0)
+    {
+        return Err(CompatError::InvalidRequest(
+            "invalid snapshot notification state".into(),
+        ));
+    }
     if ball.formation_id > 127 && ball.formation_id != NO_FORMATION {
         return Err(CompatError::InvalidRequest(
             "invalid snapshot formation ID".into(),
@@ -5151,7 +8475,13 @@ fn validate_ball_snapshot(ball: &BallSnapshot, max_children: usize) -> Result<()
         || ball.radius < 0.0
         || ball.max_velocity < 0.0
         || ball.max_angular_velocity < 0.0
-        || ball.agility <= 0.0
+        || (ball.agility <= 0.0
+            && !(ball.agility == 0.0
+                && !ball.is_free
+                && ball
+                    .motion
+                    .as_ref()
+                    .is_some_and(|control| control.mode == 9)))
         || ball.angular_agility < 0.0
         || !(0.0..=1.0).contains(&ball.speed_fraction)
         || ball.mass > MAX_MASS
@@ -5439,6 +8769,11 @@ fn parse_ball_target(target: Option<&str>) -> Result<i64, CompatError> {
     let id = match parts.as_slice() {
         ["ball", id] => *id,
         ["ball", park, id] if park.parse::<u64>().is_ok() => *id,
+        ["ball", park, generation, id]
+            if park.parse::<u64>().is_ok() && generation.parse::<u64>().is_ok() =>
+        {
+            *id
+        }
         _ => {
             return Err(CompatError::InvalidRequest(format!(
                 "invalid ball target {target:?}"
@@ -5454,11 +8789,192 @@ fn parse_ball_target(target: Option<&str>) -> Result<i64, CompatError> {
         .map_err(|_| CompatError::InvalidRequest(format!("invalid ball target {target:?}")))
 }
 
+fn parse_ball_generation(target: Option<&str>) -> Result<Option<u64>, CompatError> {
+    match target.map(|value| value.split(':').collect::<Vec<_>>()) {
+        Some(parts) if parts.len() == 4 => parts[2]
+            .parse::<u64>()
+            .map(Some)
+            .map_err(|_| CompatError::InvalidRequest("invalid object generation".into())),
+        _ => Ok(None),
+    }
+}
+
+fn retained_ball_property(ball: &RetainedBall, name: &str) -> Result<Value, CompatError> {
+    let snapshot = ball
+        .detached
+        .as_ref()
+        .ok_or_else(|| CompatError::Engine("missing retained object state".into()))?;
+    match name {
+        "id" => Ok(json!(ball.id)),
+        "isMoribund" => Ok(json!(ball.moribund)),
+        "harmonic" | "corporationID" | "allianceID" => Ok(json!(
+            ball.identity_fields[match name {
+                "harmonic" => 0,
+                "corporationID" => 1,
+                _ => 2,
+            }]
+        )),
+        "roll" | "pitch" | "yaw" => {
+            let rotation = quat_from_slice(&snapshot.rotation)?;
+            let (yaw, pitch, roll) = rotation.to_euler(EulerRot::YXZ);
+            json_number(match name {
+                "roll" => roll,
+                "pitch" => pitch,
+                _ => yaw,
+            })
+        }
+        "followId" => Ok(json!(
+            snapshot
+                .motion
+                .as_ref()
+                .and_then(|motion| motion.follow_id)
+                .unwrap_or(0)
+        )),
+        "centerDist" => json_number(-1.0),
+        "surfaceDist" => json_number(-1.0 - snapshot.radius),
+        "ballpark" => Ok(Value::Null),
+        "mode" => Ok(json!(
+            snapshot
+                .motion
+                .as_ref()
+                .map_or(mode_number(OriginalMode::Stop), |motion| motion.mode)
+        )),
+        "x" | "y" | "z" => json_number(
+            snapshot.position[match name {
+                "x" => 0,
+                "y" => 1,
+                _ => 2,
+            }],
+        ),
+        "vx" | "vy" | "vz" => json_number(
+            snapshot.velocity[match name {
+                "vx" => 0,
+                "vy" => 1,
+                _ => 2,
+            }],
+        ),
+        "mass" => json_number(snapshot.mass),
+        "ownerId" => Ok(json!(snapshot.owner_id)),
+        "followRange" => json_number(
+            snapshot
+                .motion
+                .as_ref()
+                .map_or(10.0, |motion| f64::from(motion.follow_range)),
+        ),
+        "gotoX" | "gotoY" | "gotoZ" => {
+            json_number(snapshot.motion.as_ref().map_or(0.0, |motion| {
+                motion.destination[match name {
+                    "gotoX" => 0,
+                    "gotoY" => 1,
+                    _ => 2,
+                }]
+            }))
+        }
+        "radius" => json_number(snapshot.radius),
+        "maxVelocity" => json_number(snapshot.max_velocity),
+        "Agility" => json_number(snapshot.agility),
+        "speedFraction" => json_number(snapshot.speed_fraction),
+        "isFree" => Ok(json!(snapshot.is_free)),
+        "isGlobal" => Ok(json!(snapshot.is_global)),
+        "isMassive" => Ok(json!(snapshot.is_massive)),
+        "isInteractive" => Ok(json!(snapshot.is_interactive)),
+        "isCloaked" => Ok(json!(snapshot.is_cloaked)),
+        "newBubbleId" => Ok(json!(snapshot.new_bubble_id)),
+        "oldBubbleId" => Ok(json!(snapshot.old_bubble_id)),
+        "effectStamp" => Ok(json!(snapshot.effect_stamp)),
+        "formationID" => Ok(json!(snapshot.formation_id)),
+        "miniBalls" | "miniCapsules" | "miniBoxes" => {
+            let kind = match name {
+                "miniBalls" => "sphere",
+                "miniCapsules" => "capsule",
+                _ => "box",
+            };
+            Ok(Value::Array(
+                snapshot
+                    .minis
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, mini)| mini.get("kind").and_then(Value::as_str) == Some(kind))
+                    .map(|(index, mini)| {
+                        let mut row = mini.clone();
+                        row["id"] = json!(snapshot.mini_ids.get(index).copied().unwrap_or(0));
+                        row
+                    })
+                    .collect(),
+            ))
+        }
+        _ => Err(CompatError::UnsupportedTitle(format!(
+            "destiny.Ball.{name}"
+        ))),
+    }
+}
+
+fn retained_ball_call(
+    ball: &RetainedBall,
+    name: &str,
+    args: &[Value],
+) -> Result<Value, CompatError> {
+    match name {
+        "ReserveFormationSlot" => {
+            require_arity(args, &[0], name)?;
+            Ok(json!(-1))
+        }
+        "FreeFormationSlot" => {
+            require_arity(args, &[1], name)?;
+            value_i64(args.first(), "slot")?;
+            Ok(Value::Null)
+        }
+        "GetRotatedVector" => {
+            require_arity(args, &[1], name)?;
+            let vector = value_vec3(args.first(), "vector")?;
+            let snapshot = ball
+                .detached
+                .as_ref()
+                .ok_or_else(|| CompatError::Engine("missing retained state".into()))?;
+            let result = quat_from_slice(&snapshot.rotation)? * vector;
+            Ok(json!([result.x, result.y, result.z]))
+        }
+        _ => Err(CompatError::UnsupportedTitle(format!(
+            "destiny.Ball.{name}"
+        ))),
+    }
+}
+
+fn value_source_float(value: Option<&Value>, name: &str) -> Result<f64, CompatError> {
+    if let Some(object) = value.and_then(Value::as_object)
+        && object.len() == 1
+        && object.contains_key("ieee754_bits")
+    {
+        return object["ieee754_bits"]
+            .as_u64()
+            .map(f64::from_bits)
+            .ok_or_else(|| CompatError::InvalidRequest("IEEE754 operand requires64bits".into()));
+    }
+    value_f64(value, name)
+}
+
 fn value_f64(value: Option<&Value>, name: &str) -> Result<f64, CompatError> {
     value
         .and_then(Value::as_f64)
         .filter(|value| value.is_finite())
         .ok_or_else(|| CompatError::InvalidRequest(format!("{name} must be a finite number")))
+}
+
+fn value_u8(value: Option<&Value>, name: &str) -> Result<u8, CompatError> {
+    let number = match value {
+        Some(Value::Bool(value)) => i64::from(*value),
+        _ => value_i64(value, name)?,
+    };
+    u8::try_from(number)
+        .map_err(|_| CompatError::InvalidRequest(format!("{name} exceeds source unsigned byte")))
+}
+
+fn value_c_int(value: Option<&Value>, name: &str) -> Result<i32, CompatError> {
+    let number = match value {
+        Some(Value::Bool(value)) => i64::from(*value),
+        _ => value_i64(value, name)?,
+    };
+    i32::try_from(number).map_err(|_| CompatError::InvalidRequest(format!("{name} exceeds C int")))
 }
 
 fn value_i64(value: Option<&Value>, name: &str) -> Result<i64, CompatError> {
@@ -6138,6 +9654,30 @@ mod tests {
     }
 
     #[test]
+    fn retained_generation_leases_reclaim_only_after_final_detached_release() {
+        let mut runtime = runtime(false);
+        add_ball(&mut runtime, 1, false, false);
+        let generation = runtime.ball_generations[&1];
+        runtime.transition_retained_ball(1, generation, 0).unwrap();
+        runtime.transition_retained_ball(1, generation, 0).unwrap();
+        runtime.remove_ball(1).unwrap();
+        let retained = &runtime.retained_balls[&generation];
+        assert!(!retained.attached && retained.moribund);
+        assert_eq!(retained.references, 2);
+        add_ball(&mut runtime, 1, false, false);
+        let replacement = runtime.ball_generations[&1];
+        assert_ne!(replacement, generation);
+        runtime.transition_retained_ball(1, generation, 1).unwrap();
+        assert_eq!(runtime.retained_balls[&generation].references, 1);
+        runtime.transition_retained_ball(1, generation, 1).unwrap();
+        assert!(!runtime.retained_balls.contains_key(&generation));
+        assert!(runtime.retained_balls[&replacement].attached);
+        assert!(runtime.transition_retained_ball(1, generation, 0).is_err());
+        runtime.clear_all().unwrap();
+        assert!(!runtime.retained_balls.contains_key(&replacement));
+    }
+
+    #[test]
     fn exact_space_damping_and_pause_contract() {
         let mut runtime = runtime(false);
         add_ball(&mut runtime, 1, true, true);
@@ -6184,7 +9724,7 @@ mod tests {
     }
 
     #[test]
-    fn static_minis_are_one_local_f64_compound_and_follow_lifecycle() {
+    fn fixed_mini_balls_are_registered_bodies_with_source_lifecycle() {
         let mut runtime = runtime(false);
         add_ball(&mut runtime, 1, false, true);
         runtime
@@ -6197,14 +9737,21 @@ mod tests {
             .expect("mini ball");
         let entity = runtime.entity(1).expect("entity");
         let collider = runtime.world().get::<Collider>(entity).expect("collider");
-        let compound = collider.shape().as_compound().expect("compound");
-        assert_eq!(compound.shapes().len(), 2);
-        let mini_pose = &compound.shapes()[1].0;
-        assert_eq!(mini_pose.translation.x, 3.0);
-        assert_eq!(mini_pose.translation.y, 4.0);
-        assert_eq!(mini_pose.translation.z, 5.0);
+        assert!(collider.shape().as_compound().is_none());
+        let first_id = runtime.metadata(1).expect("parent").mini_ids[0];
+        assert_eq!(first_id, -(1_i64 << 30) - 1);
+        assert_eq!(runtime.balls.len(), 2);
+        assert_eq!(
+            runtime.position(first_id).expect("mini position"),
+            runtime.position(1).expect("parent position") + DVec3::new(3.0, 4.0, 5.0)
+        );
+        assert_eq!(runtime.metadata(first_id).expect("mini").owner_id, 1);
+        assert!(!runtime.metadata(first_id).expect("mini").is_free);
+        assert!(runtime.metadata(first_id).expect("mini").is_massive);
 
         runtime.set_free(1, true).expect("dynamic");
+        assert!(!runtime.balls.contains_key(&first_id));
+        assert_eq!(runtime.balls.len(), 1);
         assert!(
             runtime
                 .world()
@@ -6215,18 +9762,9 @@ mod tests {
                 .is_none()
         );
         runtime.set_free(1, false).expect("static");
-        assert_eq!(
-            runtime
-                .world()
-                .get::<Collider>(entity)
-                .expect("collider")
-                .shape()
-                .as_compound()
-                .expect("compound")
-                .shapes()
-                .len(),
-            2
-        );
+        let second_id = runtime.metadata(1).expect("parent").mini_ids[0];
+        assert_eq!(second_id, first_id - 1);
+        assert!(runtime.balls.contains_key(&second_id));
         runtime.set_massive(1, false).expect("disable collider");
         assert!(
             runtime
@@ -6234,6 +9772,16 @@ mod tests {
                 .entity(entity)
                 .contains::<ColliderDisabled>()
         );
+        assert!(
+            !runtime
+                .world()
+                .entity(runtime.entity(second_id).expect("mini entity"))
+                .contains::<ColliderDisabled>()
+        );
+        runtime
+            .remove_ball(1)
+            .expect("remove parent and owned mini");
+        assert!(runtime.balls.is_empty());
     }
 
     #[test]
@@ -6606,7 +10154,12 @@ mod tests {
             .entity_mut(entity)
             .insert(AngularVelocity(DVec3::ZERO));
         runtime
-            .schedule_remove_ball(1, 5)
+            .dispatch(request(
+                "destiny.Ballpark.RemoveBall",
+                "call",
+                Some("park:0"),
+                vec![json!(1), json!(5)],
+            ))
             .expect("scheduled removal");
         let due = runtime.park.pending_removals[&1];
         runtime.world_mut().entity_mut(entity).remove::<Transform>();
@@ -6700,7 +10253,14 @@ mod tests {
             }),
         );
 
-        runtime.schedule_remove_ball(2, 2).expect("pending removal");
+        runtime
+            .dispatch(request(
+                "destiny.Ballpark.RemoveBall",
+                "call",
+                Some("park:0"),
+                vec![json!(2), json!(2)],
+            ))
+            .expect("pending removal");
         runtime.metadata_mut(3).expect("metadata").is_cloaked = 2;
         assert_eq!(
             runtime.bubble_membership_value().expect("membership"),
@@ -6710,6 +10270,50 @@ mod tests {
                 "observers": {"1": [1]},
             }),
         );
+    }
+
+    #[test]
+    fn first_tick_fast_body_cannot_cross_a_fixed_sphere_before_a_farther_target() {
+        let mut runtime = runtime(false);
+        runtime
+            .dispatch(request(
+                "dbc.compat.Runtime.Configure",
+                "call",
+                Some("park:0"),
+                vec![json!(20), json!(true), json!(false)],
+            ))
+            .unwrap();
+        for (id, mass, z, vz, max_speed) in [
+            (1, 13_000_000.0, 4.0, 0.0, 10.0),
+            (2, 1_000_000.0, 10.0, 0.0, 10.0),
+            (3, 13_000_000.0, -4.0, 20.0, 100.0),
+        ] {
+            runtime
+                .add_ball(&[
+                    json!(id),
+                    json!(mass),
+                    json!(2.0),
+                    json!(max_speed),
+                    json!(true),
+                    json!(false),
+                    json!(true),
+                    json!(true),
+                    json!(false),
+                    json!(0.0),
+                    json!(0.0),
+                    json!(z),
+                    json!(0.0),
+                    json!(0.0),
+                    json!(vz),
+                    json!(0.9),
+                    json!(0.95),
+                ])
+                .unwrap();
+        }
+        runtime.set_free(1, false).unwrap();
+        runtime.advance_one_tick(true).unwrap();
+        assert_eq!(runtime.position(2).unwrap(), DVec3::new(0.0, 0.0, 10.0));
+        assert!(runtime.position(3).unwrap().z < runtime.position(1).unwrap().z);
     }
 
     #[test]

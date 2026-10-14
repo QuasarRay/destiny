@@ -319,13 +319,18 @@
           "start": 812
         },
         {
+          "end": 941,
+          "sha256": "b827b899b9fbc5f523ec103d38b5c9dfe3e99f47620296907923eabb4d3f8413",
+          "start": 905
+        },
+        {
           "end": 1632,
           "sha256": "fe1bf90a15ed8896752d0d6ce1a846b0be1fd0c644d36a9828bb63b1d750fb18",
           "start": 1499
         },
         {
-          "end": 1728,
-          "sha256": "43bfc03c78ca1cb62ce4802cca8976631f083e2779cbe91f026eba1de0c80c6c",
+          "end": 1875,
+          "sha256": "11ae90139df379819f6de42cd3c919fcbe7e7734e6219866d305d18f6085d920",
           "start": 1663
         },
         {
@@ -363,12 +368,16 @@
           881
         ],
         [
+          905,
+          941
+        ],
+        [
           1499,
           1632
         ],
         [
           1663,
-          1728
+          1875
         ],
         [
           1876,
@@ -403,6 +412,11 @@
           "start": 85
         },
         {
+          "end": 403,
+          "sha256": "89a96ee8591582fc9030f917af606ae0bb4c657028c88b4dffa36615e62a9c27",
+          "start": 332
+        },
+        {
           "end": 1022,
           "sha256": "207156812e86b971850a5671fabe4c02de0e2ad27f2ceb9c83dd7178a9208182",
           "start": 421
@@ -414,8 +428,13 @@
         },
         {
           "end": 1513,
-          "sha256": "3e3988429491455f183dbe25fb8b403884bdfeb856c69af993e5bbecd9c6523c",
-          "start": 1427
+          "sha256": "3925520bcb9a89ea9b4f4aff856b69b31540872289ca0849d90737d07ed8e330",
+          "start": 1398
+        },
+        {
+          "end": 2713,
+          "sha256": "3714f8c19683bd66f96e3269851b28abf18dd9d9f714c3bc4b11b0b44c32af9d",
+          "start": 1988
         },
         {
           "end": 3020,
@@ -423,9 +442,24 @@
           "start": 2745
         },
         {
+          "end": 3036,
+          "sha256": "f4a26cbf58f0963abccc8d6f1ca07449392a609688ad38e2b730a9f462ac7884",
+          "start": 3013
+        },
+        {
+          "end": 3105,
+          "sha256": "561662e2cb5bcd73372334000522c350dd8601c43950f7639b24027569719f0b",
+          "start": 3041
+        },
+        {
           "end": 3206,
           "sha256": "778839d1578db5062263f4d7287958e8875aef49b4fdfa0e01af103b66bc3d0b",
           "start": 3105
+        },
+        {
+          "end": 3314,
+          "sha256": "bd7c3e5335ec2d9002807b31f1ddb13d4c1cfbd959933d27c2bcdfbb0b64cecb",
+          "start": 3265
         },
         {
           "end": 3502,
@@ -433,9 +467,34 @@
           "start": 3320
         },
         {
+          "end": 3640,
+          "sha256": "df654d5ca4a8cf40f20b0b3f1472b60287d8cc60df3320ea16c4bb7f39166646",
+          "start": 3568
+        },
+        {
+          "end": 3788,
+          "sha256": "6c1f60eb14c5bc9a057641d03bdbc5407490260367fe0bbd1642b4417b0f4973",
+          "start": 3716
+        },
+        {
+          "end": 4071,
+          "sha256": "65c8a01220337fcb06a792359533edf92f94015f4908870e94b9e7c5854d5116",
+          "start": 3790
+        },
+        {
           "end": 4418,
-          "sha256": "ba57745e31fa7fafb1b6455f0c8fd08acb31d63cdd2519c7b803a10a1e8b1fbb",
-          "start": 4073
+          "sha256": "99843ec3844a5450e00691480796733bd29bcea8e15d456ffd41729774ffda64",
+          "start": 4072
+        },
+        {
+          "end": 4555,
+          "sha256": "88a47b30a1a4087195bff88980e538d041598fef95c4cb118371471a5fa8dbc9",
+          "start": 4471
+        },
+        {
+          "end": 4650,
+          "sha256": "ee7772dfbd93072b385d43fe4172ba66d047e71d693fb83a2d036cffae1bff4b",
+          "start": 4556
         },
         {
           "end": 4781,
@@ -458,6 +517,16 @@
           "start": 5137
         },
         {
+          "end": 4883,
+          "sha256": "20668ba5cd5be2d8a64d263904b04214b000e08c496adff6f210ff9830e1a9c7",
+          "start": 4852
+        },
+        {
+          "end": 5221,
+          "sha256": "1456686a208f052d9c1b706475f2a7dfa16b388a21ce320ae9e77fe79f8cd575",
+          "start": 5156
+        },
+        {
           "end": 5389,
           "sha256": "03e3ddb2bd38da541d141165565cd10386eafa0831ad98d2fa59c8c0fe88cb47",
           "start": 5223
@@ -468,9 +537,19 @@
           "start": 5415
         },
         {
+          "end": 5591,
+          "sha256": "74013c3d8a0238b6cdc00af0a8e5af2fe4fcf5f9334948408c2e6d09bf500a78",
+          "start": 5471
+        },
+        {
           "end": 5954,
           "sha256": "924155b4305b53049d780d1ae603e80efb1250c3d7f43129f0ebdbdd074305c4",
           "start": 5820
+        },
+        {
+          "end": 5961,
+          "sha256": "1a12067d0cb652e36cc542bb850ae0c50cb0e2f4b03ad342dfb2003c5e23910b",
+          "start": 5896
         },
         {
           "end": 6060,
@@ -488,9 +567,19 @@
           "start": 6230
         },
         {
+          "end": 6350,
+          "sha256": "974395aa80bb1fc2751475ae4e2de67988cf37d2163eca87a2a078276cad418c",
+          "start": 6278
+        },
+        {
           "end": 6618,
           "sha256": "794ae75a5495d52ac687b37006fde5d88fa76d9f2b2c6d7de5dce5b9bcfcbeb1",
           "start": 6429
+        },
+        {
+          "end": 6728,
+          "sha256": "d9d8e9a36cdb62ca3cad57b000ace844811080ce0f401d543a4c6364563d9736",
+          "start": 6667
         },
         {
           "end": 6768,
@@ -509,6 +598,10 @@
           150
         ],
         [
+          332,
+          403
+        ],
+        [
           421,
           1022
         ],
@@ -517,24 +610,60 @@
           1350
         ],
         [
-          1427,
+          1398,
           1513
+        ],
+        [
+          1988,
+          2713
         ],
         [
           2745,
           3020
         ],
         [
+          3013,
+          3036
+        ],
+        [
+          3041,
+          3105
+        ],
+        [
           3105,
           3206
+        ],
+        [
+          3265,
+          3314
         ],
         [
           3320,
           3502
         ],
         [
-          4073,
+          3568,
+          3640
+        ],
+        [
+          3716,
+          3788
+        ],
+        [
+          3790,
+          4071
+        ],
+        [
+          4072,
           4418
+        ],
+        [
+          4471,
+          4555
+        ],
+        [
+          4556,
+          4650
         ],
         [
           4716,
@@ -553,6 +682,14 @@
           5154
         ],
         [
+          4852,
+          4883
+        ],
+        [
+          5156,
+          5221
+        ],
+        [
           5223,
           5389
         ],
@@ -561,8 +698,16 @@
           5585
         ],
         [
+          5471,
+          5591
+        ],
+        [
           5820,
           5954
+        ],
+        [
+          5896,
+          5961
         ],
         [
           5956,
@@ -577,8 +722,16 @@
           6286
         ],
         [
+          6278,
+          6350
+        ],
+        [
           6429,
           6618
+        ],
+        [
+          6667,
+          6728
         ],
         [
           6730,
@@ -710,8 +863,13 @@
           "start": 20
         },
         {
-          "end": 182,
-          "sha256": "50e3b91e2b08d8108b0a27d0d15d445875876e771ed3647983d42cd610af538a",
+          "end": 79,
+          "sha256": "d79656f19e06507857d476e2d07482f01c0d86ba8e0019f857fd75c8d6055b43",
+          "start": 70
+        },
+        {
+          "end": 184,
+          "sha256": "7f21fc4bd27a95cf30fc29aa7d9329992d93e04345759775cce2391afef28bea",
           "start": 121
         },
         {
@@ -732,8 +890,12 @@
           23
         ],
         [
+          70,
+          79
+        ],
+        [
           121,
-          182
+          184
         ],
         [
           340,
@@ -776,7 +938,21 @@
     },
     {
       "path": "src/Settings.h",
+      "region_hashes": [
+        {
+          "end": 49,
+          "sha256": "ab2bb5ab3caf0f0b444828292ce85334b14c12bd74eeddb236995a62ade420f6",
+          "start": 1
+        }
+      ],
       "review": "Only first precompiled-header include spelling differs; consumed definitions have identical bytes. Catalog revision remains the behavioral authority.",
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          49
+        ]
+      ],
       "sha256": {
         "114e89fa584f0e1a81eb0a679aabf41af8870072": "8d6fc829a2620c5f7e3efc073485645a48bd9ca9bc183210eca60b2ea5ecfdf8",
         "ef738406b61ad06bae2f402857e464735ab106a2": "ab2bb5ab3caf0f0b444828292ce85334b14c12bd74eeddb236995a62ade420f6"
@@ -785,6 +961,20 @@
     },
     {
       "path": "src/Settings.cpp",
+      "region_hashes": [
+        {
+          "end": 65,
+          "sha256": "88db66374e0623b10626fee2c2e5e1acfc97d3b990ae51bd3a17cd99ff5bc9cc",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          65
+        ]
+      ],
       "sha256": {
         "114e89fa584f0e1a81eb0a679aabf41af8870072": "88db66374e0623b10626fee2c2e5e1acfc97d3b990ae51bd3a17cd99ff5bc9cc",
         "ef738406b61ad06bae2f402857e464735ab106a2": "88db66374e0623b10626fee2c2e5e1acfc97d3b990ae51bd3a17cd99ff5bc9cc"
@@ -793,6 +983,20 @@
     },
     {
       "path": "src/Settings_Blue.cpp",
+      "region_hashes": [
+        {
+          "end": 66,
+          "sha256": "7d0bceba8440594504a9d972a1b0e8c6b4255602fe4525ff790e68bb87a1d553",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          66
+        ]
+      ],
       "sha256": {
         "114e89fa584f0e1a81eb0a679aabf41af8870072": "7d0bceba8440594504a9d972a1b0e8c6b4255602fe4525ff790e68bb87a1d553",
         "ef738406b61ad06bae2f402857e464735ab106a2": "7d0bceba8440594504a9d972a1b0e8c6b4255602fe4525ff790e68bb87a1d553"
@@ -862,6 +1066,20 @@
     },
     {
       "path": "python/destiny/_util/settings.py",
+      "region_hashes": [
+        {
+          "end": 31,
+          "sha256": "6cbb1915a8a3fdfe0e79f1e25dc6b518430c4bf859a89fbe4726353d1949f78f",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          31
+        ]
+      ],
       "sha256": {
         "114e89fa584f0e1a81eb0a679aabf41af8870072": "6cbb1915a8a3fdfe0e79f1e25dc6b518430c4bf859a89fbe4726353d1949f78f",
         "ef738406b61ad06bae2f402857e464735ab106a2": "6cbb1915a8a3fdfe0e79f1e25dc6b518430c4bf859a89fbe4726353d1949f78f"
@@ -1036,6 +1254,16 @@
       "path": "src/Thunkers.cpp",
       "region_hashes": [
         {
+          "end": 187,
+          "sha256": "427d2bb054dcb6f8057ed015f4ddf0a619770be92e8b5584e12001ed692b89de",
+          "start": 66
+        },
+        {
+          "end": 324,
+          "sha256": "9a5ea2e69b20162e767e7ddb51196b20a6ce6bf81af8a0b595e1165754ad9434",
+          "start": 304
+        },
+        {
           "end": 430,
           "sha256": "fd54bf67761ce8bd4599a4098389cc21f26ac6a3e173bd0529c89f341b3a4fa2",
           "start": 356
@@ -1066,6 +1294,11 @@
           "start": 1948
         },
         {
+          "end": 2077,
+          "sha256": "a66d128a11c69600abdf8757b95a2c376019dda738de92dd1b1c0bbc4c4b89c7",
+          "start": 2044
+        },
+        {
           "end": 2260,
           "sha256": "c120f97b0742c5df8d54b8ad5ff42ed475d86f20aaead09b0606df35df6af9cd",
           "start": 2083
@@ -1094,6 +1327,14 @@
       "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
       "reviewed_regions_at_behavioral_revision": [
         [
+          66,
+          187
+        ],
+        [
+          304,
+          324
+        ],
+        [
           356,
           430
         ],
@@ -1116,6 +1357,10 @@
         [
           1948,
           2043
+        ],
+        [
+          2044,
+          2077
         ],
         [
           2083,
@@ -1346,9 +1591,119 @@
         "ef738406b61ad06bae2f402857e464735ab106a2": "15ea652f881119c759c31b4ae7ef933a4b938a692afe6de35ce404183101ae9e"
       },
       "status": "INCLUDE_SPELLING_ONLY"
+    },
+    {
+      "path": "python/destiny/test/net/client/helpers.py",
+      "region_hashes": [
+        {
+          "end": 47,
+          "sha256": "cec8132f3bd0fb003ae8f044528a851c5ca206570189a64497408d3966b24142",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          47
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "9312dc7e7c7e344b70bb5c9ebeb1e658de99ce6d00963238a28d27955b57d587"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/net/client/_ticker.py",
+      "region_hashes": [
+        {
+          "end": 340,
+          "sha256": "b33b36df9169475e8de431917b22c2aecc795ce81b3fb34f9f8c82350201b9b2",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          340
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "1d71c02a3ce57811791b7bd4308973a1a7831da4859748944329628bb32dacb8",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "1d71c02a3ce57811791b7bd4308973a1a7831da4859748944329628bb32dacb8"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/net/client/_baseticker.py",
+      "region_hashes": [
+        {
+          "end": 130,
+          "sha256": "3d4c1eca90474534522880cd9be59a032b7053fab2430353ef06e56feb5226c2",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          130
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "8450b02dfd8fa44c56625a2f8e8e3521496d43cdae6c74b9e63d59073d12c48d",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "8450b02dfd8fa44c56625a2f8e8e3521496d43cdae6c74b9e63d59073d12c48d"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "src/CollisionBallProperties.cpp",
+      "region_hashes": [
+        {
+          "end": 260,
+          "sha256": "d34bbd39972304abfd5d7f205a281dca01ca5942c2601cc05c68f00a73935097",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          260
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "d34bbd39972304abfd5d7f205a281dca01ca5942c2601cc05c68f00a73935097",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "d34bbd39972304abfd5d7f205a281dca01ca5942c2601cc05c68f00a73935097"
+      },
+      "status": "IDENTICAL"
+    },
+    {
+      "path": "python/destiny/_util/decometaclass.py",
+      "region_hashes": [
+        {
+          "end": 74,
+          "sha256": "2d1bd65716650e58b160bafb19ed592515ba2d377565c354a9de2f10374e9d29",
+          "start": 1
+        }
+      ],
+      "review_scope": "Definitions used by the implemented concrete scenario projection; all other definitions and native correspondence remain unreviewed.",
+      "reviewed_regions_at_behavioral_revision": [
+        [
+          1,
+          74
+        ]
+      ],
+      "sha256": {
+        "114e89fa584f0e1a81eb0a679aabf41af8870072": "2d1bd65716650e58b160bafb19ed592515ba2d377565c354a9de2f10374e9d29",
+        "ef738406b61ad06bae2f402857e464735ab106a2": "2d1bd65716650e58b160bafb19ed592515ba2d377565c354a9de2f10374e9d29"
+      },
+      "status": "IDENTICAL"
     }
   ],
-  "generator_sha256": "7536ea82997321ac9cbb3ad6bf2052d98ddc503ae8398d03960c81d029a65fcc",
+  "generator_sha256": "1b4070dbcdbeadc2f056b159c69ce39234c48ffcea376d769574e36dcf8ecd01",
   "implementation_review": "Previously reviewed geometry/collision/box/formation/settings/history definitions retained. Additional consumed partition/initialization/query/attribute-notification and batcher, collision/evolution/Orbit/callback/visibility/remote-follower and static partition definitions have explicit line-region hashes. NaN inflated radius affects comparisons, not the coordinate cast; finite-coordinate insertion is retained. Partition.h has a substantive hasher difference. File comparisons and region review do not establish native allocation, Python, compiler, math or production refinement. Missing include/Ball.h is retained as a historical unresolved path; the actual consumed definition is src/Ball.h.",
   "note": "File comparison alone does not review all implementation dependencies or discharge a reference correspondence obligation.",
   "numeric_dependency_review": {

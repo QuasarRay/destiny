@@ -31,7 +31,7 @@ pub struct NetworkAction {
     pub name: ActionName,
     pub parameters: BoundedList<ActionValue, 8>,
     pub local_argument: Option<ActionValue>,
-    pub stream:Option<crate::OriginalStream>,
+    pub stream: Option<crate::OriginalStream>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -73,14 +73,39 @@ impl Default for NetworkActions {
 }
 
 impl NetworkActions {
-    pub fn add_stream_to_system_history(&mut self,id:i64,stream:crate::OriginalStream)->Result<(),NetworkActionError> {
-        let record=NetworkActionRecord{ball_id:ActionValue::Integer(id),timestamp:self.stamp_for_system,
-            action:NetworkAction{name:ActionName::AddBallsToPark,parameters:BoundedList::new(),local_argument:None,stream:Some(stream)}};
-        if self.system_history.get(self.system_history.len().saturating_sub(1))!=Some(record)
-            && !self.system_history.push(record) { return Err(NetworkActionError::CapacityExceeded); }Ok(())
+    pub fn add_stream_to_system_history(
+        &mut self,
+        id: i64,
+        stream: crate::OriginalStream,
+    ) -> Result<(), NetworkActionError> {
+        let record = NetworkActionRecord {
+            ball_id: ActionValue::Integer(id),
+            timestamp: self.stamp_for_system,
+            action: NetworkAction {
+                name: ActionName::AddBallsToPark,
+                parameters: BoundedList::new(),
+                local_argument: None,
+                stream: Some(stream),
+            },
+        };
+        if self
+            .system_history
+            .get(self.system_history.len().saturating_sub(1))
+            != Some(record)
+            && !self.system_history.push(record)
+        {
+            return Err(NetworkActionError::CapacityExceeded);
+        }
+        Ok(())
     }
-    pub fn add_ball_not_global(&mut self,id:i64,bubble:i64)->Result<(),NetworkActionError> {
-        self.add_to_system_history(ActionValue::Integer(id),ActionName::BallNotGlobal,&[ActionValue::Integer(bubble)],false,None)
+    pub fn add_ball_not_global(&mut self, id: i64, bubble: i64) -> Result<(), NetworkActionError> {
+        self.add_to_system_history(
+            ActionValue::Integer(id),
+            ActionName::BallNotGlobal,
+            &[ActionValue::Integer(bubble)],
+            false,
+            None,
+        )
     }
     /// TestActions.setUp creates an empty master park at currentTime=0. This
     /// constructor models that observed state, not arbitrary Python parks.
@@ -140,7 +165,7 @@ impl NetworkActions {
                 name,
                 parameters,
                 local_argument,
-                stream:None,
+                stream: None,
             },
         };
         if self.system_history.is_empty()

@@ -4,28 +4,33 @@
 // these concrete empty-park scenarios need at most three actions. Primitive
 // values retain their original integer/float/bool types. No kani::assume.
 
-use destiny_original_spec::{ActionName, ActionValue as V, BoundedList, NetworkAction,
-    NetworkActionError, NetworkActionHistory, NetworkActionRecord, NetworkActions,
-    OriginalParkProjection, OriginalBallInit, NetworkBallProjection, Vec3};
+use destiny_original_spec::{
+    ActionName, ActionValue as V, BoundedList, NetworkAction, NetworkActionError,
+    NetworkActionHistory, NetworkActionRecord, NetworkActions, NetworkBallProjection,
+    OriginalBallInit, OriginalParkProjection, Vec3,
+};
 
 // Input adapter for the reviewed native-fixture state projection. Every
 // created ID is listed by the caller. Native constructor/Blue/spatial and
 // Python representation correspondence remain required, never assumed.
 fn refresh_fixture_balls(actions: &mut NetworkActions, park: &OriginalParkProjection, ids: &[i64]) {
-    actions.balls=BoundedList::new();
-    let mut i=0_usize;
-    while i<ids.len() {
-        if let Some(id)=ids.get(i) {
+    actions.balls = BoundedList::new();
+    let mut i = 0_usize;
+    while i < ids.len() {
+        if let Some(id) = ids.get(i) {
             if park.contains(*id) {
-                let ball=park.retained(*id);
+                let ball = park.retained(*id);
                 assert!(actions.balls.push(NetworkBallProjection {
-                    id:V::Integer(ball.id),old_bubble_id:ball.old_bubble,
-                    new_bubble_id:ball.new_bubble,cloak_mode:i64::from(ball.is_cloaked),
-                    is_interactive:ball.is_interactive,speed_fraction:f64::from(ball.speed_fraction),
+                    id: V::Integer(ball.id),
+                    old_bubble_id: ball.old_bubble,
+                    new_bubble_id: ball.new_bubble,
+                    cloak_mode: i64::from(ball.is_cloaked),
+                    is_interactive: ball.is_interactive,
+                    speed_fraction: f64::from(ball.speed_fraction),
                 }));
             }
         }
-        i=i.saturating_add(1);
+        i = i.saturating_add(1);
     }
 }
 
@@ -40,10 +45,17 @@ fn action(name: ActionName, arguments: &[V], local_argument: Option<V>) -> Netwo
     let mut parameters = BoundedList::new();
     let mut i: usize = 0;
     while i < arguments.len() {
-        if let Some(value) = arguments.get(i) { assert!(parameters.push(*value)); }
+        if let Some(value) = arguments.get(i) {
+            assert!(parameters.push(*value));
+        }
         i = i.saturating_add(1);
     }
-    NetworkAction { name, parameters, local_argument, stream:None }
+    NetworkAction {
+        name,
+        parameters,
+        local_argument,
+        stream: None,
+    }
 }
 
 fn records(entries: &[(V, i64, NetworkAction)]) -> NetworkActionHistory {
@@ -51,20 +63,34 @@ fn records(entries: &[(V, i64, NetworkAction)]) -> NetworkActionHistory {
     let mut i: usize = 0;
     while i < entries.len() {
         if let Some((ball_id, timestamp, action)) = entries.get(i) {
-            assert!(result.push(NetworkActionRecord { ball_id: *ball_id,
-                timestamp: *timestamp, action: *action }));
+            assert!(result.push(NetworkActionRecord {
+                ball_id: *ball_id,
+                timestamp: *timestamp,
+                action: *action
+            }));
         }
         i = i.saturating_add(1);
     }
     result
 }
 
-fn contains_record(history: NetworkActionHistory, ball_id: V, timestamp: i64,
-    action: NetworkAction) -> bool
-{
+fn contains_record(
+    history: NetworkActionHistory,
+    ball_id: V,
+    timestamp: i64,
+    action: NetworkAction,
+) -> bool {
     let mut i: usize = 0;
     while i < history.len() {
-        if history.get(i) == Some(NetworkActionRecord { ball_id, timestamp, action }) { return true; }
+        if history.get(i)
+            == Some(NetworkActionRecord {
+                ball_id,
+                timestamp,
+                action,
+            })
+        {
+            return true;
+        }
         i = i.saturating_add(1);
     }
     false
@@ -1388,19 +1414,51 @@ fn get_pending_speed_fraction_returns_none_when_ball_does_not_exist() {
 #[cfg_attr(test, test)]
 fn cloak_existing_ball() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
     let uncloak_range_meters = V::Float(1000.0);
     let cloak_mode = V::Integer(1);
-    let success = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.cloak_ball(V::Integer(ball), cloak_mode, uncloak_range_meters) };
+    let success = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.cloak_ball(V::Integer(ball), cloak_mode, uncloak_range_meters)
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:411
     assert!(success == Ok(true));
-    let expected_action = action(ActionName::CloakBall, &[V::Integer(ball), cloak_mode, uncloak_range_meters], Some(V::Integer(park.retained(ball).old_bubble)));
+    let expected_action = action(
+        ActionName::CloakBall,
+        &[V::Integer(ball), cloak_mode, uncloak_range_meters],
+        Some(V::Integer(park.retained(ball).old_bubble)),
+    );
     // original-assertion: python/destiny/test/net/server/test_actions.py:413
-    assert!(actions.flush_history() == records(&[(V::Integer(ball), INITIAL_TIMESTAMP, expected_action)]));
+    assert!(
+        actions.flush_history()
+            == records(&[(V::Integer(ball), INITIAL_TIMESTAMP, expected_action)])
+    );
     // Original tearDown: ClearAll, release objects, reset settings.
     actions.clear_park();
     actions.reset_settings_to_default();
@@ -1408,7 +1466,10 @@ fn cloak_existing_ball() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_has_pending_cloak_returns_true_when_pending_cloak
@@ -1418,13 +1479,44 @@ fn cloak_existing_ball() {
 #[cfg_attr(test, test)]
 fn has_pending_cloak_returns_true_when_pending_cloak() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    assert!(matches!({ refresh_fixture_balls(&mut actions, &park, &[ball]); actions.cloak_ball(V::Integer(ball), V::Integer(1), V::Float(1000.0)) }, Ok(_))); // ignored original bool; no unexpected error
-    let has_pending_cloak = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.has_pending_cloak(V::Integer(ball)) };
+    assert!(matches!(
+        {
+            refresh_fixture_balls(&mut actions, &park, &[ball]);
+            actions.cloak_ball(V::Integer(ball), V::Integer(1), V::Float(1000.0))
+        },
+        Ok(_)
+    )); // ignored original bool; no unexpected error
+    let has_pending_cloak = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.has_pending_cloak(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:471
     assert!(has_pending_cloak);
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1434,7 +1526,10 @@ fn has_pending_cloak_returns_true_when_pending_cloak() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_get_pending_cloak_mode_returns_existing_mode_when_no_cloak_pending
@@ -1444,12 +1539,37 @@ fn has_pending_cloak_returns_true_when_pending_cloak() {
 #[cfg_attr(test, test)]
 fn get_pending_cloak_mode_returns_existing_mode_when_no_cloak_pending() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    let cloak_mode = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.get_pending_cloak_mode(V::Integer(ball)) };
+    let cloak_mode = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.get_pending_cloak_mode(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:489
     assert!(Some(V::Integer(0)) == cloak_mode);
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1459,7 +1579,10 @@ fn get_pending_cloak_mode_returns_existing_mode_when_no_cloak_pending() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_get_pending_cloak_mode_returns_pending_cloak_mode_when_no_cloak_pending
@@ -1469,13 +1592,44 @@ fn get_pending_cloak_mode_returns_existing_mode_when_no_cloak_pending() {
 #[cfg_attr(test, test)]
 fn get_pending_cloak_mode_returns_pending_cloak_mode_when_no_cloak_pending() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    assert!(matches!({ refresh_fixture_balls(&mut actions, &park, &[ball]); actions.cloak_ball(V::Integer(ball), V::Integer(1), V::Float(1000.0)) }, Ok(_))); // ignored original bool; no unexpected error
-    let cloak_mode = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.get_pending_cloak_mode(V::Integer(ball)) };
+    assert!(matches!(
+        {
+            refresh_fixture_balls(&mut actions, &park, &[ball]);
+            actions.cloak_ball(V::Integer(ball), V::Integer(1), V::Float(1000.0))
+        },
+        Ok(_)
+    )); // ignored original bool; no unexpected error
+    let cloak_mode = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.get_pending_cloak_mode(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:495
     assert!(Some(V::Integer(1)) == cloak_mode);
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1485,7 +1639,10 @@ fn get_pending_cloak_mode_returns_pending_cloak_mode_when_no_cloak_pending() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_has_pending_set_free_returns_false_when_freedom_not_pending_and_ball_already_free
@@ -1495,13 +1652,38 @@ fn get_pending_cloak_mode_returns_pending_cloak_mode_when_no_cloak_pending() {
 #[cfg_attr(test, test)]
 fn has_pending_set_free_returns_false_when_freedom___f6b8db657af44c43924eafbc() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
     park.set_free(ball, true);
-    let freedom_pending = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.has_pending_set_free(V::Integer(ball)) };
+    let freedom_pending = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.has_pending_set_free(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:505
     assert!(!freedom_pending.truthy());
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1511,7 +1693,10 @@ fn has_pending_set_free_returns_false_when_freedom___f6b8db657af44c43924eafbc() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_has_pending_set_not_free_returns_false_when_freedom_removal_not_pending_and_ball_already_not_free
@@ -1521,13 +1706,38 @@ fn has_pending_set_free_returns_false_when_freedom___f6b8db657af44c43924eafbc() 
 #[cfg_attr(test, test)]
 fn has_pending_set_not_free_returns_false_when_free__0eb7dc0d21593f2370d96ad8() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
     park.set_free(ball, false);
-    let freedom_removal_pending = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.has_pending_set_not_free(V::Integer(ball)) };
+    let freedom_removal_pending = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.has_pending_set_not_free(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:520
     assert!(!freedom_removal_pending.truthy());
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1537,7 +1747,10 @@ fn has_pending_set_not_free_returns_false_when_free__0eb7dc0d21593f2370d96ad8() 
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_get_pending_interactive_state_returns_current_state_when_ball_exists
@@ -1547,12 +1760,37 @@ fn has_pending_set_not_free_returns_false_when_free__0eb7dc0d21593f2370d96ad8() 
 #[cfg_attr(test, test)]
 fn get_pending_interactive_state_returns_current_state_when_ball_exists() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    let state = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.get_pending_interactive_state(V::Integer(ball)) };
+    let state = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.get_pending_interactive_state(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:534
     assert!(Some(V::Boolean(true)) == state);
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1562,7 +1800,10 @@ fn get_pending_interactive_state_returns_current_state_when_ball_exists() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_get_pending_interactive_state_returns_pending_state_when_available
@@ -1572,13 +1813,43 @@ fn get_pending_interactive_state_returns_current_state_when_ball_exists() {
 #[cfg_attr(test, test)]
 fn get_pending_interactive_state_returns_pending_state_when_available() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    assert!({ refresh_fixture_balls(&mut actions, &park, &[ball]); actions.set_ball_interactive(V::Integer(ball), V::Boolean(false)) } == Ok(()));
-    let state = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.get_pending_interactive_state(V::Integer(ball)) };
+    assert!(
+        {
+            refresh_fixture_balls(&mut actions, &park, &[ball]);
+            actions.set_ball_interactive(V::Integer(ball), V::Boolean(false))
+        } == Ok(())
+    );
+    let state = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.get_pending_interactive_state(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:540
     assert!(Some(V::Boolean(false)) == state);
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1588,7 +1859,10 @@ fn get_pending_interactive_state_returns_pending_state_when_available() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_get_pending_speed_fraction_returns_current_state_when_ball_exists
@@ -1598,12 +1872,37 @@ fn get_pending_interactive_state_returns_pending_state_when_available() {
 #[cfg_attr(test, test)]
 fn get_pending_speed_fraction_returns_current_state_when_ball_exists() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 0.5_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 0.5_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    let speed_fraction = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.get_pending_speed_fraction(V::Integer(ball)) };
+    let speed_fraction = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.get_pending_speed_fraction(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:549
     assert!(Some(V::Float(0.5)) == speed_fraction);
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1613,7 +1912,10 @@ fn get_pending_speed_fraction_returns_current_state_when_ball_exists() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_get_pending_speed_fraction_returns_pending_state_when_available
@@ -1623,13 +1925,43 @@ fn get_pending_speed_fraction_returns_current_state_when_ball_exists() {
 #[cfg_attr(test, test)]
 fn get_pending_speed_fraction_returns_pending_state_when_available() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 0.5_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 0.5_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    assert!({ refresh_fixture_balls(&mut actions, &park, &[ball]); actions.set_speed_fraction(V::Integer(ball), V::Float(1.0)) } == Ok(()));
-    let speed_fraction = { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.get_pending_speed_fraction(V::Integer(ball)) };
+    assert!(
+        {
+            refresh_fixture_balls(&mut actions, &park, &[ball]);
+            actions.set_speed_fraction(V::Integer(ball), V::Float(1.0))
+        } == Ok(())
+    );
+    let speed_fraction = {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.get_pending_speed_fraction(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:555
     assert!(Some(V::Float(1.0)) == speed_fraction);
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1639,7 +1971,10 @@ fn get_pending_speed_fraction_returns_pending_state_when_available() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_undo_pending_cloak
@@ -1649,13 +1984,44 @@ fn get_pending_speed_fraction_returns_pending_state_when_available() {
 #[cfg_attr(test, test)]
 fn undo_pending_cloak() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
-    assert!(matches!({ refresh_fixture_balls(&mut actions, &park, &[ball]); actions.cloak_ball(V::Integer(ball), V::Integer(1), V::Float(1000.0)) }, Ok(_))); // ignored original bool; no unexpected error
-    { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.undo_pending_cloak(V::Integer(ball)) };
+    assert!(matches!(
+        {
+            refresh_fixture_balls(&mut actions, &park, &[ball]);
+            actions.cloak_ball(V::Integer(ball), V::Integer(1), V::Float(1000.0))
+        },
+        Ok(_)
+    )); // ignored original bool; no unexpected error
+    {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.undo_pending_cloak(V::Integer(ball))
+    };
     // original-assertion: python/destiny/test/net/server/test_actions.py:445
     assert!(actions.flush_history().is_empty());
     // Original tearDown: ClearAll, release objects, reset settings.
@@ -1665,7 +2031,10 @@ fn undo_pending_cloak() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
 
 // original-case: python/destiny/test/net/server/test_actions.py::TestActions::test_undo_pending_cloak_ignores_other_balls
@@ -1675,18 +2044,56 @@ fn undo_pending_cloak() {
 #[cfg_attr(test, test)]
 fn undo_pending_cloak_ignores_other_balls() {
     let mut actions = NetworkActions::new_for_empty_park_at_time_zero();
-    let mut park=OriginalParkProjection::default();
-    park.is_master=true;
+    let mut park = OriginalParkProjection::default();
+    park.is_master = true;
     assert!(!actions.dynamical_orientation); // actual original helper selects old-style AddBall
-    let ball=park.add_ball(OriginalBallInit { id: -(1_i64), mass: 1.0_f64, radius: 1.0_f32, max_velocity: 1.0_f32, is_free: true, is_global: false, is_massive: true, is_interactive: true, is_space_junk: false, agility: 1.0_f32, speed_fraction: 1.0_f32, position: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 }, velocity: Vec3 { x: 0.0_f64, y: 0.0_f64, z: 0.0_f64 } });
+    let ball = park.add_ball(OriginalBallInit {
+        id: -(1_i64),
+        mass: 1.0_f64,
+        radius: 1.0_f32,
+        max_velocity: 1.0_f32,
+        is_free: true,
+        is_global: false,
+        is_massive: true,
+        is_interactive: true,
+        is_space_junk: false,
+        agility: 1.0_f32,
+        speed_fraction: 1.0_f32,
+        position: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+        velocity: Vec3 {
+            x: 0.0_f64,
+            y: 0.0_f64,
+            z: 0.0_f64,
+        },
+    });
     assert!(park.contains(ball) && !park.scope_error); // original helper must create the object
     let uncloak_range_meters = V::Float(1000.0);
     let cloak_mode = V::Integer(1);
-    assert!(matches!({ refresh_fixture_balls(&mut actions, &park, &[ball]); actions.cloak_ball(V::Integer(ball), cloak_mode, uncloak_range_meters) }, Ok(_))); // ignored original bool; no unexpected error
-    { refresh_fixture_balls(&mut actions, &park, &[ball]); actions.undo_pending_cloak(V::Integer(ball + 1_i64)) };
-    let expected_action = action(ActionName::CloakBall, &[V::Integer(ball), cloak_mode, uncloak_range_meters], Some(V::Integer(park.retained(ball).old_bubble)));
+    assert!(matches!(
+        {
+            refresh_fixture_balls(&mut actions, &park, &[ball]);
+            actions.cloak_ball(V::Integer(ball), cloak_mode, uncloak_range_meters)
+        },
+        Ok(_)
+    )); // ignored original bool; no unexpected error
+    {
+        refresh_fixture_balls(&mut actions, &park, &[ball]);
+        actions.undo_pending_cloak(V::Integer(ball + 1_i64))
+    };
+    let expected_action = action(
+        ActionName::CloakBall,
+        &[V::Integer(ball), cloak_mode, uncloak_range_meters],
+        Some(V::Integer(park.retained(ball).old_bubble)),
+    );
     // original-assertion: python/destiny/test/net/server/test_actions.py:454
-    assert!(actions.flush_history() == records(&[(V::Integer(ball), INITIAL_TIMESTAMP, expected_action)]));
+    assert!(
+        actions.flush_history()
+            == records(&[(V::Integer(ball), INITIAL_TIMESTAMP, expected_action)])
+    );
     // Original tearDown: ClearAll, release objects, reset settings.
     actions.clear_park();
     actions.reset_settings_to_default();
@@ -1694,6 +2101,8 @@ fn undo_pending_cloak_ignores_other_balls() {
     park.clear_all();
     assert!(!park.scope_error);
     #[cfg(kani)]
-    kani::cover!(true, "original action assertions and native-fixture projection teardown completed");
+    kani::cover!(
+        true,
+        "original action assertions and native-fixture projection teardown completed"
+    );
 }
-

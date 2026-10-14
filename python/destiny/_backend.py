@@ -5,14 +5,17 @@ from __future__ import annotations
 import base64
 import binascii
 from collections import defaultdict
+from contextlib import contextmanager
 import copy
 import ctypes
 from dataclasses import asdict, dataclass, field
 import json
+import logging
 import math
 import os
 from pathlib import Path
 import sys
+import weakref
 from threading import RLock
 from typing import Any, Protocol, runtime_checkable
 
@@ -75,6 +78,9 @@ class _DbcBuffer(ctypes.Structure):
         ("status", ctypes.c_int32),
     ]
 
+_ModeCallback = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_int64, ctypes.c_uint8, ctypes.c_uint8)
+_EventCallback = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_int64, ctypes.c_uint32, ctypes.c_void_p, ctypes.c_size_t)
+
 
 class NativeBackend:
     """ctypes adapter for the stable JSON-over-C ABI exported by the Rust crate."""
@@ -88,9 +94,152 @@ class NativeBackend:
             raise AbiMismatchError(f"native ABI {actual_version} does not match Python ABI {ABI_VERSION}")
         self._options = dict(options or {})
         self._runtimes: dict[str, int] = {}
+        self._configuration_revisions: dict[str, int] = {}
         self._next_park = 0
         self._active_park: str | None = None
         self._lock = RLock()
+        self._ball_callbacks = weakref.WeakValueDictionary()
+        self._park_callbacks = weakref.WeakValueDictionary()
+        self._bubble_output_frames = []
+
+    def register_park_callback(self, handle, park):
+        if callable(getattr(type(park), "DoBubbleTransitions", None)):
+            if not self._supports_event_callbacks:
+                raise BackendUnavailableError("this ABI library lacks synchronous park callbacks")
+            with self._lock:
+                self._park_callbacks[handle] = park
+
+    @contextmanager
+    def bubble_output_session(self, outputs):
+        with self._lock:
+            frame = {"outputs": outputs, "applied": False}
+            self._bubble_output_frames.append(frame)
+            try:
+                yield frame
+            finally:
+                if not self._bubble_output_frames or self._bubble_output_frames[-1] is not frame:
+                    raise BackendCallError("bubble output frame ownership was lost", code="invalid_backend_response")
+                self._bubble_output_frames.pop()
+
+    def apply_bubble_dictionaries(self, encoded):
+        if not self._bubble_output_frames:
+            raise BackendCallError("missing bubble output caller", code="invalid_backend_response")
+        if not isinstance(encoded, list) or len(encoded) != 4:
+            raise BackendCallError("invalid bubble dictionaries", code="invalid_backend_response")
+        decoded = []
+        for rows in encoded:
+            if not isinstance(rows, list):
+                raise BackendCallError("invalid bubble dictionary rows", code="invalid_backend_response")
+            values = {}
+            for row in rows:
+                if not isinstance(row, list) or len(row) != 2:
+                    raise BackendCallError("invalid bubble dictionary entry", code="invalid_backend_response")
+                key = _integer(row[0], "bubble dictionary key")
+                if key in values:
+                    raise BackendCallError("duplicate bubble dictionary key", code="invalid_backend_response")
+                value = row[1]
+                values[key] = ([_integer(item, "bubble member") for item in value]
+                               if isinstance(value, list) else _integer(value, "bubble reference"))
+            decoded.append(values)
+        frame = self._bubble_output_frames[-1]
+        for target in frame["outputs"]:
+            dict.clear(target)
+        for target, values in zip(frame["outputs"], decoded):
+            dict.update(target, values)
+        frame["applied"] = True
+
+    def register_ball_callback(self, handle: str, ball: Any) -> None:
+        # The most recently bound wrapper handles native notifications, as in
+        # the original Blue wrapping operation. Do not retain the park through
+        # a backend -> wrapper -> park cycle.
+        handlers = [name for name in ("DoModeChange", "DoProximity", "DoRange", "DoTargetTracking", "DoCollision", "DoFinalCleanup")
+                    if callable(getattr(type(ball), name, None))]
+        if not handlers:
+            return
+        if not self._supports_event_callbacks and any(name != "DoModeChange" for name in handlers):
+            raise BackendUnavailableError("this ABI library lacks the synchronous event-callback extension")
+        if not self._supports_event_callbacks and not self._supports_mode_callbacks:
+            raise BackendUnavailableError("this ABI library lacks the synchronous mode-callback extension")
+        with self._lock:
+            self._ball_callbacks[handle] = ball
+
+    def retain_ball(self, handle: str) -> str:
+        with self._lock:
+            parts = handle.split(":")
+            if len(parts) not in {3, 4} or parts[0] != "ball":
+                raise BackendCallError("invalid retained ball target", code="invalid_target")
+            park, ball_id = f"park:{parts[1]}", _integer(int(parts[-1]), "ball id")
+            generation = (int(parts[2]) if len(parts) == 4 else
+                          self.invoke("dbc.compat.Ballpark.ObjectGeneration", "call", park, (ball_id,)))
+            if type(generation) is not int or not 0 < generation < 2**64:
+                raise BackendCallError("invalid object generation", code="invalid_backend_response")
+            self.invoke("dbc.compat.Ballpark.RetainBall", "call", park, (ball_id, generation))
+            return f"ball:{parts[1]}:{generation}:{ball_id}"
+
+    def ball_binding_session(self):
+        """Keep lookup/create and acquisition of its object lease together."""
+        return self._lock
+
+    def release_ball(self, handle: str) -> None:
+        with self._lock:
+            parts = handle.split(":")
+            if len(parts) == 4 and f"park:{parts[1]}" in self._runtimes:
+                self.invoke("dbc.compat.Ballpark.ReleaseBall", "call", f"park:{parts[1]}",
+                            (int(parts[3]), int(parts[2])))
+
+    def _callback_ball(self, park_handle: str, ball_id: int):
+        generation = self.invoke("dbc.compat.Ballpark.ObjectGeneration", "call", park_handle, (int(ball_id),))
+        return self._ball_callbacks.get(f"ball:{park_handle.rsplit(':', 1)[1]}:{generation}:{ball_id}")
+
+    def _mode_callback(self, park_handle: str):
+
+        @_ModeCallback
+        def callback(_context, ball_id, old_mode, new_mode):
+            try:
+                ball = self._callback_ball(park_handle, ball_id)
+                handler = getattr(ball, "DoModeChange", None) if ball is not None else None
+                if handler is not None:
+                    handler(int(old_mode), int(new_mode))
+            except Exception:
+                # Ball::SetMode reports PyError and completes its mode store.
+                # In particular a rejected AddBall must not abort evolution.
+                logging.getLogger(__name__).exception("Destiny DoModeChange callback failed")
+
+        return callback
+
+    def _event_callback(self, park_handle: str):
+        names = {3: "DoProximity", 6: "DoCollision", 7: "DoRange", 8: "DoModeChange", 13: "DoTargetTracking", 15: "DoFinalCleanup"}
+
+        @_EventCallback
+        def callback(_context, ball_id, kind, arguments, length):
+            try:
+                if not arguments or not 0 < length <= MAX_RESPONSE_BYTES:
+                    raise BackendCallError("native event returned invalid arguments", code="invalid_backend_response")
+                args = json.loads(ctypes.string_at(arguments, length).decode("utf-8"), object_pairs_hook=_strict_object_pairs)
+                if not isinstance(args, list):
+                    raise BackendCallError("native event arguments must be a sequence", code="invalid_backend_response")
+                if int(kind) == 14:
+                    if len(args) != 2 or not isinstance(args[0], list):
+                        raise BackendCallError("invalid bubble transition callback", code="invalid_backend_response")
+                    self.apply_bubble_dictionaries(args[1])
+                    park = self._park_callbacks.get(park_handle)
+                    if park is not None:
+                        transitions = []
+                        for row in args[0]:
+                            if not isinstance(row, list) or len(row) != 3:
+                                raise BackendCallError("invalid bubble transition", code="invalid_backend_response")
+                            transitions.append(tuple(_integer(value, "bubble transition") for value in row))
+                        park.DoBubbleTransitions(transitions)
+                    return
+                ball = self._callback_ball(park_handle, ball_id)
+                name = names.get(int(kind))
+                if ball is None or name is None or not callable(getattr(type(ball), name, None)):
+                    return
+                getattr(ball, name)(*args)
+            except Exception:
+                logging.getLogger(__name__).exception("Destiny native event callback failed")
+
+        return callback
 
     def _create_runtime(self, options: dict[str, Any]) -> int:
         try:
@@ -123,19 +272,43 @@ class NativeBackend:
             raise BackendUnavailableError(message.decode("utf-8", "replace"))
         return int(runtime)
 
-    def _select_runtime(self, target: str | None) -> tuple[str, int]:
+    def _select_runtime(self, target: str | None, *, synchronize_configuration: bool = True) -> tuple[str, int]:
         handle = None
         if target and target.startswith("park:"):
             handle = target
         elif target and target.startswith("ball:"):
             parts = target.split(":")
-            if len(parts) == 3 and parts[1].isdigit():
+            if len(parts) in {3, 4} and parts[1].isdigit():
                 handle = f"park:{parts[1]}"
         elif target is None:
             handle = self._active_park
         if handle not in self._runtimes:
             raise BackendCallError(f"invalid ballpark target {target!r}", code="invalid_target")
         self._active_park = handle
+        if not synchronize_configuration:
+            return handle, self._runtimes[handle]
+        from ._settings import settings
+
+        revision, configuration = settings._snapshot()
+        previous = self._configuration_revisions[handle]
+        if revision != previous:
+            # Read one immutable validated settings value without holding its
+            # lock across a native call. Reentry owns the same backend RLock.
+            # Mark this version before the nested call to avoid recursive sync;
+            # failure restores the marker so an unperformed update is not lost.
+            self._configuration_revisions[handle] = revision
+            try:
+                self.invoke("dbc.compat.Runtime.Configure", "call", handle, (
+                    self._options.get("collision_substeps", configuration.collisionMaxIterations),
+                    self._options.get("use_iterative_collision", configuration.useIterativeCollision),
+                    self._options.get("use_new_orbit", configuration.useNewOrbit),
+                    self._options.get("use_dynamical_orientation", configuration.useDynamicalOrientation),
+                    self._options.get("disable_dynamical_orientation_for_missiles", configuration.disableDynamicalOrientationForMissiles),
+                ))
+            except Exception:
+                if self._configuration_revisions.get(handle) == revision:
+                    self._configuration_revisions[handle] = previous
+                raise
         return handle, self._runtimes[handle]
 
     def _configure_symbols(self) -> None:
@@ -150,6 +323,26 @@ class NativeBackend:
         library.dbc_runtime_call.restype = _DbcBuffer
         library.dbc_runtime_update.argtypes = [ctypes.c_void_p]
         library.dbc_runtime_update.restype = _DbcBuffer
+        self._supports_mode_callbacks = all(hasattr(library, name) for name in (
+            "dbc_runtime_call_with_mode_callback", "dbc_runtime_update_with_mode_callback",
+        ))
+        if self._supports_mode_callbacks:
+            library.dbc_runtime_call_with_mode_callback.argtypes = [
+                ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, _ModeCallback, ctypes.c_void_p,
+            ]
+            library.dbc_runtime_call_with_mode_callback.restype = _DbcBuffer
+            library.dbc_runtime_update_with_mode_callback.argtypes = [ctypes.c_void_p, _ModeCallback, ctypes.c_void_p]
+            library.dbc_runtime_update_with_mode_callback.restype = _DbcBuffer
+        self._supports_event_callbacks = all(hasattr(library, name) for name in (
+            "dbc_runtime_call_with_event_callback", "dbc_runtime_update_with_event_callback",
+        ))
+        if self._supports_event_callbacks:
+            library.dbc_runtime_call_with_event_callback.argtypes = [
+                ctypes.c_void_p, ctypes.c_void_p, ctypes.c_size_t, _EventCallback, ctypes.c_void_p,
+            ]
+            library.dbc_runtime_call_with_event_callback.restype = _DbcBuffer
+            library.dbc_runtime_update_with_event_callback.argtypes = [ctypes.c_void_p, _EventCallback, ctypes.c_void_p]
+            library.dbc_runtime_update_with_event_callback.restype = _DbcBuffer
         library.dbc_buffer_free.argtypes = [_DbcBuffer]
         library.dbc_buffer_free.restype = None
 
@@ -217,7 +410,7 @@ class NativeBackend:
                 options["is_master"] = _boolean(args[0], "isMaster") if args else False
                 from ._settings import settings
 
-                configuration = settings.Get()
+                revision, configuration = settings._snapshot()
                 options.setdefault("collision_substeps", configuration.collisionMaxIterations)
                 options.setdefault("use_iterative_collision", configuration.useIterativeCollision)
                 options.setdefault("use_dynamical_orientation", configuration.useDynamicalOrientation)
@@ -227,9 +420,11 @@ class NativeBackend:
                 )
                 options.setdefault("use_new_orbit", configuration.useNewOrbit)
                 self._runtimes[handle] = self._create_runtime(options)
+                self._configuration_revisions[handle] = revision
                 self._active_park = handle
                 return handle
-            park_handle, runtime = self._select_runtime(target)
+            park_handle, runtime = self._select_runtime(target,
+                synchronize_configuration=canonical_title != "dbc.compat.Runtime.Configure")
             request = {
                 "title": canonical_title,
                 "operation": operation,
@@ -249,7 +444,14 @@ class NativeBackend:
                 raise BackendCallError("request must contain finite JSON values", code="invalid_request") from exc
             # Keep selection and the synchronous native call under one lock so
             # another thread cannot close this runtime between those steps.
-            buffer = self._library.dbc_runtime_call(runtime, encoded, len(encoded))
+            if self._supports_event_callbacks:
+                callback = self._event_callback(park_handle)
+                buffer = self._library.dbc_runtime_call_with_event_callback(runtime, encoded, len(encoded), callback, None)
+            elif self._supports_mode_callbacks:
+                callback = self._mode_callback(park_handle)
+                buffer = self._library.dbc_runtime_call_with_mode_callback(runtime, encoded, len(encoded), callback, None)
+            else:
+                buffer = self._library.dbc_runtime_call(runtime, encoded, len(encoded))
             status = int(buffer.status)
             raw = self._consume(buffer)
             if len(raw) > MAX_RESPONSE_BYTES:
@@ -322,6 +524,8 @@ class NativeBackend:
             )
         if code == "ball_not_found":
             raise BallNotFoundError(_integer(error.get("ball_id"), "native missing ball id"))
+        if code == "value_error":
+            raise ValueError(message)
         raise BackendCallError(
             message,
             code=code,
@@ -330,8 +534,15 @@ class NativeBackend:
 
     def update(self, target: str | None = None) -> None:
         with self._lock:
-            _, runtime = self._select_runtime(target)
-            buffer = self._library.dbc_runtime_update(runtime)
+            park_handle, runtime = self._select_runtime(target)
+            if self._supports_event_callbacks:
+                callback = self._event_callback(park_handle)
+                buffer = self._library.dbc_runtime_update_with_event_callback(runtime, callback, None)
+            elif self._supports_mode_callbacks:
+                callback = self._mode_callback(park_handle)
+                buffer = self._library.dbc_runtime_update_with_mode_callback(runtime, callback, None)
+            else:
+                buffer = self._library.dbc_runtime_update(runtime)
             status = int(buffer.status)
             raw = self._consume(buffer)
         if len(raw) > MAX_RESPONSE_BYTES:
@@ -370,11 +581,16 @@ class NativeBackend:
             if not isinstance(target, str) or not target.startswith("park:"):
                 raise BackendCallError(f"invalid ballpark target {target!r}", code="invalid_target")
             runtime = self._runtimes.pop(target, None)
+            self._configuration_revisions.pop(target, None)
             if runtime is None:
                 return
             if self._active_park == target:
                 self._active_park = next(iter(self._runtimes), None)
             self._library.dbc_runtime_free(runtime)
+            prefix = f"ball:{target.rsplit(':', 1)[1]}:"
+            for handle in tuple(self._ball_callbacks):
+                if handle.startswith(prefix):
+                    self._ball_callbacks.pop(handle, None)
 
     def close(self) -> None:
         lock = getattr(self, "_lock", None)
@@ -385,6 +601,8 @@ class NativeBackend:
             for runtime in tuple(runtimes.values()):
                 self._library.dbc_runtime_free(runtime)
             runtimes.clear()
+            self._configuration_revisions.clear()
+            self._ball_callbacks.clear()
             self._active_park = None
 
     def __del__(self) -> None:
@@ -431,6 +649,8 @@ class _ParkState:
     tick_interval_ms: float = 1000.0
     friction: float = 1_000_000.0
     current_time: int = 0
+    local_counter: int = -1
+    local_high_counter: int = -(1 << 30)
     time: int = 0
     ego: int = 0
     balls: dict[int, _BallState] = field(default_factory=dict)
@@ -726,13 +946,12 @@ def _validate_mini_descriptor(row: Any) -> None:
         radius = _finite_number(row.get("radius"), "mini capsule radius")
         if (
             not math.isfinite(distance)
-            or distance == 0.0
             or distance > MAX_COORDINATE
             or radius <= 0.0
             or radius > MAX_RADIUS
             or any(abs(value) > MAX_COORDINATE for value in (*a, *b))
         ):
-            raise ValueError("mini capsule needs distinct endpoints and a positive radius")
+            raise ValueError("mini capsule needs finite endpoints and a positive radius")
         return
     if kind == "box":
         if set(row) != {"kind", "basis"}:
@@ -1455,6 +1674,8 @@ class InMemoryBackend:
                     "tick_interval_ms": self._park.tick_interval_ms,
                     "friction": self._park.friction,
                     "current_time": self._park.current_time,
+                    "local_counter": self._park.local_counter,
+                    "local_high_counter": self._park.local_high_counter,
                     "time": self._park.time,
                     # A filtered/subset snapshot must be independently
                     # restorable. Do not retain an ego reference to a ball the
@@ -1608,7 +1829,7 @@ class InMemoryBackend:
             }
             if (
                 not isinstance(park_row, dict)
-                or not expected_park_fields <= set(park_row) <= expected_park_fields | {"formations"}
+                or not expected_park_fields <= set(park_row) <= expected_park_fields | {"formations", "local_counter", "local_high_counter"}
             ):
                 raise BackendCallError("snapshot park fields do not match schema v3", code="invalid_snapshot")
             try:
@@ -1618,6 +1839,8 @@ class InMemoryBackend:
                     "tick_interval_ms": _tick_interval(park_row["tick_interval_ms"], "tick_interval_ms"),
                     "friction": _finite_number(park_row["friction"], "friction"),
                     "current_time": _integer(park_row["current_time"], "current_time"),
+                    "local_counter": _integer(park_row.get("local_counter", -1), "local_counter"),
+                    "local_high_counter": _integer(park_row.get("local_high_counter", -(1 << 30)), "local_high_counter"),
                     "time": _integer(park_row["time"], "time"),
                     "ego": _integer(park_row["ego"], "ego"),
                     "collision_substeps": _integer(park_row["collision_substeps"], "collision_substeps"),

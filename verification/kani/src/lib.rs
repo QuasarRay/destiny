@@ -1,50 +1,77 @@
 #![forbid(unsafe_code)]
 
 #[cfg(kani)]
-mod ball_contracts;
+mod collision_identity_contracts;
+
+#[cfg(any(kani, test))]
+#[path = "../../../src/iterative_collision.rs"]
+mod iterative_collision;
+#[cfg(any(kani, test))]
+#[path = "../../../src/noniterative_collision.rs"]
+mod noniterative_collision;
+#[cfg(any(kani, test))]
+mod noniterative_production_contracts;
+
 #[cfg(any(kani, test))]
 mod add_callback_contracts;
-#[cfg(any(kani, test))]
-mod box_contracts;
 #[cfg(kani)]
-mod bounded_list_contracts;
-#[cfg(any(kani, test))]
-mod bubble_updater_contracts;
+mod ball_contracts;
 #[cfg(any(kani, test))]
 mod batcher_delivery_contracts;
 #[cfg(any(kani, test))]
 mod batcher_stream_contracts;
+#[cfg(kani)]
+mod bounded_list_contracts;
+#[cfg(any(kani, test))]
+mod box_contracts;
+#[cfg(any(kani, test))]
+mod bubble_updater_contracts;
 #[cfg(any(kani, test))]
 mod client_history_contracts;
 #[cfg(any(kani, test))]
 mod client_ticker_contracts;
 #[cfg(kani)]
 mod contracts;
+#[cfg(kani)]
+mod evolution_phase_contracts;
+#[cfg(kani)]
+mod ffi_lifecycle_contracts;
 #[cfg(any(kani, test))]
 mod formation_contracts;
 #[cfg(any(kani, test))]
 mod formation_refinement;
+#[cfg(kani)]
+mod proximity_kernel_contracts;
 // Compile the actual kernel used by runtime.rs, without engine dependencies.
+mod accuracy_production_contracts;
+mod ball_default_production_contracts;
+mod ball_lifecycle_contracts;
+mod bubble_production_contracts;
+mod callback_continuation_contracts;
 #[cfg(any(kani, test))]
 mod collision_contracts;
+mod formation_drop_contracts;
 #[cfg(any(kani, test))]
 mod geometry_contracts;
+mod harmonic_production_contracts;
+#[cfg(any(kani, test))]
+mod iterative_collision_contracts;
 #[cfg(kani)]
 mod lifecycle_contracts;
 #[cfg(any(kani, test))]
 mod lifetime_contracts;
 #[cfg(any(kani, test))]
+mod metaverification;
+mod missile_production_contracts;
+mod mushroom_production_contracts;
+#[cfg(any(kani, test))]
 mod native_object_contracts;
 #[cfg(any(kani, test))]
-mod metaverification;
+mod orbit_contracts;
 #[cfg(any(kani, test))]
 mod park_contracts;
 #[cfg(any(kani, test))]
 mod park_evolution_contracts;
-#[cfg(any(kani, test))]
-mod iterative_collision_contracts;
-#[cfg(any(kani, test))]
-mod orbit_contracts;
 #[path = "../../../src/formation.rs"]
 #[cfg(any(kani, test))]
 mod production_formation;
@@ -56,14 +83,15 @@ mod server_park_action_contracts;
 mod server_ticker_contracts;
 #[cfg(any(kani, test))]
 mod settings_contracts;
-#[cfg(any(kani, test))]
-mod stream_contracts;
 #[cfg(kani)]
 mod state_contracts;
+#[cfg(any(kani, test))]
+mod stream_contracts;
 #[cfg(any(kani, test))]
 mod update_batcher_contracts;
 #[cfg(kani)]
 mod visibility_contracts;
+mod warp_entry_contracts;
 
 use destiny_verification_macros::destiny_contract;
 #[cfg(any(kani, test))]
@@ -127,3 +155,5 @@ mod smoke {
         assert_eq!(model_speed_fraction(2.0), 1.0);
     }
 }
+#[cfg(any(kani, test))]
+mod iterative_sphere_production_contracts;

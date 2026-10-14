@@ -84,6 +84,46 @@ DBC_API DbcBuffer dbc_runtime_call(
 /** Advance the Bevy application once and return a JSON result envelope. */
 DBC_API DbcBuffer dbc_runtime_update(DbcRuntime* runtime);
 
+/** Synchronous mode notification, before the ball stores its new mode.
+ * The callback may reenter this runtime on the calling thread. An evolution
+ * retains exclusive operation ownership and rejects AddBall until it finishes.
+ * No runtime data lock is held across the callback. It must return without
+ * unwinding/longjmp, and its context must remain live for the enclosing call.
+ * Each enclosing call retains an internal reference until all callbacks and
+ * cleanup finish, including when a callback releases the caller's reference.
+ */
+typedef void (*DbcModeCallback)(void* context, int64_t ball_id, uint8_t old_mode, uint8_t new_mode);
+DBC_API DbcBuffer dbc_runtime_call_with_mode_callback(
+    DbcRuntime* runtime, const uint8_t* request_json, size_t request_len,
+    DbcModeCallback callback, void* context
+);
+DBC_API DbcBuffer dbc_runtime_update_with_mode_callback(
+    DbcRuntime* runtime, DbcModeCallback callback, void* context
+);
+
+/** General synchronous event notification. Arguments are a UTF-8 JSON array,
+ * read-only and valid only until this callback returns. event_kind uses the
+ * Destiny event constants (3 proximity, 7 range, 8 mode change); extension kind
+ * 13 denotes target tracking. Extension kind 14 targets the park (ball_id=0)
+ * with [transitions, dictionaries]: transitions is an ordered array of
+ * [ball_id, old_bubble, new_bubble]; dictionaries is four ordered arrays of
+ * [signed_id, value] pairs, whose values are a signed bubble ID or an ordered
+ * array of signed ball IDs. The Python adapter publishes those dictionary
+ * mutations before invoking DoBubbleTransitions(transitions). Extension kind 15
+ * denotes DoFinalCleanup, with an empty argument array, while the moribund ball
+ * remains in the park. The ownership, reentry
+ * and no-foreign-unwind rules of DbcModeCallback also apply.
+ */
+typedef void (*DbcEventCallback)(void* context, int64_t ball_id, uint32_t event_kind,
+                               const uint8_t* arguments_json, size_t arguments_len);
+DBC_API DbcBuffer dbc_runtime_call_with_event_callback(
+    DbcRuntime* runtime, const uint8_t* request_json, size_t request_len,
+    DbcEventCallback callback, void* context
+);
+DBC_API DbcBuffer dbc_runtime_update_with_event_callback(
+    DbcRuntime* runtime, DbcEventCallback callback, void* context
+);
+
 /** Release bytes returned by this ABI. A zero/null buffer is allowed. */
 DBC_API void dbc_buffer_free(DbcBuffer buffer);
 

@@ -74,8 +74,9 @@ fn snapshot(runtime: &mut CompatRuntime) -> Value {
 
 fn only_ball(snapshot: &Value) -> &Value {
     let balls = snapshot["balls"].as_array().expect("balls");
-    assert_eq!(balls.len(), 1);
-    &balls[0]
+    let parents: Vec<_> = balls.iter().filter(|ball| ball["id"] == json!(1)).collect();
+    assert_eq!(parents.len(), 1);
+    parents[0]
 }
 
 // Original tests:
@@ -104,6 +105,22 @@ fn original_ball_child_shapes_and_identity_rotation_match_public_contract() {
             vec![json!(1.0), json!(2.0), json!(3.0), json!(1.0)],
         ))
         .expect("add mini ball");
+
+    // Original AddActualMiniball registers a separate fixed ball. The parent
+    // descriptor assertions below still apply to the parent, selected by ID.
+    let captured = snapshot(&mut runtime);
+    let bodies = captured["balls"]
+        .as_array()
+        .expect("source parent and mini");
+    assert_eq!(bodies.len(), 2);
+    let child = bodies
+        .iter()
+        .find(|body| body["id"] == json!(-(1_i64 << 30) - 1))
+        .expect("allocated source mini body");
+    assert_eq!(child["owner_id"], json!(1));
+    assert_eq!(child["is_free"], json!(false));
+    assert_eq!(child["is_massive"], json!(true));
+    assert_eq!(child["position"], json!([1.0, 2.0, 3.0]));
 
     runtime
         .dispatch(request(

@@ -14,8 +14,8 @@
 /// first; otherwise compare the actual binary64 absolute difference to delta.
 /// This retains NaN/infinity behavior and does not replace delta by places.
 #[must_use]
-pub fn python_almost_equal_delta(first:f64,second:f64,delta:f64) -> bool {
-    first==second || (first-second).abs()<=delta
+pub fn python_almost_equal_delta(first: f64, second: f64, delta: f64) -> bool {
+    first == second || (first - second).abs() <= delta
 }
 
 /// Three exact float objects summed by CPython 3.12.9's builtin sum.
@@ -25,33 +25,49 @@ pub fn python_almost_equal_delta(first:f64,second:f64,delta:f64) -> bool {
 /// https://github.com/python/cpython/blob/v3.12.9/Python/bltinmodule.c
 /// Interpreter/build correspondence remains a boundary requirement.
 #[must_use]
-pub fn python_sum_three_floats(values:[f64;3]) -> f64 {
-    let mut total=0.0+values[0]; let mut correction=0.0;
-    let mut index=1;
-    while index<3 {
-        let value=values[index]; let next=total+value;
-        correction+=if total.abs()>=value.abs() { (total-next)+value } else { (value-next)+total };
-        total=next; index+=1;
+pub fn python_sum_three_floats(values: [f64; 3]) -> f64 {
+    let mut total = 0.0 + values[0];
+    let mut correction = 0.0;
+    let mut index = 1;
+    while index < 3 {
+        let value = values[index];
+        let next = total + value;
+        correction += if total.abs() >= value.abs() {
+            (total - next) + value
+        } else {
+            (value - next) + total
+        };
+        total = next;
+        index += 1;
     }
-    if correction!=0.0 && correction.is_finite() { total+=correction; }
+    if correction != 0.0 && correction.is_finite() {
+        total += correction;
+    }
     total
 }
 
 #[cfg(test)]
 mod reduction_regressions {
-    use super::{python_almost_equal_delta,python_sum_three_floats};
+    use super::{python_almost_equal_delta, python_sum_three_floats};
     #[test]
     fn compensation_keeps_a_small_term_after_cancellation() {
-        assert_eq!(python_sum_three_floats([1e16,1.0,-1e16]),1.0);
-        assert_eq!(python_sum_three_floats([f64::INFINITY,1.0,2.0]),f64::INFINITY);
-        assert!(python_sum_three_floats([f64::INFINITY,f64::NEG_INFINITY,1.0]).is_nan());
+        assert_eq!(python_sum_three_floats([1e16, 1.0, -1e16]), 1.0);
+        assert_eq!(
+            python_sum_three_floats([f64::INFINITY, 1.0, 2.0]),
+            f64::INFINITY
+        );
+        assert!(python_sum_three_floats([f64::INFINITY, f64::NEG_INFINITY, 1.0]).is_nan());
     }
     #[test]
     fn delta_preserves_equality_first_and_its_inclusive_boundary() {
-        assert!(python_almost_equal_delta(f64::INFINITY,f64::INFINITY,0.0));
-        assert!(python_almost_equal_delta(0.0,20.0,20.0));
-        assert!(!python_almost_equal_delta(0.0,f64::from_bits(20.0_f64.to_bits()+1),20.0));
-        assert!(!python_almost_equal_delta(f64::NAN,f64::NAN,20.0));
+        assert!(python_almost_equal_delta(f64::INFINITY, f64::INFINITY, 0.0));
+        assert!(python_almost_equal_delta(0.0, 20.0, 20.0));
+        assert!(!python_almost_equal_delta(
+            0.0,
+            f64::from_bits(20.0_f64.to_bits() + 1),
+            20.0
+        ));
+        assert!(!python_almost_equal_delta(f64::NAN, f64::NAN, 20.0));
     }
 }
 
@@ -196,8 +212,14 @@ mod tests {
         assert_eq!(python_rounded_equal(-0.0, 0.0, 4), Some(true));
         // A tiny difference can straddle a decimal boundary. Difference
         // tolerance must not replace the point helper's rounding comparison.
-        assert_eq!(python_rounded_equal(1.000049999, 1.000050001, 4), Some(false));
-        assert_eq!(python_decimal_round_key(67_108_864.0, 6), Some(67_108_864_000_000));
+        assert_eq!(
+            python_rounded_equal(1.000049999, 1.000050001, 4),
+            Some(false)
+        );
+        assert_eq!(
+            python_decimal_round_key(67_108_864.0, 6),
+            Some(67_108_864_000_000)
+        );
         assert_eq!(python_decimal_round_key(67_108_865.0, 4), None);
         assert_eq!(python_decimal_round_key(0.0, 7), None);
         assert_eq!(python_decimal_round_key(f64::NAN, 4), None);

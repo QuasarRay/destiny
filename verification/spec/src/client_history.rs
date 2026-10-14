@@ -7,7 +7,7 @@ use crate::BoundedList;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ClientHistoryAction {
-    SetState { stream_index:usize,ego_id:i64 },
+    SetState { stream_index: usize, ego_id: i64 },
     GotoDirection { id: i64, direction: [f64; 3] },
     Stop { id: i64 },
 }
