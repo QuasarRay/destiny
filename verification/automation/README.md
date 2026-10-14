@@ -31,3 +31,22 @@ The ordinary reviewed Verus campaign still runs once. Afterward,
 `check-campaign` binds the Kani-selected obligation IDs to those fresh
 `CHECKED_SCOPED` receipts. This is a reviewed correspondence boundary, not a
 general Rust-to-Verus translation proof and not Kani proof credit.
+
+
+## Restricted generated-obligation fixture slice
+
+`verification/tools/verus_subset.py` reuses the single normalized Kani compiler
+discovery artifact and generates Verus obligations only for the grammar declared
+in `capabilities.json`. It does not invoke Kani itself. Branching is preserved
+structurally; accepted literal `for _ in A..B` loops are exhaustively unrolled
+with the exact range recorded in evidence.
+
+The fixture corpus contains a universally valid branch, an exhaustively bounded
+literal loop, two independent symbolic scalar inputs, a deliberately invalid
+universal assertion, and an unsupported floating-point function. Arithmetic,
+target-width integers and assumptions are rejected by regression tests rather
+than silently modeled with mathematical integers or extra premises.
+
+A Verus proof failure remains a proof failure. Concrete source replay is kept as
+a separate explicit Kani/CBMC reference lane and is not required or invoked by
+the default Verus fixture path.

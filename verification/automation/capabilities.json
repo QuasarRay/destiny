@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "default_engine": "verus",
+  "source_discovery": {
+    "engine": "pinned Kani compiler autoharness metadata",
+    "path": "verification/tools/run_kani_autoharness_discovery.py",
+    "cbmc_or_goto_execution_on_default_path": false
+  },
+  "semantic_bridge": {
+    "status": "restricted",
+    "accepted": {
+      "functions": "free, non-generic, unit-returning",
+      "parameters": [
+        "bool",
+        "u8",
+        "u16",
+        "u32",
+        "u64",
+        "i8",
+        "i16",
+        "i32",
+        "i64"
+      ],
+      "statements": [
+        "assert!(expr)",
+        "if/else",
+        "for _ in LITERAL..LITERAL with at most 32 iterations"
+      ],
+      "expressions": [
+        "boolean literals/parameters",
+        "fixed-width integer parameters/nonnegative literals",
+        "!",
+        "&&",
+        "||",
+        "==",
+        "!=",
+        "<",
+        "<=",
+        ">",
+        ">="
+      ],
+      "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem"
+    },
+    "rejected": [
+      "arithmetic and casts",
+      "usize/isize and target-width dependent values",
+      "assumptions/requires/ensures",
+      "function calls",
+      "references, raw pointers, slices, allocation and user ADTs",
+      "floating point",
+      "unsafe code",
+      "concurrency",
+      "dynamic loops, named loop variables and recursion"
+    ],
+    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. No general Rust-to-Verus translation soundness is claimed."
+  },
+  "evidence": {
+    "strict_verus_result_parser": "existing Aegis agentinfra.destiny_reuse.checked_output",
+    "tracked": [
+      "source",
+      "manifest",
+      "normalized Kani discovery",
+      "translator",
+      "capability registry",
+      "generated Verus source",
+      "Verus binary"
+    ],
+    "proof_failure_is_source_bug": false
+  }
+}
