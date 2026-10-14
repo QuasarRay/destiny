@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "default_engine": "verus",
+  "capabilities": [
+    {"id":"cargo-discovery","status":"supported-via-kani-metadata","source":"Kani 0.68.0 autoharness/list compiler path","limits":"Requires pinned cargo-kani. Discovery uses autoharness --list, which is only-codegen; no Kani proof result is accepted."},
+    {"id":"entry-selection","status":"supported-via-kani-metadata","source":"Kani 0.68.0 include/exclude and generated harness metadata","limits":"Local --function only narrows the Kani-selected set."},
+    {"id":"symbolic-scalars","status":"supported","source":"Verus universal verification of generated scalar parameters","limits":"Independent bool and fixed-width integer parameters only. Arithmetic is rejected in the initial subset."},
+    {"id":"branching","status":"supported","source":"verification/tools/verus_kani.py structural lowering","limits":"if/else over the supported expression grammar."},
+    {"id":"assertions","status":"supported","source":"verification/tools/verus_kani.py structural lowering","limits":"Rust assert!(expr) becomes Verus assert(expr) only after parser acceptance."},
+    {"id":"loops","status":"bounded-supported","source":"exact literal-range unrolling","limits":"Only for _ in LITERAL..LITERAL, maximum 32 iterations. Not a general loop invariant or termination theorem."},
+    {"id":"assumptions-contracts","status":"unsupported-in-initial-slice","source":"none","limits":"Source assumptions/requires/ensures are rejected rather than translated."},
+    {"id":"memory-pointers-references","status":"unsupported-in-initial-slice","source":"none","limits":"References, raw pointers, allocation, aliasing, unsafe code, slices, strings and user ADTs are not translated."},
+    {"id":"floating-point","status":"unsupported-in-initial-slice","source":"none","limits":"f32/f64 are rejected; no real-number substitution is performed."},
+    {"id":"concurrency","status":"not-migrated","source":"existing Destiny counted Verus campaign","limits":"This automation slice does not alter or claim the existing concurrency refinement obligations."},
+    {"id":"counterexample-replay","status":"proof-failure-only","source":"verification/tools/verus_kani.py replay","limits":"A Verus proof failure is non-replayable unless a separately validated concrete witness exists. No trace is fabricated."}
+  ]
+}
