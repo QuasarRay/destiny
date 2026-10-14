@@ -22,7 +22,7 @@ def git(checkout: Path, *args: str, check: bool = True) -> str:
         check=check,
         capture_output=True,
         text=True,
-    ).stdout.strip()
+    ).stdout.rstrip()
 
 
 def main() -> int:

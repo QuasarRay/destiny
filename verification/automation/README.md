@@ -4,14 +4,22 @@ This crate is the first executable boundary for the Verus-default automation wor
 
 It directly compiles against the vendored Kani 0.68.0 `kani_metadata` crate and consumes Kani's own `AutoHarnessMetadata` / `AutoHarnessSkipReason` representation. It does not copy the schema, does not run CBMC, and does not claim that a Kani-eligible function is Verus-supported.
 
-Current commands:
+Shared command surface:
 
 ```sh
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- doctor
+cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- setup
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- discover path/to/.kani-metadata.json
+cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- list path/to/.kani-metadata.json
+cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- explain
+cargo +1.98.1 run --manifest-path verification/automation/Cargo.toml --locked -- verify \
+  --manifest-path path/to/Cargo.toml --discovery path/to/normalized-discovery.json \
+  --function function_name --verus path/to/verus
+cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- \
+  replay-kani-reference --source path/to/lib.rs --function function_name --cargo-kani path/to/cargo-kani
 ```
 
-`discover` is classification only and always emits `proof_credit: false`. The next implementation milestone is to invoke the vendored Kani compiler in autoharness metadata/list mode, with CBMC verification disabled, then map only the declared integer/Boolean subset to generated Verus obligations and the existing source-bound evidence controller.
+`setup` reuses the existing vendor-integrity and Kani patch bootstrap scripts; it does not install host toolchains or silently fetch external tools. `discover` and `list` are classification only and always emit `proof_credit: false`. `verify` delegates to the existing restricted Verus subset implementation and keeps Verus as the default proof engine. `replay-kani-reference` is deliberately explicit: it delegates to the separate Kani/CBMC source-replay lane and cannot grant Verus proof credit. Set `DESTINY_PYTHON` only when the platform's Python executable is not the default `python3` (or `python` on Windows).
 
 
 ## Kani-selected reviewed Verus entries

@@ -205,29 +205,32 @@ jobs:
         run: |
           set -euo pipefail
           python3 -B verification/tools/test_verus_subset.py
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- explain \
+            > fixture-capabilities.json
 
-          python3 -B verification/tools/verus_subset.py verify \
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function branch_valid --verus "$VERUS_BIN" > fixture-branch.json
 
-          python3 -B verification/tools/verus_subset.py verify \
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function fixed_loop_valid --verus "$VERUS_BIN" > fixture-loop.json
 
-          python3 -B verification/tools/verus_subset.py verify \
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function independent_inputs --verus "$VERUS_BIN" > fixture-independent.json
 
           set +e
-          python3 -B verification/tools/verus_subset.py verify \
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/invalid/normalized-discovery.json \
             --function branch_invalid --verus "$VERUS_BIN" > fixture-invalid.json
           invalid_rc=$?
-          python3 -B verification/tools/verus_subset.py verify \
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/unsupported/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/unsupported/normalized-discovery.json \
             --function float_unsupported --verus "$VERUS_BIN" > fixture-unsupported.json
@@ -291,6 +294,7 @@ jobs:
             fixture-independent.json
             fixture-invalid.json
             fixture-unsupported.json
+            fixture-capabilities.json
 
   kani-reference-replay:
     name: explicit Kani source replay reference
