@@ -292,6 +292,57 @@ jobs:
             fixture-invalid.json
             fixture-unsupported.json
 
+  kani-reference-replay:
+    name: explicit Kani source replay reference
+    needs: verus
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test replay harness construction
+        run: |
+          python3 -B verification/tools/test_verus_subset.py
+          python3 -B verification/tools/test_replay_kani_fixture.py
+
+      - name: Install pinned Kani reference backend
+        run: |
+          cargo install --locked kani-verifier --version 0.68.0
+          cargo kani setup
+          cargo kani --version
+
+      - name: Replay the failing fixture against its original source
+        run: |
+          set -euo pipefail
+          CARGO_KANI="$(command -v cargo-kani)"
+          test -n "$CARGO_KANI"
+          python3 -B verification/tools/replay_kani_fixture.py \
+            --source verification/automation/fixtures/invalid/src/lib.rs \
+            --function branch_invalid \
+            --cargo-kani "$CARGO_KANI" \
+            > kani-reference-replay.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          replay=json.loads(Path("kani-reference-replay.json").read_text())
+          assert replay["status"] == "reproduced_source_failure", replay
+          assert replay["engine"] == "kani_cbmc_reference", replay
+          assert replay["explicit_reference_backend"] is True, replay
+          assert replay["verus_proof_credit"] is False, replay
+          assert replay["source_location_reproduced"] is True, replay
+          assert replay["source_unchanged"] is True, replay
+          assert replay["replay_input_unchanged"] is True, replay
+          assert replay["playback_returncode"] != 0, replay
+          PY
+
+      - name: Retain concrete replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kani-reference-replay
+          path: |
+            .aegis/destiny/kani-reference-replay
+            kani-reference-replay.json
+
   runtime-parity:
     name: concrete runtime parity regression
     runs-on: ubuntu-24.04
