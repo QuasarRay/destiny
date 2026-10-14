@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "verus": {
+    "repository": "https://github.com/verus-lang/verus.git",
+    "release": "0.2026.09.20.aef82ed",
+    "commit": "aef82eda71838deef4a8cd0260fda6c9504be9b9",
+    "tree": "04ee402221823dccc6e98da618831d4176da68f9",
+    "rust_toolchain": "1.98.1",
+    "license": "MIT",
+    "license_blob": "735146c38c8970ebe5cecf9964bc10095f5197e1"
+  },
+  "kani": {
+    "repository": "https://github.com/model-checking/kani.git",
+    "release": "0.68.0",
+    "commit": "0d2328a93f0e0ff66132d6bfa1a7d884877cf862",
+    "tree": "9b59a9dfa917ba5b9f1af1f27a1ed2b5c02bc752",
+    "rust_toolchain": "nightly-2026-08-21",
+    "license": "Apache-2.0 OR MIT",
+    "license_blobs": {
+      "Apache-2.0": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d",
+      "MIT": "31aa79387f27e730e33d871925e152e35e428031"
+    },
+    "recursive_submodules": {
+      "charon": "b250680abd40ff1aaa07081d0497dc2755ed112e",
+      "firecracker": "cd36c699f3cb3d531289aadee26c45c1306edcfc",
+      "tests/perf/s2n-quic": "a33d369b98a50fd9290fd6586832c969035bdec0"
+    }
+  },
+  "integration": {
+    "default_engine": "verus",
+    "kani_reference_engine_requires_explicit_mode": true,
+    "cbmc_allowed_on_default_verus_path": false,
+    "process_boundary_reason": "The pinned projects require different rustc-private toolchains."
+  }
+}
