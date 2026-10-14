@@ -111,6 +111,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -134,6 +135,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -157,6 +159,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -168,6 +171,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -215,6 +219,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -226,6 +231,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -237,6 +243,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -248,6 +255,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -451,6 +459,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -744,6 +753,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -867,6 +877,7 @@
       "mapping_verdict": "PARTIAL",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -902,6 +913,7 @@
       "mapping_verdict": "PARTIAL",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -937,6 +949,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1092,6 +1105,7 @@
       "mapping_verdict": "PARTIAL",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1179,6 +1193,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1190,6 +1205,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1201,6 +1217,7 @@
       "mapping_verdict": "PARTIAL",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1284,6 +1301,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1507,6 +1525,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1586,6 +1605,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1609,6 +1629,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1632,6 +1653,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1675,6 +1697,7 @@
       "mapping_verdict": "PARTIAL",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1698,6 +1721,7 @@
       "mapping_verdict": "PARTIAL",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
@@ -1785,6 +1809,7 @@
       "mapping_verdict": "NONE",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
+        "python",
         "rust-native",
         "c-abi"
       ],
