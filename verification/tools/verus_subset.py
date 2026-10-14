@@ -776,7 +776,8 @@ def verify(
     destination.mkdir(parents=True, exist_ok=True)
     generated = destination / f"{function.name}.rs"
     generated.write_text(generated_text, encoding="utf-8")
-    nonvacuity = destination / f"{function.name}.nonvacuity.rs"
+    # Rustc derives the crate name from the file stem; keep it identifier-safe.
+    nonvacuity = destination / f"{function.name}_nonvacuity.rs"
     nonvacuity.write_text(nonvacuity_text, encoding="utf-8")
     nonvacuity_command = [str(verus), "--crate-type=lib", str(nonvacuity)]
     command = [str(verus), "--crate-type=lib", str(generated)]
