@@ -67,8 +67,20 @@ jobs:
       - name: Install pinned Kani source toolchain
         run: rustup toolchain install nightly-2026-08-21 --profile minimal
 
+      - name: Generate exact automation lock diagnostic
+        run: |
+          cargo +nightly-2026-08-21 generate-lockfile --manifest-path verification/automation/Cargo.toml
+          git diff -- verification/automation/Cargo.lock || true
+
       - name: Test shared autoharness metadata adapter
         run: cargo +nightly-2026-08-21 test --manifest-path verification/automation/Cargo.toml --locked
+
+      - name: Retain resolver-produced automation lock
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: automation-resolved-lock
+          path: verification/automation/Cargo.lock
 
       - name: Build patched pinned Kani from source
         working-directory: third_party/kani
