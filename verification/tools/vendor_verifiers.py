@@ -65,6 +65,45 @@ def main() -> int:
             if dirty:
                 raise RuntimeError(f"{dep['path']} has local modifications")
             row["tree"] = tree
+            nested_rows = []
+            for nested in dep.get("required_nested_gitlinks", []):
+                fields = run(
+                    "git", "ls-tree", "HEAD", "--", nested["path"], cwd=path
+                ).stdout.strip().split()
+                if len(fields) < 3 or fields[0] != "160000" or fields[2] != nested["commit"]:
+                    raise RuntimeError(
+                        f"{dep['path']}/{nested['path']} gitlink does not match pinned {nested['commit']}"
+                    )
+                nested_path = path / nested["path"]
+                if args.materialize:
+                    run(
+                        "git", "submodule", "update", "--init", "--depth", "1", "--",
+                        nested["path"], cwd=path
+                    )
+                nested_present = materialized(nested_path)
+                if args.verify_only and not nested_present:
+                    raise RuntimeError(
+                        f"{dep['path']}/{nested['path']} is not materialized"
+                    )
+                nested_row = {
+                    "name": nested["name"],
+                    "path": f"{dep['path']}/{nested['path']}",
+                    "gitlink": nested["commit"],
+                    "materialized": nested_present,
+                }
+                if nested_present:
+                    nested_head = run("git", "rev-parse", "HEAD", cwd=nested_path).stdout.strip()
+                    nested_tree = run(
+                        "git", "rev-parse", "HEAD^{tree}", cwd=nested_path
+                    ).stdout.strip()
+                    if nested_head != nested["commit"] or nested_tree != nested["tree"]:
+                        raise RuntimeError(
+                            f"{dep['path']}/{nested['path']} materialized identity differs"
+                        )
+                    nested_row["tree"] = nested_tree
+                nested_rows.append(nested_row)
+            if nested_rows:
+                row["required_nested_gitlinks"] = nested_rows
         rows.append(row)
     print(json.dumps({"schema": 1, "status": "VENDOR_IDENTITIES_VALIDATED",
                       "upstreams": rows, "proof_credit": False}, indent=2))

@@ -8,8 +8,17 @@
       "tag": "release/0.2026.09.20.aef82ed",
       "commit": "aef82eda71838deef4a8cd0260fda6c9504be9b9",
       "tree": "04ee402221823dccc6e98da618831d4176da68f9",
-      "toolchain": {"rust": "1.98.1", "z3": "4.16.0"},
-      "licenses": [{"spdx": "MIT", "file": "LICENSE", "blob": "735146c38c8970ebe5cecf9964bc10095f5197e1"}],
+      "toolchain": {
+        "rust": "1.98.1",
+        "z3": "4.16.0"
+      },
+      "licenses": [
+        {
+          "spdx": "MIT",
+          "file": "LICENSE",
+          "blob": "735146c38c8970ebe5cecf9964bc10095f5197e1"
+        }
+      ],
       "reused_interfaces": [
         "source/cargo-verus/src/metadata.rs",
         "source/cargo-verus/src/plan.rs",
@@ -23,10 +32,22 @@
       "tag": "kani-0.68.0",
       "commit": "0d2328a93f0e0ff66132d6bfa1a7d884877cf862",
       "tree": "9b59a9dfa917ba5b9f1af1f27a1ed2b5c02bc752",
-      "toolchain": {"rust": "nightly-2026-08-21", "cbmc": "6.11.0", "kissat": "4.0.1"},
+      "toolchain": {
+        "rust": "nightly-2026-08-21",
+        "cbmc": "6.11.0",
+        "kissat": "4.0.1"
+      },
       "licenses": [
-        {"spdx": "MIT", "file": "LICENSE-MIT", "blob": "31aa79387f27e730e33d871925e152e35e428031"},
-        {"spdx": "Apache-2.0", "file": "LICENSE-APACHE", "blob": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"}
+        {
+          "spdx": "MIT",
+          "file": "LICENSE-MIT",
+          "blob": "31aa79387f27e730e33d871925e152e35e428031"
+        },
+        {
+          "spdx": "Apache-2.0",
+          "file": "LICENSE-APACHE",
+          "blob": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+        }
       ],
       "reused_interfaces": [
         "kani-driver/src/autoharness/mod.rs",
@@ -35,6 +56,16 @@
         "kani-driver/src/list/output.rs",
         "kani-compiler/src/kani_middle/transform/automatic.rs",
         "kani-compiler/src/kani_middle/metadata.rs"
+      ],
+      "required_nested_gitlinks": [
+        {
+          "name": "charon",
+          "path": "charon",
+          "repository": "https://github.com/AeneasVerif/charon.git",
+          "commit": "b250680abd40ff1aaa07081d0497dc2755ed112e",
+          "tree": "a83f56525e28511f65e17584db0303fed72b00b2",
+          "reason": "kani-compiler path dependency"
+        }
       ]
     }
   ],
