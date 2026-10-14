@@ -454,6 +454,13 @@ class AssertionPath:
     conditions: tuple[str, ...]
 
 
+@dataclasses.dataclass(frozen=True)
+class AssumptionWitness:
+    line: int
+    prefix_conditions: tuple[str, ...]
+    conditions: tuple[str, ...]
+
+
 def collect_assumptions(statements: Sequence[Stmt]) -> list[dict[str, int | str]]:
     rows = []
     seen = set()
@@ -484,7 +491,16 @@ def _bounded_states(states: Sequence[tuple[str, ...]]) -> list[tuple[str, ...]]:
     return deduplicated
 
 
+def _path_has_machine_arithmetic(conditions: Sequence[str]) -> bool:
+    return any(
+        f" {operator} " in condition
+        for condition in conditions
+        for operator in ("+", "-", "*")
+    )
+
+
 def collect_assertion_paths(statements: Sequence[Stmt]) -> list[AssertionPath]:
+    """Record source path conditions for evidence; these are not proof assumptions."""
     paths: list[AssertionPath] = []
 
     def walk(
@@ -528,18 +544,88 @@ def collect_assertion_paths(statements: Sequence[Stmt]) -> list[AssertionPath]:
     return list(dict.fromkeys(paths))
 
 
-def lower_nonvacuity(function: Function, paths: Sequence[AssertionPath]) -> str:
-    if not paths:
-        raise Unsupported("selected function contains no supported assertion obligations")
+def collect_assumption_witnesses(statements: Sequence[Stmt]) -> list[AssumptionWitness]:
+    """Require each user assumption to preserve every otherwise feasible path.
+
+    For a path prefix P and assumption A, the proof obligation is
+    (exists inputs. P) ==> (exists inputs. P && A). This rejects contradictory
+    assumptions without requiring syntactically present but unreachable branches
+    to have witnesses. Arithmetic-dependent prefixes are rejected because Verus
+    ghost arithmetic widens and would not preserve Rust overflow semantics.
+    """
+    witnesses: list[AssumptionWitness] = []
+
+    def walk(
+        body: Sequence[Stmt],
+        states: Sequence[tuple[str, ...]],
+    ) -> list[tuple[str, ...]]:
+        current = _bounded_states(states)
+        for statement in body:
+            if isinstance(statement, AssumeStmt):
+                next_states = []
+                for prefix in current:
+                    conditions = prefix + (statement.expr.text,)
+                    if _path_has_machine_arithmetic(conditions):
+                        raise Unsupported(
+                            "assumption non-vacuity depends on a machine-arithmetic path "
+                            "condition; ghost widening is forbidden for this correspondence"
+                        )
+                    witness = AssumptionWitness(statement.line, prefix, conditions)
+                    if witness not in witnesses:
+                        witnesses.append(witness)
+                    next_states.append(conditions)
+                current = _bounded_states(next_states)
+            elif isinstance(statement, AssertStmt):
+                continue
+            elif isinstance(statement, IfStmt):
+                next_states = []
+                for conditions in current:
+                    next_states.extend(
+                        walk(
+                            statement.then_body,
+                            [conditions + (statement.cond.text,)],
+                        )
+                    )
+                    next_states.extend(
+                        walk(
+                            statement.else_body,
+                            [conditions + (f"!({statement.cond.text})",)],
+                        )
+                        if statement.else_body
+                        else [conditions + (f"!({statement.cond.text})",)]
+                    )
+                current = _bounded_states(next_states)
+            elif isinstance(statement, ForStmt):
+                for _ in range(statement.start, statement.end):
+                    current = walk(statement.body, current)
+            else:
+                raise TypeError(statement)
+        return _bounded_states(current)
+
+    walk(statements, [()])
+    return witnesses
+
+
+def _conjunction(conditions: Sequence[str]) -> str:
+    return " && ".join(f"({term})" for term in conditions) or "true"
+
+
+def lower_nonvacuity(function: Function, witnesses: Sequence[AssumptionWitness]) -> str:
+    if not witnesses:
+        raise Unsupported("selected function contains no user-assumption non-vacuity obligations")
     output = ["use vstd::prelude::*;", "", "verus! {"]
     binders = ", ".join(f"{name}: {typ}" for name, typ in function.params)
-    for index, path in enumerate(paths):
+    for index, witness in enumerate(witnesses):
         output.append(f"proof fn __destiny_nonvacuity_{index}() {{")
-        condition = " && ".join(f"({term})" for term in path.conditions) or "true"
+        prefix = _conjunction(witness.prefix_conditions)
+        post = _conjunction(witness.conditions)
         if binders:
-            output.append(f"    assert(exists|{binders}| {condition});")
+            output.append(
+                f"    assert((exists|{binders}| {prefix}) ==> "
+                f"(exists|{binders}| {post}));"
+            )
         else:
-            output.append(f"    assert({condition});")
+            output.append(f"    assert(({prefix}) ==> ({post}));")
         output.append("}")
         output.append("")
     output.extend(["}", ""])
@@ -722,7 +808,12 @@ def verify(
 
     generated_text = lower_function(function, source_path, manifest.parent)
     assertion_paths = collect_assertion_paths(function.body)
-    nonvacuity_text = lower_nonvacuity(function, assertion_paths)
+    assumption_witnesses = collect_assumption_witnesses(function.body)
+    nonvacuity_text = (
+        lower_nonvacuity(function, assumption_witnesses)
+        if assumption_witnesses
+        else None
+    )
     tracked = {
         "source": source_path,
         "manifest": manifest,
@@ -754,8 +845,16 @@ def verify(
         "source_assert_lines": collect_assert_lines(function.body),
         "generated_assert_count": generated_text.count("assert("),
         "generated_sha256": sha256_bytes(generated_text.encode()),
-        "nonvacuity_generated_sha256": sha256_bytes(nonvacuity_text.encode()),
+        "nonvacuity_generated_sha256": sha256_bytes(nonvacuity_text.encode()) if nonvacuity_text is not None else None,
         "assumptions": collect_assumptions(function.body),
+        "assumption_paths": [
+            {
+                "line": witness.line,
+                "prefix_conditions": list(witness.prefix_conditions),
+                "conditions": list(witness.conditions),
+            }
+            for witness in assumption_witnesses
+        ],
         "assertion_paths": [
             {"line": path.line, "conditions": list(path.conditions)}
             for path in assertion_paths
@@ -765,7 +864,7 @@ def verify(
         "trusted_boundaries": [
             "Kani compiler autoharness eligibility metadata selects the source function; Kani/CBMC proof results are not used.",
             "The structural Rust-to-Verus lowering is trusted only for the declared grammar and is separately regression-tested.",
-            "Kani assumptions are preserved as scoped Verus path assumptions; separate existential Verus obligations check that every translated assertion path remains satisfiable.",
+            "Kani assumptions are preserved at their source program point; Verus checks that each otherwise feasible path remains satisfiable after the assumption. Arithmetic-dependent assumption reachability is rejected rather than ghost-widened.",
             "Machine +,-,* are accepted only in executable branch conditions, where Verus checks fixed-width overflow; ghost assertion/assumption arithmetic remains rejected to prevent widening drift.",
             "Generic source functions are accepted only when pinned Kani selected an explicit primitive monomorphic instance; that exact substitution is recorded and no generic theorem is claimed.",
             "Verus, its vstd contracts, Rust toolchain and solver remain verifier trust boundaries.",
@@ -776,103 +875,110 @@ def verify(
     destination.mkdir(parents=True, exist_ok=True)
     generated = destination / f"{function.name}.rs"
     generated.write_text(generated_text, encoding="utf-8")
-    # Rustc derives the crate name from the file stem; keep it identifier-safe.
-    nonvacuity = destination / f"{function.name}_nonvacuity.rs"
-    nonvacuity.write_text(nonvacuity_text, encoding="utf-8")
-    nonvacuity_command = [str(verus), "--crate-type=lib", str(nonvacuity)]
+    nonvacuity = None
+    nonvacuity_command = None
+    if nonvacuity_text is not None:
+        # Rustc derives the crate name from the file stem; keep it identifier-safe.
+        nonvacuity = destination / f"{function.name}_nonvacuity.rs"
+        nonvacuity.write_text(nonvacuity_text, encoding="utf-8")
+        nonvacuity_command = [str(verus), "--crate-type=lib", str(nonvacuity)]
     command = [str(verus), "--crate-type=lib", str(generated)]
 
-    try:
-        nonvacuity_result = run(nonvacuity_command, ROOT, timeout)
-    except subprocess.TimeoutExpired as error:
-        row = {
-            **identity,
-            "key": key,
-            "status": "timeout",
-            "failure_stage": "non_vacuity",
-            "command": nonvacuity_command,
-            "stdout": error.stdout or "",
-            "stderr": error.stderr or "",
-        }
-        (destination / "evidence.json").write_text(json.dumps(row, indent=2) + "\n")
-        return row
+    nonvacuity_stdout = ""
+    nonvacuity_stderr = ""
+    nonvacuity_summaries = []
+    if nonvacuity is not None and nonvacuity_command is not None:
+        try:
+            nonvacuity_result = run(nonvacuity_command, ROOT, timeout)
+        except subprocess.TimeoutExpired as error:
+            row = {
+                **identity,
+                "key": key,
+                "status": "timeout",
+                "failure_stage": "non_vacuity",
+                "command": nonvacuity_command,
+                "stdout": error.stdout or "",
+                "stderr": error.stderr or "",
+            }
+            (destination / "evidence.json").write_text(json.dumps(row, indent=2) + "\n")
+            return row
 
-    nonvacuity_stdout = nonvacuity_result.stdout
-    nonvacuity_stderr = nonvacuity_result.stderr
-    nonvacuity_summaries = SUCCESS_RE.findall(
-        nonvacuity_stdout + "\n" + nonvacuity_stderr
-    )
-    if nonvacuity_result.returncode != 0:
-        row = {
-            **identity,
-            "key": key,
-            "status": "proof_failure",
-            "failure_stage": "non_vacuity",
-            "command": nonvacuity_command,
-            "returncode": nonvacuity_result.returncode,
-            "summary": nonvacuity_summaries,
-            "stdout_sha256": sha256_bytes(nonvacuity_stdout.encode()),
-            "stderr_sha256": sha256_bytes(nonvacuity_stderr.encode()),
-            "generated": str(generated),
-            "nonvacuity_generated": str(nonvacuity),
-        }
-        (destination / "nonvacuity-stdout.txt").write_text(
-            nonvacuity_stdout, encoding="utf-8"
+        nonvacuity_stdout = nonvacuity_result.stdout
+        nonvacuity_stderr = nonvacuity_result.stderr
+        nonvacuity_summaries = SUCCESS_RE.findall(
+            nonvacuity_stdout + "\n" + nonvacuity_stderr
         )
-        (destination / "nonvacuity-stderr.txt").write_text(
-            nonvacuity_stderr, encoding="utf-8"
-        )
-        (destination / "evidence.json").write_text(
-            json.dumps(row, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-        return row
+        if nonvacuity_result.returncode != 0:
+            row = {
+                **identity,
+                "key": key,
+                "status": "proof_failure",
+                "failure_stage": "non_vacuity",
+                "command": nonvacuity_command,
+                "returncode": nonvacuity_result.returncode,
+                "summary": nonvacuity_summaries,
+                "stdout_sha256": sha256_bytes(nonvacuity_stdout.encode()),
+                "stderr_sha256": sha256_bytes(nonvacuity_stderr.encode()),
+                "generated": str(generated),
+                "nonvacuity_generated": str(nonvacuity),
+            }
+            (destination / "nonvacuity-stdout.txt").write_text(
+                nonvacuity_stdout, encoding="utf-8"
+            )
+            (destination / "nonvacuity-stderr.txt").write_text(
+                nonvacuity_stderr, encoding="utf-8"
+            )
+            (destination / "evidence.json").write_text(
+                json.dumps(row, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            return row
 
-    try:
-        checked_output = import_checked_output()
-        nonvacuity_proxy = SimpleNamespace(
-            returncode=0,
-            timed_out=False,
-            stdout_truncated=False,
-            stderr_truncated=False,
-            stdout=nonvacuity_stdout,
-            stderr=nonvacuity_stderr,
-        )
-        nonvacuity_obligation = {
-            "method": "verus",
-            "entry": str(nonvacuity),
-            "expected_checks": len(assertion_paths),
-        }
-        nonvacuity_checked = checked_output(nonvacuity_obligation, nonvacuity_proxy)
-    except (ImportError, RuntimeError, ValueError, VerificationError) as error:
-        nonvacuity_checked = False
-        nonvacuity_stderr += f"\nstrict evidence parser unavailable: {error}\n"
+        try:
+            checked_output = import_checked_output()
+            nonvacuity_proxy = SimpleNamespace(
+                returncode=0,
+                timed_out=False,
+                stdout_truncated=False,
+                stderr_truncated=False,
+                stdout=nonvacuity_stdout,
+                stderr=nonvacuity_stderr,
+            )
+            nonvacuity_obligation = {
+                "method": "verus",
+                "entry": str(nonvacuity),
+                "expected_checks": len(assumption_witnesses),
+            }
+            nonvacuity_checked = checked_output(nonvacuity_obligation, nonvacuity_proxy)
+        except (ImportError, RuntimeError, ValueError, VerificationError) as error:
+            nonvacuity_checked = False
+            nonvacuity_stderr += f"\nstrict evidence parser unavailable: {error}\n"
 
-    if not nonvacuity_checked:
-        row = {
-            **identity,
-            "key": key,
-            "status": "infrastructure_error",
-            "failure_stage": "non_vacuity_evidence",
-            "command": nonvacuity_command,
-            "returncode": nonvacuity_result.returncode,
-            "summary": nonvacuity_summaries,
-            "stdout_sha256": sha256_bytes(nonvacuity_stdout.encode()),
-            "stderr_sha256": sha256_bytes(nonvacuity_stderr.encode()),
-            "generated": str(generated),
-            "nonvacuity_generated": str(nonvacuity),
-        }
-        (destination / "nonvacuity-stdout.txt").write_text(
-            nonvacuity_stdout, encoding="utf-8"
-        )
-        (destination / "nonvacuity-stderr.txt").write_text(
-            nonvacuity_stderr, encoding="utf-8"
-        )
-        (destination / "evidence.json").write_text(
-            json.dumps(row, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-        return row
+        if not nonvacuity_checked:
+            row = {
+                **identity,
+                "key": key,
+                "status": "infrastructure_error",
+                "failure_stage": "non_vacuity_evidence",
+                "command": nonvacuity_command,
+                "returncode": nonvacuity_result.returncode,
+                "summary": nonvacuity_summaries,
+                "stdout_sha256": sha256_bytes(nonvacuity_stdout.encode()),
+                "stderr_sha256": sha256_bytes(nonvacuity_stderr.encode()),
+                "generated": str(generated),
+                "nonvacuity_generated": str(nonvacuity),
+            }
+            (destination / "nonvacuity-stdout.txt").write_text(
+                nonvacuity_stdout, encoding="utf-8"
+            )
+            (destination / "nonvacuity-stderr.txt").write_text(
+                nonvacuity_stderr, encoding="utf-8"
+            )
+            (destination / "evidence.json").write_text(
+                json.dumps(row, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            return row
 
     try:
         result = run(command, ROOT, timeout)
@@ -919,7 +1025,7 @@ def verify(
     try:
         after = {name: sha256_file(path) for name, path in tracked.items()}
         generated_after = sha256_file(generated)
-        nonvacuity_after = sha256_file(nonvacuity)
+        nonvacuity_after = sha256_file(nonvacuity) if nonvacuity is not None else None
     except OSError as error:
         after = {"error": str(error)}
         generated_after = None
@@ -927,7 +1033,10 @@ def verify(
     if (
         after != before
         or generated_after != identity["generated_sha256"]
-        or nonvacuity_after != identity["nonvacuity_generated_sha256"]
+        or (
+            nonvacuity is not None
+            and nonvacuity_after != identity["nonvacuity_generated_sha256"]
+        )
     ):
         status = "stale_input"
 

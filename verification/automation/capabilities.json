@@ -42,13 +42,13 @@
         "+, -, * only inside executable if conditions; Verus must discharge fixed-width overflow/underflow"
       ],
       "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem",
-      "assumptions": "preserved at their source program point; each translated assertion path gets a separate existential Verus non-vacuity obligation over the original fixed-width parameter domains",
-      "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected because Verus widens it.",
+      "assumptions": "preserved at their source program point; for each user assumption, Verus proves that every otherwise feasible non-arithmetic path prefix retains at least one fixed-width input after the assumption",
+      "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected, and arithmetic-dependent assumption reachability is rejected rather than widened.",
       "generics": "source functions with unbounded type parameters only when Kani autoharness selected an explicit monomorphic instance and every selected type is in the supported fixed-width integer/Boolean set; the result is scoped to that concrete instantiation"
     },
     "rejected": [
       "requires/ensures syntax and contract macros",
-      "arithmetic in assert!/kani::assume, division/remainder, casts, and arithmetic outside executable if conditions",
+      "arithmetic in assert!/kani::assume, division/remainder, casts, arithmetic outside executable if conditions, and assumption non-vacuity paths that depend on machine arithmetic",
       "usize/isize and target-width dependent values",
       "function calls",
       "references, raw pointers, slices, allocation and user ADTs",
@@ -57,7 +57,7 @@
       "concurrency",
       "generic trait-bound syntax, const generics, lifetimes, target-width generic arguments, dynamic loops, named loop variables and recursion"
     ],
-    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Scoped assumptions are additionally guarded by Verus-checked assertion-path non-vacuity obligations. No general Rust-to-Verus translation soundness is claimed."
+    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Scoped assumptions are guarded by Verus-checked path-preservation non-vacuity obligations; syntactically unreachable assertion branches are recorded but are not required to have witnesses. No general Rust-to-Verus translation soundness is claimed."
   },
   "evidence": {
     "strict_verus_result_parser": "existing Aegis agentinfra.destiny_reuse.checked_output",

@@ -113,10 +113,33 @@ class TranslatorTests(unittest.TestCase):
             "pub fn contradiction(x: bool) { "
             "kani::assume(x); kani::assume(!x); assert!(x); }\n"
         )[0]
-        paths = vk.collect_assertion_paths(function.body)
-        self.assertEqual(paths[0].conditions, ("x", "!(x)"))
-        lowered = vk.lower_nonvacuity(function, paths)
-        self.assertIn("exists|x: bool| (x) && (!(x))", lowered)
+        witnesses = vk.collect_assumption_witnesses(function.body)
+        self.assertEqual(witnesses[0].prefix_conditions, ())
+        self.assertEqual(witnesses[0].conditions, ("x",))
+        self.assertEqual(witnesses[1].prefix_conditions, ("x",))
+        self.assertEqual(witnesses[1].conditions, ("x", "!(x)"))
+        lowered = vk.lower_nonvacuity(function, witnesses)
+        self.assertIn(
+            "(exists|x: bool| (x)) ==> (exists|x: bool| (x) && (!(x)))",
+            lowered,
+        )
+
+    def test_unreachable_assertion_branch_is_not_a_hard_nonvacuity_requirement(self):
+        function = self.parse(
+            "pub fn guarded(x: u8) { "
+            "if x == 255 { assert!(true); } else { "
+            "if x + 1 > x { assert!(true); } else { assert!(false); } } }\n"
+        )[0]
+        self.assertEqual(vk.collect_assumption_witnesses(function.body), [])
+        self.assertEqual(len(vk.collect_assertion_paths(function.body)), 3)
+
+    def test_assumption_reachability_depending_on_machine_arithmetic_is_rejected(self):
+        function = self.parse(
+            "pub fn arithmetic_assume(x: u8) { "
+            "if x + 1 > x { kani::assume(true); assert!(true); } }\n"
+        )[0]
+        with self.assertRaises(vk.Unsupported):
+            vk.collect_assumption_witnesses(function.body)
 
     def test_discovery_requires_exact_pinned_kani_identity_and_no_proof_credit(self):
         with tempfile.TemporaryDirectory() as directory:
