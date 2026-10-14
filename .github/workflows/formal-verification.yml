@@ -191,8 +191,10 @@ jobs:
       - name: Apply and validate the exported controller postimages
         run: python3 -B verification/tools/bootstrap_controller.py
 
-      - name: Install Verus Rust toolchain
-        run: rustup toolchain install 1.98.1-x86_64-unknown-linux-gnu
+      - name: Install verifier toolchains
+        run: |
+          rustup toolchain install 1.98.1-x86_64-unknown-linux-gnu
+          rustup toolchain install nightly-2026-08-21 --profile minimal
 
       - name: Download pinned Verus release
         run: |
@@ -211,35 +213,35 @@ jobs:
         run: |
           set -euo pipefail
           python3 -B verification/tools/test_verus_subset.py
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet \
+          cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- explain \
             > fixture-capabilities.json
 
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function branch_valid --verus "$VERUS_BIN" > fixture-branch.json
 
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function fixed_loop_valid --verus "$VERUS_BIN" > fixture-loop.json
 
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function independent_inputs --verus "$VERUS_BIN" > fixture-independent.json
 
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function assumed_valid --verus "$VERUS_BIN" > fixture-assumed.json
 
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function guarded_add_valid --verus "$VERUS_BIN" > fixture-guarded-add.json
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function guarded_sub_valid --verus "$VERUS_BIN" > fixture-guarded-sub.json
@@ -255,33 +257,33 @@ jobs:
           print(matches[0])
           PY
           )"
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/valid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function "$generic_fn" --verus "$VERUS_BIN" > fixture-generic.json
 
           set +e
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/invalid/normalized-discovery.json \
             --function branch_invalid --verus "$VERUS_BIN" > fixture-invalid.json
           invalid_rc=$?
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/invalid/normalized-discovery.json \
             --function contradictory_assumption --verus "$VERUS_BIN" > fixture-contradictory.json
           contradictory_rc=$?
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/invalid/normalized-discovery.json \
             --function add_overflow_invalid --verus "$VERUS_BIN" > fixture-add-overflow.json
           add_overflow_rc=$?
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/invalid/normalized-discovery.json \
             --function sub_underflow_invalid --verus "$VERUS_BIN" > fixture-sub-underflow.json
           sub_underflow_rc=$?
-          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/unsupported/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/unsupported/normalized-discovery.json \
             --function float_unsupported --verus "$VERUS_BIN" > fixture-unsupported.json

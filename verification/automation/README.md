@@ -12,7 +12,7 @@ cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- discover path/to/.kani-metadata.json
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- list path/to/.kani-metadata.json
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- explain
-cargo +1.98.1 run --manifest-path verification/automation/Cargo.toml --locked -- verify \
+cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- verify \
   --manifest-path path/to/Cargo.toml --discovery path/to/normalized-discovery.json \
   --function function_name --verus path/to/verus
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- \
