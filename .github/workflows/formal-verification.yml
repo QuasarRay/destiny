@@ -60,7 +60,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: true
+
+      - name: Materialize only the pinned verifier source trees
+        run: python3 verification/tools/vendor_verifiers.py --materialize
 
       - name: Validate materialized verifier source identities
         run: python3 verification/tools/vendor_verifiers.py --verify-only

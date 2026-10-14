@@ -22,9 +22,15 @@ def gitlink(path: str) -> str:
     return fields[2]
 
 def materialized(path: Path) -> bool:
-    return path.is_dir() and run(
-        "git", "rev-parse", "--is-inside-work-tree", cwd=path, check=False
-    ).returncode == 0
+    if not path.is_dir():
+        return False
+    probe = run("git", "rev-parse", "--show-toplevel", cwd=path, check=False)
+    if probe.returncode:
+        return False
+    try:
+        return Path(probe.stdout.strip()).resolve() == path.resolve()
+    except OSError:
+        return False
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
