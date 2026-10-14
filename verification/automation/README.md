@@ -50,3 +50,18 @@ than silently modeled with mathematical integers or extra premises.
 A Verus proof failure remains a proof failure. Concrete source replay is kept as
 a separate explicit Kani/CBMC reference lane and is not required or invoked by
 the default Verus fixture path.
+
+
+## Explicit concrete replay reference lane
+
+Pinned Kani 0.68 records in its source that automatic harnesses do not support
+concrete playback. Therefore replay is intentionally **not** part of the
+Verus-default autoharness path.
+
+`verification/tools/replay_kani_fixture.py` creates a temporary manual Kani
+harness that imports the original failing fixture with Rust's `#[path]`
+attribute. Kani/CBMC generates the concrete witness and Kani playback executes
+that harness. A result is called `reproduced_source_failure` only when playback
+fails at the original source assertion line and the original source remains
+byte-for-byte unchanged. This lane is explicitly labeled
+`kani_cbmc_reference` and grants no Verus proof credit.
