@@ -1,3 +1,7 @@
+[submodule ".agents"]
+	path = .agents
+	url = https://github.com/QuasarRay/Aegis.git
+	shallow = true
 [submodule "third_party/verus"]
 	path = third_party/verus
 	url = https://github.com/verus-lang/verus.git
