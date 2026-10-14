@@ -39,6 +39,9 @@ jobs:
       - name: Validate proof markers against exhaustive original test catalog
         run: python verification/tools/proof_coverage.py
 
+      - name: Test Kani-assisted Verus bridge metadata handling
+        run: python3 -B verification/tools/test_verus_kani_bridge.py
+
       - name: Scan repeated implementation and proof patterns
         run: python verification/tools/pattern_scan.py --json > repetition-patterns.json
 
@@ -46,6 +49,33 @@ jobs:
         with:
           name: formal-repetition-patterns
           path: repetition-patterns.json
+
+  kani-discovery:
+    name: Kani 0.68.0 autoharness discovery for Verus
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned Kani discovery frontend
+        run: |
+          cargo install --locked kani-verifier --version 0.68.0
+          cargo kani setup
+          cargo-kani --version
+
+      - name: Discover supported Verus candidates through Kani metadata only
+        run: |
+          mkdir -p .aegis/destiny/verus-kani-automation
+          python3 -B verification/tools/verus_kani_bridge.py discover \
+            --cargo-kani "$(command -v cargo-kani)" \
+            --output .aegis/destiny/verus-kani-automation/discovery.json
+          python3 -B verification/tools/verus_kani_bridge.py check-discovery \
+            --discovery .aegis/destiny/verus-kani-automation/discovery.json \
+            --plan verification/plans/verus-concurrency.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verus-kani-autoharness-discovery
+          path: .aegis/destiny/verus-kani-automation/discovery.json
 
   kani:
     name: Kani 0.68.0
@@ -64,6 +94,7 @@ jobs:
 
   verus:
     name: Verus 0.2026.09.20.aef82ed
+    needs: kani-discovery
     runs-on: ubuntu-24.04
     env:
       VERUS_RELEASE: 0.2026.09.20.aef82ed
@@ -72,6 +103,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Restore Kani-assisted discovery evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: verus-kani-autoharness-discovery
+          path: .aegis/destiny/verus-kani-automation
 
       - name: Check out the pinned maintained controller
         uses: actions/checkout@v4
@@ -102,7 +139,9 @@ jobs:
       - name: Verify logical refinement proofs
         run: |
           python3 -B verification/tools/check_concurrency_acceptance.py --structure-only
-          python3 -B verification/tools/run_verus_campaign.py --verus "$VERUS_BIN"
+          python3 -B verification/tools/run_verus_campaign.py \
+            --verus "$VERUS_BIN" \
+            --automation-discovery .aegis/destiny/verus-kani-automation/discovery.json
 
       - name: Retain complete counted results, VIR inventories and scope audit
         if: always()
@@ -116,6 +155,7 @@ jobs:
             .aegis/destiny/bindings
             .aegis/destiny/proofs
             .aegis/destiny/concurrency-acceptance.json
+            .aegis/destiny/verus-kani-automation/discovery.json
 
   runtime-parity:
     name: concrete runtime parity regression
