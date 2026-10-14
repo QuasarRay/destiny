@@ -18,12 +18,14 @@ class MetadataTests(unittest.TestCase):
         candidates = [
             {
                 "function": "destiny_original_spec::model::assign_flag",
+                "kani_metadata_name": "model::assign_flag",
                 "controller_obligation": "state-contracts-reviewed-inventory",
                 "verus_entry": "verification/verus/state_contracts.rs",
                 "reason": "Boolean identity",
             },
             {
                 "function": "destiny_original_spec::model::follow_allowed",
+                "kani_metadata_name": "model::follow_allowed",
                 "controller_obligation": "proofs-reviewed-inventory",
                 "verus_entry": "verification/verus/proofs.rs",
                 "reason": "Boolean/equality",
@@ -38,9 +40,9 @@ class MetadataTests(unittest.TestCase):
                 "test_harnesses": [],
                 "contracted_functions": [],
                 "autoharness_md": {
-                    "chosen": ["destiny_original_spec::model::assign_flag"],
+                    "chosen": ["model::assign_flag"],
                     "skipped": {
-                        "destiny_original_spec::model::follow_allowed": {
+                        "model::follow_allowed": {
                             "GenericFn": "fixture blocker"
                         }
                     },
@@ -61,6 +63,7 @@ class MetadataTests(unittest.TestCase):
         candidates = [
             {
                 "function": "destiny_original_spec::model::assign_flag",
+                "kani_metadata_name": "model::assign_flag",
                 "controller_obligation": "state-contracts-reviewed-inventory",
                 "verus_entry": "verification/verus/state_contracts.rs",
                 "reason": "Boolean identity",

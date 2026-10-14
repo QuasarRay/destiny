@@ -34,63 +34,72 @@
       "status": "supported",
       "reason": "i64 equality plus Boolean logic; no arithmetic or representation-changing operation",
       "controller_obligation": "proofs-reviewed-inventory",
-      "verus_entry": "verification/verus/proofs.rs"
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::follow_allowed"
     },
     {
       "function": "destiny_original_spec::model::visibility_occluder",
       "status": "supported",
       "reason": "Boolean conjunction/negation only",
       "controller_obligation": "proofs-reviewed-inventory",
-      "verus_entry": "verification/verus/proofs.rs"
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::visibility_occluder"
     },
     {
       "function": "destiny_original_spec::model::proximity_eligible",
       "status": "supported",
       "reason": "Boolean logic only",
       "controller_obligation": "proofs-reviewed-inventory",
-      "verus_entry": "verification/verus/proofs.rs"
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::proximity_eligible"
     },
     {
       "function": "destiny_original_spec::model::uncloak_restores_massive",
       "status": "supported",
       "reason": "Boolean negation only",
       "controller_obligation": "proofs-reviewed-inventory",
-      "verus_entry": "verification/verus/proofs.rs"
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::uncloak_restores_massive"
     },
     {
       "function": "destiny_original_spec::model::assign_flag",
       "status": "supported",
       "reason": "Boolean identity",
       "controller_obligation": "state-contracts-reviewed-inventory",
-      "verus_entry": "verification/verus/state_contracts.rs"
+      "verus_entry": "verification/verus/state_contracts.rs",
+      "kani_metadata_name": "model::assign_flag"
     },
     {
       "function": "destiny_original_spec::model::running_after_start",
       "status": "supported",
       "reason": "Boolean constant",
       "controller_obligation": "state-contracts-reviewed-inventory",
-      "verus_entry": "verification/verus/state_contracts.rs"
+      "verus_entry": "verification/verus/state_contracts.rs",
+      "kani_metadata_name": "model::running_after_start"
     },
     {
       "function": "destiny_original_spec::model::running_after_pause",
       "status": "supported",
       "reason": "Boolean constant",
       "controller_obligation": "state-contracts-reviewed-inventory",
-      "verus_entry": "verification/verus/state_contracts.rs"
+      "verus_entry": "verification/verus/state_contracts.rs",
+      "kani_metadata_name": "model::running_after_pause"
     },
     {
       "function": "destiny_original_spec::visibility::visibility_candidate_blocks",
       "status": "supported",
       "reason": "Boolean conjunction/negation only",
       "controller_obligation": "visibility-contracts-reviewed-inventory",
-      "verus_entry": "verification/verus/visibility_contracts.rs"
+      "verus_entry": "verification/verus/visibility_contracts.rs",
+      "kani_metadata_name": "visibility::visibility_candidate_blocks"
     },
     {
       "function": "destiny_original_spec::visibility::visibility_result",
       "status": "supported",
       "reason": "i64 value selection with constant zero; no arithmetic",
       "controller_obligation": "visibility-contracts-reviewed-inventory",
-      "verus_entry": "verification/verus/visibility_contracts.rs"
+      "verus_entry": "verification/verus/visibility_contracts.rs",
+      "kani_metadata_name": "visibility::visibility_result"
     },
     {
       "function": "destiny_original_spec::model::adjust_time",

@@ -89,7 +89,9 @@ def collect_autoharness_metadata(
     target_dir: Path,
     candidates: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    expected = {item["function"]: item for item in candidates}
+    expected = {item["kani_metadata_name"]: item for item in candidates}
+    if len(expected) != len(candidates):
+        raise BridgeError("duplicate Kani metadata names in automation registry")
     chosen: dict[str, dict[str, Any]] = {}
     skipped: dict[str, dict[str, Any]] = {}
     files = sorted(target_dir.rglob("*.kani-metadata.json"))
@@ -114,25 +116,29 @@ def collect_autoharness_metadata(
                 }
 
     records: list[dict[str, Any]] = []
-    for name, item in sorted(expected.items()):
-        if name in chosen:
+    for metadata_name, item in sorted(expected.items()):
+        function = item["function"]
+        if metadata_name in chosen:
             records.append({
-                "function": name,
+                "function": function,
+                "kani_metadata_name": metadata_name,
                 "status": "selected",
                 "controller_obligation": item["controller_obligation"],
                 "verus_entry": item["verus_entry"],
                 "semantic_reason": item["reason"],
             })
-        elif name in skipped:
+        elif metadata_name in skipped:
             records.append({
-                "function": name,
+                "function": function,
+                "kani_metadata_name": metadata_name,
                 "status": "blocked",
-                "reason": skipped[name]["reason"],
+                "reason": skipped[metadata_name]["reason"],
                 "smallest_next_step": "Resolve the Kani-reported eligibility blocker without narrowing the domain.",
             })
         else:
             records.append({
-                "function": name,
+                "function": function,
+                "kani_metadata_name": metadata_name,
                 "status": "blocked",
                 "reason": {"kind": "MissingFromKaniAutoharnessMetadata"},
                 "smallest_next_step": "Inspect the pinned Kani metadata artifact and exact definition path.",

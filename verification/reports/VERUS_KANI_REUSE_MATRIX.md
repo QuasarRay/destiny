@@ -21,6 +21,6 @@ Pinned inputs: Verus aef82eda71838deef4a8cd0260fda6c9504be9b9; Kani 0d2328a93f0e
 
 The first supported subset accepts only executable-specification functions whose operations are Boolean logic, integer equality, or direct value selection and for which an already reviewed Verus entry exists. Floating point, machine arithmetic, casts, pointers, allocation, unsafe code, loops, recursion, and concurrency are not translated by this slice.
 
-Kani owns eligibility discovery; Verus owns the checked proof. The bridge uses the pinned Kani autoharness list path because it implies codegen-only, then reads compiler-emitted chosen/skipped metadata. A selected function maps to an existing Destiny controller obligation, and the existing controller checks the exact reviewed Verus inventory.
+Kani owns eligibility discovery; Verus owns the checked proof. Kani's compiler stores autoharness metadata in crate-relative form (for example `model::follow_allowed`), while include filters are crate-qualified; the registry records both identities explicitly. The bridge uses the pinned Kani autoharness list path because it implies codegen-only, then reads compiler-emitted chosen/skipped metadata. A selected function maps to an existing Destiny controller obligation, and the existing controller checks the exact reviewed Verus inventory.
 
 This does not prove general Rust-to-Verus translation correctness. The source-to-existing-Verus mapping remains a reviewed correspondence boundary, and arithmetic/floating-point cases whose semantics differ are explicitly unsupported.
