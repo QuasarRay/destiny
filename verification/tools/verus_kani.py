@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -114,6 +115,23 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def strict_json(text: str):
+    def unique(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def reject_constant(value):
+        raise ValueError(f"non-finite JSON constant: {value}")
+
+    return json.loads(
+        text, object_pairs_hook=unique, parse_constant=reject_constant
+    )
 
 
 def tokenize(text: str) -> list[Token]:
@@ -400,6 +418,7 @@ def discover(
         command = [
             kani_cargo, "kani", "autoharness", "-Z", "autoharness",
             "--manifest-path", str(manifest),
+            "--target-dir", str(temp / "target"),
             "--list", "--format", "json", "--quiet",
         ]
         for pattern in includes:
@@ -427,8 +446,8 @@ def discover(
                 "stderr": result.stderr,
             }
         try:
-            data = json.loads(list_path.read_text())
-        except json.JSONDecodeError as error:
+            data = strict_json(list_path.read_text())
+        except (json.JSONDecodeError, ValueError) as error:
             return {"status": "malformed_output", "reason": f"invalid kani-list.json: {error}"}
         if data.get("kani-version") != KANI_VERSION or data.get("file-version") != "0.1":
             return {
@@ -436,19 +455,54 @@ def discover(
                 "observed_kani_version": data.get("kani-version"),
                 "observed_file_version": data.get("file-version"),
             }
-        names = sorted(
+        listed_harnesses = sorted(
             set(flatten_strings(data.get("standard-harnesses", {})))
             | set(flatten_strings(data.get("contract-harnesses", {})))
         )
-        names = [name for name in names if "/" not in name and "\\" not in name and name != "NONE"]
+        listed_harnesses = [
+            name for name in listed_harnesses
+            if "/" not in name and "\\" not in name and name != "NONE"
+        ]
+        chosen: set[str] = set()
+        skipped = []
+        metadata_files = []
+        for metadata_path in sorted((temp / "target").rglob("*.kani-metadata.json")):
+            try:
+                metadata = strict_json(metadata_path.read_text())
+            except (json.JSONDecodeError, ValueError) as error:
+                return {
+                    "status": "malformed_output",
+                    "reason": f"invalid Kani metadata {metadata_path.name}: {error}",
+                }
+            auto = metadata.get("autoharness_md")
+            if not auto:
+                continue
+            metadata_files.append(metadata_path.name)
+            chosen.update(auto.get("chosen", []))
+            for function, reason in auto.get("skipped", {}).items():
+                skipped.append({
+                    "crate": metadata.get("crate_name"),
+                    "function": function,
+                    "reason": reason,
+                })
+        selected = sorted(chosen) if metadata_files else listed_harnesses
+        kani_driver = shutil.which("cargo-kani")
         return {
-            "status": "discovered" if names else "empty_selection",
+            "status": "discovered" if selected else "empty_selection",
             "stage": "kani_metadata_codegen",
             "engine": "kani_metadata_only",
             "cbmc_verification": False,
             "command": command,
-            "selected": names,
+            "selected": selected,
+            "listed_harnesses": listed_harnesses,
+            "skipped": sorted(skipped, key=lambda row: (str(row["crate"]), row["function"])),
+            "metadata_files": metadata_files,
             "totals": data.get("totals", {}),
+            "kani_driver_path": kani_driver,
+            "kani_driver_sha256": (
+                sha256_file(Path(kani_driver)) if kani_driver and Path(kani_driver).is_file()
+                else None
+            ),
             "stdout_sha256": sha256_bytes(result.stdout.encode()),
             "stderr_sha256": sha256_bytes(result.stderr.encode()),
         }
@@ -498,16 +552,26 @@ def verify_one(
     timeout: int,
 ) -> dict:
     generated_text = lower_function(function, source_path, manifest.parent)
+    tracked_inputs = {
+        "source": source_path,
+        "manifest": manifest,
+        "translator": Path(__file__),
+        "capabilities": ROOT / "verification" / "automation" / "capabilities.json",
+        "vendor_manifest": ROOT / "verification" / "vendor" / "manifest.json",
+    }
+    input_sha256 = {name: sha256_file(path) for name, path in tracked_inputs.items()}
     identity = {
         "schema": SCHEMA,
         "engine": "verus",
         "verus_commit": VERUS_COMMIT,
+        "verus_sha256": sha256_file(verus),
         "kani_metadata_commit": KANI_COMMIT,
         "source_file": str(source_path.resolve()),
-        "source_sha256": sha256_file(source_path),
+        "source_sha256": input_sha256["source"],
+        "input_sha256": input_sha256,
         "function": function.name,
         "generated_sha256": sha256_bytes(generated_text.encode()),
-        "translator_sha256": sha256_file(Path(__file__)),
+        "translator_sha256": input_sha256["translator"],
         "assumptions": [],
         "bounds": [{"kind": "literal_for_unroll", "max_iterations": 32}],
         "trusted_boundaries": [
@@ -550,10 +614,23 @@ def verify_one(
             stderr += f"\nstrict evidence parser unavailable: {error}\n"
     elif not summaries:
         status = "proof_failure" if "error" in (stdout + stderr).lower() else "infrastructure_error"
+    try:
+        post_input_sha256 = {
+            name: sha256_file(path) for name, path in tracked_inputs.items()
+        }
+        generated_after = sha256_file(generated)
+    except OSError as error:
+        post_input_sha256 = {"error": str(error)}
+        generated_after = None
+    if post_input_sha256 != input_sha256 or generated_after != identity["generated_sha256"]:
+        status = "stale_input"
+
     row = {
         **identity,
         "key": key,
         "status": status,
+        "post_input_sha256": post_input_sha256,
+        "generated_after_sha256": generated_after,
         "command": command,
         "returncode": result.returncode,
         "summary": summaries,
@@ -657,6 +734,15 @@ def command_verify(args) -> int:
         "cbmc_verification": False,
         "manifest": str(manifest),
         "selected": selected,
+        "skipped": discovery.get("skipped", []),
+        "discovery": {
+            key: discovery.get(key)
+            for key in (
+                "engine", "stage", "cbmc_verification", "listed_harnesses",
+                "metadata_files", "totals", "kani_driver_path",
+                "kani_driver_sha256", "stdout_sha256", "stderr_sha256"
+            )
+        },
         "results": results,
     }
     print(json.dumps(report, indent=2))

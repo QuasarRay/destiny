@@ -59,5 +59,11 @@ class TranslatorTests(unittest.TestCase):
         data = {"a.rs": ["crate::one"], "b.rs": ["crate::two"]}
         self.assertEqual(vk.flatten_strings(data), ["crate::one", "crate::two"])
 
+    def test_strict_json_rejects_duplicate_and_nonfinite_values(self):
+        with self.assertRaises(ValueError):
+            vk.strict_json('{"a": 1, "a": 2}')
+        with self.assertRaises(ValueError):
+            vk.strict_json('{"a": NaN}')
+
 if __name__ == "__main__":
     unittest.main()
