@@ -55,6 +55,18 @@ class TranslatorTests(unittest.TestCase):
         with self.assertRaises(vk.Unsupported):
             self.parse("pub fn no_dynamic(x: u8) { for i in 0..3 { assert!(x == x); } }\n")
 
+    def test_generic_function_is_rejected(self):
+        with self.assertRaises(vk.Unsupported):
+            self.parse("pub fn generic<T>(x: T) { assert!(true); }\n")
+
+    def test_reference_memory_syntax_is_rejected(self):
+        with self.assertRaises(vk.Unsupported):
+            self.parse("pub fn reference(x: &u8) { assert!(true); }\n")
+
+    def test_assumption_syntax_is_rejected(self):
+        with self.assertRaises(vk.Unsupported):
+            self.parse("pub fn assumption(x: bool) { kani::assume(x); assert!(x); }\n")
+
     def test_kani_list_flatten_ignores_map_keys(self):
         data = {"a.rs": ["crate::one"], "b.rs": ["crate::two"]}
         self.assertEqual(vk.flatten_strings(data), ["crate::one", "crate::two"])
