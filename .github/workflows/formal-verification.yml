@@ -110,6 +110,11 @@ jobs:
           name: verus-kani-autoharness-discovery
           path: .aegis/destiny/verus-kani-automation
 
+      - name: Materialize and verify pinned verifier sources
+        run: |
+          python3 -B verification/tools/bootstrap_verifiers.py --init --check \
+            | tee .aegis/destiny/verus-kani-automation/vendor-source.json
+
       - name: Check out the pinned maintained controller
         uses: actions/checkout@v4
         with:
@@ -156,6 +161,7 @@ jobs:
             .aegis/destiny/proofs
             .aegis/destiny/concurrency-acceptance.json
             .aegis/destiny/verus-kani-automation/discovery.json
+            .aegis/destiny/verus-kani-automation/vendor-source.json
 
   runtime-parity:
     name: concrete runtime parity regression
