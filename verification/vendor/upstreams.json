@@ -29,7 +29,7 @@
         {
           "path": "charon",
           "commit": "b250680abd40ff1aaa07081d0497dc2755ed112e",
-          "required_for_current_boundary": false
+          "required_for_current_boundary": true
         },
         {
           "path": "firecracker",
@@ -56,7 +56,27 @@
     }
   },
   "current_boundary": {
-    "description": "Compile and consume Kani's autoharness metadata types now; next staged slice applies a two-file Kani patch so compiler-side autoharness discovery/listing stops before GOTO/CBMC linking. Neither path grants proof credit.",
+    "description": "Kani autoharness discovery is sourced from the pinned compiler through a two-file metadata-only patch. The path stops before GOTO linking and CI hard-fails any CBMC/GOTO executable invocation. Results remain discovery-only with no proof credit; Verus remains the default engine.",
     "default_engine": "verus"
-  }
+  },
+  "repository_gitlinks": [
+    {
+      "path": ".agents",
+      "repository": "https://github.com/QuasarRay/Aegis.git",
+      "commit": "46f90f7dbc4f3db8a1a74ef9d8aa91fb4b679460",
+      "role": "maintained verification controller"
+    },
+    {
+      "path": "vendor/github.com/carbonengine/vcpkg-registry",
+      "repository": "https://github.com/carbonengine/vcpkg-registry",
+      "commit": "ec7d8d86e07879d1c73ba2016ac34dd6610fef6a",
+      "role": "existing project dependency"
+    },
+    {
+      "path": "vendor/github.com/microsoft/vcpkg",
+      "repository": "https://github.com/microsoft/vcpkg",
+      "commit": "6d9d7df564a1ccdaa994e4ad39ccd4a32360867b",
+      "role": "existing project dependency"
+    }
+  ]
 }

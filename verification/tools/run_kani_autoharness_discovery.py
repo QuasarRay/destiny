@@ -88,11 +88,27 @@ def main() -> int:
     if not metadata:
         raise SystemExit("Kani produced no .kani_metadata.json artifacts")
 
+    combined = []
+    for path in metadata:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise SystemExit(f"Malformed Kani metadata object: {path}")
+        combined.append(payload)
+    combined_path = out / "kani-metadata.json"
+    combined_path.write_text(
+        json.dumps(combined, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
     receipt = {
         "status": "KANI_AUTOHARNESS_DISCOVERY_ONLY",
         "proof_credit": False,
         "manifest": str(manifest.relative_to(ROOT)),
         "driver": str(driver),
+        "combined_metadata": {
+            "path": str(combined_path.relative_to(ROOT)),
+            "sha256": digest(combined_path),
+        },
         "metadata": [
             {
                 "path": str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path),

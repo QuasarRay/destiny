@@ -58,11 +58,53 @@ jobs:
       - name: Verify immutable upstream source pins
         run: python3 -B verification/tools/check_vendor_integrity.py
 
+      - name: Materialize Kani compiler source dependency
+        run: git -C third_party/kani submodule update --init --depth=1 charon
+
+      - name: Apply validated metadata-only Kani patch
+        run: python3 -B verification/tools/bootstrap_kani_vendor.py
+
       - name: Install pinned Kani source toolchain
         run: rustup toolchain install nightly-2026-08-21 --profile minimal
 
       - name: Test shared autoharness metadata adapter
         run: cargo +nightly-2026-08-21 test --manifest-path verification/automation/Cargo.toml --locked
+
+      - name: Build patched pinned Kani from source
+        working-directory: third_party/kani
+        run: cargo +nightly-2026-08-21 build-dev -- --release
+
+      - name: Discover automatic harnesses with CBMC and GOTO execution forbidden
+        run: python3 -B verification/tools/run_kani_autoharness_discovery.py
+
+      - name: Normalize real Kani compiler metadata for the Verus-default planner
+        run: |
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            discover .aegis/destiny/kani-autoharness-discovery/kani-metadata.json \
+            > .aegis/destiny/kani-autoharness-discovery/normalized-discovery.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path(".aegis/destiny/kani-autoharness-discovery/normalized-discovery.json")
+          data=json.loads(p.read_text())
+          assert data["default_engine"] == "verus"
+          assert data["proof_credit"] is False
+          assert data["crates_with_autoharness_metadata"] > 0
+          assert data["candidates"], "empty autoharness candidate inventory"
+          print(json.dumps({
+              "default_engine": data["default_engine"],
+              "candidates": len(data["candidates"]),
+              "proof_credit": data["proof_credit"],
+          }, sort_keys=True))
+          PY
+
+      - name: Retain Kani-to-Verus discovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kani-verus-automation-discovery
+          path: .aegis/destiny/kani-autoharness-discovery
 
   kani:
     name: Kani 0.68.0
