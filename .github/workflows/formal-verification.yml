@@ -36,6 +36,12 @@ jobs:
       - name: Compile and run non-Kani proof-crate regression tests
         run: cargo test --manifest-path verification/kani/Cargo.toml
 
+      - name: Test Verus/Kani structural bridge
+        run: python verification/automation/test_verus_kani.py -v
+
+      - name: Validate verifier vendor gitlinks without network
+        run: python verification/tools/vendor_verifiers.py
+
       - name: Validate proof markers against exhaustive original test catalog
         run: python verification/tools/proof_coverage.py
 
@@ -46,6 +52,33 @@ jobs:
         with:
           name: formal-repetition-patterns
           path: repetition-patterns.json
+
+  vendor-source-build:
+    name: immutable verifier source builds
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Validate materialized verifier source identities
+        run: python3 verification/tools/vendor_verifiers.py --verify-only
+
+      - name: Provision pinned Rust toolchains
+        run: |
+          rustup toolchain install 1.98.1 --component rustc-dev --component llvm-tools
+          rustup toolchain install nightly-2026-08-21 --component llvm-tools --component rustc-dev --component rust-src --component rustfmt
+
+      - name: Provision Cargo dependencies explicitly
+        run: |
+          cargo +nightly-2026-08-21 fetch --locked --manifest-path third_party/kani/Cargo.toml
+          cargo +1.98.1 fetch --locked --manifest-path third_party/verus/source/Cargo.toml
+
+      - name: Build both vendored verifier sources with dependency network disabled
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: verification/tools/build_vendored_verifiers.sh --offline
 
   kani:
     name: Kani 0.68.0
@@ -99,6 +132,71 @@ jobs:
           echo "VERUS_BIN=$VERUS_BIN" >> "$GITHUB_ENV"
           "$VERUS_BIN" --version
 
+      - name: Install pinned Kani metadata provider
+        run: |
+          cargo install --locked kani-verifier --version 0.68.0
+          cargo kani setup
+          cargo kani --version
+
+      - name: Verify Kani-assisted Verus vertical slice with CBMC proof execution blocked
+        run: |
+          set -euo pipefail
+          CBMC_BIN="$(find "$HOME/.kani" -type f -name cbmc -perm -u+x | head -n 1)"
+          test -n "$CBMC_BIN"
+          export REAL_CBMC="${CBMC_BIN}.real"
+          mv "$CBMC_BIN" "$REAL_CBMC"
+          export CBMC_BLOCK_LOG="$RUNNER_TEMP/cbmc-invocations.log"
+          : > "$CBMC_BLOCK_LOG"
+          cat > "$CBMC_BIN" <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          printf '%s\n' "$*" >> "$CBMC_BLOCK_LOG"
+          if [[ "${1:-}" == "--version" ]]; then
+            exec "$REAL_CBMC" "$@"
+          fi
+          echo "CBMC symbolic execution is disabled for the Verus-default automation lane" >&2
+          exit 97
+          SH
+          chmod +x "$CBMC_BIN"
+
+          python3 -B verification/tools/verus_kani.py verify \
+            --manifest-path verification/automation/fixtures/valid/Cargo.toml \
+            --function branch_valid --verus "$VERUS_BIN" > automation-valid.json
+          python3 -B verification/tools/verus_kani.py verify \
+            --manifest-path verification/automation/fixtures/valid/Cargo.toml \
+            --function fixed_loop_valid --verus "$VERUS_BIN" > automation-loop.json
+
+          set +e
+          python3 -B verification/tools/verus_kani.py verify \
+            --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
+            --function branch_invalid --verus "$VERUS_BIN" > automation-invalid.json
+          invalid_rc=$?
+          python3 -B verification/tools/verus_kani.py verify \
+            --manifest-path verification/automation/fixtures/unsupported/Cargo.toml \
+            --function float_unsupported --verus "$VERUS_BIN" > automation-unsupported.json
+          unsupported_rc=$?
+          set -e
+
+          test "$invalid_rc" -eq 1
+          test "$unsupported_rc" -eq 1
+          cp "$CBMC_BLOCK_LOG" cbmc-invocations.log
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          valid = json.loads(Path("automation-valid.json").read_text())
+          loop = json.loads(Path("automation-loop.json").read_text())
+          invalid = json.loads(Path("automation-invalid.json").read_text())
+          unsupported = json.loads(Path("automation-unsupported.json").read_text())
+          assert valid["status"] == "checked_valid", valid
+          assert loop["status"] == "checked_valid", loop
+          assert invalid["status"] == "refuted_or_unproved", invalid
+          assert invalid["results"][0]["status"] == "proof_failure", invalid
+          assert unsupported["status"] == "incomplete", unsupported
+          assert unsupported["results"][0]["status"] == "unsupported", unsupported
+          for line in Path("cbmc-invocations.log").read_text().splitlines():
+              assert line == "--version", f"unexpected CBMC execution: {line}"
+          PY
+
       - name: Verify logical refinement proofs
         run: |
           python3 -B verification/tools/check_concurrency_acceptance.py --structure-only
@@ -113,9 +211,15 @@ jobs:
             .aegis/destiny/receipts
             .aegis/destiny/verus-artifacts
             .aegis/destiny/verus-final-campaign
+            .aegis/destiny/verus-kani
             .aegis/destiny/bindings
             .aegis/destiny/proofs
             .aegis/destiny/concurrency-acceptance.json
+            automation-valid.json
+            automation-loop.json
+            automation-invalid.json
+            automation-unsupported.json
+            cbmc-invocations.log
 
   runtime-parity:
     name: concrete runtime parity regression
