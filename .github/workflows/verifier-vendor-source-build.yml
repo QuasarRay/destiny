@@ -1,0 +1,54 @@
+name: verifier-vendor-source-build
+
+on:
+  pull_request:
+    paths:
+      - ".gitmodules"
+      - "third_party/kani"
+      - "third_party/verus"
+      - "verification/vendor/**"
+      - "verification/tools/vendor_verifiers.py"
+      - "verification/tools/build_vendored_verifiers.sh"
+      - ".github/workflows/verifier-vendor-source-build.yml"
+  push:
+    paths:
+      - ".gitmodules"
+      - "third_party/kani"
+      - "third_party/verus"
+      - "verification/vendor/**"
+      - "verification/tools/vendor_verifiers.py"
+      - "verification/tools/build_vendored_verifiers.sh"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vendor-source-build:
+    name: immutable verifier source builds
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Materialize only the pinned verifier source trees
+        run: python3 verification/tools/vendor_verifiers.py --materialize
+
+      - name: Validate materialized verifier source identities
+        run: python3 verification/tools/vendor_verifiers.py --verify-only
+
+      - name: Provision pinned Rust toolchains
+        run: |
+          rustup toolchain install 1.98.1 --component rustc-dev --component llvm-tools
+          rustup toolchain install nightly-2026-08-21 --component llvm-tools --component rustc-dev --component rust-src --component rustfmt
+
+      - name: Provision Cargo dependencies explicitly
+        run: |
+          cargo +nightly-2026-08-21 fetch --locked --manifest-path third_party/kani/Cargo.toml
+          cargo +1.98.1 fetch --locked --manifest-path third_party/verus/source/Cargo.toml
+
+      - name: Build both vendored verifier sources with dependency network disabled
+        env:
+          CARGO_NET_OFFLINE: "true"
+        run: verification/tools/build_vendored_verifiers.sh --offline
