@@ -108,6 +108,8 @@ MAX_PATH_STATES = 256
 class Function:
     name: str
     params: tuple[tuple[str, str], ...]
+    generic_params: tuple[str, ...]
+    selected_generic_args: tuple[tuple[str, str], ...]
     body: tuple[Stmt, ...]
     line: int
     source: str
@@ -213,8 +215,16 @@ class Parser:
     def parse_function(self) -> Function:
         start = self.take("fn")
         name = self.take(kind="ident").value
-        if self.current().value == "<":
-            self.fail("generic functions are unsupported")
+        generic_params = []
+        if self.accept("<"):
+            while True:
+                generic = self.take(kind="ident").value
+                if self.current().value == ":":
+                    self.fail("generic trait bounds are unsupported in the initial selected-instantiation subset")
+                generic_params.append(generic)
+                if not self.accept(","):
+                    break
+            self.take(">")
         self.take("(")
         params = []
         if self.current().value != ")":
@@ -224,7 +234,7 @@ class Parser:
                     self.fail("unnamed parameters are unsupported")
                 self.take(":")
                 typ = self.take(kind="ident").value
-                if typ not in SUPPORTED_TYPES:
+                if typ not in SUPPORTED_TYPES and typ not in generic_params:
                     self.fail(f"unsupported parameter type {typ!r}")
                 params.append((param, typ))
                 if not self.accept(","):
@@ -241,7 +251,15 @@ class Parser:
         self.allowed_names = {name for name, _ in params}
         body = self.parse_block()
         self.allowed_names = previous
-        return Function(name, tuple(params), body, start.line, self.source)
+        return Function(
+            name,
+            tuple(params),
+            tuple(generic_params),
+            (),
+            body,
+            start.line,
+            self.source,
+        )
 
     def parse_block(self) -> tuple[Stmt, ...]:
         self.take("{")
@@ -562,8 +580,54 @@ def collect_loop_bounds(statements: Sequence[Stmt]) -> list[dict[str, int | str]
     return bounds
 
 
+def split_selected_instance(requested: str) -> tuple[str, tuple[str, ...]]:
+    match = re.search(r"::<([^<>]+)>$", requested)
+    if match:
+        arguments = tuple(part.strip() for part in match.group(1).split(","))
+        base = requested[:match.start()]
+    else:
+        arguments = ()
+        base = requested
+    return base.rsplit("::", 1)[-1], arguments
+
+
+def instantiate_selected_function(function: Function, requested: str) -> Function:
+    base, selected = split_selected_instance(requested)
+    if base != function.name:
+        raise Unsupported(
+            f"Kani-selected identity {requested!r} does not refer to source function {function.name!r}"
+        )
+    if not function.generic_params:
+        if selected:
+            raise Unsupported(
+                f"non-generic source function {function.name!r} received generic arguments {selected!r}"
+            )
+        return function
+    if len(selected) != len(function.generic_params):
+        raise Unsupported(
+            f"selected generic instance for {function.name!r} has {len(selected)} arguments; "
+            f"expected {len(function.generic_params)}"
+        )
+    if any(argument not in SUPPORTED_TYPES for argument in selected):
+        raise Unsupported(
+            f"selected generic instance for {function.name!r} uses unsupported arguments {selected!r}"
+        )
+    substitution = dict(zip(function.generic_params, selected, strict=True))
+    params = tuple((name, substitution.get(typ, typ)) for name, typ in function.params)
+    if any(typ not in SUPPORTED_TYPES for _, typ in params):
+        raise Unsupported(
+            f"selected generic instance for {function.name!r} leaves unsupported parameter types"
+        )
+    return dataclasses.replace(
+        function,
+        params=params,
+        selected_generic_args=tuple(zip(function.generic_params, selected, strict=True)),
+    )
+
+
 def source_for_function(manifest: Path, requested: str) -> tuple[Path, Function]:
     source_root = manifest.parent / "src"
+    requested_base, _ = split_selected_instance(requested)
     matches = []
     failures = []
     for path in sorted(source_root.rglob("*.rs")):
@@ -573,8 +637,11 @@ def source_for_function(manifest: Path, requested: str) -> tuple[Path, Function]
             failures.append(str(error))
             continue
         for function in functions:
-            if requested == function.name or requested.endswith("::" + function.name):
-                matches.append((path, function))
+            if requested_base == function.name:
+                try:
+                    matches.append((path, instantiate_selected_function(function, requested)))
+                except Unsupported as error:
+                    failures.append(str(error))
     if len(matches) != 1:
         detail = "; ".join(failures[:3])
         raise Unsupported(f"function {requested!r} is not uniquely supported; {detail}")
@@ -680,6 +747,10 @@ def verify(
             {"name": name, "rust_type": typ, "independent": True}
             for name, typ in function.params
         ],
+        "selected_generic_arguments": [
+            {"parameter": parameter, "concrete_type": concrete}
+            for parameter, concrete in function.selected_generic_args
+        ],
         "source_assert_lines": collect_assert_lines(function.body),
         "generated_assert_count": generated_text.count("assert("),
         "generated_sha256": sha256_bytes(generated_text.encode()),
@@ -696,6 +767,7 @@ def verify(
             "The structural Rust-to-Verus lowering is trusted only for the declared grammar and is separately regression-tested.",
             "Kani assumptions are preserved as scoped Verus path assumptions; separate existential Verus obligations check that every translated assertion path remains satisfiable.",
             "Machine +,-,* are accepted only in executable branch conditions, where Verus checks fixed-width overflow; ghost assertion/assumption arithmetic remains rejected to prevent widening drift.",
+            "Generic source functions are accepted only when pinned Kani selected an explicit primitive monomorphic instance; that exact substitution is recorded and no generic theorem is claimed.",
             "Verus, its vstd contracts, Rust toolchain and solver remain verifier trust boundaries.",
         ],
     }

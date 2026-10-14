@@ -57,3 +57,7 @@ pub fn guarded_sub_valid(x: u8) {
         }
     }
 }
+
+pub fn generic_selected<T>(x: T) {
+    assert!(true);
+}

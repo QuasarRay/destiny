@@ -80,9 +80,17 @@ class TranslatorTests(unittest.TestCase):
         with self.assertRaises(vk.Unsupported):
             self.parse("pub fn no_dynamic(x: u8) { for i in 0..3 { assert!(x == x); } }\n")
 
-    def test_generic_and_reference_syntax_are_rejected(self):
+    def test_selected_primitive_generic_instance_is_explicitly_substituted(self):
+        function = self.parse("pub fn generic<T>(x: T) { assert!(true); }\n")[0]
+        selected = vk.instantiate_selected_function(function, "crate::generic::<i32>")
+        self.assertEqual(selected.params, (("x", "i32"),))
+        self.assertEqual(selected.selected_generic_args, (("T", "i32"),))
         with self.assertRaises(vk.Unsupported):
-            self.parse("pub fn generic<T>(x: T) { assert!(true); }\n")
+            vk.instantiate_selected_function(function, "crate::generic::<usize>")
+
+    def test_generic_bounds_and_reference_syntax_are_rejected(self):
+        with self.assertRaises(vk.Unsupported):
+            self.parse("pub fn bounded<T: Copy>(x: T) { assert!(true); }\n")
         with self.assertRaises(vk.Unsupported):
             self.parse("pub fn reference(x: &u8) { assert!(true); }\n")
 

@@ -43,7 +43,8 @@
       ],
       "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem",
       "assumptions": "preserved at their source program point; each translated assertion path gets a separate existential Verus non-vacuity obligation over the original fixed-width parameter domains",
-      "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected because Verus widens it."
+      "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected because Verus widens it.",
+      "generics": "source functions with unbounded type parameters only when Kani autoharness selected an explicit monomorphic instance and every selected type is in the supported fixed-width integer/Boolean set; the result is scoped to that concrete instantiation"
     },
     "rejected": [
       "requires/ensures syntax and contract macros",
@@ -54,7 +55,7 @@
       "floating point",
       "unsafe code",
       "concurrency",
-      "dynamic loops, named loop variables and recursion"
+      "generic trait-bound syntax, const generics, lifetimes, target-width generic arguments, dynamic loops, named loop variables and recursion"
     ],
     "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Scoped assumptions are additionally guarded by Verus-checked assertion-path non-vacuity obligations. No general Rust-to-Verus translation soundness is claimed."
   },

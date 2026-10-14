@@ -244,6 +244,22 @@ jobs:
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function guarded_sub_valid --verus "$VERUS_BIN" > fixture-guarded-sub.json
 
+          generic_fn="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path(".aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json").read_text())
+          matches=[row["function"] for row in data["candidates"]
+                   if row["disposition"] == "kani_eligible"
+                   and row["function"].endswith("generic_selected::<i32>")]
+          assert len(matches) == 1, matches
+          print(matches[0])
+          PY
+          )"
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/valid/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
+            --function "$generic_fn" --verus "$VERUS_BIN" > fixture-generic.json
+
           set +e
           cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
@@ -286,6 +302,7 @@ jobs:
           assumed=json.loads(Path("fixture-assumed.json").read_text())
           guarded_add=json.loads(Path("fixture-guarded-add.json").read_text())
           guarded_sub=json.loads(Path("fixture-guarded-sub.json").read_text())
+          generic=json.loads(Path("fixture-generic.json").read_text())
           invalid=json.loads(Path("fixture-invalid.json").read_text())
           contradictory=json.loads(Path("fixture-contradictory.json").read_text())
           add_overflow=json.loads(Path("fixture-add-overflow.json").read_text())
@@ -297,6 +314,10 @@ jobs:
           assert assumed["status"] == "checked_valid", assumed
           assert guarded_add["status"] == "checked_valid", guarded_add
           assert guarded_sub["status"] == "checked_valid", guarded_sub
+          assert generic["status"] == "checked_valid", generic
+          assert generic["selected_generic_arguments"] == [
+              {"parameter":"T","concrete_type":"i32"}
+          ], generic
           assert assumed["assumptions"] == [{"line":2,"expression":"(x > 0)"}], assumed
           assert assumed["assertion_paths"] == [{"line":3,"conditions":["(x > 0)"]}], assumed
           assert contradictory["status"] == "proof_failure", contradictory
@@ -348,6 +369,7 @@ jobs:
             fixture-assumed.json
             fixture-guarded-add.json
             fixture-guarded-sub.json
+            fixture-generic.json
             fixture-invalid.json
             fixture-contradictory.json
             fixture-add-overflow.json
