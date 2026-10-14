@@ -22,6 +22,7 @@
         "i64"
       ],
       "statements": [
+        "kani::assume(expr) with source-scoped path semantics",
         "assert!(expr)",
         "if/else",
         "for _ in LITERAL..LITERAL with at most 32 iterations"
@@ -39,12 +40,13 @@
         ">",
         ">="
       ],
-      "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem"
+      "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem",
+      "assumptions": "preserved at their source program point; each translated assertion path gets a separate existential Verus non-vacuity obligation over the original fixed-width parameter domains"
     },
     "rejected": [
+      "requires/ensures syntax and contract macros",
       "arithmetic and casts",
       "usize/isize and target-width dependent values",
-      "assumptions/requires/ensures",
       "function calls",
       "references, raw pointers, slices, allocation and user ADTs",
       "floating point",
@@ -52,7 +54,7 @@
       "concurrency",
       "dynamic loops, named loop variables and recursion"
     ],
-    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. No general Rust-to-Verus translation soundness is claimed."
+    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Scoped assumptions are additionally guarded by Verus-checked assertion-path non-vacuity obligations. No general Rust-to-Verus translation soundness is claimed."
   },
   "evidence": {
     "strict_verus_result_parser": "existing Aegis agentinfra.destiny_reuse.checked_output",

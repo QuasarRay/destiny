@@ -19,3 +19,17 @@ pub fn fixed_loop_valid(x: bool) {
 pub fn independent_inputs(a: u8, b: u8) {
     assert!(a == a && b == b);
 }
+
+pub fn assumed_valid(x: u8) {
+    kani::assume(x > 0);
+    assert!(x > 0);
+}
+
+pub fn conditional_assume_valid(x: bool, y: bool) {
+    if x {
+        kani::assume(y);
+        assert!(y);
+    } else {
+        assert!(!x);
+    }
+}

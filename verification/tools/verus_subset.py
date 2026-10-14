@@ -78,6 +78,12 @@ class AssertStmt:
 
 
 @dataclasses.dataclass(frozen=True)
+class AssumeStmt:
+    expr: Expr
+    line: int
+
+
+@dataclasses.dataclass(frozen=True)
 class IfStmt:
     cond: Expr
     then_body: tuple["Stmt", ...]
@@ -93,7 +99,9 @@ class ForStmt:
     line: int
 
 
-Stmt = AssertStmt | IfStmt | ForStmt
+Stmt = AssertStmt | AssumeStmt | IfStmt | ForStmt
+
+MAX_PATH_STATES = 256
 
 
 @dataclasses.dataclass(frozen=True)
@@ -247,6 +255,16 @@ class Parser:
 
     def parse_statement(self) -> Stmt:
         token = self.current()
+        if token.value == "kani":
+            self.take("kani")
+            self.take(":")
+            self.take(":")
+            self.take("assume")
+            self.take("(")
+            expr = self.parse_expression()
+            self.take(")")
+            self.take(";")
+            return AssumeStmt(expr, token.line)
         if token.value == "assert":
             self.take("assert")
             self.take("!")
@@ -280,7 +298,7 @@ class Parser:
                 self.fail("literal loop bound exceeds 32 iterations")
             body = self.parse_block()
             return ForStmt(lower, upper, body, token.line)
-        self.fail("supported statements are assert!, if/else, and literal for-ranges")
+        self.fail("supported statements are kani::assume, assert!, if/else, and literal for-ranges")
         raise AssertionError("unreachable")
 
     def parse_expression(self) -> Expr:
@@ -340,6 +358,10 @@ def parse_source(path: Path) -> list[Function]:
 
 
 def emit_statement(statement: Stmt, indent: str, source: str, output: list[str]) -> None:
+    if isinstance(statement, AssumeStmt):
+        output.append(f"{indent}// source {source}:{statement.line}; Kani path assumption")
+        output.append(f"{indent}assume({statement.expr.text});")
+        return
     if isinstance(statement, AssertStmt):
         output.append(f"{indent}// source {source}:{statement.line}")
         output.append(f"{indent}assert({statement.expr.text});")
@@ -380,11 +402,111 @@ def lower_function(function: Function, source_path: Path, project_root: Path) ->
     return "\n".join(output)
 
 
+@dataclasses.dataclass(frozen=True)
+class AssertionPath:
+    line: int
+    conditions: tuple[str, ...]
+
+
+def collect_assumptions(statements: Sequence[Stmt]) -> list[dict[str, int | str]]:
+    rows = []
+    seen = set()
+
+    def visit(body: Sequence[Stmt]) -> None:
+        for statement in body:
+            if isinstance(statement, AssumeStmt):
+                key = (statement.line, statement.expr.text)
+                if key not in seen:
+                    seen.add(key)
+                    rows.append({"line": statement.line, "expression": statement.expr.text})
+            elif isinstance(statement, IfStmt):
+                visit(statement.then_body)
+                visit(statement.else_body)
+            elif isinstance(statement, ForStmt):
+                visit(statement.body)
+
+    visit(statements)
+    return rows
+
+
+def _bounded_states(states: Sequence[tuple[str, ...]]) -> list[tuple[str, ...]]:
+    deduplicated = list(dict.fromkeys(states))
+    if len(deduplicated) > MAX_PATH_STATES:
+        raise Unsupported(
+            f"symbolic path-state count exceeds the supported limit of {MAX_PATH_STATES}"
+        )
+    return deduplicated
+
+
+def collect_assertion_paths(statements: Sequence[Stmt]) -> list[AssertionPath]:
+    paths: list[AssertionPath] = []
+
+    def walk(
+        body: Sequence[Stmt],
+        states: Sequence[tuple[str, ...]],
+    ) -> list[tuple[str, ...]]:
+        current = _bounded_states(states)
+        for statement in body:
+            if isinstance(statement, AssumeStmt):
+                current = _bounded_states(
+                    [conditions + (statement.expr.text,) for conditions in current]
+                )
+            elif isinstance(statement, AssertStmt):
+                paths.extend(AssertionPath(statement.line, conditions) for conditions in current)
+            elif isinstance(statement, IfStmt):
+                next_states = []
+                for conditions in current:
+                    next_states.extend(
+                        walk(
+                            statement.then_body,
+                            [conditions + (statement.cond.text,)],
+                        )
+                    )
+                    next_states.extend(
+                        walk(
+                            statement.else_body,
+                            [conditions + (f"!({statement.cond.text})",)],
+                        )
+                        if statement.else_body
+                        else [conditions + (f"!({statement.cond.text})",)]
+                    )
+                current = _bounded_states(next_states)
+            elif isinstance(statement, ForStmt):
+                for _ in range(statement.start, statement.end):
+                    current = walk(statement.body, current)
+            else:
+                raise TypeError(statement)
+        return _bounded_states(current)
+
+    walk(statements, [()])
+    return list(dict.fromkeys(paths))
+
+
+def lower_nonvacuity(function: Function, paths: Sequence[AssertionPath]) -> str:
+    if not paths:
+        raise Unsupported("selected function contains no supported assertion obligations")
+    output = ["use vstd::prelude::*;", "", "verus! {"]
+    binders = ", ".join(f"{name}: {typ}" for name, typ in function.params)
+    for index, path in enumerate(paths):
+        output.append(f"proof fn __destiny_nonvacuity_{index}() {{")
+        condition = " && ".join(f"({term})" for term in path.conditions) or "true"
+        if binders:
+            output.append(f"    assert(exists|{binders}| {condition});")
+        else:
+            output.append(f"    assert({condition});")
+        output.append("}")
+        output.append("")
+    output.extend(["}", ""])
+    return "\n".join(output)
+
+
 def collect_assert_lines(statements: Sequence[Stmt]) -> list[int]:
     lines = []
     for statement in statements:
         if isinstance(statement, AssertStmt):
             lines.append(statement.line)
+        elif isinstance(statement, AssumeStmt):
+            continue
         elif isinstance(statement, IfStmt):
             lines.extend(collect_assert_lines(statement.then_body))
             lines.extend(collect_assert_lines(statement.else_body))
@@ -396,6 +518,8 @@ def collect_assert_lines(statements: Sequence[Stmt]) -> list[int]:
 def collect_loop_bounds(statements: Sequence[Stmt]) -> list[dict[str, int | str]]:
     bounds = []
     for statement in statements:
+        if isinstance(statement, AssumeStmt):
+            continue
         if isinstance(statement, ForStmt):
             bounds.append({
                 "kind": "literal_for_exhaustive_unroll",
@@ -502,6 +626,8 @@ def verify(
         }
 
     generated_text = lower_function(function, source_path, manifest.parent)
+    assertion_paths = collect_assertion_paths(function.body)
+    nonvacuity_text = lower_nonvacuity(function, assertion_paths)
     tracked = {
         "source": source_path,
         "manifest": manifest,
@@ -529,12 +655,18 @@ def verify(
         "source_assert_lines": collect_assert_lines(function.body),
         "generated_assert_count": generated_text.count("assert("),
         "generated_sha256": sha256_bytes(generated_text.encode()),
-        "assumptions": [],
+        "nonvacuity_generated_sha256": sha256_bytes(nonvacuity_text.encode()),
+        "assumptions": collect_assumptions(function.body),
+        "assertion_paths": [
+            {"line": path.line, "conditions": list(path.conditions)}
+            for path in assertion_paths
+        ],
         "bounds": collect_loop_bounds(function.body),
         "target_scope": "bool_and_fixed_width_integers_only; usize/isize rejected",
         "trusted_boundaries": [
             "Kani compiler autoharness eligibility metadata selects the source function; Kani/CBMC proof results are not used.",
             "The structural Rust-to-Verus lowering is trusted only for the declared grammar and is separately regression-tested.",
+            "Kani assumptions are preserved as scoped Verus path assumptions; separate existential Verus obligations check that every translated assertion path remains satisfiable.",
             "Verus, its vstd contracts, Rust toolchain and solver remain verifier trust boundaries.",
         ],
     }
@@ -543,7 +675,102 @@ def verify(
     destination.mkdir(parents=True, exist_ok=True)
     generated = destination / f"{function.name}.rs"
     generated.write_text(generated_text, encoding="utf-8")
+    nonvacuity = destination / f"{function.name}.nonvacuity.rs"
+    nonvacuity.write_text(nonvacuity_text, encoding="utf-8")
+    nonvacuity_command = [str(verus), "--crate-type=lib", str(nonvacuity)]
     command = [str(verus), "--crate-type=lib", str(generated)]
+
+    try:
+        nonvacuity_result = run(nonvacuity_command, ROOT, timeout)
+    except subprocess.TimeoutExpired as error:
+        row = {
+            **identity,
+            "key": key,
+            "status": "timeout",
+            "failure_stage": "non_vacuity",
+            "command": nonvacuity_command,
+            "stdout": error.stdout or "",
+            "stderr": error.stderr or "",
+        }
+        (destination / "evidence.json").write_text(json.dumps(row, indent=2) + "\n")
+        return row
+
+    nonvacuity_stdout = nonvacuity_result.stdout
+    nonvacuity_stderr = nonvacuity_result.stderr
+    nonvacuity_summaries = SUCCESS_RE.findall(
+        nonvacuity_stdout + "\n" + nonvacuity_stderr
+    )
+    if nonvacuity_result.returncode != 0:
+        row = {
+            **identity,
+            "key": key,
+            "status": "proof_failure",
+            "failure_stage": "non_vacuity",
+            "command": nonvacuity_command,
+            "returncode": nonvacuity_result.returncode,
+            "summary": nonvacuity_summaries,
+            "stdout_sha256": sha256_bytes(nonvacuity_stdout.encode()),
+            "stderr_sha256": sha256_bytes(nonvacuity_stderr.encode()),
+            "generated": str(generated),
+            "nonvacuity_generated": str(nonvacuity),
+        }
+        (destination / "nonvacuity-stdout.txt").write_text(
+            nonvacuity_stdout, encoding="utf-8"
+        )
+        (destination / "nonvacuity-stderr.txt").write_text(
+            nonvacuity_stderr, encoding="utf-8"
+        )
+        (destination / "evidence.json").write_text(
+            json.dumps(row, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        return row
+
+    try:
+        checked_output = import_checked_output()
+        nonvacuity_proxy = SimpleNamespace(
+            returncode=0,
+            timed_out=False,
+            stdout_truncated=False,
+            stderr_truncated=False,
+            stdout=nonvacuity_stdout,
+            stderr=nonvacuity_stderr,
+        )
+        nonvacuity_obligation = {
+            "method": "verus",
+            "entry": str(nonvacuity),
+            "expected_checks": len(assertion_paths),
+        }
+        nonvacuity_checked = checked_output(nonvacuity_obligation, nonvacuity_proxy)
+    except (ImportError, RuntimeError, ValueError, VerificationError) as error:
+        nonvacuity_checked = False
+        nonvacuity_stderr += f"\nstrict evidence parser unavailable: {error}\n"
+
+    if not nonvacuity_checked:
+        row = {
+            **identity,
+            "key": key,
+            "status": "infrastructure_error",
+            "failure_stage": "non_vacuity_evidence",
+            "command": nonvacuity_command,
+            "returncode": nonvacuity_result.returncode,
+            "summary": nonvacuity_summaries,
+            "stdout_sha256": sha256_bytes(nonvacuity_stdout.encode()),
+            "stderr_sha256": sha256_bytes(nonvacuity_stderr.encode()),
+            "generated": str(generated),
+            "nonvacuity_generated": str(nonvacuity),
+        }
+        (destination / "nonvacuity-stdout.txt").write_text(
+            nonvacuity_stdout, encoding="utf-8"
+        )
+        (destination / "nonvacuity-stderr.txt").write_text(
+            nonvacuity_stderr, encoding="utf-8"
+        )
+        (destination / "evidence.json").write_text(
+            json.dumps(row, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        return row
 
     try:
         result = run(command, ROOT, timeout)
@@ -590,10 +817,16 @@ def verify(
     try:
         after = {name: sha256_file(path) for name, path in tracked.items()}
         generated_after = sha256_file(generated)
+        nonvacuity_after = sha256_file(nonvacuity)
     except OSError as error:
         after = {"error": str(error)}
         generated_after = None
-    if after != before or generated_after != identity["generated_sha256"]:
+        nonvacuity_after = None
+    if (
+        after != before
+        or generated_after != identity["generated_sha256"]
+        or nonvacuity_after != identity["nonvacuity_generated_sha256"]
+    ):
         status = "stale_input"
 
     row = {
@@ -602,6 +835,11 @@ def verify(
         "status": status,
         "post_input_sha256": after,
         "generated_after_sha256": generated_after,
+        "nonvacuity_after_sha256": nonvacuity_after,
+        "nonvacuity_command": nonvacuity_command,
+        "nonvacuity_summary": nonvacuity_summaries,
+        "nonvacuity_stdout_sha256": sha256_bytes(nonvacuity_stdout.encode()),
+        "nonvacuity_stderr_sha256": sha256_bytes(nonvacuity_stderr.encode()),
         "command": command,
         "returncode": result.returncode,
         "summary": summaries,
@@ -609,6 +847,8 @@ def verify(
         "stderr_sha256": sha256_bytes(stderr.encode()),
         "generated": str(generated),
     }
+    (destination / "nonvacuity-stdout.txt").write_text(nonvacuity_stdout, encoding="utf-8")
+    (destination / "nonvacuity-stderr.txt").write_text(nonvacuity_stderr, encoding="utf-8")
     (destination / "stdout.txt").write_text(stdout, encoding="utf-8")
     (destination / "stderr.txt").write_text(stderr, encoding="utf-8")
     (destination / "evidence.json").write_text(

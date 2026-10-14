@@ -230,6 +230,11 @@ jobs:
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function independent_inputs --verus "$VERUS_BIN" > fixture-independent.json
 
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/valid/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
+            --function assumed_valid --verus "$VERUS_BIN" > fixture-assumed.json
+
           set +e
           cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
@@ -237,12 +242,18 @@ jobs:
             --function branch_invalid --verus "$VERUS_BIN" > fixture-invalid.json
           invalid_rc=$?
           cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/invalid/normalized-discovery.json \
+            --function contradictory_assumption --verus "$VERUS_BIN" > fixture-contradictory.json
+          contradictory_rc=$?
+          cargo +1.98.1-x86_64-unknown-linux-gnu run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/unsupported/Cargo.toml \
             --discovery .aegis/destiny/kani-autoharness-fixtures/unsupported/normalized-discovery.json \
             --function float_unsupported --verus "$VERUS_BIN" > fixture-unsupported.json
           unsupported_rc=$?
           set -e
           test "$invalid_rc" -eq 1
+          test "$contradictory_rc" -eq 1
           test "$unsupported_rc" -eq 1
 
           python3 - <<'PY'
@@ -251,11 +262,18 @@ jobs:
           branch=json.loads(Path("fixture-branch.json").read_text())
           loop=json.loads(Path("fixture-loop.json").read_text())
           independent=json.loads(Path("fixture-independent.json").read_text())
+          assumed=json.loads(Path("fixture-assumed.json").read_text())
           invalid=json.loads(Path("fixture-invalid.json").read_text())
+          contradictory=json.loads(Path("fixture-contradictory.json").read_text())
           unsupported=json.loads(Path("fixture-unsupported.json").read_text())
           assert branch["status"] == "checked_valid", branch
           assert loop["status"] == "checked_valid", loop
           assert independent["status"] == "checked_valid", independent
+          assert assumed["status"] == "checked_valid", assumed
+          assert assumed["assumptions"] == [{"line":2,"expression":"(x > 0)"}], assumed
+          assert assumed["assertion_paths"] == [{"line":3,"conditions":["(x > 0)"]}], assumed
+          assert contradictory["status"] == "proof_failure", contradictory
+          assert contradictory["failure_stage"] == "non_vacuity", contradictory
           assert len(independent["parameter_domains"]) == 2, independent
           assert all(row["independent"] for row in independent["parameter_domains"]), independent
           assert invalid["status"] == "proof_failure", invalid
@@ -298,7 +316,9 @@ jobs:
             fixture-branch.json
             fixture-loop.json
             fixture-independent.json
+            fixture-assumed.json
             fixture-invalid.json
+            fixture-contradictory.json
             fixture-unsupported.json
             fixture-capabilities.json
 

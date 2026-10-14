@@ -69,9 +69,29 @@ class TranslatorTests(unittest.TestCase):
         with self.assertRaises(vk.Unsupported):
             self.parse("pub fn reference(x: &u8) { assert!(true); }\n")
 
-    def test_assumptions_are_rejected_including_contradictory_assumptions(self):
-        with self.assertRaises(vk.Unsupported):
-            self.parse("pub fn assumption(x: bool) { kani::assume(false); assert!(x); }\n")
+    def test_assumptions_are_scoped_and_recorded(self):
+        function = self.parse(
+            "pub fn assumption(x: bool, y: bool) { "
+            "if x { kani::assume(y); assert!(y); } else { assert!(!x); } }\n"
+        )[0]
+        self.assertEqual(
+            vk.collect_assumptions(function.body),
+            [{"line": 1, "expression": "y"}],
+        )
+        paths = vk.collect_assertion_paths(function.body)
+        self.assertEqual(len(paths), 2)
+        self.assertIn(("x", "y"), [row.conditions for row in paths])
+        self.assertIn(("!(x)",), [row.conditions for row in paths])
+
+    def test_contradictory_assumption_gets_explicit_nonvacuity_obligation(self):
+        function = self.parse(
+            "pub fn contradiction(x: bool) { "
+            "kani::assume(x); kani::assume(!x); assert!(x); }\n"
+        )[0]
+        paths = vk.collect_assertion_paths(function.body)
+        self.assertEqual(paths[0].conditions, ("x", "!(x)"))
+        lowered = vk.lower_nonvacuity(function, paths)
+        self.assertIn("exists|x: bool| (x) && (!(x))", lowered)
 
     def test_discovery_requires_exact_pinned_kani_identity_and_no_proof_credit(self):
         with tempfile.TemporaryDirectory() as directory:
