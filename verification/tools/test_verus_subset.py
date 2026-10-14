@@ -45,9 +45,26 @@ class TranslatorTests(unittest.TestCase):
         )[0]
         self.assertEqual(function.params, (("a", "u8"), ("b", "u8")))
 
-    def test_arithmetic_is_rejected_instead_of_widened(self):
+    def test_ghost_arithmetic_is_rejected_instead_of_widened(self):
         with self.assertRaises(vk.Unsupported):
             self.parse("pub fn arithmetic(x: u8) { assert!(x + 1 > x); }\n")
+        with self.assertRaises(vk.Unsupported):
+            self.parse("pub fn assumed(x: u8) { kani::assume(x + 1 > x); assert!(true); }\n")
+
+    def test_machine_arithmetic_is_preserved_in_executable_branch_conditions(self):
+        function = self.parse(
+            "pub fn arithmetic(x: u8) { "
+            "if x + 1 > x { assert!(true); } else { assert!(true); } }\n"
+        )[0]
+        self.assertEqual(function.body[0].cond.text, "((x + 1) > x)")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lib.rs"
+            path.write_text(
+                "pub fn arithmetic(x: u8) { "
+                "if x + 1 > x { assert!(true); } else { assert!(true); } }\n"
+            )
+            lowered = vk.lower_function(vk.parse_source(path)[0], path, Path(directory))
+        self.assertIn("if ((x + 1) > x) {", lowered)
 
     def test_float_is_rejected_instead_of_real_substitution(self):
         with self.assertRaises(vk.Unsupported):

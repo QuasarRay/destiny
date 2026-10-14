@@ -38,14 +38,16 @@
         "<",
         "<=",
         ">",
-        ">="
+        ">=",
+        "+, -, * only inside executable if conditions; Verus must discharge fixed-width overflow/underflow"
       ],
       "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem",
-      "assumptions": "preserved at their source program point; each translated assertion path gets a separate existential Verus non-vacuity obligation over the original fixed-width parameter domains"
+      "assumptions": "preserved at their source program point; each translated assertion path gets a separate existential Verus non-vacuity obligation over the original fixed-width parameter domains",
+      "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected because Verus widens it."
     },
     "rejected": [
       "requires/ensures syntax and contract macros",
-      "arithmetic and casts",
+      "arithmetic in assert!/kani::assume, division/remainder, casts, and arithmetic outside executable if conditions",
       "usize/isize and target-width dependent values",
       "function calls",
       "references, raw pointers, slices, allocation and user ADTs",

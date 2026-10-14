@@ -33,3 +33,27 @@ pub fn conditional_assume_valid(x: bool, y: bool) {
         assert!(!x);
     }
 }
+
+pub fn guarded_add_valid(x: u8) {
+    if x == 255 {
+        assert!(true);
+    } else {
+        if x + 1 > x {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
+    }
+}
+
+pub fn guarded_sub_valid(x: u8) {
+    if x == 0 {
+        assert!(true);
+    } else {
+        if x - 1 < x {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
+    }
+}

@@ -43,7 +43,7 @@ TOKEN_RE = re.compile(
   | (?P<range>\.\.)
   | (?P<number>0|[1-9][0-9]*)
   | (?P<ident>[A-Za-z_][A-Za-z0-9_]*)
-  | (?P<punct>[(){}:;,!<>])
+  | (?P<punct>[(){}:;,!<>+*\-])
     """,
     re.X | re.S,
 )
@@ -262,6 +262,11 @@ class Parser:
             self.take("assume")
             self.take("(")
             expr = self.parse_expression()
+            if expression_has_machine_arithmetic(expr):
+                self.fail(
+                    "machine arithmetic in kani::assume is unsupported because "
+                    "Verus ghost arithmetic widens instead of checking Rust overflow"
+                )
             self.take(")")
             self.take(";")
             return AssumeStmt(expr, token.line)
@@ -270,6 +275,11 @@ class Parser:
             self.take("!")
             self.take("(")
             expr = self.parse_expression()
+            if expression_has_machine_arithmetic(expr):
+                self.fail(
+                    "machine arithmetic in assert! is unsupported because "
+                    "Verus ghost arithmetic widens instead of checking Rust overflow"
+                )
             self.take(")")
             self.take(";")
             return AssertStmt(expr, token.line)
@@ -319,13 +329,27 @@ class Parser:
         return left
 
     def parse_comparison(self) -> str:
-        left = self.parse_unary()
+        left = self.parse_additive()
         if self.current().value in {"==", "!=", "<", "<=", ">", ">="}:
             operator = self.take().value
-            right = self.parse_unary()
+            right = self.parse_additive()
             left = f"({left} {operator} {right})"
             if self.current().value in {"==", "!=", "<", "<=", ">", ">="}:
                 self.fail("chained comparisons are unsupported")
+        return left
+
+    def parse_additive(self) -> str:
+        left = self.parse_multiplicative()
+        while self.current().value in {"+", "-"}:
+            operator = self.take().value
+            left = f"({left} {operator} {self.parse_multiplicative()})"
+        return left
+
+    def parse_multiplicative(self) -> str:
+        left = self.parse_unary()
+        while self.current().value == "*":
+            self.take("*")
+            left = f"({left} * {self.parse_unary()})"
         return left
 
     def parse_unary(self) -> str:
@@ -351,6 +375,10 @@ class Parser:
             return name
         self.fail(f"unsupported expression atom {token.value!r}")
         raise AssertionError("unreachable")
+
+
+def expression_has_machine_arithmetic(expr: Expr) -> bool:
+    return any(f" {operator} " in expr.text for operator in ("+", "-", "*"))
 
 
 def parse_source(path: Path) -> list[Function]:
@@ -662,11 +690,12 @@ def verify(
             for path in assertion_paths
         ],
         "bounds": collect_loop_bounds(function.body),
-        "target_scope": "bool_and_fixed_width_integers_only; usize/isize rejected",
+        "target_scope": "bool_and_fixed_width_integers; +,-,* only in executable if conditions; usize/isize rejected",
         "trusted_boundaries": [
             "Kani compiler autoharness eligibility metadata selects the source function; Kani/CBMC proof results are not used.",
             "The structural Rust-to-Verus lowering is trusted only for the declared grammar and is separately regression-tested.",
             "Kani assumptions are preserved as scoped Verus path assumptions; separate existential Verus obligations check that every translated assertion path remains satisfiable.",
+            "Machine +,-,* are accepted only in executable branch conditions, where Verus checks fixed-width overflow; ghost assertion/assumption arithmetic remains rejected to prevent widening drift.",
             "Verus, its vstd contracts, Rust toolchain and solver remain verifier trust boundaries.",
         ],
     }
