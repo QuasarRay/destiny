@@ -84,7 +84,7 @@ def main() -> int:
     if forbidden_log.exists() and forbidden_log.read_text(encoding="utf-8").strip():
         raise SystemExit("A forbidden CBMC/GOTO backend tool was invoked")
 
-    metadata = sorted((out / "kani-target").rglob("*.kani_metadata.json"))
+    metadata = sorted((out / "kani-target").rglob("*.kani-metadata.json"))
     if not metadata:
         raise SystemExit("Kani produced no .kani_metadata.json artifacts")
 
