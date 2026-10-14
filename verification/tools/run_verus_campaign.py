@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Bind and execute each reviewed Verus entry once; audit exact symbol evidence.
+"""Validate optional discovery, then execute each reviewed Verus entry once.
 
-No discovery, automatic retries or input edits occur in this runner. Failures
-preserve their receipts and stop the current campaign. Case acceptance remains
-separate and may report incomplete even when all scoped entries are checked.
+The runner does not generate or mutate discovery inputs, retry proofs, or edit
+proof sources. When Kani-assisted discovery is supplied it is validated before
+the existing source-bound campaign. Failures preserve receipts and stop the
+current campaign; case acceptance remains separate.
 """
 import argparse
 import json
