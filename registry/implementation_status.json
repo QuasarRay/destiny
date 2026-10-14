@@ -16,11 +16,11 @@
     "unsupported": "No shipped Python object path or Rust Destiny dispatch handler was found."
   },
   "counts": {
-    "facade-only": 209,
+    "facade-only": 211,
     "implemented-conformant": 2,
     "implemented-state-only": 4,
-    "implemented-with-accepted-difference": 95,
-    "unsupported": 79
+    "implemented-with-accepted-difference": 130,
+    "unsupported": 42
   },
   "records": [
     {
@@ -109,9 +109,12 @@
       "title_id": "destiny-ball-allianceid",
       "canonical_title": "destiny.Ball.allianceID",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-ballpark",
@@ -129,9 +132,12 @@
       "title_id": "destiny-ball-corporationid",
       "canonical_title": "destiny.Ball.corporationID",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-effectstamp",
@@ -149,17 +155,23 @@
       "title_id": "destiny-ball-followid",
       "canonical_title": "destiny.Ball.followId",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-followrange",
       "canonical_title": "destiny.Ball.followRange",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-formationid",
@@ -201,33 +213,45 @@
       "title_id": "destiny-ball-gotox",
       "canonical_title": "destiny.Ball.gotoX",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-gotoy",
       "canonical_title": "destiny.Ball.gotoY",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-gotoz",
       "canonical_title": "destiny.Ball.gotoZ",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-harmonic",
       "canonical_title": "destiny.Ball.harmonic",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-id",
@@ -305,9 +329,13 @@
       "title_id": "destiny-ball-ismoribund",
       "canonical_title": "destiny.Ball.isMoribund",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-mass",
@@ -349,33 +377,49 @@
       "title_id": "destiny-ball-miniballs",
       "canonical_title": "destiny.Ball.miniBalls",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-miniboxes",
       "canonical_title": "destiny.Ball.miniBoxes",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-minicapsules",
       "canonical_title": "destiny.Ball.miniCapsules",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-mode",
       "canonical_title": "destiny.Ball.mode",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-newbubbleid",
@@ -405,9 +449,12 @@
       "title_id": "destiny-ball-ownerid",
       "canonical_title": "destiny.Ball.ownerId",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ball-pitch",
@@ -661,13 +708,11 @@
       "title_id": "destiny-ballpark-constructor",
       "canonical_title": "destiny.Ballpark.__init__",
       "mapping_verdict": "PARTIAL",
-      "implementation_status": "implemented-with-accepted-difference",
+      "implementation_status": "facade-only",
       "surfaces": [
-        "python",
-        "rust-native",
-        "c-abi"
+        "python"
       ],
-      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
+      "note": "The shipped Python/Carbon object path is statically reachable; no Rust Destiny dispatch handler is claimed for this title."
     },
     {
       "title_id": "destiny-ballpark-addball",
@@ -685,17 +730,24 @@
       "title_id": "destiny-ballpark-additionsanddeletions",
       "canonical_title": "destiny.Ballpark.AdditionsAndDeletions",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-addmushroom",
       "canonical_title": "destiny.Ballpark.AddMushroom",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-addproximitysensor",
@@ -813,9 +865,12 @@
       "title_id": "destiny-ballpark-copybubbles",
       "canonical_title": "destiny.Ballpark.CopyBubbles",
       "mapping_verdict": "PARTIAL",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-currenttime",
@@ -845,9 +900,12 @@
       "title_id": "destiny-ballpark-entitywarpin",
       "canonical_title": "destiny.Ballpark.EntityWarpIn",
       "mapping_verdict": "PARTIAL",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-evolve",
@@ -865,17 +923,24 @@
       "title_id": "destiny-ballpark-followball",
       "canonical_title": "destiny.Ballpark.FollowBall",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-formationfollow",
       "canonical_title": "destiny.Ballpark.FormationFollow",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-friction",
@@ -893,9 +958,13 @@
       "title_id": "destiny-ballpark-getaccuracy",
       "canonical_title": "destiny.Ballpark.GetAccuracy",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-getactiveboxes",
@@ -1021,9 +1090,12 @@
       "title_id": "destiny-ballpark-getbubbleatcoordinates",
       "canonical_title": "destiny.Ballpark.GetBubbleAtCoordinates",
       "mapping_verdict": "PARTIAL",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-getcenterdist",
@@ -1053,17 +1125,25 @@
       "title_id": "destiny-ballpark-getfollowers",
       "canonical_title": "destiny.Ballpark.GetFollowers",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-getremotefollowers",
       "canonical_title": "destiny.Ballpark.GetRemoteFollowers",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-getstaticcollidablebox",
@@ -1097,25 +1177,34 @@
       "title_id": "destiny-ballpark-gotodirection",
       "canonical_title": "destiny.Ballpark.GotoDirection",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-gotopoint",
       "canonical_title": "destiny.Ballpark.GotoPoint",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-initializebubbles",
       "canonical_title": "destiny.Ballpark.InitializeBubbles",
       "mapping_verdict": "PARTIAL",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-int1",
@@ -1169,9 +1258,13 @@
       "title_id": "destiny-ballpark-launchmissile",
       "canonical_title": "destiny.Ballpark.LaunchMissile",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-loadformations",
@@ -1189,9 +1282,12 @@
       "title_id": "destiny-ballpark-missilefollow",
       "canonical_title": "destiny.Ballpark.MissileFollow",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-moribundballremovalbuffer",
@@ -1213,9 +1309,13 @@
       "title_id": "destiny-ballpark-orbit",
       "canonical_title": "destiny.Ballpark.Orbit",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "python",
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-para1",
@@ -1405,9 +1505,12 @@
       "title_id": "destiny-ballpark-setballharmonic",
       "canonical_title": "destiny.Ballpark.SetBallHarmonic",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-setballinteractive",
@@ -1481,9 +1584,12 @@
       "title_id": "destiny-ballpark-setballrigid",
       "canonical_title": "destiny.Ballpark.SetBallRigid",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-setballrotation",
@@ -1501,9 +1607,12 @@
       "title_id": "destiny-ballpark-setballtroll",
       "canonical_title": "destiny.Ballpark.SetBallTroll",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-setballvelocity",
@@ -1521,9 +1630,12 @@
       "title_id": "destiny-ballpark-setboid",
       "canonical_title": "destiny.Ballpark.SetBoid",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-setboxobject",
@@ -1561,9 +1673,12 @@
       "title_id": "destiny-ballpark-setnotificationrange",
       "canonical_title": "destiny.Ballpark.SetNotificationRange",
       "mapping_verdict": "PARTIAL",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-setspeedfraction",
@@ -1581,9 +1696,12 @@
       "title_id": "destiny-ballpark-settargettracking",
       "canonical_title": "destiny.Ballpark.SetTargetTracking",
       "mapping_verdict": "PARTIAL",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-solarsystemid",
@@ -1665,9 +1783,12 @@
       "title_id": "destiny-ballpark-warpto",
       "canonical_title": "destiny.Ballpark.WarpTo",
       "mapping_verdict": "NONE",
-      "implementation_status": "unsupported",
-      "surfaces": [],
-      "note": "No shipped Python object path or Rust Destiny dispatch handler was found; registry-aware access fails explicitly where a dynamic fallback exists."
+      "implementation_status": "implemented-with-accepted-difference",
+      "surfaces": [
+        "rust-native",
+        "c-abi"
+      ],
+      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
     },
     {
       "title_id": "destiny-ballpark-writeballstostream",
@@ -3547,13 +3668,11 @@
       "title_id": "destiny-net-server-networkinterface",
       "canonical_title": "destiny.net.server.NetworkInterface",
       "mapping_verdict": "COMPOSED",
-      "implementation_status": "implemented-with-accepted-difference",
+      "implementation_status": "facade-only",
       "surfaces": [
-        "python",
-        "rust-native",
-        "c-abi"
+        "python"
       ],
-      "note": "A Rust Destiny dispatch handler is reachable through the stable C ABI; the documented Bevy/Avian lifecycle, precision, or snapshot differences apply."
+      "note": "The shipped Python/Carbon object path is statically reachable; no Rust Destiny dispatch handler is claimed for this title."
     },
     {
       "title_id": "destiny-net-server-networkinterface-narrowcast",
@@ -3561,9 +3680,7 @@
       "mapping_verdict": "DIRECT",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
-        "python",
-        "rust-native",
-        "c-abi"
+        "python"
       ],
       "note": "The Rust bridge resolves authenticated Carbon IDs to individual Lightyear links and redacts the other recipient IDs from each ordered-reliable frame; product authentication remains host-owned."
     },
@@ -3573,9 +3690,7 @@
       "mapping_verdict": "DIRECT",
       "implementation_status": "implemented-with-accepted-difference",
       "surfaces": [
-        "python",
-        "rust-native",
-        "c-abi"
+        "python"
       ],
       "note": "The Rust bridge resolves an authenticated Carbon ID to one Lightyear link and sends one recipient-redacted ordered-reliable frame; product authentication remains host-owned."
     },
