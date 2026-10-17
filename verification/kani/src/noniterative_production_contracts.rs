@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 // Copyright © 2015, 2023 CCP ehf. Original Destiny MIT license retained.
 //! Complete original stopped-overlap coordinate trace on the actual native
 //! gradient kernel. Scope: 2 source fixture bodies,10ticks, dt1, friction1e6.
@@ -30,6 +35,7 @@ fn body(id: i64) -> Body {
         mode: OriginalMode::Stop,
         owner_id: 0,
         follow_id: 0,
+        cached_dead: false,
     }
 }
 
@@ -59,9 +65,17 @@ fn original_stopped_overlap_full_trace_uses_production_gradient() {
     let mut b = Vec::new();
     for _ in 0..10 {
         for body in &mut bodies {
+            body.collision_acceleration = Vec3::ZERO;
             body.velocity = destiny_original_spec::original_stop_velocity(body.velocity);
         }
-        let result = noniterative_collision::resolve(&bodies, &[], 1_000_000.0, 1.0, false);
+        let result = noniterative_collision::resolve(
+            &mut bodies,
+            &[],
+            1_000_000.0,
+            1.0,
+            false,
+            &mut Vec::new(),
+        );
         assert!(result.is_ok());
         let result = result.unwrap();
         for index in 0..2 {

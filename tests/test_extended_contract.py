@@ -194,7 +194,7 @@ class SourceContractTests(unittest.TestCase):
             "Collider::cuboid",
             "LinearVelocity",
             "AngularVelocity",
-            "MaxLinearSpeed",
+            "DestinyMaxVelocity",
             "MaxAngularSpeed",
             "DestinySpaceFriction",
             "LinearDamping",

@@ -1,0 +1,155 @@
+{
+  "configuration": {
+    "adapter_sha256": "7e197f7346e01d5d570b7fa7ea049510d4405dd2a3c5c4ce00eea51a61050461",
+    "compiler": "clang version 23.1.1\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin\n",
+    "external_Vector3": "declaration-only parsing adapter for unused overloads; no selected method reads it",
+    "flags": [
+      "-std=c++17",
+      "-fno-fast-math",
+      "-ffp-contract=off",
+      "-resource-dir=/usr/lib/clang/23"
+    ],
+    "numeric_policy": "IEEE binary64 expression order; no fast math or contraction; host sqrt",
+    "scope": "isolated_original_Vector3d_header; not full_original_build",
+    "target": "x86_64-pc-linux-gnu"
+  },
+  "original_revisions": [
+    "ef738406b61ad06bae2f402857e464735ab106a2",
+    "114e89fa584f0e1a81eb0a679aabf41af8870072"
+  ],
+  "records": [
+    {
+      "compiler_usr": "c:@S@Vector3d@F@Length#1",
+      "expression": {
+        "machine_type": "double",
+        "op": "sqrt",
+        "value": {
+          "left": {
+            "left": {
+              "left": {
+                "machine_type": "double",
+                "name": "x",
+                "op": "field"
+              },
+              "machine_type": "double",
+              "op": "binary",
+              "operator": "*",
+              "right": {
+                "machine_type": "double",
+                "name": "x",
+                "op": "field"
+              }
+            },
+            "machine_type": "double",
+            "op": "binary",
+            "operator": "+",
+            "right": {
+              "left": {
+                "machine_type": "double",
+                "name": "y",
+                "op": "field"
+              },
+              "machine_type": "double",
+              "op": "binary",
+              "operator": "*",
+              "right": {
+                "machine_type": "double",
+                "name": "y",
+                "op": "field"
+              }
+            }
+          },
+          "machine_type": "double",
+          "op": "binary",
+          "operator": "+",
+          "right": {
+            "left": {
+              "machine_type": "double",
+              "name": "z",
+              "op": "field"
+            },
+            "machine_type": "double",
+            "op": "binary",
+            "operator": "*",
+            "right": {
+              "machine_type": "double",
+              "name": "z",
+              "op": "field"
+            }
+          }
+        }
+      },
+      "name": "vector_length",
+      "original_symbol": "Vector3d::Length",
+      "return_type": "double",
+      "signature": "double (void) const",
+      "source_line": 59
+    },
+    {
+      "compiler_usr": "c:@S@Vector3d@F@LengthSq#1",
+      "expression": {
+        "left": {
+          "left": {
+            "left": {
+              "machine_type": "double",
+              "name": "x",
+              "op": "field"
+            },
+            "machine_type": "double",
+            "op": "binary",
+            "operator": "*",
+            "right": {
+              "machine_type": "double",
+              "name": "x",
+              "op": "field"
+            }
+          },
+          "machine_type": "double",
+          "op": "binary",
+          "operator": "+",
+          "right": {
+            "left": {
+              "machine_type": "double",
+              "name": "y",
+              "op": "field"
+            },
+            "machine_type": "double",
+            "op": "binary",
+            "operator": "*",
+            "right": {
+              "machine_type": "double",
+              "name": "y",
+              "op": "field"
+            }
+          }
+        },
+        "machine_type": "double",
+        "op": "binary",
+        "operator": "+",
+        "right": {
+          "left": {
+            "machine_type": "double",
+            "name": "z",
+            "op": "field"
+          },
+          "machine_type": "double",
+          "op": "binary",
+          "operator": "*",
+          "right": {
+            "machine_type": "double",
+            "name": "z",
+            "op": "field"
+          }
+        }
+      },
+      "name": "vector_length_squared",
+      "original_symbol": "Vector3d::LengthSq",
+      "return_type": "double",
+      "signature": "double (void) const",
+      "source_line": 60
+    }
+  ],
+  "schema": 1,
+  "source": "src/Vector3d.h",
+  "source_sha256": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238"
+}

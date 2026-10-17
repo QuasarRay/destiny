@@ -1,0 +1,62 @@
+{
+  "invariants": [
+    "Existing ball metadata owns mCollisions as a dynamically sized ordered identifier list; snapshots preserve duplicates and signed 64-bit IDs.",
+    "Live/free control admission clears contacts alongside LastG/LastC. Dead/nonfree retain prior state.",
+    "Gradient appends from existing real kernel scratch lists before angular updates. Iterative location IDs are a separate frame projection and do not change pre-dispatch source angles.",
+    "Static collision identities use existing registered geometry IDs; no surrogate IDs or deduplication.",
+    "The generated source dispatcher captures contact count once in an operation-owned, generation-bound cursor. Each event rereads the actual next ID and LastC bits; later appends are outside the captured iteration.",
+    "A typed direct Rust observer receives contact and immediate host-error notices. A false result reports host error and continues, allowing reentrant world mutation between both notices and later contacts."
+  ],
+  "open_correspondence": [
+    "Complete source location/time/history state, dynamic orientation, mini-allocation correspondence and pending-work snapshots remain incomplete.",
+    "Production/specification proofs remain missing; unchanged formal tool limitations are retained.",
+    "The dispatcher is implemented as a real typed Rust host API and reusable incremental cursor; automatic moved-missile per-body Evolve/FFI scheduling is not wired yet. It must use this same cursor at the original late publication boundary, not a second dispatcher.",
+    "The generation cancellation and explicit error for a list shortened below its captured count replace unsafe/dangling source cases. No portable Original equivalence is claimed for those cases.",
+    "The selected returning-host event/error contract is observed independently; actual PyOS/PyError unwinding/private behavior remains unresolved. Pending publication/snapshot state and full original lifetime correspondence remain required."
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 488,
+      "region_sha256": "bb25cc98d8a9dfde502af68bc7ee36962a72817ea143faf20e39a53f70312bc5",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 335
+    },
+    {
+      "end": 639,
+      "region_sha256": "401f9f77fb115f0c3ebc39a1661b2fd0d1828e721d1c7a286ce8576d493ac818",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 530
+    },
+    {
+      "end": 795,
+      "region_sha256": "54ec1de0ccaaeb2c8a81294051f4a3a04d9086e99f1e6750397f14798e75a1ef",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 780
+    },
+    {
+      "end": 3006,
+      "region_sha256": "433881074948476b38777f90addac8af8fa379997ed3cd48b55a3b70cf581795",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 2745
+    },
+    {
+      "end": 165,
+      "region_sha256": "83e3b8ac726ab40d83085ba6e85ccd24c8cc9214a8c1c3f3e61c6381aa072a45",
+      "source": "src/Ball.h",
+      "source_sha256": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+      "start": 148
+    }
+  ],
+  "reused_git_sources": {
+    "src/iterative_collision.rs": "a373aa8fc14fba24e74aa75e099b2615c9367c7dc925d63fb6e558f54d63efe7",
+    "src/noniterative_collision.rs": "efdd330e94abcf111335c1cfc35c9bac17064475ad7a45438d81746762923d93",
+    "src/runtime.rs": "6d6a6b2c8095a10d83355f821a8fe43d75dfbd87ee6b5e94f9e9e27e3d6fbb51"
+  },
+  "reused_sources": {},
+  "schema": 1
+}

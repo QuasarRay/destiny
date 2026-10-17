@@ -1,0 +1,2363 @@
+{
+  "functions": [
+    {
+      "body": [
+        {
+          "mutable": false,
+          "name": "previous",
+          "op": "Let",
+          "value": {
+            "arguments": [
+              {
+                "arguments": [
+                  {
+                    "name": "dt",
+                    "op": "Name"
+                  }
+                ],
+                "method": "scale",
+                "op": "Method",
+                "receiver": {
+                  "fields": [
+                    [
+                      "x",
+                      {
+                        "base": {
+                          "name": "velocity",
+                          "op": "Name"
+                        },
+                        "index": {
+                          "machine_type": "usize",
+                          "op": "Literal",
+                          "value": 0
+                        },
+                        "op": "Index"
+                      }
+                    ],
+                    [
+                      "y",
+                      {
+                        "base": {
+                          "name": "velocity",
+                          "op": "Name"
+                        },
+                        "index": {
+                          "machine_type": "usize",
+                          "op": "Literal",
+                          "value": 1
+                        },
+                        "op": "Index"
+                      }
+                    ],
+                    [
+                      "z",
+                      {
+                        "base": {
+                          "name": "velocity",
+                          "op": "Name"
+                        },
+                        "index": {
+                          "machine_type": "usize",
+                          "op": "Literal",
+                          "value": 2
+                        },
+                        "op": "Index"
+                      }
+                    ]
+                  ],
+                  "op": "Record",
+                  "path": [
+                    "destiny_original_spec",
+                    "Vec3"
+                  ]
+                }
+              }
+            ],
+            "method": "sub",
+            "op": "Method",
+            "receiver": {
+              "fields": [
+                [
+                  "x",
+                  {
+                    "base": {
+                      "name": "position",
+                      "op": "Name"
+                    },
+                    "index": {
+                      "machine_type": "usize",
+                      "op": "Literal",
+                      "value": 0
+                    },
+                    "op": "Index"
+                  }
+                ],
+                [
+                  "y",
+                  {
+                    "base": {
+                      "name": "position",
+                      "op": "Name"
+                    },
+                    "index": {
+                      "machine_type": "usize",
+                      "op": "Literal",
+                      "value": 1
+                    },
+                    "op": "Index"
+                  }
+                ],
+                [
+                  "z",
+                  {
+                    "base": {
+                      "name": "position",
+                      "op": "Name"
+                    },
+                    "index": {
+                      "machine_type": "usize",
+                      "op": "Literal",
+                      "value": 2
+                    },
+                    "op": "Index"
+                  }
+                ]
+              ],
+              "op": "Record",
+              "path": [
+                "destiny_original_spec",
+                "Vec3"
+              ]
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "position",
+                {
+                  "elements": [
+                    {
+                      "base": {
+                        "name": "previous",
+                        "op": "Name"
+                      },
+                      "member": "x",
+                      "op": "Field"
+                    },
+                    {
+                      "base": {
+                        "name": "previous",
+                        "op": "Name"
+                      },
+                      "member": "y",
+                      "op": "Field"
+                    },
+                    {
+                      "base": {
+                        "name": "previous",
+                        "op": "Name"
+                      },
+                      "member": "z",
+                      "op": "Field"
+                    }
+                  ],
+                  "op": "Array"
+                }
+              ],
+              [
+                "velocity",
+                {
+                  "name": "velocity",
+                  "op": "Name"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "Self"
+            ]
+          }
+        }
+      ],
+      "name": "created",
+      "owner": "Pose",
+      "parameters": [
+        [
+          "position",
+          {
+            "element": {
+              "arguments": [],
+              "kind": "Named",
+              "path": [
+                "f64"
+              ]
+            },
+            "kind": "Array",
+            "length": 3
+          }
+        ],
+        [
+          "velocity",
+          {
+            "element": {
+              "arguments": [],
+              "kind": "Named",
+              "path": [
+                "f64"
+              ]
+            },
+            "kind": "Array",
+            "length": 3
+          }
+        ],
+        [
+          "dt",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "f64"
+            ]
+          }
+        ]
+      ],
+      "receiver": null,
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "Self"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:3356-3371; new object only; existing Vec3 sub/scale matches Vector3d operators"
+      ],
+      "visibility": "crate"
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "x",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "position",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 0
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "y",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "position",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 1
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "z",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "position",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 2
+                  },
+                  "op": "Index"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "destiny_original_spec",
+              "Vec3"
+            ]
+          }
+        }
+      ],
+      "name": "position_vector",
+      "owner": "Pose",
+      "parameters": [],
+      "receiver": "value",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "destiny_original_spec",
+          "Vec3"
+        ]
+      },
+      "source_regions": [
+        "src/Vector3d.h:8-18; field representation mapping"
+      ],
+      "visibility": "crate"
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "x",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "velocity",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 0
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "y",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "velocity",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 1
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "z",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "velocity",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 2
+                  },
+                  "op": "Index"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "destiny_original_spec",
+              "Vec3"
+            ]
+          }
+        }
+      ],
+      "name": "velocity_vector",
+      "owner": "Pose",
+      "parameters": [],
+      "receiver": "value",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "destiny_original_spec",
+          "Vec3"
+        ]
+      },
+      "source_regions": [
+        "src/Vector3d.h:8-18; field representation mapping"
+      ],
+      "visibility": "crate"
+    },
+    {
+      "body": [
+        {
+          "mutable": false,
+          "name": "delta",
+          "op": "Let",
+          "value": {
+            "arguments": [
+              {
+                "arguments": [],
+                "method": "velocity_vector",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            ],
+            "method": "sub",
+            "op": "Method",
+            "receiver": {
+              "fields": [
+                [
+                  "x",
+                  {
+                    "base": {
+                      "name": "current",
+                      "op": "Name"
+                    },
+                    "index": {
+                      "machine_type": "usize",
+                      "op": "Literal",
+                      "value": 0
+                    },
+                    "op": "Index"
+                  }
+                ],
+                [
+                  "y",
+                  {
+                    "base": {
+                      "name": "current",
+                      "op": "Name"
+                    },
+                    "index": {
+                      "machine_type": "usize",
+                      "op": "Literal",
+                      "value": 1
+                    },
+                    "op": "Index"
+                  }
+                ],
+                [
+                  "z",
+                  {
+                    "base": {
+                      "name": "current",
+                      "op": "Name"
+                    },
+                    "index": {
+                      "machine_type": "usize",
+                      "op": "Literal",
+                      "value": 2
+                    },
+                    "op": "Index"
+                  }
+                ]
+              ],
+              "op": "Record",
+              "path": [
+                "destiny_original_spec",
+                "Vec3"
+              ]
+            }
+          }
+        },
+        {
+          "mutable": false,
+          "name": "scaled",
+          "op": "Let",
+          "value": {
+            "arguments": [
+              {
+                "left": {
+                  "machine_type": "f64",
+                  "op": "Literal",
+                  "value": 1.0
+                },
+                "op": "Binary",
+                "operator": "/",
+                "right": {
+                  "name": "dt",
+                  "op": "Name"
+                }
+              }
+            ],
+            "method": "scale",
+            "op": "Method",
+            "receiver": {
+              "name": "delta",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "elements": [
+              {
+                "machine_type": {
+                  "arguments": [],
+                  "kind": "Named",
+                  "path": [
+                    "f64"
+                  ]
+                },
+                "op": "Cast",
+                "value": {
+                  "machine_type": {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "f32"
+                    ]
+                  },
+                  "op": "Cast",
+                  "value": {
+                    "base": {
+                      "name": "scaled",
+                      "op": "Name"
+                    },
+                    "member": "x",
+                    "op": "Field"
+                  }
+                }
+              },
+              {
+                "machine_type": {
+                  "arguments": [],
+                  "kind": "Named",
+                  "path": [
+                    "f64"
+                  ]
+                },
+                "op": "Cast",
+                "value": {
+                  "machine_type": {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "f32"
+                    ]
+                  },
+                  "op": "Cast",
+                  "value": {
+                    "base": {
+                      "name": "scaled",
+                      "op": "Name"
+                    },
+                    "member": "y",
+                    "op": "Field"
+                  }
+                }
+              },
+              {
+                "machine_type": {
+                  "arguments": [],
+                  "kind": "Named",
+                  "path": [
+                    "f64"
+                  ]
+                },
+                "op": "Cast",
+                "value": {
+                  "machine_type": {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "f32"
+                    ]
+                  },
+                  "op": "Cast",
+                  "value": {
+                    "base": {
+                      "name": "scaled",
+                      "op": "Name"
+                    },
+                    "member": "z",
+                    "op": "Field"
+                  }
+                }
+              }
+            ],
+            "op": "Array"
+          }
+        }
+      ],
+      "name": "acceleration",
+      "owner": "Pose",
+      "parameters": [
+        [
+          "current",
+          {
+            "element": {
+              "arguments": [],
+              "kind": "Named",
+              "path": [
+                "f64"
+              ]
+            },
+            "kind": "Array",
+            "length": 3
+          }
+        ],
+        [
+          "dt",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "f64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "value",
+      "result": {
+        "element": {
+          "arguments": [],
+          "kind": "Named",
+          "path": [
+            "f64"
+          ]
+        },
+        "kind": "Array",
+        "length": 3
+      },
+      "source_regions": [
+        "src/Ball.cpp:1484; Vector3d.h:22,46; reciprocal multiplication then f32 Vector3 components"
+      ],
+      "visibility": "crate"
+    },
+    {
+      "body": [
+        {
+          "mutable": false,
+          "name": "entity",
+          "op": "Let",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                }
+              ],
+              "method": "entity",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "mutable": false,
+          "name": "velocity",
+          "op": "Let",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "arguments": [
+                    {
+                      "arguments": [
+                        {
+                          "machine_type": "str",
+                          "op": "Literal",
+                          "value": "missing LinearVelocity"
+                        }
+                      ],
+                      "function": [
+                        "String",
+                        "from"
+                      ],
+                      "op": "Call"
+                    }
+                  ],
+                  "function": [
+                    "CompatError",
+                    "Engine"
+                  ],
+                  "op": "Call"
+                }
+              ],
+              "method": "ok_or",
+              "op": "Method",
+              "receiver": {
+                "arguments": [
+                  {
+                    "name": "entity",
+                    "op": "Name"
+                  }
+                ],
+                "method": "get",
+                "op": "Method",
+                "receiver": {
+                  "arguments": [],
+                  "method": "world",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "app",
+                    "op": "Field"
+                  }
+                },
+                "type_arguments": [
+                  {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "LinearVelocity"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "fields": [
+                  [
+                    "position",
+                    {
+                      "arguments": [],
+                      "method": "to_array",
+                      "op": "Method",
+                      "receiver": {
+                        "op": "Try",
+                        "value": {
+                          "arguments": [
+                            {
+                              "name": "id",
+                              "op": "Name"
+                            }
+                          ],
+                          "method": "position",
+                          "op": "Method",
+                          "receiver": {
+                            "name": "self",
+                            "op": "Name"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  [
+                    "velocity",
+                    {
+                      "arguments": [],
+                      "method": "to_array",
+                      "op": "Method",
+                      "receiver": {
+                        "base": {
+                          "name": "velocity",
+                          "op": "Name"
+                        },
+                        "member": "0",
+                        "op": "Field"
+                      }
+                    }
+                  ]
+                ],
+                "op": "Record",
+                "path": [
+                  "crate",
+                  "generated_kinematics",
+                  "Pose"
+                ]
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "source_current_pose",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "crate",
+              "generated_kinematics",
+              "Pose"
+            ]
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ball.h mNewPos/mNewVel; current ECS representation"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "name": "pose",
+          "op": "IfSome",
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "pose",
+                    "op": "Name"
+                  }
+                ],
+                "function": [
+                  "Ok"
+                ],
+                "op": "Call"
+              }
+            }
+          ],
+          "value": {
+            "base": {
+              "op": "Try",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "metadata",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            },
+            "member": "source_old_pose",
+            "op": "Field"
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              }
+            ],
+            "method": "source_current_pose",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        }
+      ],
+      "name": "source_old_pose",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "crate",
+              "generated_kinematics",
+              "Pose"
+            ]
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ball.h mOldPos/mOldVel; missing old logical state uses documented current-state fallback"
+      ],
+      "visibility": "public"
+    },
+    {
+      "body": [
+        {
+          "mutable": false,
+          "name": "dt",
+          "op": "Let",
+          "value": {
+            "arguments": [],
+            "method": "as_secs_f64",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "timestep",
+              "op": "Method",
+              "receiver": {
+                "arguments": [],
+                "method": "resource",
+                "op": "Method",
+                "receiver": {
+                  "arguments": [],
+                  "method": "world",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "app",
+                    "op": "Field"
+                  }
+                },
+                "type_arguments": [
+                  {
+                    "arguments": [
+                      {
+                        "arguments": [],
+                        "kind": "Named",
+                        "path": [
+                          "Fixed"
+                        ]
+                      }
+                    ],
+                    "kind": "Named",
+                    "path": [
+                      "Time"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "mutable": false,
+          "name": "current",
+          "op": "Let",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                }
+              ],
+              "method": "source_current_pose",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "arguments": [
+                  {
+                    "base": {
+                      "name": "current",
+                      "op": "Name"
+                    },
+                    "member": "velocity",
+                    "op": "Field"
+                  },
+                  {
+                    "name": "dt",
+                    "op": "Name"
+                  }
+                ],
+                "method": "acceleration",
+                "op": "Method",
+                "receiver": {
+                  "op": "Try",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "id",
+                        "op": "Name"
+                      }
+                    ],
+                    "method": "source_old_pose",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "self",
+                      "op": "Name"
+                    }
+                  }
+                }
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "source_acceleration",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "element": {
+              "arguments": [],
+              "kind": "Named",
+              "path": [
+                "f64"
+              ]
+            },
+            "kind": "Array",
+            "length": 3
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ball.cpp:1466-1487; live in-park GetValueDoubleDotAt"
+      ],
+      "visibility": "public"
+    },
+    {
+      "body": [
+        {
+          "mutable": true,
+          "name": "pose",
+          "op": "Let",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                }
+              ],
+              "method": "source_old_pose",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "pose",
+              "op": "Name"
+            },
+            "member": "position",
+            "op": "Field"
+          },
+          "value": {
+            "arguments": [],
+            "method": "to_array",
+            "op": "Method",
+            "receiver": {
+              "name": "position",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "op": "Try",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "metadata_mut",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            },
+            "member": "source_old_pose",
+            "op": "Field"
+          },
+          "value": {
+            "arguments": [
+              {
+                "name": "pose",
+                "op": "Name"
+              }
+            ],
+            "function": [
+              "Some"
+            ],
+            "op": "Call"
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "write_source_old_position",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "position",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "DVec3"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:4750-4757 / 4782-4789; commands write both slots"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "mutable": true,
+          "name": "pose",
+          "op": "Let",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                }
+              ],
+              "method": "source_old_pose",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "pose",
+              "op": "Name"
+            },
+            "member": "velocity",
+            "op": "Field"
+          },
+          "value": {
+            "arguments": [],
+            "method": "to_array",
+            "op": "Method",
+            "receiver": {
+              "name": "velocity",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "op": "Try",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "metadata_mut",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            },
+            "member": "source_old_pose",
+            "op": "Field"
+          },
+          "value": {
+            "arguments": [
+              {
+                "name": "pose",
+                "op": "Name"
+              }
+            ],
+            "function": [
+              "Some"
+            ],
+            "op": "Call"
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "write_source_old_velocity",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "velocity",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "DVec3"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:4750-4757 / 4782-4789; commands write both slots"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "name": "plan",
+          "op": "IfSome",
+          "then": [
+            {
+              "body": [
+                {
+                  "op": "Assign",
+                  "place": {
+                    "base": {
+                      "op": "Try",
+                      "value": {
+                        "arguments": [
+                          {
+                            "base": {
+                              "name": "step",
+                              "op": "Name"
+                            },
+                            "member": "id",
+                            "op": "Field"
+                          }
+                        ],
+                        "method": "metadata_mut",
+                        "op": "Method",
+                        "receiver": {
+                          "name": "self",
+                          "op": "Name"
+                        }
+                      }
+                    },
+                    "member": "source_old_pose",
+                    "op": "Field"
+                  },
+                  "value": {
+                    "arguments": [
+                      {
+                        "fields": [
+                          [
+                            "position",
+                            {
+                              "elements": [
+                                {
+                                  "base": {
+                                    "base": {
+                                      "name": "step",
+                                      "op": "Name"
+                                    },
+                                    "member": "position",
+                                    "op": "Field"
+                                  },
+                                  "member": "x",
+                                  "op": "Field"
+                                },
+                                {
+                                  "base": {
+                                    "base": {
+                                      "name": "step",
+                                      "op": "Name"
+                                    },
+                                    "member": "position",
+                                    "op": "Field"
+                                  },
+                                  "member": "y",
+                                  "op": "Field"
+                                },
+                                {
+                                  "base": {
+                                    "base": {
+                                      "name": "step",
+                                      "op": "Name"
+                                    },
+                                    "member": "position",
+                                    "op": "Field"
+                                  },
+                                  "member": "z",
+                                  "op": "Field"
+                                }
+                              ],
+                              "op": "Array"
+                            }
+                          ],
+                          [
+                            "velocity",
+                            {
+                              "elements": [
+                                {
+                                  "base": {
+                                    "base": {
+                                      "name": "step",
+                                      "op": "Name"
+                                    },
+                                    "member": "velocity",
+                                    "op": "Field"
+                                  },
+                                  "member": "x",
+                                  "op": "Field"
+                                },
+                                {
+                                  "base": {
+                                    "base": {
+                                      "name": "step",
+                                      "op": "Name"
+                                    },
+                                    "member": "velocity",
+                                    "op": "Field"
+                                  },
+                                  "member": "y",
+                                  "op": "Field"
+                                },
+                                {
+                                  "base": {
+                                    "base": {
+                                      "name": "step",
+                                      "op": "Name"
+                                    },
+                                    "member": "velocity",
+                                    "op": "Field"
+                                  },
+                                  "member": "z",
+                                  "op": "Field"
+                                }
+                              ],
+                              "op": "Array"
+                            }
+                          ]
+                        ],
+                        "op": "Record",
+                        "path": [
+                          "crate",
+                          "generated_kinematics",
+                          "Pose"
+                        ]
+                      }
+                    ],
+                    "function": [
+                      "Some"
+                    ],
+                    "op": "Call"
+                  }
+                }
+              ],
+              "iterator": {
+                "name": "plan",
+                "op": "Name"
+              },
+              "name": "step",
+              "op": "For"
+            }
+          ],
+          "value": {
+            "name": "plan",
+            "op": "Name"
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "stage_source_motion",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "plan",
+          {
+            "arguments": [
+              {
+                "element": {
+                  "element": {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "PreparedMotion"
+                    ]
+                  },
+                  "kind": "Slice"
+                },
+                "kind": "Ref",
+                "mutable": false
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "Option"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:520-521; mutable results before publication"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "mutable": false,
+          "name": "previous",
+          "op": "Let",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                }
+              ],
+              "method": "source_current_pose",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "mutable": false,
+          "name": "next",
+          "op": "Let",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                }
+              ],
+              "method": "source_old_pose",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                },
+                {
+                  "arguments": [
+                    {
+                      "base": {
+                        "name": "next",
+                        "op": "Name"
+                      },
+                      "member": "position",
+                      "op": "Field"
+                    }
+                  ],
+                  "function": [
+                    "DVec3",
+                    "from_array"
+                  ],
+                  "op": "Call"
+                }
+              ],
+              "method": "set_position_value",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "op": "Try",
+            "value": {
+              "arguments": [
+                {
+                  "name": "id",
+                  "op": "Name"
+                },
+                {
+                  "arguments": [
+                    {
+                      "base": {
+                        "name": "next",
+                        "op": "Name"
+                      },
+                      "member": "velocity",
+                      "op": "Field"
+                    }
+                  ],
+                  "function": [
+                    "DVec3",
+                    "from_array"
+                  ],
+                  "op": "Call"
+                }
+              ],
+              "method": "set_velocity_value",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "op": "Try",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "metadata_mut",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            },
+            "member": "source_old_pose",
+            "op": "Field"
+          },
+          "value": {
+            "arguments": [
+              {
+                "name": "previous",
+                "op": "Name"
+              }
+            ],
+            "function": [
+              "Some"
+            ],
+            "op": "Call"
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "publish_source_pose",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:581-582; source swap, not immutable plan replay"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "mutable": true,
+          "name": "entities",
+          "op": "Let",
+          "value": {
+            "arguments": [],
+            "method": "clone",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "arguments": [],
+                "method": "resource",
+                "op": "Method",
+                "receiver": {
+                  "arguments": [],
+                  "method": "world",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "app",
+                    "op": "Field"
+                  }
+                },
+                "type_arguments": [
+                  {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "crate",
+                      "generated_liveness",
+                      "Frame"
+                    ]
+                  }
+                ]
+              },
+              "member": "cached_dead",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "name": "plan",
+          "op": "IfSome",
+          "then": [
+            {
+              "body": [
+                {
+                  "name": "entity",
+                  "op": "IfSome",
+                  "then": [
+                    {
+                      "op": "Evaluate",
+                      "value": {
+                        "arguments": [
+                          {
+                            "op": "Unary",
+                            "operator": "*",
+                            "value": {
+                              "name": "entity",
+                              "op": "Name"
+                            }
+                          }
+                        ],
+                        "method": "insert",
+                        "op": "Method",
+                        "receiver": {
+                          "name": "entities",
+                          "op": "Name"
+                        }
+                      }
+                    }
+                  ],
+                  "value": {
+                    "arguments": [
+                      {
+                        "mutable": false,
+                        "op": "Ref",
+                        "value": {
+                          "base": {
+                            "name": "step",
+                            "op": "Name"
+                          },
+                          "member": "id",
+                          "op": "Field"
+                        }
+                      }
+                    ],
+                    "method": "get",
+                    "op": "Method",
+                    "receiver": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "balls",
+                      "op": "Field"
+                    }
+                  }
+                }
+              ],
+              "iterator": {
+                "name": "plan",
+                "op": "Name"
+              },
+              "name": "step",
+              "op": "For"
+            }
+          ],
+          "value": {
+            "name": "plan",
+            "op": "Name"
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "name": "entities",
+            "op": "Name"
+          }
+        }
+      ],
+      "name": "source_projection_entities",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "plan",
+          {
+            "arguments": [
+              {
+                "element": {
+                  "element": {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "PreparedMotion"
+                    ]
+                  },
+                  "kind": "Slice"
+                },
+                "kind": "Ref",
+                "mutable": false
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "Option"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Entity"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "std",
+          "collections",
+          "BTreeSet"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:429-639; current pose held until source publication; existing ECS projection utility reused"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "body": [
+            {
+              "mutable": false,
+              "name": "id",
+              "op": "Let",
+              "value": {
+                "base": {
+                  "base": {
+                    "name": "ball",
+                    "op": "Name"
+                  },
+                  "member": "ball_id",
+                  "op": "Field"
+                },
+                "member": "0",
+                "op": "Field"
+              }
+            },
+            {
+              "condition": {
+                "left": {
+                  "op": "Unary",
+                  "operator": "!",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "id",
+                        "op": "Name"
+                      }
+                    ],
+                    "method": "source_cached_dead",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "self",
+                      "op": "Name"
+                    }
+                  }
+                },
+                "op": "Binary",
+                "operator": "&&",
+                "right": {
+                  "left": {
+                    "base": {
+                      "op": "Try",
+                      "value": {
+                        "arguments": [
+                          {
+                            "name": "id",
+                            "op": "Name"
+                          }
+                        ],
+                        "method": "metadata",
+                        "op": "Method",
+                        "receiver": {
+                          "name": "self",
+                          "op": "Name"
+                        }
+                      }
+                    },
+                    "member": "is_free",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "&&",
+                  "right": {
+                    "left": {
+                      "op": "Unary",
+                      "operator": "!",
+                      "value": {
+                        "arguments": [
+                          {
+                            "mutable": false,
+                            "op": "Ref",
+                            "value": {
+                              "name": "id",
+                              "op": "Name"
+                            }
+                          }
+                        ],
+                        "method": "contains_key",
+                        "op": "Method",
+                        "receiver": {
+                          "base": {
+                            "base": {
+                              "name": "self",
+                              "op": "Name"
+                            },
+                            "member": "park",
+                            "op": "Field"
+                          },
+                          "member": "pending_removals",
+                          "op": "Field"
+                        }
+                      }
+                    },
+                    "op": "Binary",
+                    "operator": "&&",
+                    "right": {
+                      "op": "Unary",
+                      "operator": "!",
+                      "value": {
+                        "arguments": [
+                          {
+                            "expression": {
+                              "left": {
+                                "base": {
+                                  "name": "control",
+                                  "op": "Name"
+                                },
+                                "member": "mode",
+                                "op": "Field"
+                              },
+                              "op": "Binary",
+                              "operator": "==",
+                              "right": {
+                                "components": [
+                                  "OriginalMode",
+                                  "Mushroom"
+                                ],
+                                "op": "Path"
+                              }
+                            },
+                            "op": "Closure",
+                            "parameters": [
+                              "control"
+                            ]
+                          }
+                        ],
+                        "method": "is_some_and",
+                        "op": "Method",
+                        "receiver": {
+                          "arguments": [
+                            {
+                              "mutable": false,
+                              "op": "Ref",
+                              "value": {
+                                "name": "id",
+                                "op": "Name"
+                              }
+                            }
+                          ],
+                          "method": "get",
+                          "op": "Method",
+                          "receiver": {
+                            "base": {
+                              "name": "self",
+                              "op": "Name"
+                            },
+                            "member": "motion",
+                            "op": "Field"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Assign",
+                  "place": {
+                    "base": {
+                      "op": "Try",
+                      "value": {
+                        "arguments": [
+                          {
+                            "name": "id",
+                            "op": "Name"
+                          }
+                        ],
+                        "method": "metadata_mut",
+                        "op": "Method",
+                        "receiver": {
+                          "name": "self",
+                          "op": "Name"
+                        }
+                      }
+                    },
+                    "member": "source_old_pose",
+                    "op": "Field"
+                  },
+                  "value": {
+                    "arguments": [
+                      {
+                        "fields": [
+                          [
+                            "position",
+                            {
+                              "arguments": [],
+                              "method": "to_array",
+                              "op": "Method",
+                              "receiver": {
+                                "base": {
+                                  "base": {
+                                    "name": "ball",
+                                    "op": "Name"
+                                  },
+                                  "member": "position",
+                                  "op": "Field"
+                                },
+                                "member": "0",
+                                "op": "Field"
+                              }
+                            }
+                          ],
+                          [
+                            "velocity",
+                            {
+                              "arguments": [],
+                              "method": "to_array",
+                              "op": "Method",
+                              "receiver": {
+                                "base": {
+                                  "base": {
+                                    "name": "ball",
+                                    "op": "Name"
+                                  },
+                                  "member": "linear_velocity",
+                                  "op": "Field"
+                                },
+                                "member": "0",
+                                "op": "Field"
+                              }
+                            }
+                          ]
+                        ],
+                        "op": "Record",
+                        "path": [
+                          "crate",
+                          "generated_kinematics",
+                          "Pose"
+                        ]
+                      }
+                    ],
+                    "function": [
+                      "Some"
+                    ],
+                    "op": "Call"
+                  }
+                }
+              ]
+            }
+          ],
+          "iterator": {
+            "mutable": false,
+            "op": "Ref",
+            "value": {
+              "base": {
+                "name": "checkpoint",
+                "op": "Name"
+              },
+              "member": "balls",
+              "op": "Field"
+            }
+          },
+          "name": "ball",
+          "op": "For"
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "capture_source_previous",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "checkpoint",
+          {
+            "element": {
+              "arguments": [],
+              "kind": "Named",
+              "path": [
+                "EvolutionCheckpoint"
+              ]
+            },
+            "kind": "Ref",
+            "mutable": false
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:581-582; retained fallback path records prior current fields; full fallback physics correspondence remains open"
+      ],
+      "visibility": "private"
+    }
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "schema": 1
+}

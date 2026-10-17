@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "source": "src/Ball.cpp",
+      "start": 335,
+      "end": 466,
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "region_sha256": "fc815032d0221364fc8ab119a4c37ab35cf4981827ee3c717cec936bab21b9fa"
+    },
+    {
+      "source": "src/Ball.cpp",
+      "start": 777,
+      "end": 807,
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "region_sha256": "b7fbfa623fe3b3da964435b334affbd4ba06fbca6d19e7c410f965bfd35e9440"
+    },
+    {
+      "source": "src/Ball.cpp",
+      "start": 865,
+      "end": 875,
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "region_sha256": "7e2a067bc944415c45323784a1ff1043ed5d49c092f34ae2898e15bf8b38eddf"
+    },
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 4770,
+      "end": 4800,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "b02005af3d6113ad12b1333a01eb32ef2a9408f1a75da3fefdb404fa637c7f83"
+    },
+    {
+      "source": "src/Ball.cpp",
+      "start": 10,
+      "end": 16,
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "region_sha256": "143c0e0294022d1feafa0f9b9467a02dd517025fb1f2e20dc9718460feafb83e"
+    },
+    {
+      "source": "src/Ball.cpp",
+      "start": 70,
+      "end": 109,
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "region_sha256": "e549558599d69db3d23f580fa446e9d43d3f6314337e4355ea6bc8de9756ca4d"
+    },
+    {
+      "source": "src/Ball.cpp",
+      "start": 2191,
+      "end": 2203,
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "region_sha256": "a32ac9171d2116ee13c3208db4cab18714fc31db10c06adda2017e5b3a5e62df"
+    },
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 1023,
+      "end": 1066,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "5f7477b402adfcc38101ed2ca067973ee7c7e68f6ce8571eadf518df8e189445"
+    },
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 548,
+      "end": 603,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "5f5efb1a6fd05a75f54f22ae7b025331af31763e6be7ed71f34b01e555b3a2cf"
+    }
+  ],
+  "reused_sources": {
+    "verification/spec/src/original_park.rs": "16825218b56dcc7328458977f3514cad8ba98016fab31c97152e7e421d9bf09d",
+    "verification/spec/src/original_rotation.rs": "7e88889219ccab6e3b8ff4d2cd79f442616d1f44bbfea0051fe0ee7b4d5ee044"
+  },
+  "source_ownership": "Nine binary64 scalar angles/history fields on each ball; corresponding state is retained in its existing Bevy metadata component. Quaternion/client presentation is a distinct field family.",
+  "lowering": "Transplant reviewed Rust angular AST; bind fixed projection constants to original friction/dt/roll inputs; replace libm::atan2 invocation with original platform atan2; separate original ClientBall presentation boundary. No bounded projection collection is used as world storage.",
+  "proof_credit": false,
+  "open_correspondence": [
+    "Original supported platform math branches",
+    "Source-owned collision history and dynamical orientation variants",
+    "Full original-host ClientBall presentation/interpolation"
+  ],
+  "snapshot_representation": "Nine f64 fields encoded as exact u64 bits, preserving source-generated nonfinite values and signed zero. Older snapshots lacking these new fields use the existing backward-compatibility default; complete historical-format correspondence remains open.",
+  "formation_reuse": "AST transplant of only the unbounded formation arithmetic suffix; the actual world owns loaded offsets and chooses source signed-char slot/formation indices. Original fixed projection table and bounded storage are not used.",
+  "math_dependency": {
+    "registry_baseline": "f0325d62b39d94fcd91216ba8eb6786ce2c00364",
+    "resolved_commit": "540edbfbb779a8f5616e9bbdfbf595c564af5a2c",
+    "previous_math_sources_all_nine_files_byte_equal": true,
+    "scope": "Existing old-orientation f32 rotation kernel reused unchanged; full supported variant/target correspondence remains open."
+  }
+}

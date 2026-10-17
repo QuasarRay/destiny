@@ -1,0 +1,89 @@
+{
+  "invariants": [
+    "Existing Tracking owns interactive and keep-alive membership. Registration is separate and does not imply group membership.",
+    "Source transition adds the new group before removing the old, including the same-group case.",
+    "The cached dead flag skips control, collision response, integration/publication, angular state and partition mutation; warp mode is always live.",
+    "A temporary generic ECS component projection excludes cached dead bodies from the Avian schedule without changing source free/velocity state.",
+    "Master proximity samples liveness again; a dead bubble with prior sensor members gets one forced final check and clears membership afterwards.",
+    "Existing concrete production-kernel fixtures are source client scenarios; InDeadBubble always returns false there. The recorded AST adapter supplies cached_dead=false while retaining all existing bodies/assertions. This is no new dead/master proof credit."
+  ],
+  "open_correspondence": [
+    "Full collision-force history across dead/live global interactions and all controller/warp/mushroom/dynamic orientations require evidence.",
+    "Reentrant mutation, malformed/aliased host Python objects, empty interactive-map key order, pending-work/history snapshot correspondence and Original Blue ABI remain open.",
+    "Current mandatory formal binding/Verus f64, source/configuration closure, whole-engine API/runner and quality/release gates remain open."
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 6277,
+      "region_sha256": "83f6d344a865807ce39949e645aa40dec77d2e492293a54248f44aff9a1f3c54",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 6216
+    },
+    {
+      "end": 6400,
+      "region_sha256": "72945698fff5f014121bbf444857012bac69bc432aba78ad49077c33886aae0a",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 6310
+    },
+    {
+      "end": 6803,
+      "region_sha256": "e886689fd810b7663644ead41810f6a9f10cc300d227f4fef55bddec5ada0455",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 6745
+    },
+    {
+      "end": 615,
+      "region_sha256": "0adb12ec4fd0893ad487b00fd9e1c86d529d54eb0adeeac98b7c21aea799ac3d",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 429
+    },
+    {
+      "end": 5890,
+      "region_sha256": "172db259310291ace480019af735bee36245b85a73483688278ce86d8e1c1ec3",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 5832
+    },
+    {
+      "end": 242,
+      "region_sha256": "9813c1592538d7c7597fc469ff2e05c2856a2fa13d3062a1388cbd8771e2a9f5",
+      "source": "src/Ballpark_Blue.cpp",
+      "source_sha256": "5436575b6391c480894ace92aa4305a12d136d0ed91f569f96642ebd4bc4c338",
+      "start": 204
+    },
+    {
+      "end": 6427,
+      "region_sha256": "3981b0279c60b61ef1e5bca039fe6c2aaee750a944f89ea2d0a2c6800eec2bca",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 6402
+    },
+    {
+      "end": 6554,
+      "region_sha256": "a3c4241b5dfa66efba1c6d731172dde15d26b25488f1a515219d554202945567",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 6553
+    },
+    {
+      "end": 25,
+      "region_sha256": "cdbfc89abbdeb7d7b26833cf1d70b0f8789573fd5d7be1700e6940f84cdc74b9",
+      "source": "src/IDstConstants.h",
+      "source_sha256": "90d722e6815d83b183a3903fcd9ffc25f1473aeb876f8615c30f0a601a5e27d8",
+      "start": 10
+    }
+  ],
+  "reused_git_sources": {
+    "src/iterative_collision.rs": "a373aa8fc14fba24e74aa75e099b2615c9367c7dc925d63fb6e558f54d63efe7",
+    "src/noniterative_collision.rs": "efdd330e94abcf111335c1cfc35c9bac17064475ad7a45438d81746762923d93",
+    "verification/kani/src/iterative_sphere_production_contracts.rs": "20fed49d85cf7c1f77db99b4b4445e183708690f2e0fd05eb42d634d7d40836b",
+    "verification/kani/src/noniterative_production_contracts.rs": "02fe5748be1e31ae281ba69c534424441f4988c2a9c8111e8ab61d272ce27310"
+  },
+  "reused_sources": {},
+  "schema": 1
+}

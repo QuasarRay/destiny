@@ -1,0 +1,78 @@
+{
+  "artifact_kind": "CPG mapping sidecar; not a conformant Code Property Graph",
+  "compiler_input_sha256": "02b28abc65481f101f8f68ce20a08f1abc761fa7a1a3cb347ba181a60f577802",
+  "extension_boundary": "Destiny contracts, Bevy mappings and evidence stay in sidecars. No graph-local IDs are used as stable source identities.",
+  "implementation_schema_match": "UNVERIFIED; check this before executing a frontend",
+  "joern_declared_commit": "3218f990c258a29e5715198a94d776b7aeabfdff",
+  "joern_executed": false,
+  "joern_repository": "https://github.com/joernio/joern.git",
+  "layers": [
+    {
+      "edges": [
+        "AST",
+        "CFG",
+        "CALL",
+        "REF",
+        "CDG",
+        "REACHING_DEF"
+      ],
+      "generated_by_joern": false,
+      "nodes": [
+        "METHOD",
+        "METHOD_PARAMETER_IN",
+        "TYPE_DECL",
+        "MEMBER",
+        "CALL",
+        "IDENTIFIER",
+        "LITERAL",
+        "RETURN"
+      ],
+      "reason": "No installed Joern frontend or complete original compile configuration. Scalar compiler IR exists separately.",
+      "validated_graph_layers": []
+    }
+  ],
+  "mapping_structure_checked": true,
+  "method_mapping_candidates": [
+    {
+      "compiler_usr": "c:@S@Vector3d@F@Length#1",
+      "cpg_node_kind": "METHOD",
+      "property_mapping": {
+        "AST_PARENT_FULL_NAME": "Vector3d",
+        "AST_PARENT_TYPE": "TYPE_DECL",
+        "FILENAME": "src/Vector3d.h",
+        "FULL_NAME": "Vector3d::Length",
+        "IS_EXTERNAL": false,
+        "LINE_NUMBER": 59,
+        "SIGNATURE": "double (void) const"
+      },
+      "source_identity": "114e89fa584f0e1a81eb0a679aabf41af8870072::src/Vector3d.h::c:@S@Vector3d@F@Length#1::double (void) const"
+    },
+    {
+      "compiler_usr": "c:@S@Vector3d@F@LengthSq#1",
+      "cpg_node_kind": "METHOD",
+      "property_mapping": {
+        "AST_PARENT_FULL_NAME": "Vector3d",
+        "AST_PARENT_TYPE": "TYPE_DECL",
+        "FILENAME": "src/Vector3d.h",
+        "FULL_NAME": "Vector3d::LengthSq",
+        "IS_EXTERNAL": false,
+        "LINE_NUMBER": 60,
+        "SIGNATURE": "double (void) const"
+      },
+      "source_identity": "114e89fa584f0e1a81eb0a679aabf41af8870072::src/Vector3d.h::c:@S@Vector3d@F@LengthSq#1::double (void) const"
+    }
+  ],
+  "regenerate": "python verification/tools/update_migration.py cpg",
+  "schema": 1,
+  "schema_conformance_assessed": false,
+  "schema_source_commit": "1735c289d7258d4ef02f6c39ce635581cca4f330",
+  "schema_source_repository": "https://github.com/ShiftLeftSecurity/codepropertygraph.git",
+  "specification": "https://cpg.joern.io/",
+  "specification_version": "1.1",
+  "unresolved": [
+    "Matching implementation/schema validation",
+    "Full compiler configuration and macro provenance",
+    "All graph layer/cardinality checks",
+    "78 ambiguous Doxygen identity joins"
+  ]
+}

@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 // Copyright © 2015, 2023 CCP ehf. Original Destiny MIT license retained.
 //! Ordered, old-orientation sphere impacts from Ballpark.cpp:1988..2713 and
 //! CollisionBallProperties.cpp. This is the native iterative collision path.
@@ -59,6 +64,7 @@ pub(crate) struct Body {
     pub mode: OriginalMode,
     pub owner_id: i64,
     pub follow_id: i64,
+    pub cached_dead: bool,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -647,6 +653,7 @@ pub(crate) fn resolve(
     dt: f64,
     iterations: usize,
     is_master: bool,
+    source_contact_effects: &mut crate::iterative_collision::ContactTrace,
 ) -> Vec<Option<(Vec3, Vec3)>> {
     assert!(bodies.windows(2).all(|pair| pair[0].id < pair[1].id));
     let free: BTreeSet<_> = bodies
@@ -668,7 +675,7 @@ pub(crate) fn resolve(
         let mut next = BTreeSet::new();
         for index in current {
             let body = solver.bodies[index];
-            if body.is_moribund || !body.is_massive {
+            if (body.is_moribund || !body.is_massive) || body.cached_dead {
                 continue;
             }
             let nearby =
@@ -688,6 +695,12 @@ pub(crate) fn resolve(
         }
         current = next;
     }
+    for index in 0..solver.bodies.len() {
+        source_contact_effects.push((
+            solver.bodies[index].id,
+            source_location_contacts(solver.properties[index].as_ref(), solver.statics),
+        ));
+    }
     #[cfg(kani)]
     kani::cover!(
         true,
@@ -696,7 +709,7 @@ pub(crate) fn resolve(
     (0..solver.bodies.len())
         .map(|index| {
             let body = solver.bodies[index];
-            if !body.is_free || body.is_moribund {
+            if (!body.is_free || body.is_moribund) || body.cached_dead {
                 return None;
             }
             Some(match &solver.properties[index] {
@@ -705,4 +718,26 @@ pub(crate) fn resolve(
             })
         })
         .collect()
+}
+
+pub(crate) type ContactTrace = Vec<(i64, Vec<i64>)>;
+#[doc = "src/Ballpark.cpp:617-626; loc.collider != -1, preserve order/duplicates/zero and actual collider IDs"]
+fn source_location_contacts(
+    properties: Option<&Properties>,
+    statics: &[StaticGeometry],
+) -> Vec<i64> {
+    let mut ids = Vec::new();
+    if let Some(properties) = properties {
+        for location in &properties.locations {
+            let id = match location.collider {
+                ColliderKey::None => -1_i64,
+                ColliderKey::Ball(id) => id,
+                ColliderKey::Static(index) => (statics[index].shape).id(),
+            };
+            if (id) != (-1_i64) {
+                (ids).push(id);
+            }
+        }
+    }
+    ids
 }

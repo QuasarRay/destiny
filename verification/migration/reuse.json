@@ -1,0 +1,208 @@
+{
+  "assurance": "All reuse, inventory and runtime observations are independent from formal proof credit.",
+  "local_packaging_backend": {
+    "archive_sha256": "e4277ff81d24afa520a61cf573646bd4b71d675c5687fcba9da154bf53c75b95",
+    "archive_url": "https://codeload.github.com/scikit-build/scikit-build-core/tar.gz/24bd675a4a677e75324b61a358eee19c098f4c58",
+    "commit": "24bd675a4a677e75324b61a358eee19c098f4c58",
+    "dependency": {
+      "commit": "6485791e1b5cf2ef4e756ae392fa80f2c5045d4c",
+      "repository": "https://github.com/cpburnz/python-pathspec",
+      "version": "0.12.1"
+    },
+    "local_bootstrap": "Only missing build-version metadata was generated from the verified v0.11.6 tag. No backend function modified. License retained with source.",
+    "repository": "https://github.com/scikit-build/scikit-build-core",
+    "scope": "Local candidate packaging only. Ordinary builds use the documented build-system dependencies; no runtime dependency introduced.",
+    "version": "0.11.6"
+  },
+  "preserved_rust_base": {
+    "before": "f5bb8edafb27d35165ceafeb39be8b0498e553e9",
+    "evidence": ".aegis/destiny/migration/preservation-after-upstream.json",
+    "integrated_tip": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+    "method": "Fast-forward on destiny-rs-dev, all pre-existing tracked Rust hashes preserved before the generated numeric correction."
+  },
+  "reuse": [
+    {
+      "path": "/home/astral/Projects/trinity-docs/Doxyfile.in",
+      "reuse": "Selected generic configuration settings independently adapted; no source/XML/semantics imported. Original INPUT=trinity/Eve/SpaceObject and EXTRACT_PRIVATE=NO replaced. No files in sibling project changed.",
+      "sha256": "52cadd412a9160eed6bc8ea47ff546c1d318d2034701fc6fad81024c541d9dce"
+    },
+    {
+      "path": "/home/astral/Projects/trinity/doc/Doxyfile.in",
+      "reuse": "Selected generic configuration settings independently adapted; no source/XML/semantics imported. Original INPUT=trinity/Eve/SpaceObject and EXTRACT_PRIVATE=NO replaced. No files in sibling project changed.",
+      "sha256": "52cadd412a9160eed6bc8ea47ff546c1d318d2034701fc6fad81024c541d9dce"
+    },
+    {
+      "path": "blue-rs/crates/blue-codegen/src/discover.rs",
+      "reuse": "Inspected parser pattern. No code copied or build dependency added. Existing parser skips malformed/missing XML; migration validation must reject them. Repository is untracked user work and stays untouched.",
+      "sha256": "6b9be7e039cbfcf6724f394a38973f98d0bdc0e8c9d183b29dd06f34a2e72d7a"
+    },
+    {
+      "path": "blue-rs/crates/blue-codegen/src/generate.rs",
+      "reuse": "Inspected structured Genco emission pattern; no source copied. Use independently implemented generic scalar lowering and checked reuse of existing Vec3 kernel.",
+      "sha256": "b16a8c3471da1dfcea7cf0ee457010ff3f26bbbba122bac260442eb84792db8b"
+    },
+    {
+      "path": ".agents/infra/agentinfra/process.py",
+      "reuse": "Direct import of existing bounded process supervisor; no new supervisor.",
+      "sha256": "051175c3fc8b89c117747d7eba9583fc165c285e2bd2ef49dd33cbf133198e19"
+    },
+    {
+      "path": "verification/spec/src/geometry.rs",
+      "reuse": "Production generated representation adapter delegates to existing Vec3::length after compiler/Rust syntax equivalence check; algorithm not duplicated.",
+      "sha256": "6a3923290c3dde0462162a37c80c66c38c32cb18e237a0ca6b69866d9c9b8d13"
+    },
+    {
+      "path": "verification/spec/src/model.rs",
+      "reuse": "Existing Vec3::norm_squared reused unchanged.",
+      "sha256": "7f4459d1e1d0cdc4763c3fe13d47098699712166638bfd0a0e4992cc07f72f7c"
+    },
+    {
+      "path": "verification/tools/verus_subset.py",
+      "reuse": "Inspected latest existing restricted Verus bridge. It excludes floating point and does not lower C++/emit Genco adapters. Retained unchanged; no verifier backend or scheduler was duplicated.",
+      "sha256": "d366b4d5f283827b5ee7fb76394bb44d712371857d2d2bc624891a315a88346e"
+    },
+    {
+      "path": "verification/spec/src/original_park.rs",
+      "reuse": "Existing uncloak guard is transplanted by a recorded syn transformation into the existing native mutation region. No bounded object collection, fixed formation table or second state machine is put into production. Original source bindings are in uncloak_source_evidence.json.",
+      "sha256": "16825218b56dcc7328458977f3514cad8ba98016fab31c97152e7e421d9bf09d"
+    },
+    {
+      "path": "src/missile.rs",
+      "reuse": "Existing admitted/follow_fields/launch_velocity kernels remain unchanged and production-reachable; new generator connects environment-aware steering and source scalar rotation.",
+      "sha256": "7a0b3eef47938b97a98c66f33330786c5a07c17ad5fb26667a2286d9c7f45dd0"
+    },
+    {
+      "path": "verification/spec/src/original_motion.rs",
+      "reuse": "Only original_missile_thrust arithmetic AST is reused and bound to actual environment values. No bounded projection storage is used as production world state; source/oracle bindings are in missile_source_evidence.json and missile_oracle_samples.json.",
+      "sha256": "93e97e03bd68e5422db3c7027e6c2e4daddb75ab79b8cf50e61bea5187980478"
+    },
+    {
+      "immutable_input_revision": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+      "immutable_input_sha256": "23cf0ccf3def5f90e8b91f70df4c7b5bef354f8e2d5540178052dd175b4b1e3f",
+      "path": "verification/spec/src/original_partition.rs",
+      "reuse": "Original arithmetic reused through recorded AST visibility/tuple adaptation. Persistent unbounded runtime ownership extends the existing Tracking owner; source base hashes, source spans and open bounds are in partition_source_evidence.json. No bounded model storage becomes the production domain.",
+      "sha256": "6beffa4cafb5fd37d1d551047d95779cff19c4c617bd3fee2f818d1541dd3e17"
+    },
+    {
+      "immutable_input_revision": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+      "immutable_input_sha256": "0c9ced95a29248d4c9663b68d11365b22c5c10d123c056f70e06d25aec630152",
+      "path": "src/bubbles.rs",
+      "reuse": "Existing authoritative Tracking is extended through the partition/liveness typed-rule and AST passes; interactivity and keep-alive do not introduce another membership owner.",
+      "sha256": "70fcb63ec355a4cc3bb7b9872887de1e50f8d2e3cbe621e666701e9472b536ce"
+    },
+    {
+      "immutable_input_revision": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+      "immutable_input_sha256": "a373aa8fc14fba24e74aa75e099b2615c9367c7dc925d63fb6e558f54d63efe7",
+      "path": "src/iterative_collision.rs",
+      "reuse": "Existing source collision algorithm is retained. A recorded AST pass adds the cached-dead input and skips response/publication for cached dead bodies.",
+      "sha256": "b8b15fc1f4fe97aaae92af70091b3d5b3c4dfb9ea6885f845e7e77795e5d4cfd"
+    },
+    {
+      "immutable_input_revision": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+      "immutable_input_sha256": "efdd330e94abcf111335c1cfc35c9bac17064475ad7a45438d81746762923d93",
+      "path": "src/noniterative_collision.rs",
+      "reuse": "Existing Potential/capsule/box/integration arithmetic is unchanged. Recorded AST changes only mutable Body transport and publishes its actual collision force; original stopped-overlap fixtures explicitly reset per source live behavior.",
+      "sha256": "883b8f76c633e57f9f60aca82175cb9b311d90c31f1f01ff369091aed64e74f2"
+    },
+    {
+      "path": "verification/codegen/src/state_rules.rs",
+      "reuse": "The existing typed state IR and lowerer are reused for source membership/proximity semantics; rooted paths and Try are typed nodes, not arbitrary Rust fields.",
+      "sha256": "21a81adc6dbca0d1fb2aa52f138fa7ab8a8e6fa6da2c5b202d004e58b3d7cc45"
+    },
+    {
+      "path": "verification/codegen/src/partition.rs",
+      "reuse": "The existing span editor is reused by the narrow liveness pass; no duplicate transformation framework or generator.",
+      "sha256": "311ad007abfb5550f8bd9006471395195099577b8c62a805a1e963cc9981ae3f"
+    },
+    {
+      "immutable_input_revision": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+      "immutable_input_sha256": "20fed49d85cf7c1f77db99b4b4445e183708690f2e0fd05eb42d634d7d40836b",
+      "path": "verification/kani/src/iterative_sphere_production_contracts.rs",
+      "reuse": "All existing concrete assertions and helper algorithms retained. Recorded AST supplies cached_dead=false because these are source client fixtures. The exact modules run under the existing engine library test runner against its actual production collision kernels. Whole Kani crate import/API compilation and formal correspondence remain incomplete; no proof credit.",
+      "sha256": "8aca2cb3e3c5f9d5460ec45c66534ccf1aa9c661610c0e22643aab00d94d6eea"
+    },
+    {
+      "immutable_input_revision": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+      "immutable_input_sha256": "02fe5748be1e31ae281ba69c534424441f4988c2a9c8111e8ab61d272ce27310",
+      "path": "verification/kani/src/noniterative_production_contracts.rs",
+      "reuse": "Existing full stopped-overlap assertions retained. AST adapts the helper call to mutable bodies and supplies the source per-tick collision-force reset; the exact fixture still runs on actual kernels in the engine library.",
+      "sha256": "eb6f0e326c91555f493ef7fba502914f65d99fc7d8d589419713bbe2bd6ade4f"
+    },
+    {
+      "path": "verification/codegen/src/forces.rs",
+      "reuse": "Existing typed state IR and partition span editor lower persistent force state and syntax-aware field/signature mappings; no new generator framework or runner.",
+      "sha256": "050a0d47b0b0f36332cad0c2f6da05b81a774129a9022788a34719894d4b6064"
+    },
+    {
+      "path": "src/generated_forces.rs",
+      "reuse": "Generated bit-preserving value for source mLastG/mLastC; one existing metadata owner per ball, no second force map or bounded projection state.",
+      "sha256": "b25d7a72ae8f9fa64768e0e429dfb6c9df15dacbe89c6529f53ba79ba9d9a8d3"
+    },
+    {
+      "path": "verification/codegen/src/contacts.rs",
+      "reuse": "Existing typed state IR, partition Rewrite and immutable production collision kernels carry contact effects. Fixture assertions and arithmetic retained; no alternate runner/queue/physics implementation.",
+      "sha256": "89ced08ea693eb70106844c2951a32959071b8a26b5dbd5a9d05a2429cd911e1"
+    },
+    {
+      "path": "src/generated_contacts.rs",
+      "reuse": "Typed operation cursor and payload representation; generated executable rules reuse the existing actual metadata owner. This direct source dispatcher is the implementation to reuse for future per-body missile/FFI scheduling, not a separate engine or queue.",
+      "sha256": "5ebeffe1ba6ae96959ff6fe198d2620547603114722b4b6db83353f1ab8b84cb"
+    }
+  ],
+  "schema": 1,
+  "source_authority": {
+    "branch": "main",
+    "commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+    "decision": "User explicitly selected newest Destiny; remote refs/heads/main checked on 2026-10-16. Retain every previous obligation.",
+    "git_tree": "c41df8c5d5dc9dc9a2d7768718aece7bfdb9f65a",
+    "last_verified_at": "2026-10-16T17:34:33.994509+00:00",
+    "latest_ref_evidence": ".aegis/destiny/migration/latest-original-remote-refs.json",
+    "repository": "https://github.com/QuasarRay/destiny.git",
+    "upstream_main_commit_at_check": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+    "upstream_repository": "https://github.com/carbonengine/destiny.git"
+  },
+  "tool_roles": {
+    "cbmc": {
+      "reason": "Use the existing Kani concrete lane for selected generated-kernel checks.",
+      "status": "AVAILABLE_VIA_KANI_6.11.0"
+    },
+    "clang_doc": {
+      "format": "json",
+      "scope": "Isolated original Vector3d header; installed tool has JSON, no YAML flag.",
+      "version": "23.1.1"
+    },
+    "codeql": {
+      "reason": "No named uncertainty in the scalar distance slice requires its data-flow database.",
+      "status": "DEFERRED"
+    },
+    "doxygen": {
+      "archive_sha256": "14fa81bdc34171edb5f1f02b1d60e74802f0439b77fa44e592565d517d72df90",
+      "scope": "Complete pinned source-tree XML, no semantic completeness claim.",
+      "version": "1.18.0"
+    },
+    "genco": {
+      "scope": "Deterministic Rust emission; official crate checksum in codegen Cargo.lock.",
+      "version": "0.19.0"
+    },
+    "joern": {
+      "reason": "No installed frontend; retain a sidecar mapping and incomplete layers. Full compiler configuration is unresolved.",
+      "status": "NOT_EXECUTED"
+    },
+    "klee": {
+      "reason": "Independent seeded/boundary original oracle traces suffice for this runtime slice; no exhaustive path claim.",
+      "status": "DEFERRED"
+    },
+    "libtooling": {
+      "scope": "Two compiler-resolved scalar methods; complete source/config extraction still required.",
+      "version": "23.1.1"
+    },
+    "phasar": {
+      "reason": "No required interprocedural uncertainty for scalar expression reuse.",
+      "status": "DEFERRED"
+    },
+    "svf": {
+      "reason": "Pointer/alias questions require the complete original dependency/ABI configuration first.",
+      "status": "DEFERRED"
+    }
+  }
+}

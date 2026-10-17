@@ -1,0 +1,15 @@
+[package]
+name = "destiny-semantic-codegen"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT"
+publish = false
+
+[dependencies]
+genco = "=0.19.0"
+proc-macro2 = { version = "=1.0.107", features = ["span-locations"] }
+quote = "=1.0.47"
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = "=1.0.150"
+syn = { version = "=2.0.119", features = ["full", "visit", "visit-mut"] }

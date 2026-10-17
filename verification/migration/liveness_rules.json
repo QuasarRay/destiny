@@ -1,0 +1,1832 @@
+{
+  "functions": [
+    {
+      "body": [
+        {
+          "condition": {
+            "name": "enabled",
+            "op": "Name"
+          },
+          "op": "If",
+          "otherwise": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "op": "Ref",
+                    "value": {
+                      "name": "id",
+                      "op": "Name"
+                    }
+                  }
+                ],
+                "method": "remove",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "keep_alive_registry",
+                  "op": "Field"
+                }
+              }
+            }
+          ],
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "insert",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "keep_alive_registry",
+                  "op": "Field"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "name": "register_keep_alive",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "enabled",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark_Blue.cpp:224-240, src/Ballpark.cpp:6755; raw registration set mutation has no automatic group update"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "left": {
+              "name": "bubble",
+              "op": "Name"
+            },
+            "op": "Binary",
+            "operator": "==",
+            "right": {
+              "machine_type": "i64",
+              "op": "Literal",
+              "value": -1
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ]
+        },
+        {
+          "name": "index",
+          "op": "IfSome",
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "insert",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "base": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "keep_alive_groups",
+                      "op": "Field"
+                    },
+                    "index": {
+                      "name": "index",
+                      "op": "Name"
+                    },
+                    "op": "Index"
+                  },
+                  "member": "1",
+                  "op": "Field"
+                }
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "0",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "bubble",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "position",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "keep_alive_groups",
+                "op": "Field"
+              }
+            }
+          }
+        },
+        {
+          "condition": {
+            "op": "Unary",
+            "operator": "!",
+            "value": {
+              "arguments": [
+                {
+                  "expression": {
+                    "left": {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "0",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": "==",
+                    "right": {
+                      "name": "bubble",
+                      "op": "Name"
+                    }
+                  },
+                  "op": "Closure",
+                  "parameters": [
+                    "entry"
+                  ]
+                }
+              ],
+              "method": "any",
+              "op": "Method",
+              "receiver": {
+                "arguments": [],
+                "method": "iter",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "keep_alive_groups",
+                  "op": "Field"
+                }
+              }
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "elements": [
+                      {
+                        "name": "bubble",
+                        "op": "Name"
+                      },
+                      {
+                        "arguments": [
+                          {
+                            "elements": [
+                              {
+                                "name": "id",
+                                "op": "Name"
+                              }
+                            ],
+                            "op": "Array"
+                          }
+                        ],
+                        "function": [
+                          "std",
+                          "collections",
+                          "BTreeSet",
+                          "from"
+                        ],
+                        "op": "Call"
+                      }
+                    ],
+                    "op": "Tuple"
+                  }
+                ],
+                "method": "push",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "keep_alive_groups",
+                  "op": "Field"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "name": "keep_alive_add",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "bubble",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:6770-6785"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "left": {
+              "name": "bubble",
+              "op": "Name"
+            },
+            "op": "Binary",
+            "operator": "==",
+            "right": {
+              "machine_type": "i64",
+              "op": "Literal",
+              "value": -1
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ]
+        },
+        {
+          "name": "index",
+          "op": "IfSome",
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "op": "Ref",
+                    "value": {
+                      "name": "id",
+                      "op": "Name"
+                    }
+                  }
+                ],
+                "method": "remove",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "base": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "keep_alive_groups",
+                      "op": "Field"
+                    },
+                    "index": {
+                      "name": "index",
+                      "op": "Name"
+                    },
+                    "op": "Index"
+                  },
+                  "member": "1",
+                  "op": "Field"
+                }
+              }
+            },
+            {
+              "condition": {
+                "arguments": [],
+                "method": "is_empty",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "base": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "keep_alive_groups",
+                      "op": "Field"
+                    },
+                    "index": {
+                      "name": "index",
+                      "op": "Name"
+                    },
+                    "op": "Index"
+                  },
+                  "member": "1",
+                  "op": "Field"
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Evaluate",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "index",
+                        "op": "Name"
+                      }
+                    ],
+                    "method": "remove",
+                    "op": "Method",
+                    "receiver": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "keep_alive_groups",
+                      "op": "Field"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "0",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "bubble",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "position",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "keep_alive_groups",
+                "op": "Field"
+              }
+            }
+          }
+        }
+      ],
+      "name": "keep_alive_remove",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "bubble",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:6787-6803"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "op": "Unary",
+            "operator": "!",
+            "value": {
+              "arguments": [
+                {
+                  "op": "Ref",
+                  "value": {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                }
+              ],
+              "method": "contains",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "keep_alive_registry",
+                "op": "Field"
+              }
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ]
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              },
+              {
+                "name": "new",
+                "op": "Name"
+              }
+            ],
+            "method": "keep_alive_add",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              },
+              {
+                "name": "old",
+                "op": "Name"
+              }
+            ],
+            "method": "keep_alive_remove",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        }
+      ],
+      "name": "update_keep_alive",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "old",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "new",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:6745-6768; valid integer/set domain; Python allocation/type-error paths remain separate"
+      ]
+    },
+    {
+      "body": [
+        {
+          "name": "index",
+          "op": "IfSome",
+          "then": [
+            {
+              "op": "Assign",
+              "place": {
+                "base": {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "keep_alive_groups",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "name": "index",
+                    "op": "Name"
+                  },
+                  "op": "Index"
+                },
+                "member": "1",
+                "op": "Field"
+              },
+              "value": {
+                "name": "members",
+                "op": "Name"
+              }
+            },
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "0",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "bubble",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "position",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "keep_alive_groups",
+                "op": "Field"
+              }
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "elements": [
+                  {
+                    "name": "bubble",
+                    "op": "Name"
+                  },
+                  {
+                    "name": "members",
+                    "op": "Name"
+                  }
+                ],
+                "op": "Tuple"
+              }
+            ],
+            "method": "push",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "keep_alive_groups",
+              "op": "Field"
+            }
+          }
+        }
+      ],
+      "name": "set_keep_alive_members",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "bubble",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "members",
+          {
+            "arguments": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "i64"
+                ]
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "std",
+              "collections",
+              "BTreeSet"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark_Blue.cpp:224-240; direct dictionary/set world-state replacement"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "0",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "!=",
+                  "right": {
+                    "name": "bubble",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "retain",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "interactives",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "body": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "elements": [
+                      {
+                        "name": "bubble",
+                        "op": "Name"
+                      },
+                      {
+                        "name": "id",
+                        "op": "Name"
+                      }
+                    ],
+                    "op": "Tuple"
+                  }
+                ],
+                "method": "push",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "interactives",
+                  "op": "Field"
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "name": "members",
+            "op": "Name"
+          },
+          "name": "id",
+          "op": "For"
+        }
+      ],
+      "name": "set_interactive_members",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "bubble",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "members",
+          {
+            "arguments": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "i64"
+                ]
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "std",
+              "collections",
+              "BTreeSet"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark_Blue.cpp:214-240; direct valid integer/set membership replacement; empty-key/host alias/order correspondence remains open"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "op": "Unary",
+            "operator": "!",
+            "value": {
+              "name": "master",
+              "op": "Name"
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "machine_type": "usize",
+                "op": "Literal",
+                "value": 0
+              }
+            }
+          ]
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [],
+            "method": "count",
+            "op": "Method",
+            "receiver": {
+              "arguments": [
+                {
+                  "expression": {
+                    "left": {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "0",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": "==",
+                    "right": {
+                      "name": "bubble",
+                      "op": "Name"
+                    }
+                  },
+                  "op": "Closure",
+                  "parameters": [
+                    "entry"
+                  ]
+                }
+              ],
+              "method": "filter",
+              "op": "Method",
+              "receiver": {
+                "arguments": [],
+                "method": "iter",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "interactives",
+                  "op": "Field"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name": "interactive_count",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "master",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "bubble",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "usize"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:6261-6277"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "machine_type": "usize",
+                "op": "Literal",
+                "value": 0
+              }
+            ],
+            "method": "unwrap_or",
+            "op": "Method",
+            "receiver": {
+              "arguments": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "method": "len",
+                    "op": "Method",
+                    "receiver": {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "1",
+                      "op": "Field"
+                    }
+                  },
+                  "op": "Closure",
+                  "parameters": [
+                    "entry"
+                  ]
+                }
+              ],
+              "method": "map",
+              "op": "Method",
+              "receiver": {
+                "arguments": [
+                  {
+                    "expression": {
+                      "left": {
+                        "base": {
+                          "name": "entry",
+                          "op": "Name"
+                        },
+                        "member": "0",
+                        "op": "Field"
+                      },
+                      "op": "Binary",
+                      "operator": "==",
+                      "right": {
+                        "name": "bubble",
+                        "op": "Name"
+                      }
+                    },
+                    "op": "Closure",
+                    "parameters": [
+                      "entry"
+                    ]
+                  }
+                ],
+                "method": "find",
+                "op": "Method",
+                "receiver": {
+                  "arguments": [],
+                  "method": "iter",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "keep_alive_groups",
+                    "op": "Field"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name": "keep_alive_count",
+      "owner": "Tracking",
+      "parameters": [
+        [
+          "bubble",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "usize"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:6244-6255"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "registered",
+                {
+                  "arguments": [],
+                  "method": "clone",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "keep_alive_registry",
+                    "op": "Field"
+                  }
+                }
+              ],
+              [
+                "keep_alive",
+                {
+                  "arguments": [],
+                  "method": "clone",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "keep_alive_groups",
+                    "op": "Field"
+                  }
+                }
+              ],
+              [
+                "interactives",
+                {
+                  "arguments": [],
+                  "method": "clone",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "interactives",
+                    "op": "Field"
+                  }
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "crate",
+              "generated_liveness",
+              "LivenessState"
+            ]
+          }
+        }
+      ],
+      "name": "liveness_state",
+      "owner": "Tracking",
+      "parameters": [],
+      "receiver": "ref",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "crate",
+          "generated_liveness",
+          "LivenessState"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:6216-6277; logical typed snapshot projection of the existing tracker"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "left": {
+              "name": "master",
+              "op": "Name"
+            },
+            "op": "Binary",
+            "operator": "&&",
+            "right": {
+              "left": {
+                "left": {
+                  "name": "mode",
+                  "op": "Name"
+                },
+                "op": "Binary",
+                "operator": "!=",
+                "right": {
+                  "machine_type": "u32",
+                  "op": "Literal",
+                  "value": 3
+                }
+              },
+              "op": "Binary",
+              "operator": "&&",
+              "right": {
+                "left": {
+                  "left": {
+                    "name": "interactive_count",
+                    "op": "Name"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 0
+                  }
+                },
+                "op": "Binary",
+                "operator": "&&",
+                "right": {
+                  "left": {
+                    "name": "keep_alive_count",
+                    "op": "Name"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name": "is_dead",
+      "owner": null,
+      "parameters": [
+        [
+          "master",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "mode",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "u32"
+            ]
+          }
+        ],
+        [
+          "interactive_count",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "usize"
+            ]
+          }
+        ],
+        [
+          "keep_alive_count",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "usize"
+            ]
+          }
+        ]
+      ],
+      "receiver": null,
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "bool"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:6216-6259; valid integer/set state"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "op": "Unary",
+            "operator": "!",
+            "value": {
+              "op": "Try",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "owner",
+                    "op": "Name"
+                  }
+                ],
+                "method": "is_in_dead_bubble",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          },
+          "op": "If",
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "arguments": [
+                  {
+                    "elements": [
+                      {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": true
+                      },
+                      {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    ],
+                    "op": "Tuple"
+                  }
+                ],
+                "function": [
+                  "Ok"
+                ],
+                "op": "Call"
+              }
+            }
+          ]
+        },
+        {
+          "name": "index",
+          "op": "LetSome",
+          "otherwise": [
+            {
+              "op": "Return",
+              "value": {
+                "arguments": [
+                  {
+                    "elements": [
+                      {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      },
+                      {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    ],
+                    "op": "Tuple"
+                  }
+                ],
+                "function": [
+                  "Ok"
+                ],
+                "op": "Call"
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "name": "owner",
+                "op": "Name"
+              },
+              {
+                "machine_type": "bool",
+                "op": "Literal",
+                "value": false
+              }
+            ],
+            "method": "sensor_index",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "name": "sensor",
+          "op": "Let",
+          "value": {
+            "mutable": true,
+            "op": "Ref",
+            "value": {
+              "base": {
+                "base": {
+                  "op": "Try",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "owner",
+                        "op": "Name"
+                      }
+                    ],
+                    "method": "metadata_mut",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "self",
+                      "op": "Name"
+                    }
+                  }
+                },
+                "member": "sensors",
+                "op": "Field"
+              },
+              "index": {
+                "name": "index",
+                "op": "Name"
+              },
+              "op": "Index"
+            }
+          }
+        },
+        {
+          "name": "has_members",
+          "op": "Let",
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "op": "Unary",
+                  "operator": "!",
+                  "value": {
+                    "arguments": [],
+                    "method": "is_empty",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "members",
+                      "op": "Name"
+                    }
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "members"
+                ]
+              }
+            ],
+            "method": "is_some_and",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "as_array",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "sensor",
+                  "op": "Name"
+                },
+                "index": {
+                  "machine_type": "str",
+                  "op": "Literal",
+                  "value": "members"
+                },
+                "op": "Index"
+              }
+            }
+          }
+        },
+        {
+          "condition": {
+            "op": "Unary",
+            "operator": "!",
+            "value": {
+              "name": "has_members",
+              "op": "Name"
+            }
+          },
+          "op": "If",
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "arguments": [
+                  {
+                    "elements": [
+                      {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      },
+                      {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    ],
+                    "op": "Tuple"
+                  }
+                ],
+                "function": [
+                  "Ok"
+                ],
+                "op": "Call"
+              }
+            }
+          ]
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "sensor",
+              "op": "Name"
+            },
+            "index": {
+              "machine_type": "str",
+              "op": "Literal",
+              "value": "elapsed"
+            },
+            "op": "Index"
+          },
+          "value": {
+            "arguments": [],
+            "method": "clone",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "sensor",
+                "op": "Name"
+              },
+              "index": {
+                "machine_type": "str",
+                "op": "Literal",
+                "value": "period"
+              },
+              "op": "Index"
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [
+                  {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": true
+                  },
+                  {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": true
+                  }
+                ],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "prepare_source_proximity",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "owner",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "bool"
+                ]
+              },
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "bool"
+                ]
+              }
+            ],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:5842-5860; source final dead-bubble proximity pass; logical sensor representation"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "name": "index",
+          "op": "IfSome",
+          "then": [
+            {
+              "op": "Assign",
+              "place": {
+                "base": {
+                  "base": {
+                    "base": {
+                      "op": "Try",
+                      "value": {
+                        "arguments": [
+                          {
+                            "name": "owner",
+                            "op": "Name"
+                          }
+                        ],
+                        "method": "metadata_mut",
+                        "op": "Method",
+                        "receiver": {
+                          "name": "self",
+                          "op": "Name"
+                        }
+                      }
+                    },
+                    "member": "sensors",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "name": "index",
+                    "op": "Name"
+                  },
+                  "op": "Index"
+                },
+                "index": {
+                  "machine_type": "str",
+                  "op": "Literal",
+                  "value": "members"
+                },
+                "op": "Index"
+              },
+              "value": {
+                "arguments": [
+                  {
+                    "arguments": [],
+                    "function": [
+                      "Vec",
+                      "new"
+                    ],
+                    "op": "Call"
+                  }
+                ],
+                "function": [
+                  "Value",
+                  "Array"
+                ],
+                "op": "Call"
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "name": "owner",
+                "op": "Name"
+              },
+              {
+                "machine_type": "bool",
+                "op": "Literal",
+                "value": false
+              }
+            ],
+            "method": "sensor_index",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "clear_source_dead_sensor",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "owner",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:5842-5860; source final dead-bubble proximity pass; logical sensor representation"
+      ],
+      "visibility": "private"
+    }
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "schema": 1
+}

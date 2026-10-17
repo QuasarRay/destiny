@@ -1,0 +1,272 @@
+{
+  "batch": "source old/new pose ownership and setter effects before per-body missile publication",
+  "cases": [],
+  "completed_batches": [
+    {
+      "batch": "source-owned angular state before formation motion",
+      "cases": [
+        "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll",
+        "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_stopped_ball",
+        "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_moving_ball"
+      ],
+      "current_result": "ANGULAR_AND_BOTH_FORMATION_ORIGINAL_FIXTURES_PASSED; FULL_VARIANTS_AND_FORMAL_GATES_OPEN",
+      "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+      "original_regions": [
+        {
+          "end": 466,
+          "region_sha256": "7d675724ad3a2686ed8c0ba5a066d42cd3458e25597050fe2cf6b81a4b35c400",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "start": 335
+        },
+        {
+          "end": 1100,
+          "region_sha256": "cce6ab77587c0ae14635776f4b8ca15e5b2950a5c21bf4db10a38771461fb9f7",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "start": 1023
+        },
+        {
+          "end": 1360,
+          "region_sha256": "17861f7ab73d6032e700f8655b219959792e734e208d07a38010c7fe70a938f6",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "start": 1339
+        }
+      ],
+      "required_method": "Extend structured semantic rules/generation or recorded AST transformations. Reuse reviewed existing kernels by hashes; no handwritten production function bodies and no bounded proof model substituted as the full runtime."
+    },
+    {
+      "batch": "source stop velocity and collision-input ordering",
+      "evidence": "verification/migration/speed_source_evidence.json",
+      "observations": "35 unchanged C++ samples, six position/velocity lanes, both collision modes: 420 exact comparisons in debug and optimized tests; original ten-step stop traces passed.",
+      "tests": "tests/original_motion_contract.rs"
+    },
+    {
+      "batch": "warp alignment goto-thrust dispatch",
+      "evidence": "verification/migration/warp_alignment_source_evidence.json",
+      "observations": "All ten original positions and per-step Warp mode assertions passed. Current original matrix retains only two legacy module-identity assertion failures; 33 errors and 138 diagnosed Blue blockers remain.",
+      "tests": "tests/original_motion_contract.rs"
+    },
+    {
+      "batch": "missile steering, source f32 state and scalar-angle launch/retained queries",
+      "evidence": "verification/migration/missile_source_evidence.json",
+      "observations": "All four original launch/20-step/collider fixtures pass; ten direct headless debug/release tests pass. 42 C++ motion cases match 756 world lanes across two collision settings, 18 source-pinned math cases match launch and attached/detached queries, 15 raw/constructor f32 states are checked; full gates remain open.",
+      "tests": "tests/original_missile_contract.rs"
+    },
+    {
+      "batch": "source partition ownership and live box queries, starting with spherical ball placement",
+      "cases": [
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one"
+      ],
+      "evidence": "verification/migration/partition_source_evidence.json",
+      "observations": "Both unchanged Original fixtures preserve eight assertions and now pass through the fresh native binding. Six direct core tests pass in debug/release, including 82 independent original C++ fixed-object transitions and snapshot/large-world/extension checks; the complete selected core regression has 147 observations/86 distinct names. Full core/formal gates remain open.",
+      "tests": "tests/original_partition_contract.rs"
+    },
+    {
+      "additional_proximity_correction": {
+        "cases": 8,
+        "feature_id": "proximity.client-sensors",
+        "preserved_event_list_assertions": 9,
+        "result": "All eight source cases/nine event-list assertions pass directly in the actual core, debug and optimized. Four diagnosed intermediate native regressions are repaired; current fresh native matrix is back to 291 passes/274 with calls.",
+        "source_fixture": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors"
+      },
+      "batch": "source dynamic partition reinsertion and master/client collision-phase fidelity",
+      "cases": [
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball"
+      ],
+      "evidence": "verification/migration/partition_source_evidence.json",
+      "observations": "Source client bubble lifecycle, arbitrary collision label admission and actual free-state inflation are generated and independently checked against 80 C++ phase states/48 ticks/456 physical numeric lanes. Eleven partition tests pass in debug/release. Full selected core regression: 157 observations, 91 distinct names; all strict lints pass. Complete core/formal gates remain open.",
+      "tests": "tests/original_partition_contract.rs"
+    },
+    {
+      "batch": "source master bubble liveness, interactive/keep-alive state and cached phase skips",
+      "evidence": "verification/migration/liveness_source_evidence.json",
+      "feature_id": "scheduling.master-bubble-liveness",
+      "observations": "70 unchanged C++/real-CPython membership states and 3640 all-mode/bubble query pairs; four actual headless liveness tests, actual cached-phase continuation and four preserved concrete collision fixtures run against production kernels. Final selected core receipts: 183 observations / 101 distinct names with all strict lints passing. Native matrix: 291 passes, 274 with calls, 2 legacy identity failures, 27 errors and 138 retained Blue blockers. Whole Kani import/API compilation and full force/history/configuration/proof gates remain open.",
+      "oracle": "verification/migration/liveness_oracle_samples.json",
+      "tests": [
+        "tests/original_liveness_contract.rs",
+        "tests/support/liveness_tracking.rs"
+      ]
+    },
+    {
+      "batch": "source persistent controller/collision forces",
+      "evidence": "verification/migration/force_source_evidence.json",
+      "feature_id": "state.controller-collision-forces",
+      "observations": "Five actual headless force checks pass in debug/release: three unchanged-C++ GotoThrust/Potential four-tick sequences compare 288 position/velocity/force lanes per profile; overlap source fragments compare 36 force lanes. Both actual collision paths replay with exact retained force bits. The original failing nonunit baseline remains recorded. Final full core observations: 193 / 106 distinct names with strict lints passing. Fresh native matrix retains 291 passes / 274 with calls, 2 legacy identity failures, 27 errors and 138 Blue blockers; no new regression.",
+      "oracle": "verification/migration/force_oracle_samples.json",
+      "tests": "tests/original_force_contract.rs"
+    },
+    {
+      "batch": "source-owned contact identity/reset/snapshot state and source warp-angle admission",
+      "evidence": "verification/migration/contact_source_evidence.json",
+      "feature_id": "collision.source-contact-state",
+      "limits": "Contact foundation is integrated_partial. Full iterative locations/history and moved-missile callback publication/dispatch remain required; no full-event or proof credit.",
+      "observations": "Six direct contact tests pass in debug and release. Current selected core regression: 205 observations / 112 distinct names, all three strict clippies pass; 11 codegen tests pass. C++ Potential IDs match actual gradient output including 130 sorted allocated-domain identifiers, and all nine angular fields match both source contact states in both collision settings. Native matrix remains 291 passes, 274 with calls, 2 legacy identity failures, 27 errors and 138 explicitly retained missing-Blue blockers. No proof credit.",
+      "rules": "verification/migration/contact_rules.json",
+      "tests": [
+        "tests/original_contact_contract.rs",
+        "tests/original_force_contract.rs"
+      ]
+    },
+    {
+      "batch": "operation-owned source collision dispatcher and typed host API",
+      "evidence": "verification/migration/contact_source_evidence.json",
+      "feature_id": "events.source-collision-dispatch",
+      "limits": "Automatic moved-missile Evolve/FFI scheduling remains unwired. Actual PyOS unwinding, unsafe list/lifetime and full pending state/history correspondence are not claimed.",
+      "observations": "Eleven contact tests pass in debug/release. Fifteen selected core commands pass: 215 observations / 117 distinct names, all three strict clippies pass; twelve codegen tests pass. Six unchanged C++ dispatcher cases yield 319 contacts and three host errors, including same-owner recursive dispatch. Real gradient output, full binary64 bits, nested cursors, foreign-world rejection, replaced-owner cancellation and explicit unsafe-list-shrink errors are checked. Native matrix remains 291 passes (274 with calls), 2 legacy identity failures, 27 errors and 138 retained Blue blockers.",
+      "oracle": "verification/migration/collision_dispatch_oracle_samples.json",
+      "tests": [
+        "tests/original_contact_contract.rs"
+      ]
+    }
+  ],
+  "diagnosed_gaps": [
+    "New source finding: SetBallPosition (4738-4764) and SetBallVelocity (4770-4807) overwrite both mNew and mOld vectors. Evolve (429-639) stores computed results into mOldPos/mOldVel before publication then swaps them per body. Earlier callbacks can therefore replace a later pending result; an immutable PreparedMotion replay is semantically wrong even if delivered in body order. The current metadata/snapshots lack this mutable source scratch/previous pose owner.",
+    "AddBall has distinct source initialization: a newly created ball sets mOldPos=mNewPos-dt*mNewVel and mOldVel=mNewVel; replacement updates new vectors while retaining old vectors. Do not initialize all old poses to current pose or reset them on replacement.",
+    "Source dispatches only moved missiles after pose swap, angle update and partition reinsertion; the delta-squared gate is <0.1. Dead/moribund/mushroom paths skip dispatch. Generic end-of-world collision callbacks would change behavior.",
+    "Iterative locations append into mCollisions only at this late moved-missile phase; source-owned gradient contacts are already present before angles. Master adds self collision if absolute-ID owner is missing, cloaked, or outside the missile bubble when that bubble is not -1.",
+    "DispatchCollisions captures list size once, preserves order/duplicates, rereads each ID and LastC immediately before each callback, ignores newly appended entries beyond captured size, reports host error then continues. Shrinking below captured size is unsafe original behavior and requires explicit domain handling.",
+    "Current advance_one_tick_with_motion publishes all poses before callbacks. Exact reentrancy requires a per-body publication continuation and preventing Avian from exposing later planned poses early; reuse current callback/continuation owner and unlock/borrow boundaries."
+  ],
+  "existing_candidates": [
+    {
+      "sha256": "74fa918db0a70ae4790ba2f6160e88ece059902fc6f0a91afe1428c86a2a7c87",
+      "source": "src/runtime.rs"
+    },
+    {
+      "sha256": "385a5eeba45b0009c695456cf44ad4da900ef8711e5be811cdb77052f37e83e0",
+      "source": "src/ffi.rs"
+    },
+    {
+      "sha256": "5ebeffe1ba6ae96959ff6fe198d2620547603114722b4b6db83353f1ab8b84cb",
+      "source": "src/generated_contacts.rs"
+    },
+    {
+      "sha256": "0cdb2a21955466202f448fc15252897e0a105d0874b7cb6218325d22b36c96e2",
+      "source": "src/generated_liveness.rs"
+    },
+    {
+      "sha256": "379623b1b8d4b5bbb3f12003f4e7c8066ba6dc924bf68c6fa1bfe8016ad22a0d",
+      "source": "src/notification_batch.rs"
+    },
+    {
+      "sha256": "89ced08ea693eb70106844c2951a32959071b8a26b5dbd5a9d05a2429cd911e1",
+      "source": "verification/codegen/src/contacts.rs"
+    },
+    {
+      "sha256": "c352194bd855b196af8aaecad5c748558b420502e421f5617b09dc4874e302eb",
+      "source": "verification/codegen/src/liveness.rs"
+    },
+    {
+      "sha256": "21a81adc6dbca0d1fb2aa52f138fa7ab8a8e6fa6da2c5b202d004e58b3d7cc45",
+      "source": "verification/codegen/src/state_rules.rs"
+    },
+    {
+      "sha256": "2e33a97e772aa7ce696f9884992a4291df4eec2cc1fe1a863e45a840c5df04d3",
+      "source": "verification/migration/contact_rules.json"
+    }
+  ],
+  "feature_id": "events.source-collision-dispatch",
+  "known_good_boundary": {
+    "finding": "Raw vx/vy/vz property writes notify Ball::OnModified, which calls SetBallVelocity. Existing scalar snapping at that boundary is correct and must not be removed based only on MAP_ATTRIBUTE field mapping.",
+    "source": "src/Ball.cpp:1538-1551",
+    "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4"
+  },
+  "next_exact_action": "Generate source mOldPos/mOldVel ownership and all writer/reader phase mappings before wiring per-body publication. Inspect only pinned constructor/AddBall, SetBallPosition/SetBallVelocity and Evolve 429-639 plus current prepare_iterative_sphere_tick, set_position/value, set_velocity/value, snapshot/checkpoint paths. New AddBall uses old_pos=new_pos-dt*new_vel and old_vel=new_vel; replacement retains old vectors. Preserve one owner for current Avian Position/LinearVelocity and a distinct bit-preserving owner for source old/scratch pose. Command setters write both; behavior mutation and publication must not accidentally use those command semantics. Commit computed plans into mutable source scratch state before publication, prevent Avian from advancing source-handled bodies, then publish each body by source swap and fresh current-mode/owner/moved gates. Earlier callback setter changes to a following body must replace that scratch result. Use the existing operation-owned CollisionPass/next_source_collision implementation for moved-missile kind-6 events through current callback/FFI lock boundaries, not a copied dispatcher or fixed plan replay. Validate an unchanged-source two-body publication/command oracle and callback queries/mutations, while preserving mushroom/troll/dead handling and explicit dynamic/pending-history/proof gaps.",
+  "observed_failure": {
+    "current_errors": 27,
+    "finding": "Contact angle owner mismatch is corrected and retained negative receipt remains. Source dispatcher now matches independent reentrant C++ traces. The next per-body tick gap is source-established: current immutable plans cannot reflect setters that write both original pose slots. Build its independent failing actual-runtime witness after adding a callback observation boundary; do not pretend a fixed-plan loop is correct.",
+    "freshness": "Final dispatcher core/native readers accept current source/binary/commands/environment/fixture bindings. Native inventory summary was refreshed via verified same-binary/source observation reuse after canonical inventory update. Core/full acceptance remain INCOMPLETE; no live process handles.",
+    "partition_box_errors": 24,
+    "remaining_not_in_park_callback_errors": 3,
+    "report": ".aegis/destiny/migration/world-dispatch-original-matrix/summary.json"
+  },
+  "old_pose_additional_source_packet": [
+    {
+      "end": 905,
+      "region_sha256": "81f06aea2b41c3945572547cc83a1c070da25a7b1470561a9f7ce294626de06e",
+      "role": "query cache initializes last position/velocity from source old vectors",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 880
+    },
+    {
+      "end": 1296,
+      "region_sha256": "297740711c7323e94255a34289a03e20c4b48b7029606b08994b490e0a810c7c",
+      "role": "time-fraction query starts from source old vectors before CalculateBallPositionVelocity",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 1280
+    },
+    {
+      "end": 1487,
+      "region_sha256": "21a7a46dac09d5754835148a0080f066a3dbbdd2beb0159e0496808516d478f1",
+      "role": "acceleration query derives new-minus-old velocity over dt and narrows via AsVector3",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 1476
+    },
+    {
+      "end": 3605,
+      "region_sha256": "aa06185cd34a6afffc7a7efffaf1317ba14732b0c4bbb34f60fcb2bfb1d713d8",
+      "role": "miniball initialization has distinct old position/zero old velocity writes",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 3570
+    }
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 488,
+      "region_sha256": "d4888a1efec5b04de3eb949eff002ba128a13e982478156c4c136d34d4827619",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 468
+    },
+    {
+      "end": 645,
+      "region_sha256": "d487cf023ca126d78feadae8b5612f1236b53e2c30797a0a48ea6e2e64670dda",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 429
+    },
+    {
+      "end": 3410,
+      "region_sha256": "6574f30cf70e9637f535f423c42f405d1fea2b86a653dcb05cffc0edff143ea3",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 3303
+    },
+    {
+      "end": 4810,
+      "region_sha256": "d340eec08d8de485d64d0936067336fa5a517e7b23003cbabd765847269e0a7b",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 4738
+    }
+  ],
+  "production_sites": [
+    "src/runtime.rs::PreparedMotion / prepare_iterative_sphere_tick / advance_one_tick_with_motion",
+    "src/runtime.rs::DestinyBallMetadata / BallSnapshot / EvolutionCheckpoint / set_position and set_position_value / set_velocity and set_velocity_value",
+    "src/runtime.rs::begin_source_collision_pass / next_source_collision / dispatch_source_collisions / CallCallback::Ball",
+    "src/generated_contacts.rs::CollisionPass / CollisionNotice / src/ffi.rs callback drain",
+    "src/runtime.rs::freeze_source_dead and generated_liveness::Frame.projected"
+  ],
+  "remaining_after_batch": [
+    "Source old/new pose semantics also feed query caches/time-fraction evaluation and acceleration (Ball.cpp:880-905,1280-1296,1476-1487), plus distinct miniball initialization (Ballpark.cpp:3570-3605). Resolve their qualified symbols and wire real readers/writers; no state-only old-pose field closure.",
+    "full collision history/candidate/rotational/static geometry correspondence and controller interactions",
+    "complete world-field/effect, source/configuration and Unknown obligation closure",
+    "pending callbacks/history snapshots, typed API/runner, mandatory proofs and production quality/platform/release acceptance"
+  ],
+  "required_assurance_gaps": [
+    "Whole Kani crate ordinary compile remains blocked by generated Tracking module/dependency closure and old initialize/cells fixture APIs; diagnose receipt world-liveness-kani-compile-diagnosis.json. Reuse the actual pure state/kernel source, adapt fixtures without weakening assertions, and retain concrete tests in the existing engine runner.",
+    "Existing charon source-binding rejection, subnormal sqrt/CBMC discrepancy and unsupported Verus f64 lowering remain unresolved."
+  ],
+  "required_method": "Extend structured semantic rules/generation or recorded AST transformations. Reuse reviewed existing kernels by hashes; no handwritten production function bodies and no bounded proof model substituted as the full runtime.",
+  "schema": 3
+}

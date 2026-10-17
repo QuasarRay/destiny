@@ -1,4 +1,86 @@
-# Destiny–Bevy–Carbon compatibility v4
+# Destiny-rs migration
+
+The current migration target is Original Destiny `main` at
+`114e89fa584f0e1a81eb0a679aabf41af8870072`, pinned from the newest remote
+source on 16 October 2026. Existing Rust work was preserved while updating
+`destiny-rs-dev` to `8bf4fad`. The implementation remains incomplete.
+
+[Migration records and reproducible commands](verification/migration/README.md)
+retain all 532 original test definitions, the twelve original configuration
+presets, generated/reused provenance, concrete failures and separate assurance
+categories. A complete behavioral-feature denominator and full required proof
+and release matrix are still unresolved. The canonical queue remains under
+`.aegis/destiny/work-queue.json`.
+
+The local migration adds exact source-order distance queries through a
+generated adapter to existing Rust math, and source-backed Python tuple/input
+representation corrections. A recorded syntax transformation reuses the
+existing proper-warp guard when uncloaking, preserving its mass state.
+Generated source angular state and formation wiring now run in the actual
+Bevy world. Nine binary64 angle/history fields and roll inputs survive snapshot
+restore, including exact nonfinite bit patterns. Both original ten-step
+formation traces run as direct Rust tests without Python or Blue.
+Source stop motion now preserves velocities above the maximum-velocity
+parameter. `DestinyMaxVelocity` owns that parameter separately from Avian's
+hard speed limit, and source collision computation precedes Avian damping
+preparation. Independent unchanged C++ stop/integration samples check actual
+world position and velocity bits in both collision configurations.
+Aligning warp now receives the original goto thrust; the ten-step original
+position and mode assertions pass through the headless Rust runtime.
+Missile steering now uses the actual world clock, friction and duration. The
+four original launch/20-step/collider scenarios and independent C++ numeric
+cases run in the real Bevy world. Rotational agility has source f32 storage,
+bit-preserving snapshots and retained-generation access. Stationary launch and
+retained-object rotation share the existing source scalar-angle kernel,
+checked with the pinned Carbon Math/DirectXMath dependencies.
+Master bubble liveness now preserves separate keep-alive registration and
+group membership, cached motion-phase skips and the final dead-bubble sensor
+check/clear. Typed membership APIs share the existing tracker and full logical
+snapshots. Independent unchanged C++ methods use real CPython sets only in the
+validation oracle. Full collision history and all source/configuration/proof
+gates remain open.
+Source controller/collision forces now persist in each existing ball metadata
+component. Live/free control resets them; dead/global neighbours retain them
+for collision prediction, and snapshots preserve their binary64 bits. Three
+unchanged-C++ scenarios and actual headless checks cover force flow and replay.
+Source contact IDs now persist in the existing metadata owner and full logical
+snapshots, preserving order and duplicates. Gradient contacts reach source warp
+orientation before publication; iterative location IDs remain a separate
+projection until the later missile phase. The existing C++ oracle checks 130
+ordered gradient IDs and both source contact states for warp angles. Six direct
+headless contact checks cover these paths, snapshot defaults and admission
+reset/retention. Complete location histories, missile collision callback timing
+and mandatory proofs remain open. See the
+[force records](verification/migration/force_source_evidence.json) and
+[contact records](verification/migration/contact_source_evidence.json).
+The source dispatcher is also available through the typed Rust API:
+`begin_source_collision_pass`, `next_source_collision` and
+`dispatch_source_collisions`. An operation captures its contact count once,
+rereads IDs/force bits between callbacks, and permits nested host mutation.
+A false observer result emits an immediate host-error notice and continues.
+Six unchanged-C++ cases cover 319 contact notices and three error notices.
+Automatic moved-missile publication/FFI scheduling must still be connected to
+this same dispatcher; it is not implemented by the direct API alone.
+[Generated architecture views](docs/architecture/overview.md)
+and [decisions](docs/adr/adr-001.md) describe their actual scope and open gaps.
+
+The active milestone is the complete standalone Rust/Bevy world engine.
+Original Blue/Blueexposure/exefile hosting, legacy wheels and authenticated
+transport integration follow core acceptance. Their world-state and transition
+semantics remain core requirements. Build and exercise the current headless
+implementation with `cargo test --no-default-features --locked --offline`.
+`python verification/tools/update_migration.py acceptance --scope core`
+and `--scope full` retain separate incomplete reports from the same canonical
+inventory. The present core report rejects unknown semantics, incomplete
+inventory and missing required evidence; no production-ready engine is claimed.
+
+## Historical compatibility v4 boundary
+
+The earlier subset description below explains the v4 compatibility design.
+Its accepted differences remain migration gaps under the complete parity
+contract; the original title catalog and wrapper reachability are not the
+full product denominator. Current execution results and blockers are recorded
+in the migration records linked above.
 
 This project exposes a supported subset of the Destiny API over a headless
 Bevy 0.19.1 / Avian 0.7.0 runtime. It ships Python, stable C, and C++17
@@ -18,10 +100,9 @@ derived from the shipped Python objects and Rust dispatch handlers:
 | Python/Carbon facade only | 209 |
 | Unsupported | 84 |
 
-See `registry/implementation_status.json` for every title. Unsupported
-controllers fail explicitly; the wrapper does not approximate orbit, follow,
-warp, missile, formation, boid, mushroom, or troll behavior with unrelated
-physics primitives.
+See `registry/implementation_status.json` for the historical title ledger.
+The current migration records above track the newer source mechanics and
+their remaining correspondence gaps. Unsupported operations fail explicitly.
 
 ## Implemented runtime subset
 
@@ -46,8 +127,8 @@ physics primitives.
 - One machine-readable validation/limit contract with Python/Rust drift tests,
   deterministic property tests, and fail-closed native ABI envelopes.
 
-`speedFraction` is validated, replicated, and snapshotted, but it has no
-steering effect because the relevant Destiny controllers are unsupported.
+`speedFraction` is validated, replicated, snapshotted and consumed by the
+implemented source steering paths; complete controller domains remain open.
 Proximity checks use a compatibility scheduler rather than Avian `Sensor`
 entities. Both facts are recorded title by title.
 

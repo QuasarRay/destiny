@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     fmt,
@@ -10,7 +15,7 @@ use avian3d::prelude::*;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use bevy::{
     ecs::system::SystemParam,
-    math::{DMat3, DQuat, DVec3, EulerRot},
+    math::{DMat3, DQuat, DVec3},
     prelude::*,
     state::app::StatesPlugin,
     time::TimeUpdateStrategy,
@@ -286,6 +291,9 @@ pub struct DestinyBallId(pub i64);
 /// layer stores the API value separately and only projects it into Avian.
 #[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub struct DestinyMass(pub f64);
+#[derive(Component, Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[doc = "Destiny maximum-velocity parameter used by source thrust; this is not an Avian velocity cap. Existing API storage is f64; motion kernels narrow to original f32."]
+pub struct DestinyMaxVelocity(pub f64);
 
 /// Delayed-destruction lifecycle state.  The component is intentionally
 /// replicated/relevance-filtered as part of the ball entity lifecycle rather
@@ -311,7 +319,8 @@ pub struct DestinyBallMetadata {
     pub is_space_junk: bool,
     pub agility: f64,
     pub speed_fraction: f64,
-    pub angular_agility: f64,
+    #[serde(with = "crate::generated_missile::float32")]
+    pub angular_agility: f32,
     pub is_cloaked: i32,
     pub new_bubble_id: i64,
     pub old_bubble_id: i64,
@@ -328,6 +337,14 @@ pub struct DestinyBallMetadata {
     #[serde(default)]
     pub owner_id: i64,
     pub sensors: Vec<Value>,
+    #[serde(default)]
+    pub source_angles: crate::generated_angular::Angles,
+    #[serde(default)]
+    pub source_forces: crate::generated_forces::Forces,
+    #[serde(default)]
+    pub source_contacts: Vec<i64>,
+    #[serde(default)]
+    pub source_old_pose: Option<crate::generated_kinematics::Pose>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -347,7 +364,8 @@ pub struct BallSnapshot {
     pub agility: f64,
     pub speed_fraction: f64,
     pub max_angular_velocity: f64,
-    pub angular_agility: f64,
+    #[serde(with = "crate::generated_missile::float32")]
+    pub angular_agility: f32,
     pub angular_velocity: Vec<f64>,
     pub rotation: Vec<f64>,
     pub is_cloaked: i32,
@@ -369,6 +387,14 @@ pub struct BallSnapshot {
     pub motion: Option<MotionSnapshot>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub notifications: Option<RangeNotificationSnapshot>,
+    #[serde(default)]
+    pub source_angles: crate::generated_angular::Angles,
+    #[serde(default)]
+    pub source_forces: crate::generated_forces::Forces,
+    #[serde(default)]
+    pub source_contacts: Vec<i64>,
+    #[serde(default)]
+    pub source_old_pose: Option<crate::generated_kinematics::Pose>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -433,6 +459,10 @@ struct ParkSnapshotMetadata {
     formations: Vec<Vec<[f64; 3]>>,
     pending_removals: Vec<PendingRemovalSnapshot>,
     snapshot_semantics: String,
+    #[serde(default)]
+    roll_parameters: crate::generated_angular::RollParameters,
+    #[serde(default)]
+    source_partition_v1: Option<crate::bubbles::Tracking>,
 }
 
 #[derive(Resource, Debug, Default, Clone, Serialize, Deserialize)]
@@ -471,6 +501,7 @@ struct ParkMetadata {
     local_high_counter: i64,
     time: i64,
     ego: i64,
+    #[cfg(feature = "carbon-network")]
     network_components: bool,
     collision_substeps: u32,
     use_iterative_collision: bool,
@@ -480,6 +511,7 @@ struct ParkMetadata {
     formations: Vec<Vec<[f64; 3]>>,
     pending_removals: HashMap<i64, i64>,
     limits: CompatLimits,
+    roll_parameters: crate::generated_angular::RollParameters,
 }
 
 #[derive(Clone)]
@@ -489,7 +521,7 @@ struct EvolutionBallCheckpoint {
     metadata: DestinyBallMetadata,
     destiny_mass: DestinyMass,
     avian_mass: Mass,
-    max_linear_speed: MaxLinearSpeed,
+    max_linear_speed: DestinyMaxVelocity,
     max_angular_speed: MaxAngularSpeed,
     rigid_body: RigidBody,
     collider: Collider,
@@ -516,6 +548,7 @@ struct EvolutionCheckpoint {
     network_outbox: CarbonNetworkOutbox,
     motion: HashMap<i64, MotionControl>,
     notifications: HashMap<i64, RangeNotifications>,
+    original_bubbles: Option<crate::bubbles::Tracking>,
 }
 
 #[derive(Clone, Debug)]
@@ -641,7 +674,6 @@ struct PreparedMotion {
     id: i64,
     position: OriginalVec3,
     velocity: OriginalVec3,
-    acceleration: OriginalVec3,
     in_warp: bool,
 }
 
@@ -664,6 +696,7 @@ pub(crate) struct NotificationPass {
     sensors: VecDeque<bool>,
     sensor: Option<SensorPass>,
     work: usize,
+    clear_dead_members: bool,
 }
 
 struct SensorPass {
@@ -700,6 +733,7 @@ struct DestinyBubbleCollisionHooks<'w, 's> {
             Option<&'static DestinyPendingRemoval>,
         ),
     >,
+    context: Res<'w, crate::generated_partition::CollisionContext>,
 }
 
 impl CollisionHooks for DestinyBubbleCollisionHooks<'_, '_> {
@@ -713,9 +747,13 @@ impl CollisionHooks for DestinyBubbleCollisionHooks<'_, '_> {
         if left_pending.is_some() || right_pending.is_some() {
             return false;
         }
-        left.is_global
-            || right.is_global
-            || (left.new_bubble_id >= 0 && left.new_bubble_id == right.new_bubble_id)
+        crate::generated_partition::source_pair_filter(
+            self.context.is_master,
+            left.new_bubble_id,
+            right.new_bubble_id,
+            left.is_global,
+            right.is_global,
+        )
     }
 }
 
@@ -878,6 +916,10 @@ impl CompatRuntime {
                 .before(BroadPhaseSystems::CollectCollisions),
         );
         app.insert_resource(DestinySpaceFriction(1_000_000.0));
+        app.init_resource::<crate::generated_liveness::Frame>();
+        app.insert_resource(crate::generated_partition::CollisionContext {
+            is_master: options.is_master,
+        });
         {
             let mut transform_config = app.world_mut().resource_mut::<PhysicsTransformConfig>();
             transform_config.transform_to_position = false;
@@ -925,7 +967,7 @@ impl CompatRuntime {
             terminal_error: None,
             motion: HashMap::new(),
             mode_callbacks: VecDeque::new(),
-            original_bubbles: None,
+            original_bubbles: Some(crate::bubbles::Tracking::default()),
             evolution_phase: 0,
             pending_tick: None,
             pending_tick_time: None,
@@ -937,6 +979,7 @@ impl CompatRuntime {
                 local_high_counter: default_local_high_counter(),
                 time: 0,
                 ego: 0,
+                #[cfg(feature = "carbon-network")]
                 network_components: options.enable_network_components,
                 collision_substeps: options.collision_substeps,
                 use_iterative_collision: options.use_iterative_collision,
@@ -953,6 +996,7 @@ impl CompatRuntime {
                     max_outbox_messages: options.max_outbox_messages,
                     max_outbox_bytes: options.max_outbox_bytes,
                 },
+                roll_parameters: Default::default(),
             },
         })
     }
@@ -1068,6 +1112,27 @@ impl CompatRuntime {
                         return Err(CompatError::UnsupportedTitle(title.into()));
                     }
                     if !retained.attached {
+                        if request.operation == "set"
+                            && title.rsplit('.').next() == Some("RotationalAgility")
+                        {
+                            require_arity(&request.args, &[1], title)?;
+                            let value: crate::generated_missile::SourceFloat32 =
+                                serde_json::from_value(request.args[0].clone()).map_err(
+                                    |error| {
+                                        CompatError::InvalidRequest(format!(
+                                            "invalid source float32: {error}"
+                                        ))
+                                    },
+                                )?;
+                            self.retained_balls
+                                .get_mut(&generation)
+                                .and_then(|ball| ball.detached.as_mut())
+                                .ok_or_else(|| {
+                                    CompatError::Engine("missing retained scalar owner".into())
+                                })?
+                                .angular_agility = value.0;
+                            return Ok(Value::Null);
+                        }
                         if request.operation == "get" {
                             require_arity(&request.args, &[0], title)?;
                             return retained_ball_property(
@@ -1469,6 +1534,11 @@ impl CompatRuntime {
         if let Some(time) = self.pending_tick_time.take() {
             self.park.current_time = time;
         }
+        self.app
+            .world_mut()
+            .resource_mut::<crate::generated_liveness::Frame>()
+            .cached_dead
+            .clear();
         self.evolution_phase = crate::evolution_phase::finish_tick(self.evolution_phase)
             .ok_or_else(|| {
                 CompatError::Engine("evolution phase did not return from callbacks".into())
@@ -1728,8 +1798,8 @@ impl CompatRuntime {
         let max_velocity = self
             .app
             .world()
-            .get::<MaxLinearSpeed>(entity)
-            .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?
+            .get::<DestinyMaxVelocity>(entity)
+            .ok_or_else(|| CompatError::Engine("missing DestinyMaxVelocity".into()))?
             .0;
         let mass = self
             .app
@@ -1781,11 +1851,31 @@ impl CompatRuntime {
             last_collision: control.warp_distance,
             follow_id: control.follow_id.unwrap_or(0),
             follow_range: control.follow_range,
+            formation_id: metadata.formation_id as i8,
+            yaw: metadata.source_angles.yaw,
+            pitch: metadata.source_angles.pitch,
+            roll: metadata.source_angles.roll,
+            old_yaw: metadata.source_angles.old_yaw,
+            old_pitch: metadata.source_angles.old_pitch,
+            old_roll: metadata.source_angles.old_roll,
+            roll_speed: metadata.source_angles.roll_speed,
+            old_roll_speed: metadata.source_angles.old_roll_speed,
+            yaw_delta: metadata.source_angles.yaw_delta,
+            is_free: metadata.is_free,
+            last_g: metadata.source_forces.controller(),
+            last_c: metadata.source_forces.collision(),
+            old_position: self.source_old_pose(id)?.position_vector(),
+            old_velocity: self.source_old_pose(id)?.velocity_vector(),
             ..OriginalParkBall::default()
         })
     }
 
     fn prepare_motion_tick(&mut self) -> Result<Vec<PreparedMotion>, CompatError> {
+        self.app
+            .world_mut()
+            .resource_mut::<crate::generated_liveness::Frame>()
+            .cached_dead
+            .clear();
         // Ordered controls retain the source's ID order. Numerical work is not
         // split across workers or reduced in a different floating-point order.
         let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
@@ -1805,6 +1895,10 @@ impl CompatRuntime {
             {
                 continue;
             }
+            if self.cache_source_dead(id)? {
+                continue;
+            }
+            self.reset_source_behavior_state(id)?;
             let mut control = self.motion.get(&id).cloned().unwrap_or_default();
             let mut ball = self.original_motion_input(id, &control)?;
             if control.mode == OriginalMode::Stop {
@@ -1812,7 +1906,7 @@ impl CompatRuntime {
                     // EvolveStop is distinct from the Stop command: the old
                     // source damps only Y before gradient/integration work.
                     let velocity = destiny_original_spec::original_stop_velocity(ball.velocity);
-                    self.set_velocity(id, DVec3::new(velocity.x, velocity.y, velocity.z))?;
+                    self.set_velocity_value(id, DVec3::new(velocity.x, velocity.y, velocity.z))?;
                 }
                 continue;
             }
@@ -1869,8 +1963,13 @@ impl CompatRuntime {
                     (position, velocity)
                 }
             } else {
-                acceleration = if matches!(control.mode, OriginalMode::Follow | OriginalMode::Orbit)
-                {
+                acceleration = if matches!(
+                    control.mode,
+                    OriginalMode::Follow
+                        | OriginalMode::Orbit
+                        | OriginalMode::Formation
+                        | OriginalMode::Missile
+                ) {
                     let target = control.follow_id.ok_or_else(|| {
                         CompatError::Engine("following mode lost its target".into())
                     })?;
@@ -1880,7 +1979,35 @@ impl CompatRuntime {
                     } else {
                         let target_control = self.motion.get(&target).cloned().unwrap_or_default();
                         let other = self.original_motion_input(target, &target_control)?;
-                        let acceleration = if control.mode == OriginalMode::Follow {
+                        let acceleration = if control.mode == OriginalMode::Missile {
+                            let tick_interval_ms = i64::try_from(
+                                self.app
+                                    .world()
+                                    .resource::<Time<Fixed>>()
+                                    .timestep()
+                                    .as_millis(),
+                            )
+                            .map_err(|_| {
+                                CompatError::InvalidRequest(
+                                    "source tick interval overflows signed arithmetic".into(),
+                                )
+                            })?;
+                            crate::generated_missile::thrust(
+                                &mut ball,
+                                &other,
+                                self.park.current_time,
+                                friction,
+                                dt,
+                                tick_interval_ms,
+                            )
+                            .map_err(|error| {
+                                CompatError::InvalidRequest(format!(
+                                    "source missile rejected state: {error:?}"
+                                ))
+                            })?
+                        } else if control.mode == OriginalMode::Formation {
+                            self.source_formation_thrust(&mut ball, &other)?
+                        } else if control.mode == OriginalMode::Follow {
                             original_follow_thrust_with_environment(&mut ball, &other, friction, dt)
                         } else if self.park.use_new_orbit {
                             original_new_orbit_thrust_with_environment(
@@ -1912,7 +2039,9 @@ impl CompatRuntime {
                         self.motion.insert(id, control.clone());
                         acceleration
                     }
-                } else if control.mode == OriginalMode::Goto {
+                } else if control.mode == OriginalMode::Goto
+                    || (control.mode == OriginalMode::Warp && ball.effect_stamp < 0)
+                {
                     original_goto_thrust(&ball, ball.goto, friction, dt, false)
                 } else {
                     OriginalVec3::ZERO
@@ -1937,11 +2066,11 @@ impl CompatRuntime {
                     "motion result exceeds the solver-safe envelope".into(),
                 ));
             }
+            self.store_source_controller_force(id, acceleration)?;
             results.push(PreparedMotion {
                 id,
                 position,
                 velocity,
-                acceleration,
                 in_warp,
             });
         }
@@ -1959,7 +2088,7 @@ impl CompatRuntime {
     }
 
     fn prepare_iterative_sphere_tick(
-        &self,
+        &mut self,
         motion: &[PreparedMotion],
     ) -> Result<Option<Vec<PreparedMotion>>, CompatError> {
         // In the pinned old-orientation iterative path, GetNextCollisionStatic
@@ -1976,16 +2105,7 @@ impl CompatRuntime {
             .timestep()
             .as_secs_f64();
         let friction = self.app.world().resource::<DestinySpaceFriction>().0;
-        if friction == 0.0
-            || friction > f64::MAX.sqrt()
-            || self
-                .balls
-                .keys()
-                .any(|id| self.metadata(*id).is_ok_and(|m| m.new_bubble_id > 0))
-        {
-            // Keep the established native zero/extreme-friction and host-bubble
-            // paths. Source arithmetic/partition correspondence for these
-            // partitions remains explicit; they receive no original proof credit.
+        if friction == 0.0 || friction > f64::MAX.sqrt() {
             return Ok(None);
         }
         let iterations = self.app.world().resource::<SubstepCount>().0 as usize;
@@ -1998,13 +2118,13 @@ impl CompatRuntime {
             let control = self.motion.get(&id).cloned().unwrap_or_default();
             let ball = self.original_motion_input(id, &control)?;
             let metadata = self.metadata(id)?;
-            let step = prepared.get(&id);
+
             bodies.push(crate::iterative_collision::Body {
                 id,
                 position: ball.position,
                 velocity: ball.velocity,
-                acceleration: step.map_or(OriginalVec3::ZERO, |s| s.acceleration),
-                collision_acceleration: OriginalVec3::ZERO,
+                acceleration: ball.last_g,
+                collision_acceleration: ball.last_c,
                 mass: ball.mass,
                 agility: ball.agility,
                 radius: ball.radius,
@@ -2020,6 +2140,7 @@ impl CompatRuntime {
                 mode: control.mode,
                 owner_id: ball.owner_id,
                 follow_id: ball.follow_id,
+                cached_dead: self.source_cached_dead(id),
             });
             if !metadata.is_free && !self.park.pending_removals.contains_key(&id) {
                 for (mini_index, mini) in metadata.minis.iter().enumerate() {
@@ -2101,6 +2222,7 @@ impl CompatRuntime {
             }
         }
         statics.sort_by_key(|geometry| geometry.shape.id());
+        let mut source_contact_effects = Vec::new();
         let results = if self.park.use_iterative_collision {
             crate::iterative_collision::resolve(
                 &mut bodies,
@@ -2109,19 +2231,23 @@ impl CompatRuntime {
                 dt,
                 iterations,
                 self.park.is_master,
+                &mut source_contact_effects,
             )
         } else {
             crate::noniterative_collision::resolve(
-                &bodies,
+                &mut bodies,
                 &statics,
                 friction,
                 dt,
                 self.park.is_master,
+                &mut source_contact_effects,
             )
             .map_err(|error| {
                 CompatError::Engine(format!("source gradient rejected scratch state: {error:?}"))
             })?
         };
+        self.store_source_collision_forces(&bodies)?;
+        self.store_source_contacts(source_contact_effects)?;
         let mut publication = Vec::with_capacity(results.len());
         for (id, result) in ids.into_iter().zip(results) {
             if let Some(step) = prepared.get(&id).filter(|step| step.in_warp) {
@@ -2142,7 +2268,6 @@ impl CompatRuntime {
                     id,
                     position,
                     velocity,
-                    acceleration: OriginalVec3::ZERO,
                     in_warp: false,
                 });
             }
@@ -2171,18 +2296,15 @@ impl CompatRuntime {
         } else {
             None
         };
-        if should_step {
-            // Pair filtering needs the standalone park's first compatibility
-            // bubble before the solver runs. Assigning it only afterward made
-            // every first-tick pair with sentinel -1 fail the collision hook.
-            self.update_single_compatibility_bubble();
-            self.configure_destiny_space_damping()?;
-        }
+
         let iterative = if should_step {
             self.prepare_iterative_sphere_tick(motion)?
         } else {
             None
         };
+        if should_step && iterative.is_none() {
+            self.configure_destiny_space_damping()?;
+        }
         let mushrooms = if should_step {
             self.prepare_mushroom_tick()?
         } else {
@@ -2194,44 +2316,69 @@ impl CompatRuntime {
                 .resource_mut::<Time<Physics>>()
                 .unpause();
         }
+        self.app
+            .world_mut()
+            .resource_mut::<crate::generated_partition::CollisionContext>()
+            .is_master = self.park.is_master;
+        if should_step {
+            self.stage_source_motion(iterative.as_deref())?;
+            self.freeze_source_dead(iterative.as_deref());
+        }
         self.app.update();
         if should_step {
+            self.thaw_source_dead();
+        }
+        if should_step {
             let step_result = if let Some(checkpoint) = checkpoint.as_ref() {
-                self.correct_collision_free_analytic_motion(checkpoint)
-                    .and_then(|()| {
-                        for &PreparedMotion {
-                            id,
-                            position,
-                            velocity,
-                            ..
-                        } in iterative.as_deref().unwrap_or(motion)
-                        {
-                            if self.balls.contains_key(&id)
+                (if iterative.is_some() {
+                    Ok(())
+                } else {
+                    self.capture_source_previous(checkpoint)?;
+                    self.correct_collision_free_analytic_motion(checkpoint)
+                })
+                .and_then(|()| {
+                    for &PreparedMotion {
+                        id,
+                        position,
+                        velocity,
+                        ..
+                    } in iterative.as_deref().unwrap_or(motion)
+                    {
+                        if !self.source_cached_dead(id)
+                            && (self.balls.contains_key(&id)
                                 && !self.park.pending_removals.contains_key(&id)
                                 && !self
                                     .motion
                                     .get(&id)
-                                    .is_some_and(|control| control.mode == OriginalMode::Mushroom)
-                            {
-                                self.set_position(
+                                    .is_some_and(|control| control.mode == OriginalMode::Mushroom))
+                        {
+                            if iterative.is_some() {
+                                self.publish_source_pose(id)?;
+                            } else {
+                                self.set_position_value(
                                     id,
                                     DVec3::new(position.x, position.y, position.z),
                                 )?;
-                                self.set_velocity(
+                                self.set_velocity_value(
                                     id,
                                     DVec3::new(velocity.x, velocity.y, velocity.z),
                                 )?;
                             }
                         }
-                        for (id, radius) in &mushrooms {
-                            match radius {
-                                Some(radius) => self.set_radius(*id, f64::from(*radius))?,
-                                None => self.schedule_remove_ball(*id, 0)?,
-                            }
+                    }
+                    for (id, radius) in &mushrooms {
+                        match radius {
+                            Some(radius) => self.set_radius(*id, f64::from(*radius))?,
+                            None => self.schedule_remove_ball(*id, 0)?,
                         }
-                        Ok(())
-                    })
-                    .and_then(|()| self.validate_authoritative_world(false))
+                    }
+                    Ok(())
+                })
+                .and_then(|()| {
+                    self.update_all_source_angles()?;
+                    self.sync_source_partition_after_motion(checkpoint)?;
+                    self.validate_authoritative_world(false)
+                })
             } else {
                 self.validate_authoritative_world(false)
             };
@@ -2258,7 +2405,7 @@ impl CompatRuntime {
                 return Err(CompatError::Engine(message));
             }
             self.sync_visual_transforms();
-            self.update_single_compatibility_bubble();
+
             self.pending_tick_time = Some(next_time.ok_or_else(|| {
                 CompatError::Engine("stepping update lost its validated time".into())
             })?);
@@ -2273,32 +2420,15 @@ impl CompatRuntime {
         Ok(())
     }
 
-    /// The standalone ABI has no product bubble manager. After the first
-    /// evolution it therefore creates one deterministic compatibility bubble
-    /// for still-unassigned balls. A Rust host can assign real non-negative
-    /// bubble IDs through its own systems; those values are never overwritten.
-    fn update_single_compatibility_bubble(&mut self) {
-        let entities = self.balls.values().copied().collect::<Vec<_>>();
-        let world = self.app.world_mut();
-        for entity in entities {
-            let Some(mut metadata) = world.get_mut::<DestinyBallMetadata>(entity) else {
-                continue;
-            };
-            if metadata.new_bubble_id == -1 {
-                metadata.old_bubble_id = -1;
-                metadata.new_bubble_id = 0;
-            }
-        }
-    }
-
     fn prepare_mushroom_tick(&self) -> Result<Vec<(i64, Option<f32>)>, CompatError> {
         let mut ids = self
             .motion
             .iter()
             .filter_map(|(id, control)| {
-                (control.mode == OriginalMode::Mushroom
+                ((control.mode == OriginalMode::Mushroom
                     && self.balls.contains_key(id)
                     && !self.park.pending_removals.contains_key(id))
+                    && !self.source_cached_dead(*id))
                 .then_some(*id)
             })
             .collect::<Vec<_>>();
@@ -2361,11 +2491,6 @@ impl CompatRuntime {
     }
 
     fn initialize_source_bubbles(&mut self) -> Result<(), CompatError> {
-        if self.park.is_master {
-            return Err(CompatError::InvalidRequest(
-                "source master partition insertion remains unimplemented".into(),
-            ));
-        }
         let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
         ids.sort_unstable();
         let mut spheres = Vec::with_capacity(ids.len());
@@ -2378,22 +2503,20 @@ impl CompatRuntime {
             }
             let control = self.motion.get(&id).cloned().unwrap_or_default();
             let ball = self.original_motion_input(id, &control)?;
-            let inflated = if metadata.is_free {
-                let m = ball.mass * f64::from(ball.agility);
-                let friction = self.app.world().resource::<DestinySpaceFriction>().0;
-                let acceleration =
-                    friction * f64::from(ball.speed_fraction) * f64::from(ball.max_velocity) / m;
-                f64::from(ball.radius)
-                    + (m * acceleration
-                        - (m * acceleration - ball.velocity.length() * friction) * ball.time_factor)
-                        / friction
-            } else {
-                f64::from(ball.radius)
-            };
+            let inflated = crate::generated_partition::inflated_radius(
+                &ball,
+                self.app.world().resource::<DestinySpaceFriction>().0,
+                self.app
+                    .world()
+                    .resource::<Time<Fixed>>()
+                    .timestep()
+                    .as_secs_f64(),
+            );
             spheres.push((id, ball.position, ball.radius, inflated));
         }
-        let (mut tracking, labels) = crate::bubbles::initialize(&spheres)
-            .map_err(|error| CompatError::InvalidRequest(error.into()))?;
+        let (mut tracking, labels) =
+            crate::bubbles::initialize(self.original_bubbles.take().unwrap_or_default(), &spheres)
+                .map_err(|error| CompatError::InvalidRequest(error.into()))?;
         for (id, label) in labels {
             let mut ball = self.source_bubble_ball(id)?;
             ball.old = ball.new;
@@ -2622,21 +2745,16 @@ impl CompatRuntime {
                 &DestinyBallId,
                 &DestinyBallMetadata,
                 &DestinyMass,
-                &MaxLinearSpeed,
                 &LinearVelocity,
             )>();
             let mut plan = Vec::with_capacity(ball_capacity);
-            for (entity, ball_id, metadata, mass, max_speed, velocity) in query.iter(world) {
-                let mut velocity = velocity.0;
+            for (entity, ball_id, metadata, mass, velocity) in query.iter(world) {
+                let velocity = velocity.0;
                 if pending_removals.contains(&ball_id.0) || !metadata.is_free {
                     plan.push((entity, velocity, 0.0));
                     continue;
                 }
-                let speed = stable_vec3_length(velocity);
-                if speed > max_speed.0 && speed > 0.0 {
-                    velocity = stable_vec3_normalize(velocity)
-                        .map_or(DVec3::ZERO, |direction| direction * max_speed.0);
-                }
+
                 // Avian integrates LinearDamping inside its solver stages, so
                 // collision impulses are not pre-scaled or post-scaled. The
                 // coefficient matches Destiny's exponential free-flight decay
@@ -2711,8 +2829,8 @@ impl CompatRuntime {
                     .get::<Mass>(entity)
                     .ok_or_else(|| CompatError::Engine("missing Mass".into()))?,
                 max_linear_speed: *world
-                    .get::<MaxLinearSpeed>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?,
+                    .get::<DestinyMaxVelocity>(entity)
+                    .ok_or_else(|| CompatError::Engine("missing DestinyMaxVelocity".into()))?,
                 max_angular_speed: *world
                     .get::<MaxAngularSpeed>(entity)
                     .ok_or_else(|| CompatError::Engine("missing MaxAngularSpeed".into()))?,
@@ -2760,6 +2878,7 @@ impl CompatRuntime {
             network_outbox: world.resource::<CarbonNetworkOutbox>().clone(),
             motion: self.motion.clone(),
             notifications: self.range_notifications.clone(),
+            original_bubbles: self.original_bubbles.clone(),
         })
     }
 
@@ -2767,6 +2886,7 @@ impl CompatRuntime {
         &mut self,
         checkpoint: &EvolutionCheckpoint,
     ) -> Result<(), CompatError> {
+        self.original_bubbles = checkpoint.original_bubbles.clone();
         self.motion = checkpoint.motion.clone();
         self.follower_sets = checkpoint.follower_sets.clone();
         self.range_notifications = checkpoint.notifications.clone();
@@ -2839,7 +2959,12 @@ impl CompatRuntime {
             let has_contact = world
                 .get::<CollidingEntities>(initial.entity)
                 .is_some_and(|entities| !entities.is_empty());
-            if !is_free || mass <= 0.0 || has_contact || initial.pending_removal.is_some() {
+            if (!is_free || mass <= 0.0 || has_contact || initial.pending_removal.is_some())
+                || world
+                    .resource::<crate::generated_liveness::Frame>()
+                    .cached_dead
+                    .contains(&initial.entity)
+            {
                 continue;
             }
             let rate = if friction <= 0.0 {
@@ -2849,14 +2974,8 @@ impl CompatRuntime {
             };
             let x = rate * dt;
             let decay = (-x).exp();
-            let mut initial_velocity = initial.linear_velocity.0;
-            let initial_speed = stable_vec3_length(initial_velocity);
-            if initial_speed > initial.max_linear_speed.0 && initial_speed > 0.0 {
-                initial_velocity = stable_vec3_normalize(initial_velocity)
-                    .map_or(DVec3::ZERO, |direction| {
-                        direction * initial.max_linear_speed.0
-                    });
-            }
+            let initial_velocity = initial.linear_velocity.0;
+
             let expected_velocity = initial_velocity * decay;
             let actual_velocity = world
                 .get::<LinearVelocity>(initial.entity)
@@ -2983,8 +3102,8 @@ impl CompatRuntime {
                 let pending = self.park.pending_removals.contains_key(ball_id);
                 let mut planned_velocity = velocity;
                 let max_speed = world
-                    .get::<MaxLinearSpeed>(*entity)
-                    .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?
+                    .get::<DestinyMaxVelocity>(*entity)
+                    .ok_or_else(|| CompatError::Engine("missing DestinyMaxVelocity".into()))?
                     .0;
                 let speed = stable_vec3_length(planned_velocity);
                 if speed > max_speed && speed > 0.0 {
@@ -3054,6 +3173,7 @@ impl CompatRuntime {
             sensors: VecDeque::new(),
             sensor: None,
             work: 0,
+            clear_dead_members: false,
         }
     }
 
@@ -3105,7 +3225,7 @@ impl CompatRuntime {
             return Ok(None);
         }
         let metadata = self.metadata(owner)?;
-        if metadata.new_bubble_id < 0 {
+        if self.park.is_master && (metadata.new_bubble_id < 0) {
             return Ok(None);
         }
         let only = metadata.sensors[index]["only_interactives"]
@@ -3316,8 +3436,24 @@ impl CompatRuntime {
             if self.balls.get(&owner) != Some(&entity)
                 || self.park.pending_removals.contains_key(&owner)
             {
+                if pass.clear_dead_members {
+                    if let Some((owner, entity)) = pass.owner
+                        && self.balls.get(&owner) == Some(&entity)
+                    {
+                        self.clear_source_dead_sensor(owner)?;
+                    }
+                    pass.clear_dead_members = false;
+                }
                 pass.owner = None;
                 continue;
+            }
+            if pass.stage == 0 {
+                let (run, clear) = self.prepare_source_proximity(owner)?;
+                if !run {
+                    pass.owner = None;
+                    continue;
+                }
+                pass.clear_dead_members = clear;
             }
             match pass.stage {
                 0 => {
@@ -3350,6 +3486,14 @@ impl CompatRuntime {
                     if pass.sensor.is_none() {
                         let Some(cloak) = crate::notification_batch::take_next(&mut pass.sensors)
                         else {
+                            if pass.clear_dead_members {
+                                if let Some((owner, entity)) = pass.owner
+                                    && self.balls.get(&owner) == Some(&entity)
+                                {
+                                    self.clear_source_dead_sensor(owner)?;
+                                }
+                                pass.clear_dead_members = false;
+                            }
                             pass.owner = None;
                             continue;
                         };
@@ -3584,7 +3728,7 @@ impl CompatRuntime {
                     agility: f64::from(fields.agility),
                     speed_fraction: f64::from(fields.speed_fraction),
                     max_angular_velocity: f64::from(fields.max_angular_velocity),
-                    angular_agility: f64::from(fields.rotational_agility),
+                    angular_agility: fields.rotational_agility,
                     angular_velocity: fields
                         .angular_velocity
                         .iter()
@@ -3622,6 +3766,10 @@ impl CompatRuntime {
                         tracking_range: fields.tracking_range,
                         tracking_within: fields.within_tracking_range,
                     }),
+                    source_angles: Default::default(),
+                    source_forces: Default::default(),
+                    source_contacts: Default::default(),
+                    source_old_pose: Some(Default::default()),
                 };
                 self.retained_balls.insert(
                     generation,
@@ -3842,7 +3990,11 @@ impl CompatRuntime {
             self.transition_retained_ball(id, generation, 3)?;
         }
         self.ball_generations.clear();
-        self.original_bubbles = None;
+        self.original_bubbles = Some({
+            let mut partition = self.original_bubbles.take().unwrap_or_default().partition;
+            partition.clear_owners();
+            crate::bubbles::Tracking::from_partition(partition)
+        });
         let balls: Vec<_> = self.balls.drain().map(|(_, entity)| entity).collect();
         self.park.pending_removals.clear();
         self.park.ego = 0;
@@ -3898,6 +4050,9 @@ impl CompatRuntime {
             });
         }
         self.follower_sets.remove(&self.ball_generations[&ball_id]);
+        if let Some(tracking) = &mut self.original_bubbles {
+            tracking.partition.remove(ball_id);
+        }
         self.detach_retained_ball(ball_id, true)?;
         self.balls.remove(&ball_id);
         self.motion.remove(&ball_id);
@@ -4151,16 +4306,24 @@ impl CompatRuntime {
             MAX_VELOCITY
         };
         let angular_agility = if args.len() == 19 {
-            value_f64(args.get(18), "angularAgility")?.max(0.0)
+            let mut value =
+                serde_json::from_value::<crate::generated_missile::SourceFloat32>(args[18].clone())
+                    .map_err(|error| {
+                        CompatError::InvalidRequest(format!("invalid source float32: {error}"))
+                    })?
+                    .0;
+            if value <= 0.0 {
+                value = 1.0;
+            }
+            value
         } else {
-            0.0
+            OriginalParkBall::default().rotational_agility
         };
         if mass > MAX_MASS
             || radius > MAX_RADIUS
             || max_velocity > MAX_VELOCITY
             || max_angular_speed > MAX_VELOCITY
             || agility > MAX_AGILITY
-            || angular_agility > MAX_AGILITY
             || !solver_safe_vec3(position, MAX_COORDINATE)
             || !solver_safe_vec3(velocity, MAX_VELOCITY)
         {
@@ -4205,12 +4368,12 @@ impl CompatRuntime {
                 normalized_quat(DQuat::from_rotation_arc(DVec3::X, direction))?;
             }
             self.set_mass(id, mass)?;
-            self.set_radius(id, radius)?;
-            self.set_max_velocity(id, max_velocity)?;
+            self.set_radius_value(id, radius)?;
+            self.set_max_velocity_value(id, max_velocity)?;
             self.set_max_angular_velocity(id, max_angular_speed)?;
-            self.set_position(id, position)?;
-            self.set_velocity(id, velocity)?;
-            self.set_free(id, is_free)?;
+            self.set_position_value(id, position)?;
+            self.set_velocity_value(id, velocity)?;
+            self.set_free_value(id, is_free)?;
             self.set_massive(
                 id,
                 if existing_cloak != 0 {
@@ -4236,6 +4399,10 @@ impl CompatRuntime {
                 .entity_mut(entity)
                 .remove::<DestinyPendingRemoval>();
             self.transition_retained_ball(id, self.ball_generations[&id], 4)?;
+            if is_free {
+                self.update_source_angles(id, true)?;
+            }
+            self.sync_source_partition(id)?;
             return Ok(format!("ball:{id}"));
         }
 
@@ -4254,13 +4421,7 @@ impl CompatRuntime {
         } else {
             RigidBody::Static
         };
-        let initial_rotation = if !self.park.use_dynamical_orientation {
-            stable_vec3_normalize(velocity)
-                .map(|direction| DQuat::from_rotation_arc(DVec3::X, direction))
-                .unwrap_or(DQuat::IDENTITY)
-        } else {
-            DQuat::IDENTITY
-        };
+        let initial_rotation = DQuat::IDENTITY;
         let metadata = DestinyBallMetadata {
             radius,
             is_free,
@@ -4282,6 +4443,18 @@ impl CompatRuntime {
             mini_ids: Vec::new(),
             owner_id: 0,
             sensors: Vec::new(),
+            source_angles: Default::default(),
+            source_forces: Default::default(),
+            source_contacts: Default::default(),
+            source_old_pose: Some(crate::generated_kinematics::Pose::created(
+                position.to_array(),
+                velocity.to_array(),
+                self.app
+                    .world()
+                    .resource::<Time<Fixed>>()
+                    .timestep()
+                    .as_secs_f64(),
+            )),
         };
         // Bevy's tuple Bundle implementations are arity-limited. Keep the
         // component set identical, but insert it in two batches so this code
@@ -4308,7 +4481,7 @@ impl CompatRuntime {
             DestinyMass(mass),
             DestinyPresentationAngularVelocity::default(),
             Mass(avian_mass(mass)),
-            MaxLinearSpeed(max_velocity),
+            DestinyMaxVelocity(max_velocity),
             MaxAngularSpeed(max_angular_speed),
             GravityScale(0.0),
             CollidingEntities::default(),
@@ -4347,6 +4520,12 @@ impl CompatRuntime {
                 identity_fields: [-1; 3],
             },
         );
+        if is_free {
+            self.update_source_angles(id, true)?;
+        }
+        {
+            self.sync_source_partition(id)?;
+        }
         Ok(format!("ball:{id}"))
     }
 
@@ -4462,8 +4641,6 @@ impl CompatRuntime {
                 local_counter: self.park.local_counter,
                 local_high_counter: self.park.local_high_counter,
                 time: self.park.time,
-                // Filtered/subset snapshots must be independently restorable;
-                // never serialize an ego reference to an omitted ball.
                 ego: if selected_set.contains(&self.park.ego) {
                     self.park.ego
                 } else {
@@ -4490,6 +4667,12 @@ impl CompatRuntime {
                     })
                     .collect(),
                 snapshot_semantics: "logical-authoritative".into(),
+                roll_parameters: self.park.roll_parameters,
+                source_partition_v1: if selected_set.len() == self.balls.len() {
+                    self.original_bubbles.clone()
+                } else {
+                    None
+                },
             },
             balls,
         };
@@ -4526,8 +4709,8 @@ impl CompatRuntime {
             .ok_or_else(|| CompatError::Engine("missing DestinyMass".into()))?
             .0;
         let max_velocity = world
-            .get::<MaxLinearSpeed>(entity)
-            .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?
+            .get::<DestinyMaxVelocity>(entity)
+            .ok_or_else(|| CompatError::Engine("missing DestinyMaxVelocity".into()))?
             .0;
         let max_angular_velocity = world
             .get::<MaxAngularSpeed>(entity)
@@ -4584,6 +4767,10 @@ impl CompatRuntime {
                     tracking_within: state.tracking_within,
                 }
             }),
+            source_angles: metadata.source_angles,
+            source_forces: metadata.source_forces,
+            source_contacts: metadata.source_contacts.clone(),
+            source_old_pose: metadata.source_old_pose,
         })
     }
 
@@ -4662,6 +4849,19 @@ impl CompatRuntime {
                 "unsupported snapshot semantics".into(),
             ));
         }
+        if [
+            snapshot.park.roll_parameters.roll_acceleration,
+            snapshot.park.roll_parameters.roll_decay,
+            snapshot.park.roll_parameters.roll_speed_acceleration,
+            snapshot.park.roll_parameters.roll_speed_decay,
+        ]
+        .iter()
+        .any(|value| !value.is_finite())
+        {
+            return Err(CompatError::InvalidRequest(
+                "non-finite snapshot roll parameter".into(),
+            ));
+        }
         validate_formations(&snapshot.park.formations)?;
         if partial != 0 && snapshot.park.formations != self.park.formations {
             return Err(CompatError::InvalidRequest(
@@ -4690,6 +4890,13 @@ impl CompatRuntime {
                     "snapshot child descriptor byte limit exceeded".into(),
                 ));
             }
+        }
+        if let Some(tracking) = &snapshot.park.source_partition_v1
+            && !tracking.partition.valid_for_balls(&ids)
+        {
+            return Err(CompatError::InvalidRequest(
+                "invalid source partition snapshot".into(),
+            ));
         }
         let incoming_by_id: HashMap<_, _> =
             snapshot.balls.iter().map(|ball| (ball.id, ball)).collect();
@@ -4909,6 +5116,7 @@ impl CompatRuntime {
             self.park.disable_dynamical_orientation_for_missiles =
                 snapshot.park.disable_dynamical_orientation_for_missiles;
             self.park.use_new_orbit = snapshot.park.use_new_orbit;
+            self.park.roll_parameters = snapshot.park.roll_parameters;
             self.park.formations = snapshot.park.formations.clone();
             self.app
                 .world_mut()
@@ -5006,7 +5214,10 @@ impl CompatRuntime {
             if self.park.use_dynamical_orientation {
                 args.extend([
                     json!(ball.max_angular_velocity),
-                    json!(ball.angular_agility),
+                    serde_json::to_value(crate::generated_missile::SourceFloat32(
+                        ball.angular_agility,
+                    ))
+                    .map_err(|error| CompatError::Engine(error.to_string()))?,
                 ]);
             }
             self.add_ball_with_identity(&args, Some(ball.id))?;
@@ -5058,6 +5269,10 @@ impl CompatRuntime {
                 metadata.formation_slots = ball.formation_slots;
                 metadata.massive_before_cloak = ball.massive_before_cloak;
                 metadata.angular_agility = ball.angular_agility;
+                metadata.source_angles = ball.source_angles;
+                metadata.source_forces = ball.source_forces;
+                metadata.source_contacts = ball.source_contacts.clone();
+                metadata.source_old_pose = ball.source_old_pose;
                 metadata.agility = ball.agility;
                 metadata.owner_id = ball.owner_id;
                 metadata.mini_ids = ball.mini_ids.clone();
@@ -5180,6 +5395,11 @@ impl CompatRuntime {
                         reason: "delayed".into(),
                     });
             }
+        }
+        if partial != 2
+            && let Some(tracking) = snapshot.park.source_partition_v1
+        {
+            self.original_bubbles = Some(tracking);
         }
         self.rebuild_follower_sets();
         self.sync_visual_transforms();
@@ -5385,14 +5605,7 @@ impl CompatRuntime {
             "GetRotatedVector" => {
                 require_arity(args, &[1], title)?;
                 let vector = value_vec3(args.first(), "vector")?;
-                let entity = self.entity(ball_id)?;
-                let rotation = self
-                    .app
-                    .world()
-                    .get::<Rotation>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing Rotation".into()))?
-                    .0;
-                let result = rotation * vector;
+                let result = self.source_rotated_vector(ball_id, vector)?;
                 if !result.is_finite() {
                     return Err(CompatError::InvalidRequest(
                         "rotated vector exceeds the finite output range".into(),
@@ -5682,8 +5895,9 @@ impl CompatRuntime {
                 {
                     return json_number(0.0);
                 }
-                let center =
-                    stable_vec3_length(self.position(ball_id)? - self.position(self.park.ego)?);
+                let center = crate::generated_geometry::vector_length(
+                    (self.position(ball_id)? - self.position(self.park.ego)?).to_array(),
+                );
                 if name == "centerDist" {
                     json_number(center)
                 } else {
@@ -5700,8 +5914,8 @@ impl CompatRuntime {
             "radius" => json_number(metadata.radius),
             "maxVelocity" => json_number(
                 world
-                    .get::<MaxLinearSpeed>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?
+                    .get::<DestinyMaxVelocity>(entity)
+                    .ok_or_else(|| CompatError::Engine("missing DestinyMaxVelocity".into()))?
                     .0,
             ),
             "maxAngularVelocity" => json_number(
@@ -5755,18 +5969,11 @@ impl CompatRuntime {
                     _ => value.w,
                 })
             }
-            "roll" | "pitch" | "yaw" => {
-                let rotation = world
-                    .get::<Rotation>(entity)
-                    .ok_or_else(|| CompatError::Engine("missing Rotation".into()))?
-                    .0;
-                let (roll, pitch, yaw) = rotation.to_euler(EulerRot::XYZ);
-                json_number(match name {
-                    "roll" => roll,
-                    "pitch" => pitch,
-                    _ => yaw,
-                })
-            }
+            "roll" | "pitch" | "yaw" => json_number(match name {
+                "roll" => metadata.source_angles.roll,
+                "pitch" => metadata.source_angles.pitch,
+                _ => metadata.source_angles.yaw,
+            }),
             "isFree" => Ok(json!(metadata.is_free)),
             "isGlobal" => Ok(json!(metadata.is_global)),
             "isMassive" => Ok(json!(metadata.is_massive)),
@@ -5776,6 +5983,10 @@ impl CompatRuntime {
             "oldBubbleId" => Ok(json!(metadata.old_bubble_id)),
             "effectStamp" => Ok(json!(metadata.effect_stamp)),
             "formationID" => Ok(json!(metadata.formation_id)),
+            "RotationalAgility" => serde_json::to_value(crate::generated_missile::SourceFloat32(
+                metadata.angular_agility,
+            ))
+            .map_err(|error| CompatError::Engine(error.to_string())),
             "Agility" => json_number(metadata.agility),
             "speedFraction" => json_number(metadata.speed_fraction),
             _ => Err(CompatError::UnsupportedTitle(format!(
@@ -5897,6 +6108,15 @@ impl CompatRuntime {
                     self.cloak_ball(ball_id, mode as i32, None)?;
                 }
             }
+            "RotationalAgility" => {
+                let value: crate::generated_missile::SourceFloat32 = serde_json::from_value(
+                    value.cloned().unwrap_or(Value::Null),
+                )
+                .map_err(|error| {
+                    CompatError::InvalidRequest(format!("invalid source float32: {error}"))
+                })?;
+                self.metadata_mut(ball_id)?.angular_agility = value.0;
+            }
             "Agility" => {
                 let agility = value_f64(value, "Agility")?;
                 let agility = if agility <= 0.0 { 1.0 } else { agility };
@@ -5921,9 +6141,12 @@ impl CompatRuntime {
     }
 
     fn set_interactive(&mut self, id: i64, enabled: bool) -> Result<(), CompatError> {
+        let was_interactive = self.metadata(id)?.is_interactive;
         let bubble = self.metadata(id)?.new_bubble_id;
         self.metadata_mut(id)?.is_interactive = enabled;
-        if let Some(tracking) = &mut self.original_bubbles {
+        if was_interactive != enabled
+            && let Some(tracking) = &mut self.original_bubbles
+        {
             tracking.interactive(id, bubble, enabled);
         }
         Ok(())
@@ -5946,7 +6169,7 @@ impl CompatRuntime {
         })
     }
 
-    fn set_position(&mut self, ball_id: i64, position: DVec3) -> Result<(), CompatError> {
+    fn set_position_value(&mut self, ball_id: i64, position: DVec3) -> Result<(), CompatError> {
         if !solver_safe_vec3(position, MAX_COORDINATE) {
             return Err(CompatError::InvalidRequest(
                 "position exceeds the solver-safe coordinate limit".into(),
@@ -5970,23 +6193,17 @@ impl CompatRuntime {
         Ok(())
     }
 
-    fn set_velocity(&mut self, ball_id: i64, velocity: DVec3) -> Result<(), CompatError> {
+    fn set_velocity_value(&mut self, ball_id: i64, velocity: DVec3) -> Result<(), CompatError> {
         if !solver_safe_vec3(velocity, MAX_VELOCITY) {
             return Err(CompatError::InvalidRequest(
                 "velocity exceeds the solver-safe limit".into(),
             ));
         }
         let entity = self.entity(ball_id)?;
-        let planned_rotation = if self.park.use_dynamical_orientation {
-            None
-        } else {
-            stable_vec3_normalize(velocity)
-                .map(|direction| normalized_quat(DQuat::from_rotation_arc(DVec3::X, direction)))
-                .transpose()?
-        };
+        let update_orientation = !self.park.use_dynamical_orientation;
         let world = self.app.world_mut();
         if world.get::<LinearVelocity>(entity).is_none()
-            || (planned_rotation.is_some()
+            || (update_orientation
                 && (world.get::<Rotation>(entity).is_none()
                     || world.get::<Transform>(entity).is_none()
                     || world.get::<AngularVelocity>(entity).is_none()))
@@ -5995,22 +6212,19 @@ impl CompatRuntime {
                 "ball is missing velocity/orientation components".into(),
             ));
         }
-        if let Some(rotation) = planned_rotation {
-            let mut transform = *world
-                .get::<Transform>(entity)
-                .ok_or_else(|| CompatError::Engine("missing Transform".into()))?;
-            transform.rotation = rotation.as_quat();
-            world.entity_mut(entity).insert((
-                LinearVelocity(velocity),
-                Rotation(rotation),
-                AngularVelocity(DVec3::ZERO),
-                transform,
-            ));
-        } else {
+        {
             world
                 .get_mut::<LinearVelocity>(entity)
                 .ok_or_else(|| CompatError::Engine("missing LinearVelocity".into()))?
                 .0 = velocity;
+        }
+        Ok(())
+    }
+    fn set_velocity(&mut self, ball_id: i64, velocity: DVec3) -> Result<(), CompatError> {
+        self.set_velocity_value(ball_id, velocity)?;
+        self.write_source_old_velocity(ball_id, velocity)?;
+        if !self.park.use_dynamical_orientation {
+            self.update_source_angles(ball_id, true)?;
         }
         Ok(())
     }
@@ -6081,7 +6295,7 @@ impl CompatRuntime {
         Ok(())
     }
 
-    fn set_radius(&mut self, ball_id: i64, radius: f64) -> Result<(), CompatError> {
+    fn set_radius_value(&mut self, ball_id: i64, radius: f64) -> Result<(), CompatError> {
         if !radius.is_finite() || !(0.0..=MAX_RADIUS).contains(&radius) {
             return Err(CompatError::InvalidRequest(
                 "radius must be finite and within the solver-safe range".into(),
@@ -6193,7 +6407,7 @@ impl CompatRuntime {
         Ok(())
     }
 
-    fn set_max_velocity(&mut self, ball_id: i64, speed: f64) -> Result<(), CompatError> {
+    fn set_max_velocity_value(&mut self, ball_id: i64, speed: f64) -> Result<(), CompatError> {
         if !speed.is_finite() || !(0.0..=MAX_VELOCITY).contains(&speed) {
             return Err(CompatError::InvalidRequest(
                 "max speed must be finite and within the solver-safe range".into(),
@@ -6202,8 +6416,8 @@ impl CompatRuntime {
         let entity = self.entity(ball_id)?;
         self.app
             .world_mut()
-            .get_mut::<MaxLinearSpeed>(entity)
-            .ok_or_else(|| CompatError::Engine("missing MaxLinearSpeed".into()))?
+            .get_mut::<DestinyMaxVelocity>(entity)
+            .ok_or_else(|| CompatError::Engine("missing DestinyMaxVelocity".into()))?
             .0 = speed;
         Ok(())
     }
@@ -6223,7 +6437,7 @@ impl CompatRuntime {
         Ok(())
     }
 
-    fn set_free(&mut self, ball_id: i64, is_free: bool) -> Result<(), CompatError> {
+    fn set_free_value(&mut self, ball_id: i64, is_free: bool) -> Result<(), CompatError> {
         let was_free = self.metadata(ball_id)?.is_free;
         let entity = self.entity(ball_id)?;
         let staged_collider = if was_free == is_free {
@@ -6397,12 +6611,17 @@ impl CompatRuntime {
             metadata.massive_before_cloak = None;
         }
 
-        // Original Destiny's Ballpark::UncloakBall always makes a ball
-        // massive when it is not in proper warp, even when the ball was
-        // already uncloaked. This compatibility subset does not implement
-        // Warp, so every representable state is a non-warp state.
-        self.set_massive(ball_id, true)?;
-        self.remove_from_sensor_members(ball_id)?;
+        // Source-bound guard reused from OriginalParkProjection::uncloak_ball.
+        if !(self
+            .motion
+            .get(&ball_id)
+            .map_or(OriginalMode::Stop, |control| control.mode)
+            == OriginalMode::Warp
+            && self.metadata(ball_id)?.effect_stamp >= 0)
+        {
+            self.set_massive(ball_id, true)?;
+            self.remove_from_sensor_members(ball_id)?;
+        }
         Ok(())
     }
 
@@ -6599,6 +6818,12 @@ impl CompatRuntime {
                         .as_secs_f64()
                         * 1000.0,
                 ),
+                "rollAcceleration" => json_number(self.park.roll_parameters.roll_acceleration),
+                "rollDecay" => json_number(self.park.roll_parameters.roll_decay),
+                "rollSpeedAcceleration" => {
+                    json_number(self.park.roll_parameters.roll_speed_acceleration)
+                }
+                "rollSpeedDecay" => json_number(self.park.roll_parameters.roll_speed_decay),
                 "friction" => json_number(self.app.world().resource::<DestinySpaceFriction>().0),
                 "currentTime" => Ok(json!(self.park.current_time)),
                 "time" => Ok(json!(self.park.time)),
@@ -6617,6 +6842,19 @@ impl CompatRuntime {
                         .world_mut()
                         .resource_mut::<Time<Fixed>>()
                         .set_timestep(duration);
+                }
+                "rollAcceleration" => {
+                    self.park.roll_parameters.roll_acceleration = value_f64(args.first(), name)?;
+                }
+                "rollDecay" => {
+                    self.park.roll_parameters.roll_decay = value_f64(args.first(), name)?;
+                }
+                "rollSpeedAcceleration" => {
+                    self.park.roll_parameters.roll_speed_acceleration =
+                        value_f64(args.first(), name)?;
+                }
+                "rollSpeedDecay" => {
+                    self.park.roll_parameters.roll_speed_decay = value_f64(args.first(), name)?;
                 }
                 "friction" => {
                     let coefficient = value_f64(args.first(), "friction")?;
@@ -7087,16 +7325,11 @@ impl CompatRuntime {
                 let maximum = self
                     .app
                     .world()
-                    .get::<MaxLinearSpeed>(launcher)
+                    .get::<DestinyMaxVelocity>(launcher)
                     .ok_or_else(|| CompatError::Engine("missing launcher max speed".into()))?
                     .0 as f32;
-                let rotation = self
-                    .app
-                    .world()
-                    .get::<Rotation>(launcher)
-                    .ok_or_else(|| CompatError::Engine("missing launcher rotation".into()))?
-                    .0;
-                let stationary = rotation * -DVec3::Z;
+
+                let stationary = self.source_rotated_vector(owner_check, -DVec3::Z)?;
                 let has_target = target != owner && self.balls.contains_key(&target);
                 let target_cloaked = has_target && self.metadata(target)?.is_cloaked != 0;
                 let offset = if has_target {
@@ -7465,8 +7698,8 @@ impl CompatRuntime {
                 if !self.balls.contains_key(&first_id) || !self.balls.contains_key(&second_id) {
                     Ok(Value::Null)
                 } else {
-                    json_number(stable_vec3_length(
-                        self.position(first_id)? - self.position(second_id)?,
+                    json_number(crate::generated_geometry::vector_length(
+                        (self.position(first_id)? - self.position(second_id)?).to_array(),
                     ))
                 }
             }
@@ -7555,6 +7788,25 @@ impl CompatRuntime {
                 )?;
                 Ok(Value::Null)
             }
+            "GetBallBox" => {
+                require_arity(args, &[1], title)?;
+                let id = value_i64(args.first(), "srcID")?;
+                if self
+                    .original_bubbles
+                    .as_ref()
+                    .is_some_and(|tracking| tracking.partition.undefined_coordinates.contains(&id))
+                {
+                    return Err(CompatError::InvalidRequest(
+                        "source partition coordinate conversion is undefined".into(),
+                    ));
+                }
+                serde_json::to_value(
+                    self.original_bubbles
+                        .as_ref()
+                        .and_then(|tracking| tracking.partition.ball_box(id)),
+                )
+                .map_err(|error| CompatError::Engine(error.to_string()))
+            }
             "GetBoxCenter" => get_box_center_value(args),
             _ => Err(CompatError::UnsupportedTitle(title.to_owned())),
         }
@@ -7583,7 +7835,9 @@ impl CompatRuntime {
         if !self.balls.contains_key(&first_id) || !self.balls.contains_key(&second_id) {
             return Ok(Value::Null);
         }
-        let center = stable_vec3_length(self.position(first_id)? - self.position(second_id)?);
+        let center = crate::generated_geometry::vector_length(
+            (self.position(first_id)? - self.position(second_id)?).to_array(),
+        );
         let distance = surface_distance_from_center(
             center,
             self.metadata(first_id)?.radius,
@@ -8463,7 +8717,6 @@ fn validate_ball_snapshot(ball: &BallSnapshot, max_children: usize) -> Result<()
         ball.agility,
         ball.speed_fraction,
         ball.max_angular_velocity,
-        ball.angular_agility,
     ];
     if scalars.iter().any(|value| !value.is_finite()) {
         return Err(CompatError::InvalidRequest(format!(
@@ -8482,14 +8735,12 @@ fn validate_ball_snapshot(ball: &BallSnapshot, max_children: usize) -> Result<()
                     .motion
                     .as_ref()
                     .is_some_and(|control| control.mode == 9)))
-        || ball.angular_agility < 0.0
         || !(0.0..=1.0).contains(&ball.speed_fraction)
         || ball.mass > MAX_MASS
         || ball.radius > MAX_RADIUS
         || ball.max_velocity > MAX_VELOCITY
         || ball.max_angular_velocity > MAX_VELOCITY
         || ball.agility > MAX_AGILITY
-        || ball.angular_agility > MAX_AGILITY
     {
         return Err(CompatError::InvalidRequest(format!(
             "ball {} contains an out-of-range scalar",
@@ -8814,15 +9065,11 @@ fn retained_ball_property(ball: &RetainedBall, name: &str) -> Result<Value, Comp
                 _ => 2,
             }]
         )),
-        "roll" | "pitch" | "yaw" => {
-            let rotation = quat_from_slice(&snapshot.rotation)?;
-            let (yaw, pitch, roll) = rotation.to_euler(EulerRot::YXZ);
-            json_number(match name {
-                "roll" => roll,
-                "pitch" => pitch,
-                _ => yaw,
-            })
-        }
+        "roll" | "pitch" | "yaw" => json_number(match name {
+            "roll" => snapshot.source_angles.roll,
+            "pitch" => snapshot.source_angles.pitch,
+            _ => snapshot.source_angles.yaw,
+        }),
         "followId" => Ok(json!(
             snapshot
                 .motion
@@ -8872,6 +9119,10 @@ fn retained_ball_property(ball: &RetainedBall, name: &str) -> Result<Value, Comp
         }
         "radius" => json_number(snapshot.radius),
         "maxVelocity" => json_number(snapshot.max_velocity),
+        "RotationalAgility" => serde_json::to_value(crate::generated_missile::SourceFloat32(
+            snapshot.angular_agility,
+        ))
+        .map_err(|error| CompatError::Engine(error.to_string())),
         "Agility" => json_number(snapshot.agility),
         "speedFraction" => json_number(snapshot.speed_fraction),
         "isFree" => Ok(json!(snapshot.is_free)),
@@ -8931,7 +9182,14 @@ fn retained_ball_call(
                 .detached
                 .as_ref()
                 .ok_or_else(|| CompatError::Engine("missing retained state".into()))?;
-            let result = quat_from_slice(&snapshot.rotation)? * vector;
+            let result = crate::generated_angular::rotate(
+                &snapshot.source_angles,
+                OriginalVec3 {
+                    x: vector.x,
+                    y: vector.y,
+                    z: vector.z,
+                },
+            );
             Ok(json!([result.x, result.y, result.z]))
         }
         _ => Err(CompatError::UnsupportedTitle(format!(
@@ -9160,6 +9418,662 @@ fn closest_point_on_triangle(point: DVec3, a: DVec3, b: DVec3, c: DVec3) -> DVec
     a + raw_ab * v + raw_ac * w
 }
 
+// Generated state-access wiring; semantics are in generated_angular.
+impl CompatRuntime {
+    fn source_rotation(
+        &self,
+        id: i64,
+    ) -> Result<impl Fn(OriginalVec3) -> OriginalVec3, CompatError> {
+        let entity = self.entity(id)?;
+        let rotation = self
+            .app
+            .world()
+            .get::<Rotation>(entity)
+            .ok_or_else(|| CompatError::Engine("missing Rotation".into()))?
+            .0;
+        let angles = self.metadata(id)?.source_angles;
+        let dynamic = self.park.use_dynamical_orientation;
+        Ok(move |vector: OriginalVec3| {
+            if dynamic {
+                let result = rotation * DVec3::new(vector.x, vector.y, vector.z);
+                OriginalVec3 {
+                    x: result.x,
+                    y: result.y,
+                    z: result.z,
+                }
+            } else {
+                crate::generated_angular::rotate(&angles, vector)
+            }
+        })
+    }
+
+    fn source_rotated_vector(&self, id: i64, vector: DVec3) -> Result<DVec3, CompatError> {
+        let value = (self.source_rotation(id)?)(OriginalVec3 {
+            x: vector.x,
+            y: vector.y,
+            z: vector.z,
+        });
+        Ok(DVec3::new(value.x, value.y, value.z))
+    }
+
+    fn source_formation_thrust(
+        &self,
+        ball: &mut OriginalParkBall,
+        other: &OriginalParkBall,
+    ) -> Result<OriginalVec3, CompatError> {
+        let Some(points) = self.park.formations.get(other.formation_id as usize) else {
+            return Ok(OriginalVec3::ZERO);
+        };
+        let slot = ball.effect_stamp as i8;
+        if slot < 0 {
+            return Err(CompatError::InvalidRequest(
+                "negative source signed-char formation index is undefined".into(),
+            ));
+        }
+        let Some(offset) = points.get(slot as usize) else {
+            return Ok(OriginalVec3::ZERO);
+        };
+        let offset = OriginalVec3 {
+            x: offset[0],
+            y: offset[1],
+            z: offset[2],
+        };
+        let friction = self.app.world().resource::<DestinySpaceFriction>().0;
+        let dt = self
+            .app
+            .world()
+            .resource::<Time<Fixed>>()
+            .timestep()
+            .as_secs_f64();
+        Ok(crate::generated_angular::formation_thrust(
+            ball,
+            other,
+            offset,
+            friction,
+            dt,
+            self.source_rotation(other.id)?,
+        ))
+    }
+
+    fn update_source_angles(&mut self, id: i64, snap: bool) -> Result<(), CompatError> {
+        if self.park.use_dynamical_orientation {
+            return Ok(());
+        }
+        let control = self.motion.get(&id).cloned().unwrap_or_default();
+        let ball = self.original_motion_input(id, &control)?;
+
+        let input = crate::generated_angular::Input {
+            mass: ball.mass,
+            velocity: ball.velocity,
+            position: ball.position,
+            goto: ball.goto,
+            mode: ball.mode,
+            effect_stamp: ball.effect_stamp,
+            has_collisions: !self.metadata(id)?.source_contacts.is_empty(),
+        };
+        let parameters = self.park.roll_parameters;
+        let environment = crate::generated_angular::Environment {
+            current_time: self.park.current_time,
+            friction: self.app.world().resource::<DestinySpaceFriction>().0,
+            dt: self
+                .app
+                .world()
+                .resource::<Time<Fixed>>()
+                .timestep()
+                .as_secs_f64(),
+            roll_acceleration: parameters.roll_acceleration,
+            roll_decay: parameters.roll_decay,
+            roll_speed_acceleration: parameters.roll_speed_acceleration,
+            roll_speed_decay: parameters.roll_speed_decay,
+        };
+        let mut state = self.metadata(id)?.source_angles;
+        if crate::generated_angular::update(&mut state, &input, &environment, snap) {
+            return Err(CompatError::InvalidRequest(
+                "angular timestamp arithmetic overflow".into(),
+            ));
+        }
+        self.metadata_mut(id)?.source_angles = state;
+        Ok(())
+    }
+
+    fn update_all_source_angles(&mut self) -> Result<(), CompatError> {
+        let mut ids = self.balls.keys().copied().collect::<Vec<_>>();
+        ids.sort_unstable();
+        for id in ids {
+            if !self.source_cached_dead(id)
+                && (!self.park.pending_removals.contains_key(&id)
+                    && self.metadata(id)?.is_free
+                    && !self
+                        .motion
+                        .get(&id)
+                        .is_some_and(|control| control.mode == OriginalMode::Mushroom))
+            {
+                self.update_source_angles(id, false)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl CompatRuntime {
+    fn sync_source_partition(&mut self, id: i64) -> Result<(), CompatError> {
+        let control = self.motion.get(&id).cloned().unwrap_or_default();
+        let ball = self.original_motion_input(id, &control)?;
+        let friction = self.app.world().resource::<DestinySpaceFriction>().0;
+        let dt = self
+            .app
+            .world()
+            .resource::<Time<Fixed>>()
+            .timestep()
+            .as_secs_f64();
+        let inflated = crate::generated_partition::inflated_radius(&ball, friction, dt);
+        let Some((footprint, modifiers)) = destiny_original_spec::original_partition_placement(
+            ball.position,
+            ball.radius,
+            inflated,
+            true,
+        ) else {
+            self.original_bubbles
+                .get_or_insert_with(Default::default)
+                .partition
+                .unplace_undefined(id);
+            return Ok(());
+        };
+        let owned = (0..footprint.keys.len())
+            .map(|index| {
+                footprint
+                    .keys
+                    .get(index)
+                    .map(|key| crate::generated_partition::Address::from_cell(key, footprint.level))
+                    .ok_or_else(|| CompatError::Engine("missing source footprint entry".into()))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let primary = owned
+            .first()
+            .copied()
+            .ok_or_else(|| CompatError::Engine("empty source footprint".into()))?;
+        let current = self.metadata(id)?.new_bubble_id;
+        let mut tracking = self.original_bubbles.take().unwrap_or_default();
+        let prepared = tracking
+            .partition
+            .prepare_insert(id, primary, self.park.is_master, current);
+        if let Some(label) = prepared.transition {
+            let mut ball = self.source_bubble_ball(id)?;
+            ball.old = ball.new;
+            ball.new = label;
+            tracking.transition(ball);
+            let mut metadata = self.metadata_mut(id)?;
+            metadata.old_bubble_id = ball.old;
+            metadata.new_bubble_id = label;
+        }
+        tracking
+            .partition
+            .finish_insert(id, primary, modifiers, owned, prepared);
+        self.original_bubbles = Some(tracking);
+        Ok(())
+    }
+    fn sync_source_partition_after_motion(
+        &mut self,
+        checkpoint: &EvolutionCheckpoint,
+    ) -> Result<(), CompatError> {
+        let mut old = checkpoint.balls.iter().collect::<Vec<_>>();
+        old.sort_unstable_by_key(|ball| ball.ball_id.0);
+        for ball in old {
+            let id = ball.ball_id.0;
+            if !self.source_cached_dead(id) && (self.balls.contains_key(&id)) {
+                let current = self.position(id)?;
+                if crate::generated_partition::tick_reinsert(
+                    OriginalVec3 {
+                        x: ball.position.0.x,
+                        y: ball.position.0.y,
+                        z: ball.position.0.z,
+                    },
+                    OriginalVec3 {
+                        x: current.x,
+                        y: current.y,
+                        z: current.z,
+                    },
+                    self.metadata(id)?.is_free,
+                    self.park.pending_removals.contains_key(&id),
+                    self.motion
+                        .get(&id)
+                        .is_some_and(|control| control.mode == OriginalMode::Mushroom),
+                ) {
+                    self.sync_source_partition(id)?;
+                }
+            }
+        }
+        Ok(())
+    }
+    fn set_position(&mut self, id: i64, position: DVec3) -> Result<(), CompatError> {
+        self.set_position_value(id, position)?;
+        self.write_source_old_position(id, position)?;
+        self.sync_source_partition(id)
+    }
+    fn set_radius(&mut self, id: i64, radius: f64) -> Result<(), CompatError> {
+        self.set_radius_value(id, radius)?;
+        self.sync_source_partition(id)
+    }
+    fn set_max_velocity(&mut self, id: i64, speed: f64) -> Result<(), CompatError> {
+        self.set_max_velocity_value(id, speed)?;
+        self.sync_source_partition(id)
+    }
+    fn set_free(&mut self, id: i64, free: bool) -> Result<(), CompatError> {
+        let previous = self.metadata(id)?.is_free;
+        self.set_free_value(id, free)?;
+        if crate::generated_partition::became_fixed(previous, free) {
+            self.sync_source_partition(id)?;
+        }
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    pub fn register_keep_alive(&mut self, id: i64, enabled: bool) {
+        self.original_bubbles
+            .get_or_insert_with(Default::default)
+            .register_keep_alive(id, enabled);
+    }
+    pub fn add_keep_alive_member(&mut self, id: i64, bubble: i64) {
+        self.original_bubbles
+            .get_or_insert_with(Default::default)
+            .keep_alive_add(id, bubble);
+    }
+    pub fn remove_keep_alive_member(&mut self, id: i64, bubble: i64) {
+        self.original_bubbles
+            .get_or_insert_with(Default::default)
+            .keep_alive_remove(id, bubble);
+    }
+    pub fn set_keep_alive_members(
+        &mut self,
+        bubble: i64,
+        members: std::collections::BTreeSet<i64>,
+    ) {
+        self.original_bubbles
+            .get_or_insert_with(Default::default)
+            .set_keep_alive_members(bubble, members);
+    }
+    pub fn set_interactive_members(
+        &mut self,
+        bubble: i64,
+        members: std::collections::BTreeSet<i64>,
+    ) {
+        self.original_bubbles
+            .get_or_insert_with(Default::default)
+            .set_interactive_members(bubble, members);
+    }
+    pub fn liveness_state(&self) -> crate::generated_liveness::LivenessState {
+        self.original_bubbles
+            .as_ref()
+            .map(crate::bubbles::Tracking::liveness_state)
+            .unwrap_or_default()
+    }
+    pub fn is_in_dead_bubble(&self, id: i64) -> Result<bool, CompatError> {
+        let bubble = self.metadata(id)?.new_bubble_id;
+        let mode = self.motion.get(&id).cloned().unwrap_or_default().mode;
+        let interactive = self.original_bubbles.as_ref().map_or(0, |tracking| {
+            tracking.interactive_count(self.park.is_master, bubble)
+        });
+        let keep_alive = self
+            .original_bubbles
+            .as_ref()
+            .map_or(0, |tracking| tracking.keep_alive_count(bubble));
+        Ok(crate::generated_liveness::is_dead(
+            self.park.is_master,
+            u32::from(mode_number(mode)),
+            interactive,
+            keep_alive,
+        ))
+    }
+    fn cache_source_dead(&mut self, id: i64) -> Result<bool, CompatError> {
+        let dead = self.is_in_dead_bubble(id)?;
+        if dead {
+            let entity = self.entity(id)?;
+            self.app
+                .world_mut()
+                .resource_mut::<crate::generated_liveness::Frame>()
+                .cached_dead
+                .insert(entity);
+        }
+        Ok(dead)
+    }
+    fn source_cached_dead(&self, id: i64) -> bool {
+        self.balls.get(&id).is_some_and(|entity| {
+            self.app
+                .world()
+                .resource::<crate::generated_liveness::Frame>()
+                .cached_dead
+                .contains(entity)
+        })
+    }
+    fn freeze_source_dead(&mut self, plan: Option<&[PreparedMotion]>) {
+        let entities = self.source_projection_entities(plan);
+        let saved = crate::generated_liveness::project_components(
+            self.app.world_mut(),
+            &entities,
+            RigidBody::Static,
+        );
+        self.app
+            .world_mut()
+            .resource_mut::<crate::generated_liveness::Frame>()
+            .projected = saved;
+    }
+    fn thaw_source_dead(&mut self) {
+        let saved = std::mem::take(
+            &mut self
+                .app
+                .world_mut()
+                .resource_mut::<crate::generated_liveness::Frame>()
+                .projected,
+        );
+        crate::generated_liveness::restore_components(self.app.world_mut(), saved);
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:5842-5860; source final dead-bubble proximity pass; logical sensor representation"]
+    fn prepare_source_proximity(&mut self, owner: i64) -> Result<(bool, bool), CompatError> {
+        if !(((self).is_in_dead_bubble(owner))?) {
+            return Ok((true, false));
+        }
+        let Some(index) = (self).sensor_index(owner, false) else {
+            return Ok((false, false));
+        };
+        let sensor = &mut ((self).metadata_mut(owner))?.sensors[index];
+        let has_members =
+            ((sensor["members"]).as_array()).is_some_and(|members| !((members).is_empty()));
+        if !(has_members) {
+            return Ok((false, false));
+        }
+        sensor["elapsed"] = (sensor["period"]).clone();
+        Ok((true, true))
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:5842-5860; source final dead-bubble proximity pass; logical sensor representation"]
+    fn clear_source_dead_sensor(&mut self, owner: i64) -> Result<(), CompatError> {
+        if let Some(index) = (self).sensor_index(owner, false) {
+            ((self).metadata_mut(owner))?.sensors[index]["members"] = Value::Array(Vec::new());
+        }
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ball.h:162-163; direct typed view of the single actual metadata owner"]
+    pub fn source_force_state(
+        &self,
+        id: i64,
+    ) -> Result<crate::generated_forces::Forces, CompatError> {
+        Ok(((self).metadata(id))?.source_forces)
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:791-793; source reset after live/free admission"]
+    fn reset_source_behavior_state(&mut self, id: i64) -> Result<(), CompatError> {
+        (((self).metadata_mut(id))?.source_forces).reset();
+        (((self).metadata_mut(id))?.source_contacts).clear();
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:899; after actual controller output"]
+    fn store_source_controller_force(
+        &mut self,
+        id: i64,
+        value: destiny_original_spec::Vec3,
+    ) -> Result<(), CompatError> {
+        (((self).metadata_mut(id))?.source_forces).set_controller(value);
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:2493-2499,2995; retained actual solver mutations for both live and dead candidates"]
+    fn store_source_collision_forces(
+        &mut self,
+        bodies: &[crate::iterative_collision::Body],
+    ) -> Result<(), CompatError> {
+        for body in bodies {
+            (((self).metadata_mut(body.id))?.source_forces)
+                .set_collision(body.collision_acceleration);
+        }
+        Ok(())
+    }
+}
+
+impl CompatRuntime {
+    #[doc = "src/Ball.h:148-165; mCollisions ordered identifiers"]
+    pub fn source_contact_ids(&self, id: i64) -> Result<Vec<i64>, CompatError> {
+        Ok((((self).metadata(id))?.source_contacts).clone())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:617-626; source location projection before late missile publication"]
+    pub fn source_collision_location_ids(&self, id: i64) -> Result<Vec<i64>, CompatError> {
+        ((self).entity(id))?;
+        Ok((((self.app).world()).resource::<crate::generated_liveness::Frame>()).contact_ids(id))
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:791-793; reset during live behavior; src/Ballpark.cpp:2745-3005; gradient appends before angular update; iterative locations remain distinct until missile publication"]
+    fn store_source_contacts(
+        &mut self,
+        trace: crate::iterative_collision::ContactTrace,
+    ) -> Result<(), CompatError> {
+        if self.park.use_iterative_collision {
+            ((self.app).world_mut())
+                .resource_mut::<crate::generated_liveness::Frame>()
+                .contact_locations = trace;
+        } else {
+            for row in trace {
+                (((self).metadata_mut(row.0))?.source_contacts).extend(row.1);
+            }
+        }
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"]
+    pub fn begin_source_collision_pass(
+        &self,
+        id: i64,
+    ) -> Result<crate::generated_contacts::CollisionPass, CompatError> {
+        let generation =
+            *((((self.ball_generations).get(&id)).ok_or(CompatError::BallNotFound(id)))?);
+        let limit = (((self).metadata(id))?.source_contacts).len();
+        Ok(crate::generated_contacts::CollisionPass {
+            world: ((self.app).world()).id(),
+            entity: ((self).entity(id))?,
+            owner: id,
+            generation,
+            limit,
+            index: 0_usize,
+            failures: 0_usize,
+        })
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"]
+    pub fn next_source_collision(
+        &self,
+        pass: &mut crate::generated_contacts::CollisionPass,
+    ) -> Result<Option<crate::generated_contacts::CollisionEvent>, CompatError> {
+        if (pass.world) != (((self.app).world()).id()) {
+            return Err(CompatError::InvalidRequest(String::from(
+                "source collision cursor belongs to a different world",
+            )));
+        }
+        if (((pass.index) >= (pass.limit))
+            || (((self.ball_generations).get(&pass.owner)) != (Some(&pass.generation))))
+            || (((self.balls).get(&pass.owner)) != (Some(&pass.entity)))
+        {
+            return Ok(None);
+        }
+        let metadata = ((self).metadata(pass.owner))?;
+        let other_id =
+            *((((metadata.source_contacts).get(pass.index)).ok_or(CompatError::InvalidRequest(
+                String::from("source collision list shrank below its captured dispatch size"),
+            )))?);
+        let event = crate::generated_contacts::CollisionEvent {
+            ball_id: pass.owner,
+            other_id,
+            acceleration: metadata.source_forces.last_c,
+        };
+        pass.index += 1_usize;
+        Ok(Some(event))
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"]
+    pub fn dispatch_source_collisions(
+        &mut self,
+        id: i64,
+        observer: &mut dyn FnMut(
+            &mut CompatRuntime,
+            crate::generated_contacts::CollisionNotice,
+        ) -> bool,
+    ) -> Result<crate::generated_contacts::CollisionPass, CompatError> {
+        let mut pass = ((self).begin_source_collision_pass(id))?;
+        while let Some(event) = ((self).next_source_collision(&mut pass))? {
+            if !(observer(
+                self,
+                crate::generated_contacts::CollisionNotice::Contact(event),
+            )) {
+                pass.failures += 1_usize;
+                observer(
+                    self,
+                    crate::generated_contacts::CollisionNotice::HostError {
+                        ball_id: event.ball_id,
+                    },
+                );
+            }
+        }
+        Ok(pass)
+    }
+}
+#[cfg(test)]
+#[path = "../tests/support/kinematic_phases.rs"]
+mod source_kinematic_tests;
+impl CompatRuntime {
+    #[doc = "src/Ball.h mNewPos/mNewVel; current ECS representation"]
+    fn source_current_pose(
+        &self,
+        id: i64,
+    ) -> Result<crate::generated_kinematics::Pose, CompatError> {
+        let entity = ((self).entity(id))?;
+        let velocity = ((((self.app).world()).get::<LinearVelocity>(entity))
+            .ok_or(CompatError::Engine(String::from("missing LinearVelocity"))))?;
+        Ok(crate::generated_kinematics::Pose {
+            position: (((self).position(id))?).to_array(),
+            velocity: (velocity.0).to_array(),
+        })
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ball.h mOldPos/mOldVel; missing old logical state uses documented current-state fallback"]
+    pub fn source_old_pose(
+        &self,
+        id: i64,
+    ) -> Result<crate::generated_kinematics::Pose, CompatError> {
+        if let Some(pose) = ((self).metadata(id))?.source_old_pose {
+            return Ok(pose);
+        }
+        (self).source_current_pose(id)
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ball.cpp:1466-1487; live in-park GetValueDoubleDotAt"]
+    pub fn source_acceleration(&self, id: i64) -> Result<[f64; 3usize], CompatError> {
+        let dt = ((((self.app).world()).resource::<Time<Fixed>>()).timestep()).as_secs_f64();
+        let current = ((self).source_current_pose(id))?;
+        Ok((((self).source_old_pose(id))?).acceleration(current.velocity, dt))
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:4750-4757 / 4782-4789; commands write both slots"]
+    fn write_source_old_position(&mut self, id: i64, position: DVec3) -> Result<(), CompatError> {
+        let mut pose = ((self).source_old_pose(id))?;
+        pose.position = (position).to_array();
+        ((self).metadata_mut(id))?.source_old_pose = Some(pose);
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:4750-4757 / 4782-4789; commands write both slots"]
+    fn write_source_old_velocity(&mut self, id: i64, velocity: DVec3) -> Result<(), CompatError> {
+        let mut pose = ((self).source_old_pose(id))?;
+        pose.velocity = (velocity).to_array();
+        ((self).metadata_mut(id))?.source_old_pose = Some(pose);
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:520-521; mutable results before publication"]
+    fn stage_source_motion(&mut self, plan: Option<&[PreparedMotion]>) -> Result<(), CompatError> {
+        if let Some(plan) = plan {
+            for step in plan {
+                ((self).metadata_mut(step.id))?.source_old_pose =
+                    Some(crate::generated_kinematics::Pose {
+                        position: [step.position.x, step.position.y, step.position.z],
+                        velocity: [step.velocity.x, step.velocity.y, step.velocity.z],
+                    });
+            }
+        }
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:581-582; source swap, not immutable plan replay"]
+    fn publish_source_pose(&mut self, id: i64) -> Result<(), CompatError> {
+        let previous = ((self).source_current_pose(id))?;
+        let next = ((self).source_old_pose(id))?;
+        ((self).set_position_value(id, DVec3::from_array(next.position)))?;
+        ((self).set_velocity_value(id, DVec3::from_array(next.velocity)))?;
+        ((self).metadata_mut(id))?.source_old_pose = Some(previous);
+        Ok(())
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:429-639; current pose held until source publication; existing ECS projection utility reused"]
+    fn source_projection_entities(
+        &self,
+        plan: Option<&[PreparedMotion]>,
+    ) -> std::collections::BTreeSet<Entity> {
+        let mut entities = (((self.app).world())
+            .resource::<crate::generated_liveness::Frame>()
+            .cached_dead)
+            .clone();
+        if let Some(plan) = plan {
+            for step in plan {
+                if let Some(entity) = (self.balls).get(&step.id) {
+                    (entities).insert(*(entity));
+                }
+            }
+        }
+        entities
+    }
+}
+impl CompatRuntime {
+    #[doc = "src/Ballpark.cpp:581-582; retained fallback path records prior current fields; full fallback physics correspondence remains open"]
+    fn capture_source_previous(
+        &mut self,
+        checkpoint: &EvolutionCheckpoint,
+    ) -> Result<(), CompatError> {
+        for ball in &checkpoint.balls {
+            let id = ball.ball_id.0;
+            if (!((self).source_cached_dead(id)))
+                && ((((self).metadata(id))?.is_free)
+                    && ((!((self.park.pending_removals).contains_key(&id)))
+                        && (!(((self.motion).get(&id))
+                            .is_some_and(|control| (control.mode) == (OriginalMode::Mushroom))))))
+            {
+                ((self).metadata_mut(id))?.source_old_pose =
+                    Some(crate::generated_kinematics::Pose {
+                        position: (ball.position.0).to_array(),
+                        velocity: (ball.linear_velocity.0).to_array(),
+                    });
+            }
+        }
+        Ok(())
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -9237,7 +10151,7 @@ mod tests {
         let before_radius = runtime.metadata(1).expect("metadata").radius;
         let before_speed = runtime
             .world()
-            .get::<MaxLinearSpeed>(entity)
+            .get::<DestinyMaxVelocity>(entity)
             .expect("max speed")
             .0;
         let before_angular_speed = runtime
@@ -9298,7 +10212,7 @@ mod tests {
         assert_eq!(
             runtime
                 .world()
-                .get::<MaxLinearSpeed>(entity)
+                .get::<DestinyMaxVelocity>(entity)
                 .expect("max speed")
                 .0,
             before_speed
@@ -9411,7 +10325,7 @@ mod tests {
         assert_eq!(
             runtime
                 .world()
-                .get::<MaxLinearSpeed>(entity)
+                .get::<DestinyMaxVelocity>(entity)
                 .expect("max speed")
                 .0,
             3.14
@@ -10018,6 +10932,9 @@ mod tests {
         add_ball(&mut runtime, 2, true, true);
         add_ball(&mut runtime, 3, true, true);
         runtime
+            .initialize_source_bubbles()
+            .expect("explicit source bubble initialization");
+        runtime
             .set_position(2, DVec3::new(5.0e99, 5.0e99, 0.0))
             .expect("far position");
         runtime
@@ -10074,7 +10991,7 @@ mod tests {
     }
 
     #[test]
-    fn speed_clamped_damped_motion_uses_the_clamped_initial_velocity() {
+    fn source_max_velocity_does_not_cap_stop_motion() {
         let mut runtime = runtime(false);
         add_ball(&mut runtime, 1, true, true);
         runtime.set_max_velocity(1, 1.0).expect("speed limit");
@@ -10096,7 +11013,7 @@ mod tests {
             .expect("friction");
         runtime.advance_one_tick(true).expect("evolve");
         let x = (5.0_f64 / 10.0 / 0.5) * 0.1;
-        let expected = -(-x).exp_m1() / x * 0.1;
+        let expected = 10.0 * (-(-x).exp_m1() / x * 0.1);
         assert!((runtime.position(1).expect("position").x - expected).abs() < 1.0e-10);
     }
 
@@ -10319,7 +11236,7 @@ mod tests {
     #[test]
     fn collision_hooks_isolate_bubbles_but_allow_same_bubble_contacts() {
         fn configured_pair(left_bubble: i64, right_bubble: i64) -> CompatRuntime {
-            let mut runtime = runtime(false);
+            let mut runtime = runtime(true);
             add_ball(&mut runtime, 1, true, true);
             add_ball(&mut runtime, 2, true, true);
             runtime
@@ -10348,6 +11265,8 @@ mod tests {
                     vec![json!(0.0)],
                 ))
                 .expect("friction");
+            runtime.add_keep_alive_member(1, left_bubble);
+            runtime.add_keep_alive_member(2, right_bubble);
             runtime
         }
 

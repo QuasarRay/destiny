@@ -1,0 +1,88 @@
+{
+  "invariants": [
+    "Existing ball metadata is the single persistent owner of source mLastG/mLastC; binary64 array bits survive full logical snapshots.",
+    "Only live/free behavior admission resets both values; computed controller thrust is retained before collision work.",
+    "Collision input reads the actual retained owner even for dead/global candidates. Both solver modes publish actual collision force mutations; dead candidates may acquire a collision force without advancing pose.",
+    "Existing collision arithmetic and source fixture assertions are retained; the noniterative owner loop changes only its mutation transport."
+  ],
+  "open_correspondence": [
+    "Full collision location/last-collision/event histories, interpolation/pending-work snapshots and dynamic-orientation/capsule interactions still need closure.",
+    "The new C++ oracle covers Potential and exact time-zero overlap force fragments with explicit typed candidate/dead-state inputs, not full Evolve or arbitrary iterative contact histories.",
+    "Whole Kani module/dependency/fixture compilation, mandatory proofs, complete source/configuration inventory and quality/release gates remain incomplete."
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 488,
+      "region_sha256": "ea05d834a61d96ee48dbef944087d4b842600e82b8b2baf8324f27575747df89",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 429
+    },
+    {
+      "end": 902,
+      "region_sha256": "a1a8448b1e424b01a14d7d071e1f960dc438efe0cc80ebb666e52994da2f8925",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 780
+    },
+    {
+      "end": 2501,
+      "region_sha256": "c919e33ef7a2b66bd0bb4cc02b888b94dc10b3c2aefe15a4259ac846b06f7071",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 2479
+    },
+    {
+      "end": 2741,
+      "region_sha256": "920a262922abceb3ae525b8473819ecdd7be8c795b44eaf45bcd2b8034050421",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 2716
+    },
+    {
+      "end": 3005,
+      "region_sha256": "d3e6844e64359187c5207a75b26674070fc76256c16f065ea7d844c367bb16d0",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 2789
+    },
+    {
+      "end": 165,
+      "region_sha256": "83e3b8ac726ab40d83085ba6e85ccd24c8cc9214a8c1c3f3e61c6381aa072a45",
+      "source": "src/Ball.h",
+      "source_sha256": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+      "start": 148
+    },
+    {
+      "end": 20,
+      "region_sha256": "fe531b18ef8f9507773074cc9f4081900dd39fcb6acddeb219607cbf9b29c23f",
+      "source": "src/Vector3d.h",
+      "source_sha256": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238",
+      "start": 8
+    },
+    {
+      "end": 1426,
+      "region_sha256": "64f0bec4eca9035f6df57ca035f634976d38a0d95829b0a940abe16313bcaf04",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 1398
+    },
+    {
+      "end": 2211,
+      "region_sha256": "a380c41fafa5be0d56d86dbc761acb448981c21be0ca4b3392c6f8f32ef2bf14",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 2198
+    }
+  ],
+  "reused_git_sources": {
+    "src/iterative_collision.rs": "a373aa8fc14fba24e74aa75e099b2615c9367c7dc925d63fb6e558f54d63efe7",
+    "src/noniterative_collision.rs": "efdd330e94abcf111335c1cfc35c9bac17064475ad7a45438d81746762923d93",
+    "src/runtime.rs": "6d6a6b2c8095a10d83355f821a8fe43d75dfbd87ee6b5e94f9e9e27e3d6fbb51",
+    "verification/kani/src/noniterative_production_contracts.rs": "02fe5748be1e31ae281ba69c534424441f4988c2a9c8111e8ab61d272ce27310"
+  },
+  "reused_sources": {},
+  "schema": 1,
+  "validation_scope": "Independent C++ GotoThrust computes initial historical force; three 4-tick Potential sequences cover underflow, nonunit dt and an oblique 3D direction, with erased-force counterfactuals. A source overlap fragment checks both bodies collision forces; actual iterative setup respects source live-ID < dead-ID selection. Both real collision paths replay from logical snapshots."
+}

@@ -1,0 +1,2464 @@
+{
+  "case_classifications": [
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll::assert:102",
+          "line": 102
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll::assert:103",
+          "line": 103
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll::assert:104",
+          "line": 104
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll::assert:102",
+        "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll::assert:103",
+        "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll::assert:104"
+      ],
+      "feature_ids": [
+        "state.angular"
+      ],
+      "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll",
+      "rationale": "The three assertions check stored yaw/pitch/roll after SetBallVelocity; no hosting identity or private encoding assertion.",
+      "region_sha256": "5c43e201cd89e3bb1e700afc2454be006a2dc0249337cd36dca10c75803592c6",
+      "source": "python/destiny/test/ballpark/test_getters_and_setters.py",
+      "source_sha256": "14437b607ecf4a97471762b5f448147f75f70d7ab264a962f8110f30506d2596",
+      "source_span": [
+        98,
+        104
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertListOfPointsAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_moving_ball::assert:72",
+          "line": 72
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_moving_ball::assert:72"
+      ],
+      "feature_ids": [
+        "controller.formation",
+        "state.angular"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_moving_ball",
+      "rationale": "The unchanged ordered ten-step position trace checks formation motion and the moving leader orientation.",
+      "region_sha256": "adb2aa5e705eb4f8f4a735d75c336990719f45ba8029ebb2a4115d7ef19d2bb4",
+      "source": "python/destiny/test/ballpark/evolve/test_follow.py",
+      "source_sha256": "c343e312ca36a9b7ecc3d162889086cc965803fc4d364e38a82eb4da80e5b1b9",
+      "source_span": [
+        44,
+        72
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertListOfPointsAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_stopped_ball::assert:42",
+          "line": 42
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_stopped_ball::assert:42"
+      ],
+      "feature_ids": [
+        "controller.formation",
+        "state.angular"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_stopped_ball",
+      "rationale": "The unchanged ordered ten-step position trace checks formation motion and the stopped leader orientation.",
+      "region_sha256": "8e9e7caf19bc4665a5be05769dfcba90d8201f0e2f879e627c1aa3efe34ffe2b",
+      "source": "python/destiny/test/ballpark/evolve/test_follow.py",
+      "source_sha256": "c343e312ca36a9b7ecc3d162889086cc965803fc4d364e38a82eb4da80e5b1b9",
+      "source_span": [
+        16,
+        42
+      ]
+    },
+    {
+      "adapter_assertion_ids": [
+        "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_using_destiny_from_carbon_module::assert:19"
+      ],
+      "adapter_contract": {
+        "deferred_reason": "Original Python/Blue hosting or private stream representation belongs to the later integration milestone. All retained core assertion meanings remain required.",
+        "original_boundaries": [
+          "destiny.__file__"
+        ]
+      },
+      "assertions": [
+        {
+          "call": "assertTrue",
+          "id": "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_using_destiny_from_carbon_module::assert:19",
+          "line": 19
+        }
+      ],
+      "category": "HOST_ADAPTER",
+      "core_assertion_ids": [],
+      "feature_ids": [],
+      "id": "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_using_destiny_from_carbon_module",
+      "rationale": "The only assertion checks destiny.__file__ against the legacy Python package location. No world mutation/observation occurs.",
+      "region_sha256": "a9914fe7c8c108da9409069683ecec59d675de5593f09ecebb87b808fe260db5",
+      "source": "python/destiny/test/test_using_correct_module.py",
+      "source_sha256": "225b9acf56052c50cf1a79ba387ee826691d03f200af96b1a06be648cc2ae562",
+      "source_span": [
+        18,
+        22
+      ]
+    },
+    {
+      "adapter_assertion_ids": [
+        "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_destiny_python_module_is_in_path::assert:25"
+      ],
+      "adapter_contract": {
+        "deferred_reason": "Original Python/Blue hosting or private stream representation belongs to the later integration milestone. All retained core assertion meanings remain required.",
+        "original_boundaries": [
+          "sys.path"
+        ]
+      },
+      "assertions": [
+        {
+          "call": "assertIn",
+          "id": "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_destiny_python_module_is_in_path::assert:25",
+          "line": 25
+        }
+      ],
+      "category": "HOST_ADAPTER",
+      "core_assertion_ids": [],
+      "feature_ids": [],
+      "id": "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_destiny_python_module_is_in_path",
+      "rationale": "The only assertion checks the legacy package directory in sys.path. No world mutation/observation occurs.",
+      "region_sha256": "df8137599d443197914206d99ea25f5de2cd435725d9af9ef441bea076597a08",
+      "source": "python/destiny/test/test_using_correct_module.py",
+      "source_sha256": "225b9acf56052c50cf1a79ba387ee826691d03f200af96b1a06be648cc2ae562",
+      "source_span": [
+        24,
+        25
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "adapter_contract": {
+        "deferred_reason": "Original Python/Blue hosting or private stream representation belongs to the later integration milestone. All retained core assertion meanings remain required.",
+        "original_boundaries": [
+          "blue.MemStream",
+          "WriteFullStateToStream",
+          "ReadFullStateFromStream"
+        ]
+      },
+      "assertions": [
+        {
+          "call": "assertIn",
+          "id": "python/destiny/test/ballpark/test_stream_read_write.py::TestWriteFullStateToStream::test_write_ball_then_read_ball::assert:73",
+          "line": 73
+        },
+        {
+          "call": "assertBallEqual",
+          "id": "python/destiny/test/ballpark/test_stream_read_write.py::TestWriteFullStateToStream::test_write_ball_then_read_ball::assert:75",
+          "line": 75
+        }
+      ],
+      "category": "MIXED",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_stream_read_write.py::TestWriteFullStateToStream::test_write_ball_then_read_ball::assert:73",
+        "python/destiny/test/ballpark/test_stream_read_write.py::TestWriteFullStateToStream::test_write_ball_then_read_ball::assert:75"
+      ],
+      "feature_ids": [
+        "history.external-state-transfer"
+      ],
+      "id": "python/destiny/test/ballpark/test_stream_read_write.py::TestWriteFullStateToStream::test_write_ball_then_read_ball",
+      "rationale": "The fixture uses Blue MemStream hosting/private representation and also requires membership and assertBallEqual world state after transfer. Its core assertions remain required independently of Blue.",
+      "region_sha256": "e97e9bf0b8c839d6fdc35648ec51fa80cbb4ed44ac88e7ea0e3793bce1a58825",
+      "source": "python/destiny/test/ballpark/test_stream_read_write.py",
+      "source_sha256": "1484eadfd21e991a5cb85bcd2b07097c2f959aa14b264cd9b3219fc36cbf0e86",
+      "source_span": [
+        67,
+        75
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "EXPECT_NE",
+          "id": "tests/TestPartition.cpp::PartitionKeyHash::SeparatesCoordinatesThatPreviouslyCollided::assert:12",
+          "line": 12
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "tests/TestPartition.cpp::PartitionKeyHash::SeparatesCoordinatesThatPreviouslyCollided::assert:12"
+      ],
+      "feature_ids": [
+        "spatial.partition-hash"
+      ],
+      "id": "tests/TestPartition.cpp::PartitionKeyHash::SeparatesCoordinatesThatPreviouslyCollided",
+      "rationale": "The assertion distinguishes the source partition key hashes for two different spatial coordinates; it is world spatial organization.",
+      "region_sha256": "c001d24d0028bd89c444b34951c1db60b69125ae9a43250c6b9ba02be8fa3c02",
+      "source": "tests/TestPartition.cpp",
+      "source_sha256": "5a79644d159a425515a3464322473e05160c472dc6b65c769c2f2d27440ff8f6",
+      "source_span": [
+        5,
+        13
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped::assert:11",
+          "line": 11
+        },
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped::assert:12",
+          "line": 12
+        },
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped::assert:13",
+          "line": 13
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped::assert:11",
+        "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped::assert:12",
+        "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped::assert:13"
+      ],
+      "feature_ids": [
+        "controller.stop"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped",
+      "rationale": "The three assertions observe each world position lane remaining zero on every one of ten Evolve steps.",
+      "region_sha256": "d7d27774bac43c176aefe4d2082ecb008b26b42874867a402faccb5323e758bd",
+      "source": "python/destiny/test/ballpark/evolve/test_stop.py",
+      "source_sha256": "85a31d0d1ec984a5ae1dc2feef72b73d1eff97616f6599911787e58db20e89de",
+      "source_span": [
+        6,
+        13
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertListOfPointsAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stop_ball_in_goto_mode::assert:42",
+          "line": 42
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stop_ball_in_goto_mode::assert:42"
+      ],
+      "feature_ids": [
+        "controller.stop",
+        "state.max-velocity"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stop_ball_in_goto_mode",
+      "rationale": "All assertions observe world velocity decay after the ordered source Stop/Evolve sequence, including an initial velocity above the source max-velocity parameter.",
+      "region_sha256": "cdc080006fbd3622796cc04d4726b6ad1772ee7edaa17428d67e92e588c0b714",
+      "source": "python/destiny/test/ballpark/evolve/test_stop.py",
+      "source_sha256": "85a31d0d1ec984a5ae1dc2feef72b73d1eff97616f6599911787e58db20e89de",
+      "source_span": [
+        15,
+        42
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_warp.py::TestWarp::test_warpto::assert:25",
+          "line": 25
+        },
+        {
+          "call": "assertListOfPointsAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_warp.py::TestWarp::test_warpto::assert:41",
+          "line": 41
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_warp.py::TestWarp::test_warpto::assert:25",
+        "python/destiny/test/ballpark/evolve/test_warp.py::TestWarp::test_warpto::assert:41"
+      ],
+      "feature_ids": [
+        "controller.warp-alignment"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_warp.py::TestWarp::test_warpto",
+      "rationale": "The original fixture asserts the Warp world mode after each Evolve and all ten alignment positions. Its setup, velocity commands, mode and trajectory are world-core semantics.",
+      "region_sha256": "37b20dc87584337dbb0398763d332930ecd71cdea0e464b2acfdd13d295ff429",
+      "source": "python/destiny/test/ballpark/evolve/test_warp.py",
+      "source_sha256": "7e7fd14f284fdc576b1f83ff1a2fa79545908a1edde5176b7145193676e72c01",
+      "source_span": [
+        12,
+        41
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:39",
+          "line": 39
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:40",
+          "line": 40
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:41",
+          "line": 41
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:47",
+          "line": 47
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:48",
+          "line": 48
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:49",
+          "line": 49
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:52",
+          "line": 52
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:53",
+          "line": 53
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:54",
+          "line": 54
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:39",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:40",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:41",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:47",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:48",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:49",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:52",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:53",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary::assert:54"
+      ],
+      "feature_ids": [
+        "controller.missile",
+        "state.rotational-agility",
+        "motion.source-rotation"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary",
+      "rationale": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "region_sha256": "66d9fa71111a848f2ae2dc8a74705bb5add88284f9e4de09ed1b826deb84c05f",
+      "source": "python/destiny/test/ballpark/evolve/test_missile.py",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "source_span": [
+        34,
+        54
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:63",
+          "line": 63
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:64",
+          "line": 64
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:65",
+          "line": 65
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:71",
+          "line": 71
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:72",
+          "line": 72
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:73",
+          "line": 73
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:76",
+          "line": 76
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:77",
+          "line": 77
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:78",
+          "line": 78
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:63",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:64",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:65",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:71",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:72",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:73",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:76",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:77",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving::assert:78"
+      ],
+      "feature_ids": [
+        "controller.missile",
+        "state.rotational-agility",
+        "motion.source-rotation"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving",
+      "rationale": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "region_sha256": "375c79636b9e20028020ce2fb5108788207c4bf7e3910064423f91200d731935",
+      "source": "python/destiny/test/ballpark/evolve/test_missile.py",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "source_span": [
+        56,
+        78
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:84",
+          "line": 84
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:85",
+          "line": 85
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:86",
+          "line": 86
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:92",
+          "line": 92
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:93",
+          "line": 93
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:94",
+          "line": 94
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:97",
+          "line": 97
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:98",
+          "line": 98
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:99",
+          "line": 99
+        },
+        {
+          "call": "assertGreater",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:102",
+          "line": 102
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:84",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:85",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:86",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:92",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:93",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:94",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:97",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:98",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:99",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive::assert:102"
+      ],
+      "feature_ids": [
+        "controller.missile",
+        "state.rotational-agility",
+        "motion.source-rotation"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive",
+      "rationale": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "region_sha256": "7383454204652d8a4e54a25860838a8259c3350321c874734c2e7fdc15d7c908",
+      "source": "python/destiny/test/ballpark/evolve/test_missile.py",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "source_span": [
+        80,
+        102
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:111",
+          "line": 111
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:112",
+          "line": 112
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:113",
+          "line": 113
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:116",
+          "line": 116
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:117",
+          "line": 117
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:118",
+          "line": 118
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:111",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:112",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:113",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:116",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:117",
+        "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive::assert:118"
+      ],
+      "feature_ids": [
+        "controller.missile",
+        "state.rotational-agility",
+        "motion.source-rotation"
+      ],
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive",
+      "rationale": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "region_sha256": "9c932cf8f5d6ec4d86c38e8572d7c9c23c5efcf24e145bf80c9e93c980f0fc23",
+      "source": "python/destiny/test/ballpark/evolve/test_missile.py",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "source_span": [
+        104,
+        118
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:320",
+          "line": 320
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:321",
+          "line": 321
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:322",
+          "line": 322
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:323",
+          "line": 323
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:320",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:321",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:322",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero::assert:323"
+      ],
+      "feature_ids": [
+        "spatial.partition-ownership"
+      ],
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero",
+      "rationale": "Every original assertion observes the width and center of the ball-owned partition after immediate x/y/z mutations. All four assertions are preserved in a direct headless scenario; Python tuple conversion is retained separately as a representation adapter.",
+      "region_sha256": "b8f90ae39e861d306f1275be5852fbb724d29d19fcc58bd167fc173e589ea70d",
+      "source": "python/destiny/test/ballpark/test_boxes_and_bubbles.py",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "source_span": [
+        314,
+        323
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:331",
+          "line": 331
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:332",
+          "line": 332
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:333",
+          "line": 333
+        },
+        {
+          "call": "assertAlmostEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:334",
+          "line": 334
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:331",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:332",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:333",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one::assert:334"
+      ],
+      "feature_ids": [
+        "spatial.partition-ownership"
+      ],
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one",
+      "rationale": "Every original assertion observes the width and center of the ball-owned partition after immediate x/y/z mutations. All four assertions are preserved in a direct headless scenario; Python tuple conversion is retained separately as a representation adapter.",
+      "region_sha256": "1bc68b158f8a3c5753e58c51752368ce018f9c1acfe770b01366b407954e106b",
+      "source": "python/destiny/test/ballpark/test_boxes_and_bubbles.py",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "source_span": [
+        325,
+        334
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles::assert:11",
+          "line": 11
+        },
+        {
+          "call": "assertNotEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles::assert:13",
+          "line": 13
+        },
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles::assert:14",
+          "line": 14
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles::assert:11",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles::assert:13",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles::assert:14"
+      ],
+      "feature_ids": [
+        "spatial.partition-ownership"
+      ],
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles",
+      "rationale": "All assertions observe source bubble state before/after explicit initialization, including old state and preservation of an unselected ball. Direct core scenarios retain every original assertion; client evolution no longer fabricates initialization.",
+      "region_sha256": "9b79a067a4d98a8201c9aef3e9ec94e0e83b7bb95ef716ce09924e7bb6b8884e",
+      "source": "python/destiny/test/ballpark/test_boxes_and_bubbles.py",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "source_span": [
+        9,
+        14
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:18",
+          "line": 18
+        },
+        {
+          "call": "assertNotEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:20",
+          "line": 20
+        },
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:21",
+          "line": 21
+        },
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:22",
+          "line": 22
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:18",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:20",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:21",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball::assert:22"
+      ],
+      "feature_ids": [
+        "spatial.partition-ownership"
+      ],
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball",
+      "rationale": "All assertions observe source bubble state before/after explicit initialization, including old state and preservation of an unselected ball. Direct core scenarios retain every original assertion; client evolution no longer fabricates initialization.",
+      "region_sha256": "01930b9a3fb1985ffc232e2ea7a47af7657b14420a0c283ce4a667e209cf5eaf",
+      "source": "python/destiny/test/ballpark/test_boxes_and_bubbles.py",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "source_span": [
+        16,
+        22
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed::assert:18",
+          "line": 18
+        },
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed::assert:20",
+          "line": 20
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed::assert:18",
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed::assert:20"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "4bdad429ead34da6afc3435f19fd6725f466338a3ed8402ca61b47f97ccadc5c",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        8,
+        20
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called::assert:32",
+          "line": 32
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called::assert:32"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "4560eb269c701011744598358fab432a590c53058a26dc8b9f25d20a1715fa01",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        22,
+        32
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ignores_balls_that_are_not_free::assert:44",
+          "line": 44
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ignores_balls_that_are_not_free::assert:44"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ignores_balls_that_are_not_free",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "f53aa3e249fb2de30d19532f2a68a9a56a20a82162ac3038daeda7ae2273ac4c",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        34,
+        44
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_only_interactives_ignores_non_interactive_balls::assert:56",
+          "line": 56
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_only_interactives_ignores_non_interactive_balls::assert:56"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_only_interactives_ignores_non_interactive_balls",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "40449c2f941a96012a1ee8b424876d8d86f4c8204ada12f4e3eba973153d67f5",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        46,
+        56
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_remove_proximity_sensor::assert:69",
+          "line": 69
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_remove_proximity_sensor::assert:69"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_remove_proximity_sensor",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "3a6af2b8b8e9bcdb874fce541f650f5e398ce8315c40b212c13c9b9571f6080d",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        58,
+        69
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_out_of_range::assert:81",
+          "line": 81
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_out_of_range::assert:81"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_out_of_range",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "e9f33ffe40e957e946d368d073a273e728512af728a0b56feeb5f743ef0f3d8a",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        71,
+        81
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_on_edge_of_range::assert:93",
+          "line": 93
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_on_edge_of_range::assert:93"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_on_edge_of_range",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "738d01530ad010d79cca91470fc91798878738b09795047664d02cfd0ffcd938",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        83,
+        93
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertEqual",
+          "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_leave_proximity::assert:107",
+          "line": 107
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_leave_proximity::assert:107"
+      ],
+      "feature_ids": [
+        "proximity.client-sensors"
+      ],
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_leave_proximity",
+      "rationale": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "region_sha256": "87be97fc8169661980050cc9c138c40cbb2884864633693bfdda38633d2a4c5a",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "source_span": [
+        95,
+        107
+      ]
+    },
+    {
+      "adapter_assertion_ids": [],
+      "assertions": [
+        {
+          "call": "assertTrue",
+          "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_can_set_ball_interactive::assert:96",
+          "line": 96
+        }
+      ],
+      "category": "WORLD_CORE",
+      "core_assertion_ids": [
+        "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_can_set_ball_interactive::assert:96"
+      ],
+      "feature_ids": [
+        "scheduling.master-bubble-liveness"
+      ],
+      "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_can_set_ball_interactive",
+      "rationale": "The preserved assertion observes the ball interactivity flag after its world setter. It is a core state mutation; the same flag also controls source bubble membership/liveness. No host identity or transport assertion is present.",
+      "region_sha256": "686725b90379ba2deb3ba135ceb39e5f5f50d5243e8346ab1ea81c7890ed45a7",
+      "source": "python/destiny/test/ballpark/test_getters_and_setters.py",
+      "source_sha256": "14437b607ecf4a97471762b5f448147f75f70d7ab264a962f8110f30506d2596",
+      "source_span": [
+        93,
+        96
+      ]
+    }
+  ],
+  "classification_audit": [
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_setting_ball_velocity_updates_yaw_pitch_and_roll",
+      "reason": "The three assertions check stored yaw/pitch/roll after SetBallVelocity; no hosting identity or private encoding assertion.",
+      "source_sha256": "14437b607ecf4a97471762b5f448147f75f70d7ab264a962f8110f30506d2596",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_moving_ball",
+      "reason": "The unchanged ordered ten-step position trace checks formation motion and the moving leader orientation.",
+      "source_sha256": "c343e312ca36a9b7ecc3d162889086cc965803fc4d364e38a82eb4da80e5b1b9",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_follow.py::TestFormation::test_formation_follow_stopped_ball",
+      "reason": "The unchanged ordered ten-step position trace checks formation motion and the stopped leader orientation.",
+      "source_sha256": "c343e312ca36a9b7ecc3d162889086cc965803fc4d364e38a82eb4da80e5b1b9",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_using_destiny_from_carbon_module",
+      "reason": "The only assertion checks destiny.__file__ against the legacy Python package location. No world mutation/observation occurs.",
+      "source_sha256": "225b9acf56052c50cf1a79ba387ee826691d03f200af96b1a06be648cc2ae562",
+      "to": "HOST_ADAPTER"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/test_using_correct_module.py::TestUsingCorrectModule::test_destiny_python_module_is_in_path",
+      "reason": "The only assertion checks the legacy package directory in sys.path. No world mutation/observation occurs.",
+      "source_sha256": "225b9acf56052c50cf1a79ba387ee826691d03f200af96b1a06be648cc2ae562",
+      "to": "HOST_ADAPTER"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_stream_read_write.py::TestWriteFullStateToStream::test_write_ball_then_read_ball",
+      "reason": "The fixture uses Blue MemStream hosting/private representation and also requires membership and assertBallEqual world state after transfer. Its core assertions remain required independently of Blue.",
+      "source_sha256": "1484eadfd21e991a5cb85bcd2b07097c2f959aa14b264cd9b3219fc36cbf0e86",
+      "to": "MIXED"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "tests/TestPartition.cpp::PartitionKeyHash::SeparatesCoordinatesThatPreviouslyCollided",
+      "reason": "The assertion distinguishes the source partition key hashes for two different spatial coordinates; it is world spatial organization.",
+      "source_sha256": "5a79644d159a425515a3464322473e05160c472dc6b65c769c2f2d27440ff8f6",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stopped_ball_is_stopped",
+      "reason": "The three assertions observe each world position lane remaining zero on every one of ten Evolve steps.",
+      "source_sha256": "85a31d0d1ec984a5ae1dc2feef72b73d1eff97616f6599911787e58db20e89de",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_stop.py::TestStop::test_stop_ball_in_goto_mode",
+      "reason": "All assertions observe world velocity decay after the ordered source Stop/Evolve sequence, including an initial velocity above the source max-velocity parameter.",
+      "source_sha256": "85a31d0d1ec984a5ae1dc2feef72b73d1eff97616f6599911787e58db20e89de",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_warp.py::TestWarp::test_warpto",
+      "reason": "The original fixture asserts the Warp world mode after each Evolve and all ten alignment positions. Its setup, velocity commands, mode and trajectory are world-core semantics.",
+      "source_sha256": "7e7fd14f284fdc576b1f83ff1a2fa79545908a1edde5176b7145193676e72c01",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_stationary",
+      "reason": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_not_aimed_not_massive_from_moving",
+      "reason": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_not_massive",
+      "reason": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/evolve/test_missile.py::TestMissile::test_aimed_massive",
+      "reason": "All source assertions observe initial launch velocity, twenty-step missile steering, collider world position and, where required, passing the collider. Setup includes real rotational-agility state; there is no legacy hosting/encoding assertion.",
+      "source_sha256": "54318296ae3b22357998fc71df774ecdbdd177f9ac5a29df9dd472716d40aa67",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_zero",
+      "reason": "Every original assertion observes the width and center of the ball-owned partition after immediate x/y/z mutations. All four assertions are preserved in a direct headless scenario; Python tuple conversion is retained separately as a representation adapter.",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestBallBox::test_box_zero_zero_one",
+      "reason": "Every original assertion observes the width and center of the ball-owned partition after immediate x/y/z mutations. All four assertions are preserved in a direct headless scenario; Python tuple conversion is retained separately as a representation adapter.",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubbles",
+      "reason": "All assertions observe source bubble state before/after explicit initialization, including old state and preservation of an unselected ball. Direct core scenarios retain every original assertion; client evolution no longer fabricates initialization.",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_boxes_and_bubbles.py::TestInitialize_bubbles::test_can_initialize_bubble_for_specific_ball",
+      "reason": "All assertions observe source bubble state before/after explicit initialization, including old state and preservation of an unselected ball. Direct core scenarios retain every original assertion; client evolution no longer fabricates initialization.",
+      "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called_when_period_has_passed",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_callback_gets_called",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ignores_balls_that_are_not_free",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_only_interactives_ignores_non_interactive_balls",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_remove_proximity_sensor",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_out_of_range",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_ball_on_edge_of_range",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_callbacks.py::TestProximitySensors::test_leave_proximity",
+      "reason": "Every assertion compares ordered proximity world-event IDs and enter/leave flags, including period timing and absence under fixed/noninteractive/out-of-range/removal conditions. The actual Rust host scenario preserves helper defaults, operations and all assertions; False shuffle maps to the existing integer-zero ABI. No assertion checks legacy hosting identity.",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "to": "WORLD_CORE"
+    },
+    {
+      "from": "UNKNOWN",
+      "id": "python/destiny/test/ballpark/test_getters_and_setters.py::TestSetters::test_can_set_ball_interactive",
+      "reason": "The preserved assertion observes the ball interactivity flag after its world setter. It is a core state mutation; the same flag also controls source bubble membership/liveness. No host identity or transport assertion is present.",
+      "source_sha256": "14437b607ecf4a97471762b5f448147f75f70d7ab264a962f8110f30506d2596",
+      "to": "WORLD_CORE"
+    }
+  ],
+  "configurations": [
+    {
+      "cargo_flags": [
+        "--no-default-features",
+        "--locked",
+        "--offline"
+      ],
+      "id": "linux-x86_64-engine-only-observation",
+      "original_preset_semantic_mapping": "UNRESOLVED",
+      "scope": "Observed standalone host; not acceptance of the complete required engine target/variant matrix."
+    }
+  ],
+  "deferred_host_contract": "Original Blue/Blueexposure/exefile hosting, conversion/registration ABI, legacy wheels and authenticated transport deployment. Their world meanings remain core requirements.",
+  "feature_denominator_status": "UNRESOLVED_SOURCE_AND_CONFIGURATION_RECONCILIATION",
+  "features": [
+    {
+      "family": "motion-orientation",
+      "id": "state.angular",
+      "open_semantics": [
+        "Dynamical orientation and source collision-history correspondence remain open; all supported platform math/configuration mappings remain open."
+      ],
+      "original_regions": [
+        "src/Ball.cpp:335-466",
+        "src/Ball.cpp:777-807",
+        "src/Ball.h:140-150"
+      ],
+      "production_paths": [
+        "src/generated_angular.rs",
+        "src/runtime.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "original_cpp_angular_transitions_match_exact_bits",
+        "velocity_command_reaches_source_owned_angular_state"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "fc815032d0221364fc8ab119a4c37ab35cf4981827ee3c717cec936bab21b9fa",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            335,
+            466
+          ]
+        },
+        {
+          "region_sha256": "b7fbfa623fe3b3da964435b334affbd4ba06fbca6d19e7c410f965bfd35e9440",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            777,
+            807
+          ]
+        },
+        {
+          "region_sha256": "4a7e15e5de1c235b870906df13355f0de6ba8def15e10d97dd4678b61e09750d",
+          "source": "src/Ball.h",
+          "source_sha256": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+          "span": [
+            140,
+            150
+          ]
+        }
+      ]
+    },
+    {
+      "family": "controllers",
+      "id": "controller.formation",
+      "open_semantics": [
+        "Both unchanged concrete traces passed; full valid-domain, dynamical-rotation and mandatory refinement evidence remain open."
+      ],
+      "original_regions": [
+        "src/Ballpark.cpp:1023-1066",
+        "src/Ball.cpp:2191-2203"
+      ],
+      "production_paths": [
+        "src/generated_angular.rs",
+        "src/runtime.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "moving_formation_matches_original_ten_step_trace",
+        "stopped_formation_matches_original_ten_step_trace"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "5f7477b402adfcc38101ed2ca067973ee7c7e68f6ce8571eadf518df8e189445",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            1023,
+            1066
+          ]
+        },
+        {
+          "region_sha256": "a32ac9171d2116ee13c3208db4cab18714fc31db10c06adda2017e5b3a5e62df",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            2191,
+            2203
+          ]
+        }
+      ]
+    },
+    {
+      "family": "history-state-transfer",
+      "id": "snapshot.angular",
+      "open_semantics": [
+        "Complete source snapshot/history semantics, older format reconstruction and full future-state equivalence are not closed by these scoped tests."
+      ],
+      "original_regions": [
+        "src/Ball.cpp:335-466",
+        "src/Ball.h:140-150"
+      ],
+      "production_paths": [
+        "src/generated_angular.rs",
+        "src/runtime.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "world_snapshot_preserves_each_angular_bit_pattern",
+        "restored_angles_and_roll_inputs_produce_the_same_future"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "fc815032d0221364fc8ab119a4c37ab35cf4981827ee3c717cec936bab21b9fa",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            335,
+            466
+          ]
+        },
+        {
+          "region_sha256": "4a7e15e5de1c235b870906df13355f0de6ba8def15e10d97dd4678b61e09750d",
+          "source": "src/Ball.h",
+          "source_sha256": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+          "span": [
+            140,
+            150
+          ]
+        }
+      ]
+    },
+    {
+      "family": "history-state-transfer",
+      "id": "history.external-state-transfer",
+      "open_semantics": [
+        "Core incoming state-transfer meaning needs complete inventory and independent engine scenarios; Blue stream representation is later integration."
+      ],
+      "original_regions": [
+        "python/destiny/test/ballpark/test_stream_read_write.py:67-75"
+      ],
+      "production_paths": [
+        "src/runtime.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [],
+      "source_regions": [
+        {
+          "region_sha256": "e97e9bf0b8c839d6fdc35648ec51fa80cbb4ed44ac88e7ea0e3793bce1a58825",
+          "source": "python/destiny/test/ballpark/test_stream_read_write.py",
+          "source_sha256": "1484eadfd21e991a5cb85bcd2b07097c2f959aa14b264cd9b3219fc36cbf0e86",
+          "span": [
+            67,
+            75
+          ]
+        }
+      ]
+    },
+    {
+      "family": "spatial-organization",
+      "id": "spatial.partition-hash",
+      "open_semantics": [
+        "Newest partition hash has not yet been connected to a source-bound production equivalent."
+      ],
+      "original_regions": [
+        "tests/TestPartition.cpp:5-13"
+      ],
+      "production_paths": [],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [],
+      "source_regions": [
+        {
+          "region_sha256": "c001d24d0028bd89c444b34951c1db60b69125ae9a43250c6b9ba02be8fa3c02",
+          "source": "tests/TestPartition.cpp",
+          "source_sha256": "5a79644d159a425515a3464322473e05160c472dc6b65c769c2f2d27440ff8f6",
+          "span": [
+            5,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "family": "controllers",
+      "id": "controller.stop",
+      "open_semantics": [
+        "The two original fixtures and 35 collision-free source observations pass in both collision variants on Linux. Full valid-domain, contacts, dynamic orientation, platform and required refinement gates remain open."
+      ],
+      "original_regions": [
+        "src/Ballpark.cpp:1339-1345",
+        "src/Ballpark.cpp:751-776",
+        "src/Ballpark.cpp:429-515"
+      ],
+      "production_paths": [
+        "src/runtime.rs",
+        "src/iterative_collision.rs",
+        "src/noniterative_collision.rs",
+        "verification/spec/src/original_motion.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "stop_velocity_matches_original_ten_step_trace",
+        "iterative_stop_velocity_matches_original_ten_step_trace",
+        "stopped_ball_preserves_original_zero_position_each_tick",
+        "stop_motion_matches_unchanged_cpp_position_and_velocity_bits"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "6a5e2f3eaf4158fcb6559349b7362a71f8c4cffa05751c85abb7af8046783cb8",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            1339,
+            1345
+          ]
+        },
+        {
+          "region_sha256": "296c79fae31060d7e72472154290f8365fac8f78fb250bda932d43b88827c1a3",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            751,
+            776
+          ]
+        },
+        {
+          "region_sha256": "90fcb2455c52c7edef45d3a75965cdf73eb965a588363d0e9a72d78ecdada461",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            429,
+            515
+          ]
+        }
+      ]
+    },
+    {
+      "family": "authoritative-state",
+      "id": "state.max-velocity",
+      "open_semantics": [
+        "The source thrust parameter has one custom ECS owner and no Avian hard-cap component. Existing API f64 storage versus source f32 rounding/domain and all remaining consumer/configuration correspondence remain open."
+      ],
+      "original_regions": [
+        "src/Ball.h:125-133",
+        "src/Ballpark.cpp:1394-1433"
+      ],
+      "production_paths": [
+        "src/runtime.rs",
+        "src/network.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "source_max_velocity_does_not_cap_stop_motion",
+        "stop_motion_matches_unchanged_cpp_position_and_velocity_bits"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "0b2cac315734cd76cb72a177107437d5300857ff3529cc57f41349cfa8407c96",
+          "source": "src/Ball.h",
+          "source_sha256": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+          "span": [
+            125,
+            133
+          ]
+        },
+        {
+          "region_sha256": "572861b903a51188d672cf9093a8cc5ef7e36f7f412ccd7c4f06fece7d05b6f5",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            1394,
+            1433
+          ]
+        }
+      ]
+    },
+    {
+      "family": "controllers",
+      "id": "controller.warp-alignment",
+      "open_semantics": [
+        "The unchanged ten-step alignment mode/position trace passes. Proper warp activation/callback/transition domains, source field side effects, dynamic orientation, platform and production-refinement gates remain open."
+      ],
+      "original_regions": [
+        "src/Ballpark.cpp:915-961"
+      ],
+      "production_paths": [
+        "src/runtime.rs",
+        "verification/spec/src/original_motion.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "warp_alignment_matches_original_ten_step_positions_and_mode"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "0bb162b915f97aa9fa9af29d1a06aabf767f499de05d151a75209ae03fee1511",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            915,
+            961
+          ]
+        }
+      ]
+    },
+    {
+      "family": "controllers",
+      "id": "controller.missile",
+      "open_semantics": [
+        "Original fixture launch, twenty-step steering and collider assertions pass; 42 independent collision-free numeric cases cover two collision-mode settings on this host. Admission/callback/target-loss variants, full interactions, dynamic orientation, supported configurations and mandatory production refinement remain open."
+      ],
+      "original_regions": [
+        "src/Ballpark.cpp:972-1015",
+        "src/Ballpark.cpp:3798-3873"
+      ],
+      "production_paths": [
+        "src/generated_missile.rs",
+        "src/missile.rs",
+        "src/runtime.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "original_non_aimed_stationary_missile_fixture",
+        "original_non_aimed_moving_missile_fixture",
+        "original_aimed_nonmassive_missile_fixture",
+        "original_aimed_massive_missile_fixture",
+        "missile_motion_matches_unchanged_cpp_bits_with_real_clock_and_friction",
+        "restored_missile_preserves_tracking_and_twenty_future_ticks"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "f8311d36dd3f8aa57eedbaad86befc2ae6d49a3cc1f55749125340c319dbeaeb",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            972,
+            1015
+          ]
+        },
+        {
+          "region_sha256": "2c27163a4d78f95b558d5d109dacf41cefc7e8d581301cec938abff5c9798b91",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            3798,
+            3873
+          ]
+        }
+      ]
+    },
+    {
+      "family": "authoritative-state",
+      "id": "state.rotational-agility",
+      "open_semantics": [
+        "Fifteen raw f32 field patterns, snapshot restore, detached generation isolation and constructor normalization match their source numeric boundaries. Dynamic constructor checks exercise existing compatibility configuration only; complete dynamical world construction/evolution and dynamic snapshot restore remain unsupported. Original Blue conversion/ABI and required refinement remain open."
+      ],
+      "original_regions": [
+        "src/Ball.cpp:79-79",
+        "src/Ball.cpp:1582-1585",
+        "src/Ball_Blue.cpp:318-324",
+        "src/Ballpark.cpp:3551-3552",
+        "src/Ballpark.cpp:4958-4966"
+      ],
+      "production_paths": [
+        "src/generated_missile.rs",
+        "src/runtime.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "raw_rotational_agility_preserves_cpp_f32_state_and_snapshot_bits",
+        "retained_rotational_agility_mutates_the_original_detached_generation",
+        "dynamic_constructor_normalizes_only_the_source_nonpositive_domain"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "9719364e6a3c0fa89a7c9e6210c8b2e6c8b129827db57dfd216fc179d7ab71a3",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            79,
+            79
+          ]
+        },
+        {
+          "region_sha256": "28216aa0d71ff47f29c83265c0afe05fffad7fd62fec2e753ba11752269277e7",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            1582,
+            1585
+          ]
+        },
+        {
+          "region_sha256": "d61066a0ff702da77185f62986b9db2b45602765fe9dac5f43ede6fcef63bec2",
+          "source": "src/Ball_Blue.cpp",
+          "source_sha256": "cff5977cfabb09dfc69de51b90470ea5329ea8bc22971dada402f06db9fd018b",
+          "span": [
+            318,
+            324
+          ]
+        },
+        {
+          "region_sha256": "14b25d2d7c64cb375673d9186fbe21b49af06db56d3c92d8f497b8f7012121c6",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            3551,
+            3552
+          ]
+        },
+        {
+          "region_sha256": "1a6437f94f3e0e026bec3553a400446460bd685821e98240dd526319f052af83",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            4958,
+            4966
+          ]
+        }
+      ]
+    },
+    {
+      "family": "motion-orientation",
+      "id": "motion.source-rotation",
+      "open_semantics": [
+        "Eighteen original C++ cases use actual Carbon Math 1.2.2/DirectXMath apr2025 SSE2 non-FMA dependencies and match launch, attached and detached rotations. Dynamic/Apple/other vector branches, full argument domains and mandatory refinement remain open."
+      ],
+      "original_regions": [
+        "src/Ball.cpp:2191-2203",
+        "src/Thunkers.cpp:898-926"
+      ],
+      "production_paths": [
+        "src/runtime.rs",
+        "src/generated_angular.rs",
+        "verification/spec/src/original_rotation.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "stationary_launch_and_retained_rotation_match_original_cpp_math_bits"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "a32ac9171d2116ee13c3208db4cab18714fc31db10c06adda2017e5b3a5e62df",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            2191,
+            2203
+          ]
+        },
+        {
+          "region_sha256": "35a42f7bb2f3bda5b78b08ec9e8040085fc1f4f98b2aae86509a1598507db74c",
+          "source": "src/Thunkers.cpp",
+          "source_sha256": "61acb87a22569561e7a608cd7a9a82698145afd2d5a3671365c24372a035ea17",
+          "span": [
+            898,
+            926
+          ]
+        }
+      ]
+    },
+    {
+      "family": "spatial-organization",
+      "id": "spatial.partition-ownership",
+      "open_semantics": [
+        "Full static/master/compound geometry, source box objects and interactions",
+        "Native unordered-map enumeration before exposing GetActiveBoxes, newest hash regression and full platform configurations",
+        "Existing native free/constructor/mini/callback phase differences, authoritative old position/time-factor state and complete history semantics",
+        "Mandatory production refinement, whole-engine source/configuration closure, robustness/performance/platform/release gates",
+        "Independent source slices cover 82 fixed and 80 client Stop environment/mutation/motion states, including 48 nonunit-dt ticks. Client collision label invariance is tested in both response modes. Full master dead-bubble/keep-alive, collision candidate geometry, warp/mushroom/dynamic orientation, static/dictionary/history and required proof/configuration gates remain open."
+      ],
+      "original_regions": [
+        "src/Partition.h:66-122",
+        "src/Partition.cpp:19-170",
+        "src/Partition.cpp:183-237",
+        "src/Partition.cpp:490-522",
+        "src/Box.cpp:15-205",
+        "src/Box.cpp:220-282",
+        "src/Ball.cpp:812-853",
+        "src/Ball.cpp:2355-2536",
+        "src/Ballpark.cpp:429-615",
+        "src/Ballpark.cpp:3115-3219",
+        "src/Ballpark.cpp:3290-3455",
+        "src/Ballpark.cpp:4680-4720",
+        "src/Ballpark.cpp:4738-4765",
+        "src/Ballpark.cpp:4880-4933",
+        "src/Ballpark.cpp:6565-6624",
+        "src/Thunkers.cpp:2260-2300",
+        "src/Ballpark.cpp:5896-5953",
+        "src/Partition.cpp:417-461",
+        "src/Ballpark.cpp:429-615",
+        "src/Ballpark.cpp:6216-6260",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py:8-22"
+      ],
+      "production_paths": [
+        "src/runtime.rs",
+        "src/generated_partition.rs",
+        "src/bubbles.rs",
+        "verification/spec/src/original_partition.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "original_box_zero_zero_zero",
+        "original_box_zero_zero_one",
+        "partition_ownership_matches_unchanged_cpp_after_every_mutation",
+        "source_partition_is_unbounded_and_retains_stale_ownership_in_snapshots",
+        "malformed_partition_snapshots_reject_without_mutation",
+        "retained_rust_extreme_coordinates_keep_explicit_partition_limits",
+        "client_motion_and_partition_match_original_nonunit_dt_phases",
+        "collision_motion_ignores_client_numeric_bubble_labels",
+        "original_can_initialize_bubbles",
+        "original_can_initialize_bubble_for_specific_ball"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "539ff203a6b3ee17c34ec2f579ee8bcc05f5856146944bbd753d7d3f890736f1",
+          "source": "src/Partition.h",
+          "source_sha256": "31bfaf15eedd3f5bf73d7f661376a06b363457c0b045f38e35517260bdc68398",
+          "span": [
+            66,
+            122
+          ]
+        },
+        {
+          "region_sha256": "7bf7d0d90a57f557a48e87855022c5fceb62efa1d0b651031941fe3850a3b994",
+          "source": "src/Partition.cpp",
+          "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+          "span": [
+            19,
+            170
+          ]
+        },
+        {
+          "region_sha256": "c25673790585b7d1b2e28a50934bdca16857fc87ea594d357b3b6bc017aa9f46",
+          "source": "src/Partition.cpp",
+          "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+          "span": [
+            183,
+            237
+          ]
+        },
+        {
+          "region_sha256": "ba18b05d0c141782c8ab13321bc4132547061c985d3eeaca9903915617388b44",
+          "source": "src/Partition.cpp",
+          "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+          "span": [
+            490,
+            522
+          ]
+        },
+        {
+          "region_sha256": "b6d48a212e8e2e31ce6138b0bcdcff7b03348622f9495e2b3ad592c0b1c97d25",
+          "source": "src/Box.cpp",
+          "source_sha256": "d72b01c8fc00bb5ac0381c7936fa698a57231812995a3becedba0d2efe4e0fd8",
+          "span": [
+            15,
+            205
+          ]
+        },
+        {
+          "region_sha256": "809fc44e51a191adec094cbd8142288ab8db4feb679fd26f736f552d04ec3fb8",
+          "source": "src/Box.cpp",
+          "source_sha256": "d72b01c8fc00bb5ac0381c7936fa698a57231812995a3becedba0d2efe4e0fd8",
+          "span": [
+            220,
+            282
+          ]
+        },
+        {
+          "region_sha256": "11da10177318b64e4ce38cb19d177fa190b1c3b4f70eef6a61fce8366d4f664f",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            812,
+            853
+          ]
+        },
+        {
+          "region_sha256": "25e908166e3f5dbae03051f34db1e1ec7ebc135169c014e0a025afe764cfa080",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            2355,
+            2536
+          ]
+        },
+        {
+          "region_sha256": "0adb12ec4fd0893ad487b00fd9e1c86d529d54eb0adeeac98b7c21aea799ac3d",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            429,
+            615
+          ]
+        },
+        {
+          "region_sha256": "1abf5747d6fa5673e718355217511698605f9cf798c161895cdb06a49cf5c09e",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            3115,
+            3219
+          ]
+        },
+        {
+          "region_sha256": "41ceb0f395fd6c5ace2bb95146db50d30a6245e94668f7891a62832f1afa239a",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            3290,
+            3455
+          ]
+        },
+        {
+          "region_sha256": "f977782d9c9f31db3747f1e2ecb3435f5a416f08c9b8a94c711c7eb10a36a26d",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            4680,
+            4720
+          ]
+        },
+        {
+          "region_sha256": "abb850a76e6ca80cd09e36277c14cd5e1c0485400a5e7da1f76583fafe80000c",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            4738,
+            4765
+          ]
+        },
+        {
+          "region_sha256": "f27dcfb595bb636e06105acc7235f79d44c5d80172f9672ce0c85d553b342fb6",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            4880,
+            4933
+          ]
+        },
+        {
+          "region_sha256": "de181147d3c9baa5016b11a09e2722af91c8b7e6490d9cd4764060c312a58e8e",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            6565,
+            6624
+          ]
+        },
+        {
+          "region_sha256": "4f6f2b32da0822c90196ab62e2e3b14060356586ebcd2f252f6b22e064285098",
+          "source": "src/Thunkers.cpp",
+          "source_sha256": "61acb87a22569561e7a608cd7a9a82698145afd2d5a3671365c24372a035ea17",
+          "span": [
+            2260,
+            2300
+          ]
+        },
+        {
+          "region_sha256": "4b45d1da4781b1c83ba26e9fafa76033cc1bca86e09c10332fdab09c7a20675b",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            5896,
+            5953
+          ]
+        },
+        {
+          "region_sha256": "ab681237dd3efbfa8c064c425a7cf36553dc7cccc6b5f9f43186119b3cf63dc8",
+          "source": "src/Partition.cpp",
+          "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+          "span": [
+            417,
+            461
+          ]
+        },
+        {
+          "region_sha256": "0adb12ec4fd0893ad487b00fd9e1c86d529d54eb0adeeac98b7c21aea799ac3d",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            429,
+            615
+          ]
+        },
+        {
+          "region_sha256": "c0f4eb60b98e8327293c845b61a7d8dc7eacfd951596e60ef695bd5e6f6fd2df",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            6216,
+            6260
+          ]
+        },
+        {
+          "region_sha256": "232f3d1b68cc63e7ad26df9365e3e9fd296d117ab0c534fa4903deae8b579d47",
+          "source": "python/destiny/test/ballpark/test_boxes_and_bubbles.py",
+          "source_sha256": "2b2e238ceba85e3ad6a1d4e3c6a85f8fd8dd7877dda08e93f662950ea3c0100a",
+          "span": [
+            8,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "family": "time-sequencing",
+      "id": "scheduling.master-bubble-liveness",
+      "implementation_status": "integrated_partial",
+      "open_semantics": [
+        "Source controller/collision force retention is now integrated through the single metadata owner and covered by independent narrow C++/headless checks; arbitrary contacts, all controllers/dynamic orientation and full collision histories remain open.",
+        "Actual typed membership, cached phase skips and fresh sensor liveness are integrated; pending callback/history snapshots, reentrant mutation and complete Original Evolve correspondence remain open.",
+        "Source/configuration closure, mandatory core proofs and production quality/platform/release gates remain open.",
+        "Whole Kani crate ordinary compilation still needs shared generated state/module dependency closure and older partition fixture API adaptation. Four exact concrete collision tests run on actual production kernels in the engine library, with no formal proof credit."
+      ],
+      "original_regions": [
+        "src/Ballpark.cpp:429-615",
+        "src/Ballpark.cpp:6216-6280",
+        "src/Ballpark.cpp:5832-5890",
+        "src/Ballpark.cpp:6745-6770"
+      ],
+      "production_paths": [
+        "src/generated_liveness.rs",
+        "src/bubbles.rs",
+        "src/runtime.rs",
+        "src/iterative_collision.rs",
+        "src/noniterative_collision.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "master_dead_bubble_freezes_source_phases",
+        "original_cpython_liveness_membership_and_all_mode_queries",
+        "master_liveness_motion_decision_is_cached_until_tick_finish",
+        "source_interactive_same_flag_and_keep_alive_registry_are_distinct",
+        "source_liveness_snapshot_and_future_replay_have_no_model_capacity_cap",
+        "source_dead_sensor_final_pass_clears_members_then_live_sensor_reenters"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "0adb12ec4fd0893ad487b00fd9e1c86d529d54eb0adeeac98b7c21aea799ac3d",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            429,
+            615
+          ]
+        },
+        {
+          "region_sha256": "76d8958a1bd8c714a124852837f27cc273afdb426b017aa376e16c764d14215f",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            6216,
+            6280
+          ]
+        },
+        {
+          "region_sha256": "172db259310291ace480019af735bee36245b85a73483688278ce86d8e1c1ec3",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            5832,
+            5890
+          ]
+        },
+        {
+          "region_sha256": "0796da83363d40d98cf87cfe7b260e66dfacd27050dd797954dfe28fac52e1c7",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            6745,
+            6770
+          ]
+        }
+      ]
+    },
+    {
+      "family": "visibility-proximity",
+      "id": "proximity.client-sensors",
+      "implementation_status": "integrated",
+      "open_semantics": [
+        "Eight source fixtures/nine event-list assertions run against the actual headless world without initializing source client bubbles. This does not establish all timer/random/shuffle, geometric candidate, reentrant callback, ownership or large-world domains.",
+        "Full source partition proximity candidates, master interactive/keep-alive/dead-bubble scheduling and cloak/sensor interactions remain open.",
+        "Required current production refinement, complete core configuration/quality/API and later Original-host correspondence remain open."
+      ],
+      "original_regions": [
+        "python/destiny/test/ballpark/test_callbacks.py:7-107",
+        "python/destiny/test/helpers.py:159-204",
+        "src/Partition.cpp:281-309",
+        "src/Partition.cpp:417-461",
+        "src/Ball.cpp:494-518"
+      ],
+      "production_paths": [
+        "src/runtime.rs",
+        "src/proximity.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "original_client_proximity_assertions_without_bubble_initialization"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "1869e76201326f2829253e7092778ccbd984360c820dca4ecf1da1d88f4957c9",
+          "source": "python/destiny/test/ballpark/test_callbacks.py",
+          "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+          "span": [
+            7,
+            107
+          ]
+        },
+        {
+          "region_sha256": "dd5ed6198b645b1aa79169bf709fc40b406ddfd2e24283f0975466c8a669158e",
+          "source": "python/destiny/test/helpers.py",
+          "source_sha256": "d949e6103b7321ca39a7876ceff25c15868137b867fa5895c76fd86a2c2dd66a",
+          "span": [
+            159,
+            204
+          ]
+        },
+        {
+          "region_sha256": "0a05937487a056cb4376032305749f7c58e29e182e346a3a01f95f99a501d401",
+          "source": "src/Partition.cpp",
+          "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+          "span": [
+            281,
+            309
+          ]
+        },
+        {
+          "region_sha256": "ab681237dd3efbfa8c064c425a7cf36553dc7cccc6b5f9f43186119b3cf63dc8",
+          "source": "src/Partition.cpp",
+          "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+          "span": [
+            417,
+            461
+          ]
+        },
+        {
+          "region_sha256": "ba92d21967524b210b4da098440c352e229e942e5b2b46bc0410406a9737285d",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            494,
+            518
+          ]
+        }
+      ]
+    },
+    {
+      "family": "authoritative-state",
+      "id": "state.controller-collision-forces",
+      "implementation_status": "integrated_partial",
+      "open_semantics": [
+        "Full collision locations, last-collision/target/notification histories, dynamic orientation and arbitrary contact/controller interactions require further state/effect coverage.",
+        "The new C++ oracle covers GotoThrust, Potential and exact overlap-force fragments at explicit field/candidate boundaries. Full Original Evolve, partition selection and arbitrary iterative histories remain unproved.",
+        "Intermediate callback/error ordering, pending-work snapshots, whole Kani dependency/API repairs, mandatory proofs, complete source/configuration inventory and production quality/release remain open."
+      ],
+      "original_regions": [
+        "src/Ballpark.cpp:429-488",
+        "src/Ballpark.cpp:780-902",
+        "src/Ballpark.cpp:1398-1426",
+        "src/Ballpark.cpp:2198-2211",
+        "src/Ballpark.cpp:2479-2501",
+        "src/Ballpark.cpp:2716-2741",
+        "src/Ballpark.cpp:2789-3005",
+        "src/Ball.h:148-165",
+        "src/Vector3d.h:8-20"
+      ],
+      "production_paths": [
+        "src/generated_forces.rs",
+        "src/runtime.rs",
+        "src/iterative_collision.rs",
+        "src/noniterative_collision.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "dead_global_force_changes_live_gradient_prediction_against_original_cpp",
+        "dead_candidate_receives_iterative_overlap_force_without_pose_publication",
+        "source_force_snapshot_replays_both_actual_collision_paths",
+        "source_force_reset_occurs_only_after_dead_body_becomes_live",
+        "force_snapshot_bits_survive_nonfinite_values_and_old_snapshot_defaults"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "ea05d834a61d96ee48dbef944087d4b842600e82b8b2baf8324f27575747df89",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            429,
+            488
+          ]
+        },
+        {
+          "region_sha256": "a1a8448b1e424b01a14d7d071e1f960dc438efe0cc80ebb666e52994da2f8925",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            780,
+            902
+          ]
+        },
+        {
+          "region_sha256": "c919e33ef7a2b66bd0bb4cc02b888b94dc10b3c2aefe15a4259ac846b06f7071",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            2479,
+            2501
+          ]
+        },
+        {
+          "region_sha256": "920a262922abceb3ae525b8473819ecdd7be8c795b44eaf45bcd2b8034050421",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            2716,
+            2741
+          ]
+        },
+        {
+          "region_sha256": "d3e6844e64359187c5207a75b26674070fc76256c16f065ea7d844c367bb16d0",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            2789,
+            3005
+          ]
+        },
+        {
+          "region_sha256": "83e3b8ac726ab40d83085ba6e85ccd24c8cc9214a8c1c3f3e61c6381aa072a45",
+          "source": "src/Ball.h",
+          "source_sha256": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+          "span": [
+            148,
+            165
+          ]
+        },
+        {
+          "region_sha256": "fe531b18ef8f9507773074cc9f4081900dd39fcb6acddeb219607cbf9b29c23f",
+          "source": "src/Vector3d.h",
+          "source_sha256": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238",
+          "span": [
+            8,
+            20
+          ]
+        },
+        {
+          "region_sha256": "64f0bec4eca9035f6df57ca035f634976d38a0d95829b0a940abe16313bcaf04",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            1398,
+            1426
+          ]
+        },
+        {
+          "region_sha256": "a380c41fafa5be0d56d86dbc761acb448981c21be0ca4b3392c6f8f32ef2bf14",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            2198,
+            2211
+          ]
+        }
+      ]
+    },
+    {
+      "family": "collision-geometry",
+      "id": "collision.source-contact-state",
+      "implementation_status": "integrated_partial",
+      "open_semantics": [
+        "Missile-only, moved-only late append and per-body reentrant DispatchCollisions publication continuation remain required; no deferred end-of-tick callback substitution is claimed.",
+        "Complete source location/time/history state, dynamic orientation, mini-allocation correspondence and pending-work snapshots remain incomplete.",
+        "Production/specification proofs remain missing; unchanged formal tool limitations are retained."
+      ],
+      "original_regions": [
+        "src/Ball.cpp:335-488",
+        "src/Ballpark.cpp:530-639",
+        "src/Ballpark.cpp:780-795",
+        "src/Ballpark.cpp:2745-3006",
+        "src/Ball.h:148-165"
+      ],
+      "production_paths": [
+        "src/runtime.rs",
+        "src/noniterative_collision.rs",
+        "src/iterative_collision.rs",
+        "src/generated_liveness.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "avian_contacts_do_not_change_source_warp_angle_admission",
+        "actual_source_contacts_select_cpp_warp_angles_independently_of_avian",
+        "contacts_snapshot_preserves_order_duplicates_full_ids_and_old_defaults",
+        "contacts_reset_only_after_live_free_behavior_admission",
+        "gradient_retains_130_original_cpp_contact_ids_without_a_world_capacity_limit",
+        "iterative_location_ids_remain_separate_before_late_missile_dispatch"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "bb25cc98d8a9dfde502af68bc7ee36962a72817ea143faf20e39a53f70312bc5",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            335,
+            488
+          ]
+        },
+        {
+          "region_sha256": "401f9f77fb115f0c3ebc39a1661b2fd0d1828e721d1c7a286ce8576d493ac818",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            530,
+            639
+          ]
+        },
+        {
+          "region_sha256": "54ec1de0ccaaeb2c8a81294051f4a3a04d9086e99f1e6750397f14798e75a1ef",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            780,
+            795
+          ]
+        },
+        {
+          "region_sha256": "433881074948476b38777f90addac8af8fa379997ed3cd48b55a3b70cf581795",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            2745,
+            3006
+          ]
+        },
+        {
+          "region_sha256": "83e3b8ac726ab40d83085ba6e85ccd24c8cc9214a8c1c3f3e61c6381aa072a45",
+          "source": "src/Ball.h",
+          "source_sha256": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+          "span": [
+            148,
+            165
+          ]
+        }
+      ]
+    },
+    {
+      "family": "world-mutations-events",
+      "id": "events.source-collision-dispatch",
+      "implementation_status": "integrated_partial",
+      "open_semantics": [
+        "The actual source dispatcher is a typed direct host API with a reusable incremental cursor. Automatic moved-missile per-body Evolve/FFI scheduling must call this same implementation at the source publication boundary; it is not wired yet.",
+        "Generation/entity/world identity guards cancel stale owners and reject foreign cursors; shrinking below captured count reports an error after prior effects. These are explicit safe Rust responses to unsafe/dangling original cases, not portable source-equivalence claims.",
+        "Actual PyOS/PyError unwinding behavior, pending work snapshots, complete controller/callback interactions, source/configuration closure and mandatory proofs remain open.",
+        "The public cursor is bound to the active engine object. Defined Original retained/detached owner dispatch is a required open lifetime mapping; not every removal/replacement case is classified as unsafe."
+      ],
+      "original_regions": [
+        "src/Ball.cpp:335-488"
+      ],
+      "production_paths": [
+        "src/generated_contacts.rs",
+        "src/runtime.rs"
+      ],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "direct_source_dispatch_matches_unchanged_cpp_reentrant_traces",
+        "operation_owned_source_collision_cursors_support_nested_dispatch",
+        "unsafe_source_list_shrink_is_an_explicit_rust_error_after_prior_effects",
+        "real_gradient_output_reaches_the_same_typed_source_dispatcher",
+        "source_collision_cursors_reject_other_worlds_and_cancel_replaced_owners"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "bb25cc98d8a9dfde502af68bc7ee36962a72817ea143faf20e39a53f70312bc5",
+          "source": "src/Ball.cpp",
+          "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+          "span": [
+            335,
+            488
+          ]
+        }
+      ]
+    },
+    {
+      "family": "authoritative-state",
+      "id": "state.old-new-kinematics",
+      "implementation_status": "discovered",
+      "open_semantics": [
+        "Current metadata/logical snapshots have no source mOldPos/mOldVel owner. Immutable PreparedMotion cannot retain mutations to a later body pending result during a previous callback.",
+        "New AddBall initializes old position as current position minus dt times velocity, while replacement retains old vectors. Command setters write both vector slots; publication swaps them. All these phases and fields need generated state, runtime reachability and independent evidence.",
+        "Full old/new interpolation, mutation ordering, pending snapshots, dynamic orientation and source/configuration/proof gates remain open."
+      ],
+      "original_regions": [
+        "src/Ballpark.cpp:429-639",
+        "src/Ballpark.cpp:3355-3390",
+        "src/Ballpark.cpp:4738-4801"
+      ],
+      "production_paths": [],
+      "required_evidence": [
+        "source_mapping",
+        "independent_behavior",
+        "production_refinement",
+        "supported_core_configurations"
+      ],
+      "required_runtime_witnesses": [
+        "source_old_new_pose_commands_and_callback_publication_match_original_cpp"
+      ],
+      "source_regions": [
+        {
+          "region_sha256": "2deda2175ee197a9de1f7c8beb99306eaaefddb08dde2cf853975dff4f4c6d49",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            429,
+            639
+          ]
+        },
+        {
+          "region_sha256": "5875dd14034ab5ee187c49c4cfe315c7db688df48bf4475491aedfd212228a8f",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            3355,
+            3390
+          ]
+        },
+        {
+          "region_sha256": "5e8c2ee11669bc577d688d3b2593fa0fc55b458d97c19b42ae8e87bcecd23805",
+          "source": "src/Ballpark.cpp",
+          "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+          "span": [
+            4738,
+            4801
+          ]
+        }
+      ]
+    }
+  ],
+  "milestone": "standalone-world-engine-before-original-blue",
+  "minimum_family_checklist": [
+    "identity-lifecycle",
+    "authoritative-state",
+    "controllers",
+    "motion-orientation",
+    "collision-geometry",
+    "spatial-organization",
+    "visibility-proximity",
+    "time-sequencing",
+    "world-mutations-events",
+    "history-state-transfer",
+    "client-server-world-rules"
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "schema": 1,
+  "unknown_default": "No source-level semantic classification has been reviewed. UNKNOWN blocks core completion and cannot be deferred as Blue-only."
+}

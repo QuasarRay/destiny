@@ -1,0 +1,80 @@
+{
+  "configuration_sha256": "6be0feb2d79837bd64475c9b40b1bad54ef0dca398d595f430d763da3178732e",
+  "kind": "independent_original_oracle_samples",
+  "original_revisions": [
+    "ef738406b61ad06bae2f402857e464735ab106a2",
+    "114e89fa584f0e1a81eb0a679aabf41af8870072"
+  ],
+  "proof_credit": false,
+  "recipe": "python tools/migrate_destiny.py extract; build native; python verification/tools/check_geometry_migration.py with explicit library/oracle/report; select the first seven distinct original GetCenterDist oracle rows.",
+  "rows": [
+    {
+      "expected_bits": "0000000000000000",
+      "input_bits": [
+        "0000000000000000",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "operation": "GetCenterDist"
+    },
+    {
+      "expected_bits": "4014000000000000",
+      "input_bits": [
+        "4008000000000000",
+        "4010000000000000",
+        "0000000000000000"
+      ],
+      "operation": "GetCenterDist"
+    },
+    {
+      "expected_bits": "400deeea11683f49",
+      "input_bits": [
+        "3ff0000000000000",
+        "4000000000000000",
+        "4008000000000000"
+      ],
+      "operation": "GetCenterDist"
+    },
+    {
+      "expected_bits": "0000000000000000",
+      "input_bits": [
+        "16687e92154ef7ac",
+        "16787e92154ef7ac",
+        "16825eed8ffb39c1"
+      ],
+      "operation": "GetCenterDist"
+    },
+    {
+      "expected_bits": "1eb67e93ddbc0e73",
+      "input_bits": [
+        "1eb67e9c127b6e74",
+        "0000000000000000",
+        "0000000000000000"
+      ],
+      "operation": "GetCenterDist"
+    },
+    {
+      "expected_bits": "40575569c0931a95",
+      "input_bits": [
+        "c031200000000000",
+        "3fc0000000000000",
+        "4056f00000000000"
+      ],
+      "operation": "GetCenterDist"
+    },
+    {
+      "expected_bits": "426d1a94a2000000",
+      "input_bits": [
+        "426d1a94a2000000",
+        "3ff0000000000000",
+        "c008000000000000"
+      ],
+      "operation": "GetCenterDist"
+    }
+  ],
+  "samples_sha256": "30e49ca40e121316a9a05fbec26d0c6d46ebca51c58af0eaa75b834fb4602cd3",
+  "schema": 1,
+  "scope": "Concrete original-header oracle results. No universal/source-translation/proof claim.",
+  "source_sha256": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238",
+  "status": "PASSED_SCOPED"
+}

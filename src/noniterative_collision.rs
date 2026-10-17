@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 // Copyright © 2015, 2023 CCP ehf. Original Destiny MIT license retained.
 //! Native old-orientation Gradient/Potential pass, Ballpark.cpp:2745..3005.
 //! Shared source-backed math accepts the actual friction/timestep. Native
@@ -65,22 +70,25 @@ fn candidate(body: Body, other: Body, is_master: bool) -> bool {
 /// Compute every body's output before publication; other bodies observe the
 /// input positions/velocities throughout the ID-ordered gradient pass.
 pub(crate) fn resolve(
-    bodies: &[Body],
+    bodies: &mut [Body],
     statics: &[StaticGeometry],
     friction: f64,
     dt: f64,
     is_master: bool,
+    source_contact_effects: &mut crate::iterative_collision::ContactTrace,
 ) -> Result<Vec<Option<(Vec3, Vec3)>>, OriginalParkError> {
     assert!(bodies.windows(2).all(|pair| pair[0].id < pair[1].id));
     let mut publication = Vec::with_capacity(bodies.len());
-    for &body in bodies {
-        if !body.is_free || body.is_moribund {
+    for body_index in 0..bodies.len() {
+        let body = bodies[body_index];
+        if (!body.is_free || body.is_moribund) || body.cached_dead {
             publication.push(None);
             continue;
         }
         let mut me = projection(body);
+        let mut source_contacts = Vec::new();
         if body.is_massive {
-            for &other in bodies {
+            for &other in bodies.iter() {
                 if !candidate(body, other, is_master) {
                     continue;
                 }
@@ -91,6 +99,7 @@ pub(crate) fn resolve(
                 me.collisions = BoundedList::new();
                 let mut neighbor = projection(other);
                 sphere_potential_with_environment(&mut me, &mut neighbor, 0, friction, dt)?;
+                append_source_contacts(&mut source_contacts, &me);
             }
             if !matches!(body.mode, OriginalMode::Missile | OriginalMode::Mushroom) {
                 for geometry in statics {
@@ -106,9 +115,12 @@ pub(crate) fn resolve(
                             box_collision_with_environment(&mut me, &b, friction, dt)?
                         }
                     }
+                    append_source_contacts(&mut source_contacts, &me);
                 }
             }
         }
+        source_contact_effects.push((body.id, source_contacts));
+        bodies[body_index].collision_acceleration = me.last_c;
         publication.push(Some(original_integrate_duration(
             me.position,
             me.velocity,
@@ -126,4 +138,12 @@ pub(crate) fn resolve(
         "actual source non-iterative gradient path completed before publication"
     );
     Ok(publication)
+}
+
+#[doc = "src/Ballpark.cpp:3005; preserve each retained kernel append, including recursive duplicates"]
+fn append_source_contacts(target: &mut Vec<i64>, ball: &OriginalParkBall) {
+    for index in 0_usize..(ball.collisions).len() {
+        (target)
+            .push(((ball.collisions).get(index)).expect("collision list representation invariant"));
+    }
 }

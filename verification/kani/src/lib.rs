@@ -1,6 +1,9 @@
 #![forbid(unsafe_code)]
 
 #[cfg(kani)]
+mod generated_geometry_contracts;
+
+#[cfg(kani)]
 mod collision_identity_contracts;
 
 #[cfg(any(kani, test))]

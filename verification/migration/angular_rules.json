@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "reused_source": "verification/spec/src/original_park.rs",
+  "state_fields": [
+    "yaw",
+    "pitch",
+    "roll",
+    "old_yaw",
+    "old_pitch",
+    "old_roll",
+    "roll_speed",
+    "old_roll_speed",
+    "yaw_delta"
+  ],
+  "roll_parameters": {
+    "roll_acceleration": 1.0,
+    "roll_decay": -0.5,
+    "roll_speed_acceleration": -3.0,
+    "roll_speed_decay": -0.9
+  }
+}

@@ -48,14 +48,19 @@ set(DBC_LINK_PATH "${DBC_CARGO_TARGET_DIR}/${DBC_CARGO_PROFILE}/${DBC_LINK_FILEN
 
 file(GLOB_RECURSE DBC_RUST_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.rs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/verification/spec/src/*.rs"
 )
 set(DBC_CARGO_DEPENDS
     Cargo.toml
+    verification/spec/Cargo.toml
     rust-toolchain.toml
     ${DBC_RUST_SOURCES}
 )
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Cargo.lock")
     list(APPEND DBC_CARGO_DEPENDS Cargo.lock)
+endif()
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/verification/spec/Cargo.lock")
+    list(APPEND DBC_CARGO_DEPENDS verification/spec/Cargo.lock)
 endif()
 
 set(DBC_CARGO_OUTPUTS "${DBC_RUNTIME_PATH}")

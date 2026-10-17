@@ -1,0 +1,18 @@
+{
+  "base_commit": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+  "base_sha256": "c57ee39919eec1b71abf04708fb31bc3d2fbf140619b404e409156dfcb468fe5",
+  "generator_sha256": "70ee2794e3d00f326a8d07cdc24614846a17817290e3d1d4bafe5611aec84155",
+  "no_opaque_code_fields": true,
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_source_sha256": {
+    "src/Ball.h": "c8867329c07557a154438c0e9d32ac874e149afa1297f48f68b94fe3a07f28b3",
+    "src/Ball_Blue.cpp": "cff5977cfabb09dfc69de51b90470ea5329ea8bc22971dada402f06db9fd018b",
+    "src/Thunkers.cpp": "61acb87a22569561e7a608cd7a9a82698145afd2d5a3671365c24372a035ea17"
+  },
+  "output_sha256": "d4a305f9c3c9af75b78bff11f1be26acf49891508f4ba0c8626534eafe1e6bc0",
+  "regenerate": "python verification/tools/transform_python_adapters.py",
+  "rule_version": "python-representation-ast-v1",
+  "rules_sha256": "db37ac7523d09ee6833e893a31fe9b53f3f44a2e125e6ec611b021b60f295fe0",
+  "schema": 1,
+  "target": "python/destiny/_facade.py"
+}

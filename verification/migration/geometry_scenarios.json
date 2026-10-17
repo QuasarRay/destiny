@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "source_operations": ["Ballpark::PyGetCenterDist", "Ballpark::PyGetSurfaceDist", "ClientBall::GetCenterDistance", "ClientBall::GetSurfaceDistance"],
+  "original_sources": ["src/Thunkers.cpp", "src/Ball.cpp", "src/Vector3d.h"],
+  "fixed_vectors": [[0.0, 0.0, 0.0], [3.0, 4.0, 0.0], [1.0, 2.0, 3.0], [1e-200, 2e-200, 3e-200], [1e-160, 0.0, 0.0], [-17.125, 0.125, 91.75], [1000000000000.0, 1.0, -3.0]],
+  "random_vectors": {"seed": 11489, "count": 256, "minimum": -100000000.0, "maximum": 100000000.0},
+  "radii": [0.0, 4.0],
+  "comparison": "exact IEEE binary64 bits",
+  "clock_steps": [],
+  "scope": "finite public query inputs admitted by the current native adapter; separate full-domain and numeric-limit obligations remain"
+}

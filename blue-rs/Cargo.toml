@@ -1,0 +1,42 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/blue-macros",
+    "crates/blueexposure",
+    "crates/blue",
+    "crates/blue-codegen",
+    "crates/bluepycore",
+]
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
+authors = ["Carbon Engine contributors"]
+repository = "https://github.com/carbonengine/blue"
+
+[workspace.dependencies]
+bevy = { version = "=0.20.0", default-features = false, features = ["default_app", "serialize", "bevy_asset"] }
+pyo3 = { version = "=0.30.1", features = ["macros"] }
+genco = "=0.19.0"
+delegate = "=0.13.5"
+derive_more = { version = "=2.1.1", features = ["display", "from", "deref", "deref_mut"] }
+proc-macro2 = "=1.0.107"
+quote = "1"
+syn = { version = "2", features = ["full", "extra-traits"] }
+roxmltree = "0.21"
+walkdir = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.9"
+thiserror = "2"
+
+[workspace.lints.rust]
+unsafe_code = "warn"
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(kani)"] }
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"

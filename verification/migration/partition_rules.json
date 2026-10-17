@@ -1,0 +1,4419 @@
+{
+  "functions": [
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "key",
+                {
+                  "elements": [
+                    {
+                      "base": {
+                        "name": "key",
+                        "op": "Name"
+                      },
+                      "member": "x",
+                      "op": "Field"
+                    },
+                    {
+                      "base": {
+                        "name": "key",
+                        "op": "Name"
+                      },
+                      "member": "y",
+                      "op": "Field"
+                    },
+                    {
+                      "base": {
+                        "name": "key",
+                        "op": "Name"
+                      },
+                      "member": "z",
+                      "op": "Field"
+                    }
+                  ],
+                  "op": "Array"
+                }
+              ],
+              [
+                "level",
+                {
+                  "name": "level",
+                  "op": "Name"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "Address"
+            ]
+          }
+        }
+      ],
+      "name": "from_cell",
+      "owner": "Address",
+      "parameters": [
+        [
+          "key",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CellKey"
+            ]
+          }
+        ],
+        [
+          "level",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "u32"
+            ]
+          }
+        ]
+      ],
+      "receiver": null,
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "Address"
+        ]
+      },
+      "source_regions": [
+        "src/Partition.h:66-102"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "x",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "key",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 0
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "y",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "key",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 1
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "z",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "key",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 2
+                  },
+                  "op": "Index"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "CellKey"
+            ]
+          }
+        }
+      ],
+      "name": "cell",
+      "owner": "Address",
+      "parameters": [],
+      "receiver": "value",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "CellKey"
+        ]
+      },
+      "source_regions": [
+        "src/Partition.h:66-102"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "left": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "level",
+              "op": "Field"
+            },
+            "op": "Binary",
+            "operator": "==",
+            "right": {
+              "machine_type": "u32",
+              "op": "Literal",
+              "value": 0
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "name": "None",
+                "op": "Name"
+              }
+            }
+          ]
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "arguments": [
+                  {
+                    "arguments": [],
+                    "method": "parent",
+                    "op": "Method",
+                    "receiver": {
+                      "arguments": [],
+                      "method": "cell",
+                      "op": "Method",
+                      "receiver": {
+                        "name": "self",
+                        "op": "Name"
+                      }
+                    }
+                  },
+                  {
+                    "left": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "level",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": "-",
+                    "right": {
+                      "machine_type": "u32",
+                      "op": "Literal",
+                      "value": 1
+                    }
+                  }
+                ],
+                "function": [
+                  "Address",
+                  "from_cell"
+                ],
+                "op": "Call"
+              }
+            ],
+            "function": [
+              "Some"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "parent",
+      "owner": "Address",
+      "parameters": [],
+      "receiver": "value",
+      "result": {
+        "arguments": [
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Option"
+        ]
+      },
+      "source_regions": [
+        "src/Box.cpp:98-108"
+      ]
+    },
+    {
+      "body": [
+        {
+          "machine_type": null,
+          "mutable": true,
+          "name": "current",
+          "op": "Let",
+          "value": {
+            "name": "self",
+            "op": "Name"
+          }
+        },
+        {
+          "body": [
+            {
+              "op": "Assign",
+              "place": {
+                "name": "current",
+                "op": "Name"
+              },
+              "value": {
+                "arguments": [
+                  {
+                    "machine_type": "str",
+                    "op": "Literal",
+                    "value": "source level has a parent"
+                  }
+                ],
+                "method": "expect",
+                "op": "Method",
+                "receiver": {
+                  "arguments": [],
+                  "method": "parent",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "current",
+                    "op": "Name"
+                  }
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "end": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "level",
+              "op": "Field"
+            },
+            "op": "Range",
+            "start": {
+              "machine_type": "u32",
+              "op": "Literal",
+              "value": 0
+            }
+          },
+          "name": "_level",
+          "op": "For"
+        },
+        {
+          "op": "Return",
+          "value": {
+            "name": "current",
+            "op": "Name"
+          }
+        }
+      ],
+      "name": "top",
+      "owner": "Address",
+      "parameters": [],
+      "receiver": "value",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "Address"
+        ]
+      },
+      "source_regions": [
+        "src/Partition.cpp:183-198"
+      ]
+    },
+    {
+      "body": [
+        {
+          "machine_type": null,
+          "mutable": false,
+          "name": "grid",
+          "op": "Let",
+          "value": {
+            "left": {
+              "machine_type": "i64",
+              "op": "Literal",
+              "value": 1
+            },
+            "op": "Binary",
+            "operator": "<<",
+            "right": {
+              "left": {
+                "machine_type": "u32",
+                "op": "Literal",
+                "value": 23
+              },
+              "op": "Binary",
+              "operator": "+",
+              "right": {
+                "left": {
+                  "machine_type": "u32",
+                  "op": "Literal",
+                  "value": 2
+                },
+                "op": "Binary",
+                "operator": "*",
+                "right": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "level",
+                  "op": "Field"
+                }
+              }
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "arguments": [
+                  {
+                    "name": "x",
+                    "op": "Name"
+                  },
+                  {
+                    "name": "y",
+                    "op": "Name"
+                  },
+                  {
+                    "name": "z",
+                    "op": "Name"
+                  },
+                  {
+                    "name": "grid",
+                    "op": "Name"
+                  }
+                ],
+                "method": "offset",
+                "op": "Method",
+                "receiver": {
+                  "arguments": [],
+                  "method": "cell",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "self",
+                    "op": "Name"
+                  }
+                }
+              },
+              {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "level",
+                "op": "Field"
+              }
+            ],
+            "function": [
+              "Address",
+              "from_cell"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "offset",
+      "owner": "Address",
+      "parameters": [
+        [
+          "x",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "y",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "z",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "value",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "Address"
+        ]
+      },
+      "source_regions": [
+        "src/Partition.cpp:200-222",
+        "src/Partition.h:66-102"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "address",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "address",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "any",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "boxes",
+                "op": "Field"
+              }
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ]
+        },
+        {
+          "name": "parent",
+          "op": "IfSome",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "parent",
+                    "op": "Name"
+                  }
+                ],
+                "method": "ensure",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ],
+          "value": {
+            "arguments": [],
+            "method": "parent",
+            "op": "Method",
+            "receiver": {
+              "name": "address",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "fields": [
+                  [
+                    "address",
+                    {
+                      "name": "address",
+                      "op": "Name"
+                    }
+                  ],
+                  [
+                    "bubble",
+                    {
+                      "machine_type": "i64",
+                      "op": "Literal",
+                      "value": -1
+                    }
+                  ],
+                  [
+                    "object",
+                    {
+                      "name": "None",
+                      "op": "Name"
+                    }
+                  ]
+                ],
+                "op": "Record",
+                "path": [
+                  "BoxRecord"
+                ]
+              }
+            ],
+            "method": "push",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "boxes",
+              "op": "Field"
+            }
+          }
+        }
+      ],
+      "name": "ensure",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "address",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Partition.cpp:64-85",
+        "src/Box.cpp:15-45",
+        "src/Box.cpp:98-108"
+      ]
+    },
+    {
+      "body": [
+        {
+          "name": "index",
+          "op": "LetSome",
+          "otherwise": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "address",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "address",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "position",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "boxes",
+                "op": "Field"
+              }
+            }
+          }
+        },
+        {
+          "condition": {
+            "arguments": [
+              {
+                "expression": {
+                  "arguments": [
+                    {
+                      "op": "Ref",
+                      "value": {
+                        "name": "address",
+                        "op": "Name"
+                      }
+                    }
+                  ],
+                  "method": "contains",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "placement",
+                      "op": "Name"
+                    },
+                    "member": "owned",
+                    "op": "Field"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "placement"
+                ]
+              }
+            ],
+            "method": "any",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "placements",
+                "op": "Field"
+              }
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ]
+        },
+        {
+          "condition": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "arguments": [],
+                    "method": "parent",
+                    "op": "Method",
+                    "receiver": {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "address",
+                      "op": "Field"
+                    }
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "arguments": [
+                      {
+                        "name": "address",
+                        "op": "Name"
+                      }
+                    ],
+                    "function": [
+                      "Some"
+                    ],
+                    "op": "Call"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "any",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "boxes",
+                "op": "Field"
+              }
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ]
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "index",
+                "op": "Name"
+              }
+            ],
+            "method": "remove",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "boxes",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "name": "parent",
+          "op": "IfSome",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "parent",
+                    "op": "Name"
+                  }
+                ],
+                "method": "remove_empty",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ],
+          "value": {
+            "arguments": [],
+            "method": "parent",
+            "op": "Method",
+            "receiver": {
+              "name": "address",
+              "op": "Name"
+            }
+          }
+        }
+      ],
+      "name": "remove_empty",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "address",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Box.cpp:50-61",
+        "src/Box.cpp:144-185"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "op": "Unary",
+                    "operator": "*",
+                    "value": {
+                      "name": "candidate",
+                      "op": "Name"
+                    }
+                  },
+                  "op": "Binary",
+                  "operator": "!=",
+                  "right": {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "candidate"
+                ]
+              }
+            ],
+            "method": "retain",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "undefined_coordinates",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "name": "index",
+          "op": "LetSome",
+          "otherwise": [
+            {
+              "op": "Return",
+              "value": {
+                "elements": [],
+                "op": "Tuple"
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "placement",
+                      "op": "Name"
+                    },
+                    "member": "id",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "placement"
+                ]
+              }
+            ],
+            "method": "position",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "placements",
+                "op": "Field"
+              }
+            }
+          }
+        },
+        {
+          "machine_type": null,
+          "mutable": false,
+          "name": "previous",
+          "op": "Let",
+          "value": {
+            "arguments": [
+              {
+                "name": "index",
+                "op": "Name"
+              }
+            ],
+            "method": "remove",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "placements",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "body": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "address",
+                    "op": "Name"
+                  }
+                ],
+                "method": "remove_empty",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "base": {
+              "name": "previous",
+              "op": "Name"
+            },
+            "member": "owned",
+            "op": "Field"
+          },
+          "name": "address",
+          "op": "For"
+        }
+      ],
+      "name": "remove",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ball.cpp:812-826",
+        "src/Box.cpp:168-185"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "primary",
+                "op": "Name"
+              }
+            ],
+            "method": "ensure",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "name": "previous",
+          "op": "IfSome",
+          "otherwise": [],
+          "then": [
+            {
+              "condition": {
+                "left": {
+                  "left": {
+                    "base": {
+                      "name": "previous",
+                      "op": "Name"
+                    },
+                    "member": "primary",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "primary",
+                    "op": "Name"
+                  }
+                },
+                "op": "Binary",
+                "operator": "&&",
+                "right": {
+                  "left": {
+                    "base": {
+                      "name": "previous",
+                      "op": "Name"
+                    },
+                    "member": "modifiers",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "modifiers",
+                    "op": "Name"
+                  }
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "placement",
+                      "op": "Name"
+                    },
+                    "member": "id",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "placement"
+                ]
+              }
+            ],
+            "method": "find",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "placements",
+                "op": "Field"
+              }
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              }
+            ],
+            "method": "remove",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "primary",
+                "op": "Name"
+              }
+            ],
+            "method": "ensure",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "machine_type": null,
+          "mutable": true,
+          "name": "owned",
+          "op": "Let",
+          "value": {
+            "name": "owned",
+            "op": "Name"
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [],
+            "method": "sort",
+            "op": "Method",
+            "receiver": {
+              "name": "owned",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [],
+            "method": "dedup",
+            "op": "Method",
+            "receiver": {
+              "name": "owned",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "body": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "op": "Unary",
+                    "operator": "*",
+                    "value": {
+                      "name": "address",
+                      "op": "Name"
+                    }
+                  }
+                ],
+                "method": "ensure",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "op": "Ref",
+            "value": {
+              "name": "owned",
+              "op": "Name"
+            }
+          },
+          "name": "address",
+          "op": "For"
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "fields": [
+                  [
+                    "id",
+                    {
+                      "name": "id",
+                      "op": "Name"
+                    }
+                  ],
+                  [
+                    "primary",
+                    {
+                      "name": "primary",
+                      "op": "Name"
+                    }
+                  ],
+                  [
+                    "modifiers",
+                    {
+                      "name": "modifiers",
+                      "op": "Name"
+                    }
+                  ],
+                  [
+                    "owned",
+                    {
+                      "name": "owned",
+                      "op": "Name"
+                    }
+                  ]
+                ],
+                "op": "Record",
+                "path": [
+                  "Placement"
+                ]
+              }
+            ],
+            "method": "push",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "placements",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "machine_type": "bool",
+            "op": "Literal",
+            "value": true
+          }
+        }
+      ],
+      "name": "reinsert",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "primary",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ],
+        [
+          "modifiers",
+          {
+            "element": {
+              "arguments": [],
+              "kind": "Named",
+              "path": [
+                "i64"
+              ]
+            },
+            "kind": "Array",
+            "length": 3
+          }
+        ],
+        [
+          "owned",
+          {
+            "arguments": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "Address"
+                ]
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "Vec"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "bool"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:3115-3187",
+        "src/Ball.cpp:2355-2536",
+        "src/Box.cpp:278-282"
+      ]
+    },
+    {
+      "body": [
+        {
+          "name": "placement",
+          "op": "LetSome",
+          "otherwise": [
+            {
+              "op": "Return",
+              "value": {
+                "name": "None",
+                "op": "Name"
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "placement",
+                      "op": "Name"
+                    },
+                    "member": "id",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "placement"
+                ]
+              }
+            ],
+            "method": "find",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "placements",
+                "op": "Field"
+              }
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "arguments": [],
+                "method": "cell",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "placement",
+                    "op": "Name"
+                  },
+                  "member": "primary",
+                  "op": "Field"
+                }
+              },
+              {
+                "base": {
+                  "base": {
+                    "name": "placement",
+                    "op": "Name"
+                  },
+                  "member": "primary",
+                  "op": "Field"
+                },
+                "member": "level",
+                "op": "Field"
+              }
+            ],
+            "function": [
+              "box_snapshot"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "ball_box",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "elements": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "f64"
+                ]
+              },
+              {
+                "elements": [
+                  {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "f64"
+                    ]
+                  },
+                  {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "f64"
+                    ]
+                  },
+                  {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "f64"
+                    ]
+                  }
+                ],
+                "kind": "Tuple"
+              }
+            ],
+            "kind": "Tuple"
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Option"
+        ]
+      },
+      "source_regions": [
+        "src/Thunkers.cpp:2260-2300"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "base": {
+                    "name": "entry",
+                    "op": "Name"
+                  },
+                  "member": "bubble",
+                  "op": "Field"
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "map",
+            "op": "Method",
+            "receiver": {
+              "arguments": [
+                {
+                  "expression": {
+                    "left": {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "address",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": "==",
+                    "right": {
+                      "arguments": [],
+                      "method": "top",
+                      "op": "Method",
+                      "receiver": {
+                        "name": "address",
+                        "op": "Name"
+                      }
+                    }
+                  },
+                  "op": "Closure",
+                  "parameters": [
+                    "entry"
+                  ]
+                }
+              ],
+              "method": "find",
+              "op": "Method",
+              "receiver": {
+                "arguments": [],
+                "method": "iter",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "boxes",
+                  "op": "Field"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name": "bubble",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "address",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Option"
+        ]
+      },
+      "source_regions": [
+        "src/Thunkers.cpp:2012-2047"
+      ]
+    },
+    {
+      "body": [
+        {
+          "name": "entry",
+          "op": "IfSome",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Assign",
+              "place": {
+                "base": {
+                  "name": "entry",
+                  "op": "Name"
+                },
+                "member": "bubble",
+                "op": "Field"
+              },
+              "value": {
+                "name": "bubble",
+                "op": "Name"
+              }
+            }
+          ],
+          "value": {
+            "arguments": [
+              {
+                "expression": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "address",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "arguments": [],
+                    "method": "top",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "address",
+                      "op": "Name"
+                    }
+                  }
+                },
+                "op": "Closure",
+                "parameters": [
+                  "entry"
+                ]
+              }
+            ],
+            "method": "find",
+            "op": "Method",
+            "receiver": {
+              "arguments": [],
+              "method": "iter_mut",
+              "op": "Method",
+              "receiver": {
+                "base": {
+                  "name": "self",
+                  "op": "Name"
+                },
+                "member": "boxes",
+                "op": "Field"
+              }
+            }
+          }
+        }
+      ],
+      "name": "set_bubble",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "address",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ],
+        [
+          "bubble",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ball.cpp:2425-2430",
+        "src/Ballpark.cpp:3155-3157"
+      ]
+    },
+    {
+      "body": [
+        {
+          "body": [
+            {
+              "body": [
+                {
+                  "body": [
+                    {
+                      "condition": {
+                        "left": {
+                          "left": {
+                            "name": "x",
+                            "op": "Name"
+                          },
+                          "op": "Binary",
+                          "operator": "!=",
+                          "right": {
+                            "machine_type": "i64",
+                            "op": "Literal",
+                            "value": 0
+                          }
+                        },
+                        "op": "Binary",
+                        "operator": "||",
+                        "right": {
+                          "left": {
+                            "left": {
+                              "name": "y",
+                              "op": "Name"
+                            },
+                            "op": "Binary",
+                            "operator": "!=",
+                            "right": {
+                              "machine_type": "i64",
+                              "op": "Literal",
+                              "value": 0
+                            }
+                          },
+                          "op": "Binary",
+                          "operator": "||",
+                          "right": {
+                            "left": {
+                              "name": "z",
+                              "op": "Name"
+                            },
+                            "op": "Binary",
+                            "operator": "!=",
+                            "right": {
+                              "machine_type": "i64",
+                              "op": "Literal",
+                              "value": 0
+                            }
+                          }
+                        }
+                      },
+                      "op": "If",
+                      "otherwise": [],
+                      "then": [
+                        {
+                          "machine_type": null,
+                          "mutable": false,
+                          "name": "neighbor",
+                          "op": "Let",
+                          "value": {
+                            "arguments": [
+                              {
+                                "name": "x",
+                                "op": "Name"
+                              },
+                              {
+                                "name": "y",
+                                "op": "Name"
+                              },
+                              {
+                                "name": "z",
+                                "op": "Name"
+                              }
+                            ],
+                            "method": "offset",
+                            "op": "Method",
+                            "receiver": {
+                              "name": "address",
+                              "op": "Name"
+                            }
+                          }
+                        },
+                        {
+                          "name": "bubble",
+                          "op": "IfSome",
+                          "otherwise": [],
+                          "then": [
+                            {
+                              "condition": {
+                                "left": {
+                                  "name": "bubble",
+                                  "op": "Name"
+                                },
+                                "op": "Binary",
+                                "operator": "!=",
+                                "right": {
+                                  "machine_type": "i64",
+                                  "op": "Literal",
+                                  "value": -1
+                                }
+                              },
+                              "op": "If",
+                              "otherwise": [],
+                              "then": [
+                                {
+                                  "op": "Return",
+                                  "value": {
+                                    "name": "bubble",
+                                    "op": "Name"
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "value": {
+                            "arguments": [
+                              {
+                                "name": "neighbor",
+                                "op": "Name"
+                              }
+                            ],
+                            "method": "bubble",
+                            "op": "Method",
+                            "receiver": {
+                              "name": "self",
+                              "op": "Name"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "iterator": {
+                    "end": {
+                      "machine_type": "i64",
+                      "op": "Literal",
+                      "value": 2
+                    },
+                    "op": "Range",
+                    "start": {
+                      "machine_type": "i64",
+                      "op": "Literal",
+                      "value": -1
+                    }
+                  },
+                  "name": "z",
+                  "op": "For"
+                }
+              ],
+              "iterator": {
+                "end": {
+                  "machine_type": "i64",
+                  "op": "Literal",
+                  "value": 2
+                },
+                "op": "Range",
+                "start": {
+                  "machine_type": "i64",
+                  "op": "Literal",
+                  "value": -1
+                }
+              },
+              "name": "y",
+              "op": "For"
+            }
+          ],
+          "iterator": {
+            "end": {
+              "machine_type": "i64",
+              "op": "Literal",
+              "value": 2
+            },
+            "op": "Range",
+            "start": {
+              "machine_type": "i64",
+              "op": "Literal",
+              "value": -1
+            }
+          },
+          "name": "x",
+          "op": "For"
+        },
+        {
+          "op": "Return",
+          "value": {
+            "machine_type": "i64",
+            "op": "Literal",
+            "value": -1
+          }
+        }
+      ],
+      "name": "nearby_bubble",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "address",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "i64"
+        ]
+      },
+      "source_regions": [
+        "src/Box.cpp:252-275"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "primary",
+                "op": "Name"
+              }
+            ],
+            "method": "ensure",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "machine_type": null,
+          "mutable": false,
+          "name": "top",
+          "op": "Let",
+          "value": {
+            "arguments": [],
+            "method": "top",
+            "op": "Method",
+            "receiver": {
+              "name": "primary",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "machine_type": null,
+          "mutable": true,
+          "name": "bubble",
+          "op": "Let",
+          "value": {
+            "arguments": [
+              {
+                "machine_type": "i64",
+                "op": "Literal",
+                "value": -1
+              }
+            ],
+            "method": "unwrap_or",
+            "op": "Method",
+            "receiver": {
+              "arguments": [
+                {
+                  "name": "top",
+                  "op": "Name"
+                }
+              ],
+              "method": "bubble",
+              "op": "Method",
+              "receiver": {
+                "name": "self",
+                "op": "Name"
+              }
+            }
+          }
+        },
+        {
+          "condition": {
+            "left": {
+              "name": "bubble",
+              "op": "Name"
+            },
+            "op": "Binary",
+            "operator": "==",
+            "right": {
+              "machine_type": "i64",
+              "op": "Literal",
+              "value": -1
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "remove",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            },
+            {
+              "op": "Assign",
+              "place": {
+                "name": "bubble",
+                "op": "Name"
+              },
+              "value": {
+                "arguments": [
+                  {
+                    "name": "top",
+                    "op": "Name"
+                  }
+                ],
+                "method": "nearby_bubble",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            },
+            {
+              "condition": {
+                "left": {
+                  "name": "bubble",
+                  "op": "Name"
+                },
+                "op": "Binary",
+                "operator": "==",
+                "right": {
+                  "machine_type": "i64",
+                  "op": "Literal",
+                  "value": -1
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Assign",
+                  "place": {
+                    "name": "bubble",
+                    "op": "Name"
+                  },
+                  "value": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "next_bubble",
+                    "op": "Field"
+                  }
+                },
+                {
+                  "op": "Assign",
+                  "place": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "next_bubble",
+                    "op": "Field"
+                  },
+                  "value": {
+                    "left": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "next_bubble",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": "+",
+                    "right": {
+                      "machine_type": "i64",
+                      "op": "Literal",
+                      "value": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "top",
+                    "op": "Name"
+                  },
+                  {
+                    "name": "bubble",
+                    "op": "Name"
+                  }
+                ],
+                "method": "set_bubble",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "op": "Return",
+          "value": {
+            "name": "bubble",
+            "op": "Name"
+          }
+        }
+      ],
+      "name": "prepare_master",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "primary",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "i64"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:3115-3187"
+      ]
+    },
+    {
+      "body": [
+        {
+          "machine_type": null,
+          "mutable": true,
+          "name": "cells",
+          "op": "Let",
+          "value": {
+            "arguments": [],
+            "function": [
+              "Vec",
+              "new"
+            ],
+            "op": "Call"
+          }
+        },
+        {
+          "body": [
+            {
+              "condition": {
+                "left": {
+                  "base": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "address",
+                    "op": "Field"
+                  },
+                  "member": "level",
+                  "op": "Field"
+                },
+                "op": "Binary",
+                "operator": "==",
+                "right": {
+                  "machine_type": "u32",
+                  "op": "Literal",
+                  "value": 0
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Evaluate",
+                  "value": {
+                    "arguments": [
+                      {
+                        "elements": [
+                          {
+                            "arguments": [],
+                            "method": "cell",
+                            "op": "Method",
+                            "receiver": {
+                              "base": {
+                                "name": "entry",
+                                "op": "Name"
+                              },
+                              "member": "address",
+                              "op": "Field"
+                            }
+                          },
+                          {
+                            "machine_type": "i64",
+                            "op": "Literal",
+                            "value": -1
+                          }
+                        ],
+                        "op": "Tuple"
+                      }
+                    ],
+                    "method": "push",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "cells",
+                      "op": "Name"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "iterator": {
+            "mutable": false,
+            "op": "Ref",
+            "value": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "boxes",
+              "op": "Field"
+            }
+          },
+          "name": "entry",
+          "op": "For"
+        },
+        {
+          "op": "Return",
+          "value": {
+            "name": "cells",
+            "op": "Name"
+          }
+        }
+      ],
+      "name": "unlabeled_top_cells",
+      "owner": "Partition",
+      "parameters": [],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "elements": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "CellKey"
+                ]
+              },
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "i64"
+                ]
+              }
+            ],
+            "kind": "Tuple"
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Vec"
+        ]
+      },
+      "source_regions": [
+        "src/Partition.cpp:224-237",
+        "src/Ballpark.cpp:6565-6622"
+      ]
+    },
+    {
+      "body": [
+        {
+          "body": [
+            {
+              "op": "Assign",
+              "place": {
+                "base": {
+                  "name": "entry",
+                  "op": "Name"
+                },
+                "member": "bubble",
+                "op": "Field"
+              },
+              "value": {
+                "machine_type": "i64",
+                "op": "Literal",
+                "value": -1
+              }
+            }
+          ],
+          "iterator": {
+            "mutable": true,
+            "op": "Ref",
+            "value": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "boxes",
+              "op": "Field"
+            }
+          },
+          "name": "entry",
+          "op": "For"
+        },
+        {
+          "body": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "arguments": [
+                      {
+                        "base": {
+                          "name": "entry",
+                          "op": "Name"
+                        },
+                        "member": "0",
+                        "op": "Field"
+                      },
+                      {
+                        "machine_type": "u32",
+                        "op": "Literal",
+                        "value": 0
+                      }
+                    ],
+                    "function": [
+                      "Address",
+                      "from_cell"
+                    ],
+                    "op": "Call"
+                  },
+                  {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "1",
+                    "op": "Field"
+                  }
+                ],
+                "method": "set_bubble",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "name": "cells",
+            "op": "Name"
+          },
+          "name": "entry",
+          "op": "For"
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "self",
+              "op": "Name"
+            },
+            "member": "next_bubble",
+            "op": "Field"
+          },
+          "value": {
+            "name": "next",
+            "op": "Name"
+          }
+        }
+      ],
+      "name": "apply_top_labels",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "cells",
+          {
+            "arguments": [
+              {
+                "elements": [
+                  {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "CellKey"
+                    ]
+                  },
+                  {
+                    "arguments": [],
+                    "kind": "Named",
+                    "path": [
+                      "i64"
+                    ]
+                  }
+                ],
+                "kind": "Tuple"
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "Vec"
+            ]
+          }
+        ],
+        [
+          "next",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Partition.cpp:224-237",
+        "src/Ballpark.cpp:6565-6622"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "op": "Unary",
+            "operator": "!",
+            "value": {
+              "name": "master",
+              "op": "Name"
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "fields": [
+                  [
+                    "label",
+                    {
+                      "name": "None",
+                      "op": "Name"
+                    }
+                  ],
+                  [
+                    "transition",
+                    {
+                      "name": "None",
+                      "op": "Name"
+                    }
+                  ]
+                ],
+                "op": "Record",
+                "path": [
+                  "PreparedInsertion"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "machine_type": null,
+          "mutable": false,
+          "name": "label",
+          "op": "Let",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              },
+              {
+                "name": "primary",
+                "op": "Name"
+              }
+            ],
+            "method": "prepare_master",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "machine_type": null,
+          "mutable": true,
+          "name": "transition",
+          "op": "Let",
+          "value": {
+            "name": "None",
+            "op": "Name"
+          }
+        },
+        {
+          "condition": {
+            "left": {
+              "name": "label",
+              "op": "Name"
+            },
+            "op": "Binary",
+            "operator": "!=",
+            "right": {
+              "name": "current",
+              "op": "Name"
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Assign",
+              "place": {
+                "name": "transition",
+                "op": "Name"
+              },
+              "value": {
+                "arguments": [
+                  {
+                    "name": "label",
+                    "op": "Name"
+                  }
+                ],
+                "function": [
+                  "Some"
+                ],
+                "op": "Call"
+              }
+            }
+          ]
+        },
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "label",
+                {
+                  "arguments": [
+                    {
+                      "name": "label",
+                      "op": "Name"
+                    }
+                  ],
+                  "function": [
+                    "Some"
+                  ],
+                  "op": "Call"
+                }
+              ],
+              [
+                "transition",
+                {
+                  "name": "transition",
+                  "op": "Name"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "PreparedInsertion"
+            ]
+          }
+        }
+      ],
+      "name": "prepare_insert",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "primary",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ],
+        [
+          "master",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "current",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "PreparedInsertion"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:3115-3187"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              },
+              {
+                "name": "primary",
+                "op": "Name"
+              },
+              {
+                "name": "modifiers",
+                "op": "Name"
+              },
+              {
+                "name": "owned",
+                "op": "Name"
+              }
+            ],
+            "method": "reinsert",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "name": "label",
+          "op": "IfSome",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "primary",
+                    "op": "Name"
+                  },
+                  {
+                    "name": "label",
+                    "op": "Name"
+                  }
+                ],
+                "method": "set_bubble",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ],
+          "value": {
+            "base": {
+              "name": "prepared",
+              "op": "Name"
+            },
+            "member": "label",
+            "op": "Field"
+          }
+        }
+      ],
+      "name": "finish_insert",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "primary",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Address"
+            ]
+          }
+        ],
+        [
+          "modifiers",
+          {
+            "element": {
+              "arguments": [],
+              "kind": "Named",
+              "path": [
+                "i64"
+              ]
+            },
+            "kind": "Array",
+            "length": 3
+          }
+        ],
+        [
+          "owned",
+          {
+            "arguments": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "Address"
+                ]
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "Vec"
+            ]
+          }
+        ],
+        [
+          "prepared",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "PreparedInsertion"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ball.cpp:2355-2536",
+        "src/Ballpark.cpp:3115-3187"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "left": {
+              "arguments": [
+                {
+                  "op": "Ref",
+                  "value": {
+                    "machine_type": "f64",
+                    "op": "Literal",
+                    "value": 0.1
+                  }
+                }
+              ],
+              "method": "partial_cmp",
+              "op": "Method",
+              "receiver": {
+                "arguments": [],
+                "method": "norm_squared",
+                "op": "Method",
+                "receiver": {
+                  "arguments": [
+                    {
+                      "name": "previous",
+                      "op": "Name"
+                    }
+                  ],
+                  "method": "sub",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "current",
+                    "op": "Name"
+                  }
+                }
+              }
+            },
+            "op": "Binary",
+            "operator": "!=",
+            "right": {
+              "arguments": [
+                {
+                  "components": [
+                    "std",
+                    "cmp",
+                    "Ordering",
+                    "Less"
+                  ],
+                  "op": "Path"
+                }
+              ],
+              "function": [
+                "Some"
+              ],
+              "op": "Call"
+            }
+          }
+        }
+      ],
+      "name": "moved_for_partition",
+      "owner": null,
+      "parameters": [
+        [
+          "previous",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Vec3"
+            ]
+          }
+        ],
+        [
+          "current",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Vec3"
+            ]
+          }
+        ]
+      ],
+      "receiver": null,
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "bool"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:599-612"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "left": {
+              "name": "previous",
+              "op": "Name"
+            },
+            "op": "Binary",
+            "operator": "&&",
+            "right": {
+              "op": "Unary",
+              "operator": "!",
+              "value": {
+                "name": "current",
+                "op": "Name"
+              }
+            }
+          }
+        }
+      ],
+      "name": "became_fixed",
+      "owner": null,
+      "parameters": [
+        [
+          "previous",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "current",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ]
+      ],
+      "receiver": null,
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "bool"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:4880-4933"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "left": {
+              "name": "free",
+              "op": "Name"
+            },
+            "op": "Binary",
+            "operator": "&&",
+            "right": {
+              "left": {
+                "op": "Unary",
+                "operator": "!",
+                "value": {
+                  "name": "pending",
+                  "op": "Name"
+                }
+              },
+              "op": "Binary",
+              "operator": "&&",
+              "right": {
+                "left": {
+                  "op": "Unary",
+                  "operator": "!",
+                  "value": {
+                    "name": "mushroom",
+                    "op": "Name"
+                  }
+                },
+                "op": "Binary",
+                "operator": "&&",
+                "right": {
+                  "arguments": [
+                    {
+                      "name": "previous",
+                      "op": "Name"
+                    },
+                    {
+                      "name": "current",
+                      "op": "Name"
+                    }
+                  ],
+                  "function": [
+                    "moved_for_partition"
+                  ],
+                  "op": "Call"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name": "tick_reinsert",
+      "owner": null,
+      "parameters": [
+        [
+          "previous",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Vec3"
+            ]
+          }
+        ],
+        [
+          "current",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "Vec3"
+            ]
+          }
+        ],
+        [
+          "free",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "pending",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "mushroom",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ]
+      ],
+      "receiver": null,
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "bool"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:429-615"
+      ]
+    },
+    {
+      "body": [
+        {
+          "condition": {
+            "left": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "next_bubble",
+              "op": "Field"
+            },
+            "op": "Binary",
+            "operator": "<",
+            "right": {
+              "machine_type": "i64",
+              "op": "Literal",
+              "value": 0
+            }
+          },
+          "op": "If",
+          "otherwise": [],
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "machine_type": "bool",
+                "op": "Literal",
+                "value": false
+              }
+            }
+          ]
+        },
+        {
+          "machine_type": null,
+          "mutable": true,
+          "name": "addresses",
+          "op": "Let",
+          "value": {
+            "arguments": [],
+            "function": [
+              "std",
+              "collections",
+              "BTreeSet",
+              "new"
+            ],
+            "op": "Call"
+          }
+        },
+        {
+          "body": [
+            {
+              "condition": {
+                "left": {
+                  "base": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "address",
+                    "op": "Field"
+                  },
+                  "member": "level",
+                  "op": "Field"
+                },
+                "op": "Binary",
+                "operator": ">=",
+                "right": {
+                  "machine_type": "u32",
+                  "op": "Literal",
+                  "value": 8
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            {
+              "condition": {
+                "op": "Unary",
+                "operator": "!",
+                "value": {
+                  "arguments": [
+                    {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "address",
+                      "op": "Field"
+                    }
+                  ],
+                  "method": "insert",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "addresses",
+                    "op": "Name"
+                  }
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            {
+              "body": [
+                {
+                  "condition": {
+                    "left": {
+                      "left": {
+                        "op": "Unary",
+                        "operator": "*",
+                        "value": {
+                          "name": "coordinate",
+                          "op": "Name"
+                        }
+                      },
+                      "op": "Binary",
+                      "operator": "<",
+                      "right": {
+                        "machine_type": "i64",
+                        "op": "Literal",
+                        "value": 0
+                      }
+                    },
+                    "op": "Binary",
+                    "operator": "||",
+                    "right": {
+                      "left": {
+                        "op": "Unary",
+                        "operator": "*",
+                        "value": {
+                          "name": "coordinate",
+                          "op": "Name"
+                        }
+                      },
+                      "op": "Binary",
+                      "operator": ">=",
+                      "right": {
+                        "left": {
+                          "machine_type": "i64",
+                          "op": "Literal",
+                          "value": 1
+                        },
+                        "op": "Binary",
+                        "operator": "<<",
+                        "right": {
+                          "left": {
+                            "machine_type": "u32",
+                            "op": "Literal",
+                            "value": 23
+                          },
+                          "op": "Binary",
+                          "operator": "+",
+                          "right": {
+                            "left": {
+                              "machine_type": "u32",
+                              "op": "Literal",
+                              "value": 2
+                            },
+                            "op": "Binary",
+                            "operator": "*",
+                            "right": {
+                              "base": {
+                                "base": {
+                                  "name": "entry",
+                                  "op": "Name"
+                                },
+                                "member": "address",
+                                "op": "Field"
+                              },
+                              "member": "level",
+                              "op": "Field"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "op": "If",
+                  "otherwise": [],
+                  "then": [
+                    {
+                      "op": "Return",
+                      "value": {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    }
+                  ]
+                }
+              ],
+              "iterator": {
+                "mutable": false,
+                "op": "Ref",
+                "value": {
+                  "base": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "address",
+                    "op": "Field"
+                  },
+                  "member": "key",
+                  "op": "Field"
+                }
+              },
+              "name": "coordinate",
+              "op": "For"
+            },
+            {
+              "condition": {
+                "left": {
+                  "left": {
+                    "base": {
+                      "name": "entry",
+                      "op": "Name"
+                    },
+                    "member": "bubble",
+                    "op": "Field"
+                  },
+                  "op": "Binary",
+                  "operator": "<",
+                  "right": {
+                    "machine_type": "i64",
+                    "op": "Literal",
+                    "value": -1
+                  }
+                },
+                "op": "Binary",
+                "operator": "||",
+                "right": {
+                  "left": {
+                    "left": {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "bubble",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": ">=",
+                    "right": {
+                      "machine_type": "i64",
+                      "op": "Literal",
+                      "value": 0
+                    }
+                  },
+                  "op": "Binary",
+                  "operator": "&&",
+                  "right": {
+                    "left": {
+                      "base": {
+                        "name": "entry",
+                        "op": "Name"
+                      },
+                      "member": "bubble",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": ">=",
+                    "right": {
+                      "base": {
+                        "name": "self",
+                        "op": "Name"
+                      },
+                      "member": "next_bubble",
+                      "op": "Field"
+                    }
+                  }
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            }
+          ],
+          "iterator": {
+            "mutable": false,
+            "op": "Ref",
+            "value": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "boxes",
+              "op": "Field"
+            }
+          },
+          "name": "entry",
+          "op": "For"
+        },
+        {
+          "body": [
+            {
+              "name": "parent",
+              "op": "IfSome",
+              "otherwise": [],
+              "then": [
+                {
+                  "condition": {
+                    "op": "Unary",
+                    "operator": "!",
+                    "value": {
+                      "arguments": [
+                        {
+                          "mutable": false,
+                          "op": "Ref",
+                          "value": {
+                            "name": "parent",
+                            "op": "Name"
+                          }
+                        }
+                      ],
+                      "method": "contains",
+                      "op": "Method",
+                      "receiver": {
+                        "name": "addresses",
+                        "op": "Name"
+                      }
+                    }
+                  },
+                  "op": "If",
+                  "otherwise": [],
+                  "then": [
+                    {
+                      "op": "Return",
+                      "value": {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    }
+                  ]
+                }
+              ],
+              "value": {
+                "arguments": [],
+                "method": "parent",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "entry",
+                    "op": "Name"
+                  },
+                  "member": "address",
+                  "op": "Field"
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "mutable": false,
+            "op": "Ref",
+            "value": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "boxes",
+              "op": "Field"
+            }
+          },
+          "name": "entry",
+          "op": "For"
+        },
+        {
+          "machine_type": null,
+          "mutable": true,
+          "name": "seen",
+          "op": "Let",
+          "value": {
+            "arguments": [],
+            "function": [
+              "std",
+              "collections",
+              "BTreeSet",
+              "new"
+            ],
+            "op": "Call"
+          }
+        },
+        {
+          "body": [
+            {
+              "condition": {
+                "op": "Unary",
+                "operator": "!",
+                "value": {
+                  "arguments": [
+                    {
+                      "mutable": false,
+                      "op": "Ref",
+                      "value": {
+                        "base": {
+                          "name": "placement",
+                          "op": "Name"
+                        },
+                        "member": "id",
+                        "op": "Field"
+                      }
+                    }
+                  ],
+                  "method": "contains",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "ids",
+                    "op": "Name"
+                  }
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            {
+              "condition": {
+                "op": "Unary",
+                "operator": "!",
+                "value": {
+                  "arguments": [
+                    {
+                      "base": {
+                        "name": "placement",
+                        "op": "Name"
+                      },
+                      "member": "id",
+                      "op": "Field"
+                    }
+                  ],
+                  "method": "insert",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "seen",
+                    "op": "Name"
+                  }
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            {
+              "condition": {
+                "op": "Unary",
+                "operator": "!",
+                "value": {
+                  "arguments": [
+                    {
+                      "mutable": false,
+                      "op": "Ref",
+                      "value": {
+                        "base": {
+                          "name": "placement",
+                          "op": "Name"
+                        },
+                        "member": "primary",
+                        "op": "Field"
+                      }
+                    }
+                  ],
+                  "method": "contains",
+                  "op": "Method",
+                  "receiver": {
+                    "base": {
+                      "name": "placement",
+                      "op": "Name"
+                    },
+                    "member": "owned",
+                    "op": "Field"
+                  }
+                }
+              },
+              "op": "If",
+              "otherwise": [],
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            {
+              "machine_type": null,
+              "mutable": true,
+              "name": "owned_seen",
+              "op": "Let",
+              "value": {
+                "arguments": [],
+                "function": [
+                  "std",
+                  "collections",
+                  "BTreeSet",
+                  "new"
+                ],
+                "op": "Call"
+              }
+            },
+            {
+              "body": [
+                {
+                  "condition": {
+                    "left": {
+                      "base": {
+                        "name": "address",
+                        "op": "Name"
+                      },
+                      "member": "level",
+                      "op": "Field"
+                    },
+                    "op": "Binary",
+                    "operator": "!=",
+                    "right": {
+                      "base": {
+                        "base": {
+                          "name": "placement",
+                          "op": "Name"
+                        },
+                        "member": "primary",
+                        "op": "Field"
+                      },
+                      "member": "level",
+                      "op": "Field"
+                    }
+                  },
+                  "op": "If",
+                  "otherwise": [],
+                  "then": [
+                    {
+                      "op": "Return",
+                      "value": {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    }
+                  ]
+                },
+                {
+                  "condition": {
+                    "op": "Unary",
+                    "operator": "!",
+                    "value": {
+                      "arguments": [
+                        {
+                          "name": "address",
+                          "op": "Name"
+                        }
+                      ],
+                      "method": "contains",
+                      "op": "Method",
+                      "receiver": {
+                        "name": "addresses",
+                        "op": "Name"
+                      }
+                    }
+                  },
+                  "op": "If",
+                  "otherwise": [],
+                  "then": [
+                    {
+                      "op": "Return",
+                      "value": {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    }
+                  ]
+                },
+                {
+                  "condition": {
+                    "op": "Unary",
+                    "operator": "!",
+                    "value": {
+                      "arguments": [
+                        {
+                          "name": "address",
+                          "op": "Name"
+                        }
+                      ],
+                      "method": "insert",
+                      "op": "Method",
+                      "receiver": {
+                        "name": "owned_seen",
+                        "op": "Name"
+                      }
+                    }
+                  },
+                  "op": "If",
+                  "otherwise": [],
+                  "then": [
+                    {
+                      "op": "Return",
+                      "value": {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    }
+                  ]
+                }
+              ],
+              "iterator": {
+                "mutable": false,
+                "op": "Ref",
+                "value": {
+                  "base": {
+                    "name": "placement",
+                    "op": "Name"
+                  },
+                  "member": "owned",
+                  "op": "Field"
+                }
+              },
+              "name": "address",
+              "op": "For"
+            },
+            {
+              "body": [
+                {
+                  "condition": {
+                    "left": {
+                      "left": {
+                        "op": "Unary",
+                        "operator": "*",
+                        "value": {
+                          "name": "modifier",
+                          "op": "Name"
+                        }
+                      },
+                      "op": "Binary",
+                      "operator": "<",
+                      "right": {
+                        "machine_type": "i64",
+                        "op": "Literal",
+                        "value": -1
+                      }
+                    },
+                    "op": "Binary",
+                    "operator": "||",
+                    "right": {
+                      "left": {
+                        "op": "Unary",
+                        "operator": "*",
+                        "value": {
+                          "name": "modifier",
+                          "op": "Name"
+                        }
+                      },
+                      "op": "Binary",
+                      "operator": ">",
+                      "right": {
+                        "machine_type": "i64",
+                        "op": "Literal",
+                        "value": 1
+                      }
+                    }
+                  },
+                  "op": "If",
+                  "otherwise": [],
+                  "then": [
+                    {
+                      "op": "Return",
+                      "value": {
+                        "machine_type": "bool",
+                        "op": "Literal",
+                        "value": false
+                      }
+                    }
+                  ]
+                }
+              ],
+              "iterator": {
+                "mutable": false,
+                "op": "Ref",
+                "value": {
+                  "base": {
+                    "name": "placement",
+                    "op": "Name"
+                  },
+                  "member": "modifiers",
+                  "op": "Field"
+                }
+              },
+              "name": "modifier",
+              "op": "For"
+            }
+          ],
+          "iterator": {
+            "mutable": false,
+            "op": "Ref",
+            "value": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "placements",
+              "op": "Field"
+            }
+          },
+          "name": "placement",
+          "op": "For"
+        },
+        {
+          "body": [
+            {
+              "condition": {
+                "left": {
+                  "op": "Unary",
+                  "operator": "!",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "id",
+                        "op": "Name"
+                      }
+                    ],
+                    "method": "contains",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "ids",
+                      "op": "Name"
+                    }
+                  }
+                },
+                "op": "Binary",
+                "operator": "||",
+                "right": {
+                  "op": "Unary",
+                  "operator": "!",
+                  "value": {
+                    "arguments": [
+                      {
+                        "op": "Unary",
+                        "operator": "*",
+                        "value": {
+                          "name": "id",
+                          "op": "Name"
+                        }
+                      }
+                    ],
+                    "method": "insert",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "seen",
+                      "op": "Name"
+                    }
+                  }
+                }
+              },
+              "op": "If",
+              "then": [
+                {
+                  "op": "Return",
+                  "value": {
+                    "machine_type": "bool",
+                    "op": "Literal",
+                    "value": false
+                  }
+                }
+              ]
+            }
+          ],
+          "iterator": {
+            "op": "Ref",
+            "value": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "undefined_coordinates",
+              "op": "Field"
+            }
+          },
+          "name": "id",
+          "op": "For"
+        },
+        {
+          "op": "Return",
+          "value": {
+            "left": {
+              "arguments": [],
+              "method": "len",
+              "op": "Method",
+              "receiver": {
+                "name": "seen",
+                "op": "Name"
+              }
+            },
+            "op": "Binary",
+            "operator": "==",
+            "right": {
+              "arguments": [],
+              "method": "len",
+              "op": "Method",
+              "receiver": {
+                "name": "ids",
+                "op": "Name"
+              }
+            }
+          }
+        }
+      ],
+      "name": "valid_for_balls",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "ids",
+          {
+            "element": {
+              "arguments": [
+                {
+                  "arguments": [],
+                  "kind": "Named",
+                  "path": [
+                    "i64"
+                  ]
+                }
+              ],
+              "kind": "Named",
+              "path": [
+                "std",
+                "collections",
+                "HashSet"
+              ]
+            },
+            "kind": "Ref",
+            "mutable": false
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "bool"
+        ]
+      },
+      "source_regions": [
+        "src/Partition.h:66-102",
+        "src/Box.cpp:15-61",
+        "src/Ball.cpp:812-835",
+        "logical source_partition_v1 representation invariants"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [],
+            "method": "clear",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "undefined_coordinates",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "machine_type": {
+            "arguments": [
+              {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "i64"
+                ]
+              }
+            ],
+            "kind": "Named",
+            "path": [
+              "Vec"
+            ]
+          },
+          "mutable": true,
+          "name": "ids",
+          "op": "Let",
+          "value": {
+            "arguments": [],
+            "method": "collect",
+            "op": "Method",
+            "receiver": {
+              "arguments": [
+                {
+                  "expression": {
+                    "base": {
+                      "name": "placement",
+                      "op": "Name"
+                    },
+                    "member": "id",
+                    "op": "Field"
+                  },
+                  "op": "Closure",
+                  "parameters": [
+                    "placement"
+                  ]
+                }
+              ],
+              "method": "map",
+              "op": "Method",
+              "receiver": {
+                "arguments": [],
+                "method": "iter",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "name": "self",
+                    "op": "Name"
+                  },
+                  "member": "placements",
+                  "op": "Field"
+                }
+              }
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [],
+            "method": "sort_unstable",
+            "op": "Method",
+            "receiver": {
+              "name": "ids",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "body": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "name": "id",
+                    "op": "Name"
+                  }
+                ],
+                "method": "remove",
+                "op": "Method",
+                "receiver": {
+                  "name": "self",
+                  "op": "Name"
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "name": "ids",
+            "op": "Name"
+          },
+          "name": "id",
+          "op": "For"
+        }
+      ],
+      "name": "clear_owners",
+      "owner": "Partition",
+      "parameters": [],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:5896-5953"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              }
+            ],
+            "method": "remove",
+            "op": "Method",
+            "receiver": {
+              "name": "self",
+              "op": "Name"
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "id",
+                "op": "Name"
+              }
+            ],
+            "method": "push",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "name": "self",
+                "op": "Name"
+              },
+              "member": "undefined_coordinates",
+              "op": "Field"
+            }
+          }
+        }
+      ],
+      "name": "unplace_undefined",
+      "owner": "Partition",
+      "parameters": [
+        [
+          "id",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Partition.cpp:42-60,108-139 (undefined out-of-range float-to-i64); retained Rust finite-coordinate extension, no Original equivalence claimed"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "left": {
+              "op": "Unary",
+              "operator": "!",
+              "value": {
+                "name": "is_master",
+                "op": "Name"
+              }
+            },
+            "op": "Binary",
+            "operator": "||",
+            "right": {
+              "left": {
+                "name": "left_global",
+                "op": "Name"
+              },
+              "op": "Binary",
+              "operator": "||",
+              "right": {
+                "left": {
+                  "name": "right_global",
+                  "op": "Name"
+                },
+                "op": "Binary",
+                "operator": "||",
+                "right": {
+                  "left": {
+                    "name": "left_bubble",
+                    "op": "Name"
+                  },
+                  "op": "Binary",
+                  "operator": "==",
+                  "right": {
+                    "name": "right_bubble",
+                    "op": "Name"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "name": "source_pair_filter",
+      "owner": null,
+      "parameters": [
+        [
+          "is_master",
+          {
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "left_bubble",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "right_bubble",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "left_global",
+          {
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ],
+        [
+          "right_global",
+          {
+            "kind": "Named",
+            "path": [
+              "bool"
+            ]
+          }
+        ]
+      ],
+      "receiver": null,
+      "result": {
+        "kind": "Named",
+        "path": [
+          "bool"
+        ]
+      },
+      "source_regions": [
+        "src/Partition.cpp:417-461; symmetric broad-phase admission for the retained Avian extension. Directed source kernel filters remain independent."
+      ]
+    }
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "schema": 1
+}

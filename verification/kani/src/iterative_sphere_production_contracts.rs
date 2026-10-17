@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 // Copyright © 2023 CCP ehf. Original Destiny MIT license retained.
 //! Actual native kernel, concrete unchanged original substep assertions.
 //! Scope: 3 spheres, all 20 configured passes, dt=1 and original fixture values.
@@ -37,6 +42,7 @@ fn body(id: i64, z: f64, vz: f64, dt: f64) -> production::Body {
         mode: OriginalMode::Stop,
         owner_id: 0,
         follow_id: 0,
+        cached_dead: false,
     }
 }
 
@@ -52,7 +58,7 @@ fn original_three_sphere_substeps_use_actual_ordered_kernel() {
         body(2, 10.0, 0.0, 1.0),
         body(3, 5.0, 0.0, 1.0),
     ];
-    let result = production::resolve(&mut bodies, &[], 1e-10, 1.0, 20, false);
+    let result = production::resolve(&mut bodies, &[], 1e-10, 1.0, 20, false, &mut Vec::new());
     assert_eq!(result.len(), 3);
     let (a, av) = result[0].expect("original a remains live");
     let (c, cv) = result[1].expect("original c remains live");
@@ -83,7 +89,7 @@ fn native_collection_is_not_limited_to_eight_bodies_and_preserves_dt() {
     for id in 4..=12 {
         bodies.push(body(id, 1000.0 * id as f64, 0.0, dt));
     }
-    let result = production::resolve(&mut bodies, &[], 1e-10, dt, 32, true);
+    let result = production::resolve(&mut bodies, &[], 1e-10, dt, 32, true, &mut Vec::new());
     assert_eq!(result.len(), 12);
     let (a, av) = result[0].unwrap();
     let (c, cv) = result[1].unwrap();
@@ -183,7 +189,15 @@ fn original_capsule_left_keeps_every_tick_and_assertion() {
         );
         moving.collision_acceleration = Vec3::ZERO;
         let mut bodies = [moving];
-        let result = production::resolve(&mut bodies, &geometry, 1_000_000.0, 1.0, 20, false);
+        let result = production::resolve(
+            &mut bodies,
+            &geometry,
+            1_000_000.0,
+            1.0,
+            20,
+            false,
+            &mut Vec::new(),
+        );
         let (position, velocity) = result[0].expect("original capsule tick succeeds");
         coordinates.push(position);
         moving.position = position;

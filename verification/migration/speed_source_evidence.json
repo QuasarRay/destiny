@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 429,
+      "end": 515,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "90fcb2455c52c7edef45d3a75965cdf73eb965a588363d0e9a72d78ecdada461"
+    },
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 751,
+      "end": 777,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "690a544ddf3658faa5cdaeb05720374399964ead2ac2405f41ff41fd4ea9f1d9"
+    },
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 1339,
+      "end": 1345,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "6a5e2f3eaf4158fcb6559349b7362a71f8c4cffa05751c85abb7af8046783cb8"
+    },
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 1394,
+      "end": 1433,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "572861b903a51188d672cf9093a8cc5ef7e36f7f412ccd7c4f06fece7d05b6f5"
+    },
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 4960,
+      "end": 4983,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "d430206dc89c28a4f8b5227f462eda516396612c7c8d4fa73761c0cca283d5fd"
+    }
+  ],
+  "reused_sources": {
+    "verification/spec/src/original_motion.rs": "93e97e03bd68e5422db3c7027e6c2e4daddb75ab79b8cf50e61bea5187980478"
+  },
+  "invariant": "EvolveStop changes only source Y velocity before source collision/integration. Original max velocity scales controller thrust, and does not hard-clamp the input or resulting velocity. Preserve above-max-velocity states.",
+  "lowering": "Source-span AST rename of the existing scalar storage component and its access/replication paths to DestinyMaxVelocity; remove both non-source explicit velocity clamps. Retain source stop/integration kernels and existing source collision publication unchanged. No second authoritative velocity or max-velocity copy. Compute source collision outputs before Avian damping setup can zero an underflowed velocity. This source phase is then published through the existing path after the App step.",
+  "source_precision_boundary": "Existing API max-velocity storage stays f64 for compatibility; original motion projection narrows to f32. Full API rounding/domain correspondence remains open.",
+  "old_regression_reconciliation": "The existing historical speed-cap test retains its assertion and 1e-10 tolerance, now evaluating displacement from the original input velocity 10 rather than the artificial cap 1. Independent Original stop trace assertions remain unchanged.",
+  "assurance": "No proof credit; scoped original fixtures, source review, independent numeric oracle and current production reachability evidence remain separate.",
+  "open_correspondence": [
+    "Dynamic angular orientation and source collision-history semantics",
+    "Zero/extreme-friction source arithmetic and pre-existing compatibility envelope",
+    "Complete source field/configuration inventory and all production refinements"
+  ],
+  "diagnostics": [
+    {
+      "receipt": ".aegis/destiny/migration/world-stop-baseline-execution.json",
+      "outcome": "Both direct stop trajectories reproduced the old generic-clamp failure."
+    },
+    {
+      "receipt": ".aegis/destiny/migration/world-stop-oracle-runtime-execution.json",
+      "outcome": "Original fixture passed after separating maximum velocity; independent C++ case 6 exposed pre-collision zeroing on exponential underflow."
+    },
+    {
+      "receipt": ".aegis/destiny/migration/world-stop-ordered-collision-input-execution.json",
+      "outcome": "Source collision preparation moved before damping setup; both source traces and all 408 independent position/velocity bit comparisons passed."
+    }
+  ]
+}

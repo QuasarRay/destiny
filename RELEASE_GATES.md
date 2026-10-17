@@ -1,5 +1,35 @@
 # V4 release gates
 
+The complete newest-source migration also requires the source, behavior and
+assurance obligations described in
+[verification/migration/README.md](verification/migration/README.md). The
+canonical inventory contains 532 original cases and twelve original presets;
+the complete feature denominator is still unresolved. Run:
+
+```bash
+python tools/migrate_destiny.py generate --check
+python verification/tools/transform_python_adapters.py --check
+python verification/tools/update_migration.py architecture --check
+python verification/tools/update_migration.py self-test
+python verification/tools/update_migration.py observe-core
+python verification/tools/update_migration.py acceptance --scope both
+```
+
+The readiness command currently exits unsuccessfully with `INCOMPLETE` and
+retains every missing case/configuration/proof boundary. It is not a substitute
+for the full platform/release receipt ingestion or gates below. Local Linux
+ABI/consumer observations do not discharge the macOS/Windows or deployment
+requirements.
+
+The current milestone delivers the complete standalone world engine before
+Original Blue hosting. Its core report retains all world semantics and proofs,
+including core assertions inside mixed fixtures, while deferring reviewed
+host-only obligations. Unknown cases, incomplete source/field/effect/configuration
+inventory, missing production witnesses, mandatory proofs and unvalidated
+core quality/release evidence block core acceptance. The legacy product gates
+below remain required for full migration at the later integration milestone.
+They must not cause world mechanics to wait for a Blue or wheel build.
+
 The source is a v4 integration candidate. Production release requires every
 gate below on the exact delivered archive.
 

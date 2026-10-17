@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 #![forbid(unsafe_code)]
 
 //! Bevy-independent contracts extracted from the original Destiny tests.
@@ -129,4 +134,10 @@ pub enum ObligationStatus {
 pub use visibility::{
     VisibilityState, cloak_transition, scan_cone_pi_over_2_x, uncloak_transition,
     visibility_candidate_blocks, visibility_result,
+};
+
+pub use original_partition::{
+    box_low as original_partition_box_low, box_snapshot as original_partition_box_snapshot,
+    box_width as original_partition_box_width,
+    point_cell_keys_with_modifiers as original_partition_placement,
 };

@@ -1,0 +1,3988 @@
+{
+  "symbols": [],
+  "tests": [
+    {
+      "source": "blueexposure/tests/cpp/TestBlueSmartPy.cpp",
+      "legacy_name": "blueexposure/tests/cpp/TestBlueSmartPy.cpp::BluePyStrTest::CStrConversion",
+      "line": 57,
+      "discovery": "source-test_p",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/cpp/TestBlueSmartPy.cpp",
+      "legacy_name": "blueexposure/tests/cpp/TestBlueSmartPy.cpp::BluePyStrTest::StrConversion",
+      "line": 51,
+      "discovery": "source-test_p",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testAccess_NegativeIndex",
+      "line": 551,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testAppend",
+      "line": 19,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testAppend_None",
+      "line": 38,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testAppend_WrongType",
+      "line": 43,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testAppendingPythonObjectRaisesTypeError",
+      "line": 568,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testAssign",
+      "line": 521,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testAssign_OutOfRange",
+      "line": 541,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testCheckBlueObjectInList",
+      "line": 579,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testCheckPythonObjectInList",
+      "line": 574,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testCount",
+      "line": 376,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testCount_ItemNotIRoot",
+      "line": 402,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testDebugExpand",
+      "line": 603,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testExtend_BlueList",
+      "line": 217,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testExtend_EmptyList",
+      "line": 271,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testExtend_PythonList",
+      "line": 247,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testIndex",
+      "line": 322,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testIndex_Empty",
+      "line": 369,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testIndex_ItemNotIRoot",
+      "line": 353,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testIndex_ItemNotInList",
+      "line": 337,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testInsert",
+      "line": 54,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testInsert_InvalidIndex",
+      "line": 77,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testPop",
+      "line": 278,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testPop_Empty",
+      "line": 315,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testPop_Index",
+      "line": 295,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRefCounting",
+      "line": 560,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRemove",
+      "line": 99,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRemoveAt",
+      "line": 162,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRemoveAt_InvalidIndex",
+      "line": 182,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRemoveAt_RemoveAll",
+      "line": 200,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRemove_ItemNotInList",
+      "line": 119,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRemove_ItemNotTheRightType",
+      "line": 141,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testRepr",
+      "line": 586,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testReverse",
+      "line": 408,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testReverse_Empty",
+      "line": 429,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testSlice",
+      "line": 470,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_bluelist.py::TestBlueList::testSort",
+      "line": 435,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCallbackCatchesExceptions",
+      "line": 41,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCallingEmptyCallbackReturnsException",
+      "line": 20,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCanAssignCallback",
+      "line": 24,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCanCallIntCallback",
+      "line": 50,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCanCallIntStringFloatCallback",
+      "line": 77,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCanCallStringIntCallback",
+      "line": 68,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCanCallVoidCallback",
+      "line": 30,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCanSetCallbackAttribute",
+      "line": 91,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testCanSetCallbackProperty",
+      "line": 86,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testReturningWrongType",
+      "line": 59,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_callbacks.py::TestCallbacks::testScripCallbackInitializesToEmpty",
+      "line": 16,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_attributes_in_enum_dir",
+      "line": 38,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_baseclass_method_in_subclass_dir",
+      "line": 62,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_baseclass_variable_in_subclass_dir",
+      "line": 67,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_blue_superclass_attribute",
+      "line": 83,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_blue_superclass_method",
+      "line": 87,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_class_in_module_dir",
+      "line": 41,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_enum_in_module_dir",
+      "line": 35,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_function_in_module_dir",
+      "line": 32,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_method_in_class_type_dir",
+      "line": 51,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_method_in_instance_dir",
+      "line": 54,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_method_in_singleton_dir",
+      "line": 48,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_non_python_attributes_not_in_module_dir",
+      "line": 97,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_non_python_attributes_on_blue_object",
+      "line": 91,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_subclass_method_in_subclass_dir",
+      "line": 77,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_subclass_variable_in_subclass_dir",
+      "line": 72,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_thunker_in_blue_list_dir",
+      "line": 44,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_type_attributes_not_on_instance_dont_show_up_in_dir",
+      "line": 102,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_dir.py::TestDir::test_variable_in_instance_dir",
+      "line": 58,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testBeResultArityFunctions",
+      "line": 293,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testBeResultArityWithRefFunctions",
+      "line": 310,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testBoolFunction",
+      "line": 126,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testConstCharFunction",
+      "line": 214,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testConstWCharFunction",
+      "line": 250,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testDoubleFunction",
+      "line": 180,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFloatFunction",
+      "line": 162,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningBool",
+      "line": 21,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningConstChar",
+      "line": 51,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningConstWChar",
+      "line": 61,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningDouble",
+      "line": 41,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningFloat",
+      "line": 36,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningInt",
+      "line": 26,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningPyObject",
+      "line": 121,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningString",
+      "line": 46,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningUnsignedInt",
+      "line": 31,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningVector2",
+      "line": 86,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningVector2d",
+      "line": 91,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningVector3",
+      "line": 96,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningVector3d",
+      "line": 101,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningVector3i",
+      "line": 106,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningVector4",
+      "line": 111,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningVector4d",
+      "line": 116,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testFunctionReturningWString",
+      "line": 56,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testIntArityFunctions",
+      "line": 281,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testIntFunction",
+      "line": 145,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testPython38to312UnicodeChanges",
+      "line": 66,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testStringFunction",
+      "line": 197,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testUnicodeFunction",
+      "line": 232,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_functions.py::TestFunctions::testVoidArityFunctions",
+      "line": 269,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_optionalargs.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_optionalargs.py::TestOptionalArgs::testBeOptionalArgs",
+      "line": 134,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_optionalargs.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_optionalargs.py::TestOptionalArgs::testMethodCallsAndReturnValues",
+      "line": 12,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_optionalargs.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_optionalargs.py::TestOptionalArgs::testOptionalArgs",
+      "line": 99,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testBoolAttributeAssignment",
+      "line": 258,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testBoolPropertyAssignment",
+      "line": 286,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testDirAttributes",
+      "line": 363,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testDirProperties",
+      "line": 369,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testDoubleAttributeAssignment",
+      "line": 282,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testDoublePropertyAssignment",
+      "line": 310,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testFloatAttributeAssignment",
+      "line": 278,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testFloatPropertyAssignment",
+      "line": 306,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testInt64AttributeAssignment",
+      "line": 270,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testInt64PropertyAssignment",
+      "line": 298,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testIntAttributeAssignment",
+      "line": 262,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testIntPropertyAssignment",
+      "line": 290,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testIntPropertyAssignmentWithError",
+      "line": 315,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testSharedStringAttributeAssignment",
+      "line": 332,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testSharedStringPropertyAssignment",
+      "line": 336,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testSharedStringWAttributeAssignment",
+      "line": 340,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testSharedStringWPropertyAssignment",
+      "line": 344,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testStringAttributeAssignment",
+      "line": 241,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testStringPropertyAssignment",
+      "line": 246,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testUInt64PropertyAssignment",
+      "line": 302,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testUnsignedInt64AttributeAssignment",
+      "line": 274,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testUnsignedIntAttributeAssignment",
+      "line": 266,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testUnsignedIntPropertyAssignment",
+      "line": 294,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testWStringAttributeAssignment",
+      "line": 250,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_properties.py::TestProperties::testWStringPropertyAssignment",
+      "line": 254,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testBeResultArityMethods",
+      "line": 269,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testBeResultArityWithRefMethods",
+      "line": 288,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testBoolMethod",
+      "line": 84,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testConstCharMethod",
+      "line": 182,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testConstWCharMethod",
+      "line": 222,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testDoubleMethod",
+      "line": 143,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testFloatMethod",
+      "line": 124,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testIntArityMethods",
+      "line": 255,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testIntMethod",
+      "line": 105,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testIsInstance",
+      "line": 443,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodCallsAndReturnValues",
+      "line": 12,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodReturningListOfInt",
+      "line": 407,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodReturningListOfVector3",
+      "line": 414,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodReturningMapOfStringToInt",
+      "line": 433,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodWithListOfIntParameter",
+      "line": 359,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodWithListOfListOfIntParameter",
+      "line": 376,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodWithListOfVector3Parameter",
+      "line": 394,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMethodWithMapOfStringToIntParameter",
+      "line": 421,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testMissingRequiredArgument",
+      "line": 485,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testPassAllArgumentsWithKeywords",
+      "line": 465,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testPassArgumentsWithoutKeywords",
+      "line": 460,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testPassKeywordArgumentsWithKeywords",
+      "line": 470,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testPassNoKeywordArgument",
+      "line": 480,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testPassOneKeywordArgument",
+      "line": 475,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testSafeFactory",
+      "line": 307,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testSharedStringMethods",
+      "line": 450,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testSharedStringWMethods",
+      "line": 455,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testStringMethod",
+      "line": 163,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testUnicodeMethod",
+      "line": 202,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testVoidArityMethods",
+      "line": 242,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py",
+      "legacy_name": "blueexposure/tests/python/BlueExposureTest/test/test_standaloneblueexposure.py::TestStandAloneBlueExposure::testWeakReferences",
+      "line": 335,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/cpp/TestBlueResMan.cpp",
+      "legacy_name": "tests/cpp/TestBlueResMan.cpp::BlueResManTest::CallLoadObjectFromAnotherThread",
+      "line": 171,
+      "discovery": "source-test_f",
+      "rust_test": null
+    },
+    {
+      "source": "tests/cpp/TestBlueResMan.cpp",
+      "legacy_name": "tests/cpp/TestBlueResMan.cpp::BlueResManTest::CallLoadObjectOnEmptyPath",
+      "line": 151,
+      "discovery": "source-test_f",
+      "rust_test": null
+    },
+    {
+      "source": "tests/cpp/TestBlueResMan.cpp",
+      "legacy_name": "tests/cpp/TestBlueResMan.cpp::BlueResManTest::CallLoadObjectWithGil",
+      "line": 157,
+      "discovery": "source-test_f",
+      "rust_test": null
+    },
+    {
+      "source": "tests/cpp/TestBlueResMan.cpp",
+      "legacy_name": "tests/cpp/TestBlueResMan.cpp::BlueResManTest::CallLoadObjectWithoutGil",
+      "line": 165,
+      "discovery": "source-test_f",
+      "rust_test": null
+    },
+    {
+      "source": "tests/cpp/TestPyMemory.cpp",
+      "legacy_name": "tests/cpp/TestPyMemory.cpp::PythonMemoryAllocatorTest::GetInstalledCorrectly",
+      "line": 62,
+      "discovery": "source-test_f",
+      "rust_test": null
+    },
+    {
+      "source": "tests/cpp/TestPyMemory.cpp",
+      "legacy_name": "tests/cpp/TestPyMemory.cpp::PythonMemoryAllocatorTest::TracksAllocatedAmount",
+      "line": 73,
+      "discovery": "source-test_f",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_allreferences.py",
+      "legacy_name": "tests/python/bluetests/test/test_allreferences.py::TestAllReferences::testClearsReferences",
+      "line": 47,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_allreferences.py",
+      "legacy_name": "tests/python/bluetests/test/test_allreferences.py::TestAllReferences::testDoesNotLeak",
+      "line": 62,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_allreferences.py",
+      "legacy_name": "tests/python/bluetests/test/test_allreferences.py::TestAllReferences::testFindsInterfaces",
+      "line": 23,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_allreferences.py",
+      "legacy_name": "tests/python/bluetests/test/test_allreferences.py::TestAllReferences::testFindsReferences",
+      "line": 11,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_allreferences.py",
+      "legacy_name": "tests/python/bluetests/test/test_allreferences.py::TestAllReferences::testKeepsStrongReferences",
+      "line": 35,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testBlackReaderErrors",
+      "line": 149,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testBlackReaderReuse",
+      "line": 206,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testBlackReaderVersionsSupported",
+      "line": 223,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testBlackWriterCurrentVersion",
+      "line": 229,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testBlackWriterReuse",
+      "line": 191,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteInt32ToFileAndReadBack",
+      "line": 92,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteInt32ToMemStreamAndReadBack",
+      "line": 53,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteInt64ToFileAndReadBack",
+      "line": 99,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteInt64ToMemStreamAndReadBack",
+      "line": 60,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteStringToFileAndReadBack",
+      "line": 89,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteStringToMemStreamAndReadBack",
+      "line": 47,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteUInt32ToFileAndReadBack",
+      "line": 96,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteUInt32ToMemStreamAndReadBack",
+      "line": 57,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteUInt64ToFileAndReadBack",
+      "line": 103,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blackpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_blackpersistence.py::TestBlackWriterAndReader::testWriteUInt64ToMemStreamAndReadBack",
+      "line": 64,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blue.py",
+      "legacy_name": "tests/python/bluetests/test/test_blue.py::TestBlue::test_classes",
+      "line": 12,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testBoolAttributeAssignment",
+      "line": 189,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testBoolPropertyAssignment",
+      "line": 219,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testDirAttributes",
+      "line": 261,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testDoubleAttributeAssignment",
+      "line": 213,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testDoublePropertyAssignment",
+      "line": 243,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testFloatAttributeAssignment",
+      "line": 207,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testFloatPropertyAssignment",
+      "line": 237,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testInt64AttributeAssignment",
+      "line": 201,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testInt64PropertyAssignment",
+      "line": 231,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testIntAttributeAssignment",
+      "line": 195,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testIntPropertyAssignment",
+      "line": 225,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testStringAttributeAssignment",
+      "line": 165,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testStringPropertyAssignment",
+      "line": 171,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testWStringAttributeAssignment",
+      "line": 177,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_blueexposure.py",
+      "legacy_name": "tests/python/bluetests/test/test_blueexposure.py::TestBlueExposure::testWStringPropertyAssignment",
+      "line": 183,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testBoolAttribute",
+      "line": 31,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testDefaultValues",
+      "line": 11,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testDictAttribute",
+      "line": 88,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testDoubleAttribute",
+      "line": 24,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testFloatAttribute",
+      "line": 17,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testInt64Attribute",
+      "line": 59,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testIntAttribute",
+      "line": 52,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testSharedStringAttribute",
+      "line": 66,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testStringAttribute",
+      "line": 38,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testStructureListAttribute",
+      "line": 105,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testUnicodeAttribute",
+      "line": 45,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_copier.py",
+      "legacy_name": "tests/python/bluetests/test/test_copier.py::TestCopier::testVectorAttribute",
+      "line": 73,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_crypto.py",
+      "legacy_name": "tests/python/bluetests/test/test_crypto.py::TestAsymmetricCipher::test_encryption",
+      "line": 18,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_crypto.py",
+      "legacy_name": "tests/python/bluetests/test/test_crypto.py::TestAsymmetricCipher::test_signing",
+      "line": 13,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_crypto.py",
+      "legacy_name": "tests/python/bluetests/test/test_crypto.py::TestSymmetricCipher::test_canSetKey",
+      "line": 27,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_crypto.py",
+      "legacy_name": "tests/python/bluetests/test/test_crypto.py::TestSymmetricCipher::test_encryption",
+      "line": 46,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_crypto.py",
+      "legacy_name": "tests/python/bluetests/test/test_crypto.py::TestSymmetricCipher::test_ivRequires16bytes",
+      "line": 39,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_crypto.py",
+      "legacy_name": "tests/python/bluetests/test/test_crypto.py::TestSymmetricCipher::test_keyRequires32bytes",
+      "line": 32,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dbrow.py",
+      "legacy_name": "tests/python/bluetests/test/test_dbrow.py::TestDBRow::testAttemptingToDeleteColumnDoesntCrash",
+      "line": 28,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dbrow.py",
+      "legacy_name": "tests/python/bluetests/test/test_dbrow.py::TestDBRow::testColumnNameConstraints",
+      "line": 75,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dbrow.py",
+      "legacy_name": "tests/python/bluetests/test/test_dbrow.py::TestDBRow::testEquivalencyComparison",
+      "line": 63,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dbrow.py",
+      "legacy_name": "tests/python/bluetests/test/test_dbrow.py::TestDBRow::testIndexSubscript",
+      "line": 50,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dbrow.py",
+      "legacy_name": "tests/python/bluetests/test/test_dbrow.py::TestDBRow::testSliceSubscript",
+      "line": 35,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dbrow.py",
+      "legacy_name": "tests/python/bluetests/test/test_dbrow.py::TestDBRow::testUnicodeSubscript",
+      "line": 57,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dbrow.py",
+      "legacy_name": "tests/python/bluetests/test/test_dbrow.py::TestDBRow::testVirtualColumnsAreReadOnly",
+      "line": 16,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::testDictReaderBasics",
+      "line": 7,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::test_AllBaseTypes",
+      "line": 49,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::test_BasicReferencing",
+      "line": 18,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::test_BoolErrors",
+      "line": 101,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::test_CircularReference",
+      "line": 126,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::test_DictReaderReuse",
+      "line": 34,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::test_StringFromUnicode",
+      "line": 75,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_dictpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_dictpersistence.py::TestDictReader::test_UnicodeFromString",
+      "line": 88,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_events.py",
+      "legacy_name": "tests/python/bluetests/test/test_events.py::TestPostEvent::test_event_gets_sent",
+      "line": 62,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_events.py",
+      "legacy_name": "tests/python/bluetests/test/test_events.py::TestSendEvent::test_event_gets_sent",
+      "line": 37,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_exit.py",
+      "legacy_name": "tests/python/bluetests/test/test_exit.py::TestExitPatching::test_excepthook_without_original_excepthook_raises",
+      "line": 68,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_exit.py",
+      "legacy_name": "tests/python/bluetests/test/test_exit.py::TestExitPatching::test_exit_with_int_does_not_release_argument",
+      "line": 39,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_exit.py",
+      "legacy_name": "tests/python/bluetests/test/test_exit.py::TestExitPatching::test_exit_with_int_out_of_c_long_range_does_not_release_argument",
+      "line": 43,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_exit.py",
+      "legacy_name": "tests/python/bluetests/test/test_exit.py::TestExitPatching::test_exit_with_object_does_not_release_argument",
+      "line": 46,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_exit.py",
+      "legacy_name": "tests/python/bluetests/test/test_exit.py::TestExitPatching::test_exit_with_string_does_not_release_argument",
+      "line": 36,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_exit.py",
+      "legacy_name": "tests/python/bluetests/test/test_exit.py::TestExitPatching::test_original_exit_is_kept_alive_by_blue",
+      "line": 52,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_exit.py",
+      "legacy_name": "tests/python/bluetests/test/test_exit.py::TestExitPatching::test_repeated_exit_with_same_object_does_not_release_argument",
+      "line": 49,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_create",
+      "line": 28,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_open_for_append",
+      "line": 99,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_open_for_reading",
+      "line": 67,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_open_for_writing_when_file_does_not_exist",
+      "line": 79,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_open_for_writing_when_file_exists",
+      "line": 88,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_open_read_entire_file",
+      "line": 32,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_open_read_entire_file_with_0_terminator",
+      "line": 46,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_seek_from_beginning",
+      "line": 116,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_seek_from_current",
+      "line": 142,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_filestream.py",
+      "legacy_name": "tests/python/bluetests/test/test_filestream.py::testFileStream::test_seek_from_end",
+      "line": 129,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_bool",
+      "line": 388,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_bytes_string",
+      "line": 412,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_checksum",
+      "line": 478,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_custom_exception",
+      "line": 485,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_dbrow",
+      "line": 351,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_dict",
+      "line": 395,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_empty_dbrow",
+      "line": 356,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_empty_dict",
+      "line": 392,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_empty_list",
+      "line": 408,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_empty_object",
+      "line": 405,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_empty_string",
+      "line": 365,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_empty_tuple",
+      "line": 448,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_empty_unicode",
+      "line": 399,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_float",
+      "line": 383,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_instanced_object",
+      "line": 464,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_integer",
+      "line": 371,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_list_of_one_string",
+      "line": 440,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_list_of_strings",
+      "line": 444,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_load_legacy_byte_string",
+      "line": 325,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_load_legacy_unicode_string",
+      "line": 320,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_load_new_style_object",
+      "line": 335,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_load_object_with_data",
+      "line": 340,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_load_old_style_object",
+      "line": 330,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_long",
+      "line": 380,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_new_style_with_setstate",
+      "line": 489,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_none",
+      "line": 361,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_old_style_object_with_data",
+      "line": 345,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_read_callback_called",
+      "line": 469,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_runtime_error",
+      "line": 501,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_set",
+      "line": 494,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_simple_object",
+      "line": 436,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_single_char",
+      "line": 420,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_single_char_unicode",
+      "line": 424,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_string_from_stringtable",
+      "line": 416,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_tuple_of_one_string",
+      "line": 452,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_tuple_of_strings",
+      "line": 460,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_tuple_of_two_strings",
+      "line": 456,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_unicode",
+      "line": 428,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::TestBackwardsCompatibility::test_unicode_as_utf8",
+      "line": 432,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_bool",
+      "line": 159,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_can_slice",
+      "line": 274,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_checksum",
+      "line": 250,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_converting_to_bytes_does_not_crash",
+      "line": 269,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_dbrow",
+      "line": 285,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_dbrow_with_invalid_descriptor_in_stream_raises_error",
+      "line": 290,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_deeply_nested_read",
+      "line": 308,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_dict",
+      "line": 163,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_empty_dbrow",
+      "line": 259,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_empty_dict",
+      "line": 166,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_empty_list",
+      "line": 175,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_empty_object",
+      "line": 169,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_empty_string",
+      "line": 119,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_empty_tuple",
+      "line": 184,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_empty_unicode",
+      "line": 128,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_float",
+      "line": 154,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_instanced_object",
+      "line": 196,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_integer",
+      "line": 140,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_list_of_one_string",
+      "line": 178,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_list_of_strings",
+      "line": 181,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_long",
+      "line": 149,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_none",
+      "line": 116,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_nullptr_deref_in_readobjectreference",
+      "line": 299,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_read_and_write_callbacks_used",
+      "line": 227,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_read_callback_called",
+      "line": 214,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_simple_object",
+      "line": 172,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_single_char_unicode",
+      "line": 131,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_str_method",
+      "line": 280,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_string",
+      "line": 122,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_string_from_stringtable",
+      "line": 125,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_tuple_of_one_string",
+      "line": 187,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_tuple_of_strings",
+      "line": 193,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_tuple_of_two_strings",
+      "line": 190,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_unicode",
+      "line": 134,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_unicode_as_utf8",
+      "line": 137,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_write_callback_called",
+      "line": 206,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_write_stream_comparison",
+      "line": 200,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_write_uses_default_pickle_method_when_callback_raises_error",
+      "line": 241,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_marshal.py",
+      "legacy_name": "tests/python/bluetests/test/test_marshal.py::testMarshal::test_wstream",
+      "line": 264,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_md5.py",
+      "legacy_name": "tests/python/bluetests/test/test_md5.py::TestMd5::testEmptyString",
+      "line": 21,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_md5.py",
+      "legacy_name": "tests/python/bluetests/test/test_md5.py::TestMd5::testLongString",
+      "line": 27,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_md5.py",
+      "legacy_name": "tests/python/bluetests/test/test_md5.py::TestMd5::testShortString",
+      "line": 24,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_md5.py",
+      "legacy_name": "tests/python/bluetests/test/test_md5.py::testAnotherLongString",
+      "line": 3827,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_memstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_memstream.py::testMemStream::testCreate",
+      "line": 7,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_memstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_memstream.py::testMemStream::testMultipleWriteAndReadBack",
+      "line": 27,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_memstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_memstream.py::testMemStream::testWrite",
+      "line": 11,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_memstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_memstream.py::testMemStream::testWriteAndReadBack",
+      "line": 17,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testDelete_ExistingKey",
+      "line": 42,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testDelete_NonExistingKey",
+      "line": 38,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testInitialState",
+      "line": 14,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testInsert_AsciiName",
+      "line": 17,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testInsert_None",
+      "line": 25,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testInsert_UnicodeName",
+      "line": 21,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testItems",
+      "line": 52,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testItems_Empty",
+      "line": 48,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testKeys",
+      "line": 68,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testKeys_Empty",
+      "line": 64,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testLookup_AfterObjectInsertion",
+      "line": 32,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testLookup_ObjectNotInserted",
+      "line": 28,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testSize_Empty",
+      "line": 98,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testSize_MultipleInsertions",
+      "line": 106,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testSize_OneInsertion",
+      "line": 101,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testValues",
+      "line": 86,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_motherlode.py",
+      "legacy_name": "tests/python/bluetests/test/test_motherlode.py::TestMotherLode::testValues_Empty",
+      "line": 82,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testCanOpenHttpStream",
+      "line": 16,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testCanQueryStreamSize",
+      "line": 19,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testCanReadEntireFile",
+      "line": 27,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testCurrentPositionIsIncrementedWithRead",
+      "line": 39,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testCurrentPositionIsUnavailableAfterClosingFile",
+      "line": 50,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testCurrentPositionIsZeroAtTheBeginningOfTransfer",
+      "line": 35,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testReadReturnsUpToFileSizeData",
+      "line": 31,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testReadWithRequestedSizeReturnsStringOfThatSize",
+      "line": 23,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testReadingClosedFileRaises",
+      "line": 44,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testStreamWithInvalidUrlDoesNotRaise",
+      "line": 8,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_networkstream.py",
+      "legacy_name": "tests/python/bluetests/test/test_networkstream.py::TestNetworkStream::testStreamWithInvalidUrlRaisesAtReading",
+      "line": 11,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_objectrecycler.py",
+      "legacy_name": "tests/python/bluetests/test/test_objectrecycler.py::TestObjectRecycler::testClear_ObjectsDeletedBeforeClear",
+      "line": 98,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_objectrecycler.py",
+      "legacy_name": "tests/python/bluetests/test/test_objectrecycler.py::TestObjectRecycler::testClear_ObjectsNotDeletedBeforeClear",
+      "line": 119,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_objectrecycler.py",
+      "legacy_name": "tests/python/bluetests/test/test_objectrecycler.py::TestObjectRecycler::testRecycleOrCopy",
+      "line": 139,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePathForWriting_WithMultipleFolders",
+      "line": 163,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePathToRoot_SimpleCase",
+      "line": 222,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePath_CaseMismatch",
+      "line": 173,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePath_CaseMismatchMultipleCandidates",
+      "line": 190,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePath_Folder",
+      "line": 213,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePath_WithExistingFile",
+      "line": 100,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePath_WithMultipleFolders",
+      "line": 138,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePath_WithNoPathsSet",
+      "line": 77,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testResolvePath_WithNonExistingFile",
+      "line": 86,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::test_isdir",
+      "line": 249,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestAPathsWithDiskAccess::testlistdir",
+      "line": 230,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestPaths::testGetAllSearchPaths",
+      "line": 51,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestPaths::testGetAndSetSearchPath",
+      "line": 41,
+      "discovery": "source-python",
+      "rust_test": "blue::runtime::search_paths_match_blue_set_get_and_clear_semantics"
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestPaths::testInitialWorkingDirectory",
+      "line": 22,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_paths.py",
+      "legacy_name": "tests/python/bluetests/test/test_paths.py::TestPaths::testSettingCircularSearchPathFails",
+      "line": 33,
+      "discovery": "source-python",
+      "rust_test": "blue::runtime::circular_search_paths_are_rejected_without_committing_candidate"
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testClearingResetsAccumulator",
+      "line": 26,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testGetValuesForPercentiles",
+      "line": 41,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testGetValuesForPercentilesShouldReturnSameValuesForLargerSetWithSameDistribution",
+      "line": 48,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testGetValuesForPercentilesStopsAtFirstValueThatEqualsThreshold",
+      "line": 64,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testGetValuesForPercentilesStopsAtFirstValueThatStepsOverThreshold",
+      "line": 57,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testGettingPercentilesWithoutAddingResultsInEmptyList",
+      "line": 12,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testStartValueHigherThanMaxValueResultsInEmptyList",
+      "line": 34,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_percentile_accumulator.py",
+      "legacy_name": "tests/python/bluetests/test/test_percentile_accumulator.py::TestPercentileAccumulator::testTwoValues",
+      "line": 16,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testFileExists",
+      "line": 44,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testFileExists_NotAResFile",
+      "line": 39,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testFileExists_WithNoIndexSet",
+      "line": 34,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testFilesExist_MultipleIndexes",
+      "line": 50,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testFoldersExist_MultipleIndexes",
+      "line": 58,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testisdir_FileInRootFolder",
+      "line": 106,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testisdir_FileInSubFolder",
+      "line": 113,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testisdir_NonExistingFolder",
+      "line": 120,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testisdir_rootfolder",
+      "line": 92,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testisdir_subfolder",
+      "line": 99,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testlistdir_FolderNotFound",
+      "line": 86,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testlistdir_NotAResPath",
+      "line": 80,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testlistdir_rootfolder",
+      "line": 66,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_remotefilecache.py",
+      "legacy_name": "tests/python/bluetests/test/test_remotefilecache.py::TestRemoteFileCache::testlistdir_subfolder",
+      "line": 73,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_CreateFile",
+      "line": 206,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_CreateFileAndWrite",
+      "line": 213,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_CreateFileAndWriteAndReadBack",
+      "line": 227,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_CreateFileAndWriteWhenFileExists",
+      "line": 242,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_FileExists_FileDoesNotExist",
+      "line": 268,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_FileExists_WithExistingFile",
+      "line": 260,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenCapitalOExistingFile",
+      "line": 52,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenCapitalOExistingFileForWriting",
+      "line": 76,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenCapitalOExistingFileForWritingAndWriteToIt",
+      "line": 100,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenCapitalOWhenFileDoesNotExist",
+      "line": 138,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenExistingFile",
+      "line": 64,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenExistingFileForWriting",
+      "line": 88,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenExistingFileForWritingAndWriteToIt",
+      "line": 119,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenLanguageSpecificFile_ChineseLanguageSet",
+      "line": 309,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenLanguageSpecificFile_EnglishLanguageSet",
+      "line": 321,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenLanguageSpecificFile_NoLanguageSet",
+      "line": 298,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_OpenWhenFileDoesNotExist",
+      "line": 147,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_ReadFromExistingFile",
+      "line": 152,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_ReadPartialContentsFromExistingFile",
+      "line": 169,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resfile.py",
+      "legacy_name": "tests/python/bluetests/test/test_resfile.py::TestResFile::test_ReadPartialContentsWithSeekFromExistingFile",
+      "line": 187,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::testGetResource",
+      "line": 55,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::testGetResource_Caching",
+      "line": 111,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::testGetResource_SecondGetShouldBeShared",
+      "line": 103,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::testGetResource_UnicodeName",
+      "line": 71,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::testGetResource_UnknownResourceType",
+      "line": 100,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::testGetResource_WithEx",
+      "line": 83,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::testInitialState",
+      "line": 48,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::test_OpenLanguageSpecificFile_ChineseLanguageSet",
+      "line": 135,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::test_OpenLanguageSpecificFile_EnglishLanguageSet",
+      "line": 142,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_resman.py",
+      "legacy_name": "tests/python/bluetests/test/test_resman.py::TestResMan::test_OpenLanguageSpecificFile_NoLanguageSet",
+      "line": 128,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_blueStatisticsTelemetryConfig",
+      "line": 15,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_getRegisteredTelemetryCategories",
+      "line": 116,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_registerTelemetryCategory",
+      "line": 36,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_registerTelemetryCategoryTwice",
+      "line": 78,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_registerTelemetryCategoryWithColorObject",
+      "line": 51,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_registerTelemetryCategoryWithInvalidColor",
+      "line": 66,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_registerTelemetryCategoryWithoutName",
+      "line": 96,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_setActiveTelemetryCategories",
+      "line": 143,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_setActiveTelemetryCategoriesFromAnySequence",
+      "line": 181,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_setActiveTelemetryCategoriesReplacesThePreviousOnes",
+      "line": 162,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_setActiveTelemetryCategoriesWithInvalidCategories",
+      "line": 264,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_setNoActiveTelemetryCategories",
+      "line": 197,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_setUnsetResetActiveTelemetryCategory",
+      "line": 212,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_telemetryCategoriesCompareByName",
+      "line": 225,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_statistics.py",
+      "legacy_name": "tests/python/bluetests/test/test_statistics.py::TestBlueStatistics::test_telemetryCategoryErrorIsARuntimeError",
+      "line": 105,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testBasics",
+      "line": 11,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testBoolList",
+      "line": 136,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testBoolListYamlPersistence",
+      "line": 298,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testFloat16List",
+      "line": 107,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testFloat16ListYamlPersistence",
+      "line": 286,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testFloat32List",
+      "line": 100,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testFloat32ListYamlPersistence",
+      "line": 282,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testInt16List",
+      "line": 78,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testInt16ListYamlPersistence",
+      "line": 266,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testInt32ListYamlPersistence",
+      "line": 274,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testInt8List",
+      "line": 63,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testInt8ListYamlPersistence",
+      "line": 258,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testListDefinitionWithEnumExposesChoosers",
+      "line": 310,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testListDefinitionWithoutEnumDoesNotExposeChoosers",
+      "line": 306,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testMatrixList",
+      "line": 127,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testMatrixListYamlPersistence",
+      "line": 294,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testMixedList",
+      "line": 119,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testMixedListYamlPersistence",
+      "line": 302,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadBoolListFromDict",
+      "line": 233,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadEmptyStructureListFromEmptyDict",
+      "line": 182,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadFloat16ListFromDict",
+      "line": 221,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadFloat32ListFromDict",
+      "line": 217,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadInt16ListFromDict",
+      "line": 201,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadInt32ListFromDict",
+      "line": 209,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadInt8ListFromDict",
+      "line": 193,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadMatrixListFromDict",
+      "line": 229,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadMixedListFromDict",
+      "line": 237,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadStringListFromDict",
+      "line": 225,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadUInt16ListFromDict",
+      "line": 205,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadUInt32ListFromDict",
+      "line": 213,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testReadUInt8ListFromDict",
+      "line": 197,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testStringList",
+      "line": 114,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testStringListYamlPersistence",
+      "line": 290,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testUInt16ListYamlPersistence",
+      "line": 270,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testUInt32ListYamlPersistence",
+      "line": 278,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testUInt8ListYamlPersistence",
+      "line": 262,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testUint16List",
+      "line": 70,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testUint32List",
+      "line": 85,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testUint8List",
+      "line": 55,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_structurelist.py",
+      "legacy_name": "tests/python/bluetests/test/test_structurelist.py::TestBlueStructureList::testWriteToMemStreamAndReadBack",
+      "line": 144,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sys.py",
+      "legacy_name": "tests/python/bluetests/test/test_sys.py::TestOutputStreams::test_stderr_can_be_set_to_none",
+      "line": 32,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sys.py",
+      "legacy_name": "tests/python/bluetests/test/test_sys.py::TestOutputStreams::test_stderr_is_textiowrapper_instance",
+      "line": 23,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sys.py",
+      "legacy_name": "tests/python/bluetests/test/test_sys.py::TestOutputStreams::test_stdout_can_be_set_to_none",
+      "line": 28,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sys.py",
+      "legacy_name": "tests/python/bluetests/test/test_sys.py::TestOutputStreams::test_stdout_is_textiowrapper_instance",
+      "line": 18,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestCpu::testBrandIsNotEmpty",
+      "line": 112,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestCpu::testCpuCountIsCorrect",
+      "line": 106,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestCpu::testIdentifierIsNotEmpty",
+      "line": 109,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestMemory::testAvailablePhysicalMemoryIsLessThanTotal",
+      "line": 155,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestMemory::testPageFileMemorySizeInRange",
+      "line": 138,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestMemory::testTotalPhysicalMemoryReasonable",
+      "line": 150,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestMemory::testWorkingSetSizeIncreasesWithAllocation",
+      "line": 143,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestNetworkAdapters::test_macAddress",
+      "line": 169,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestNetworkAdapters::test_macAddressString",
+      "line": 173,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestNetworkAdapters::test_macAddressString_matches_macAddress",
+      "line": 177,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestNetworkAdapters::test_name",
+      "line": 161,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestNetworkAdapters::test_uuid",
+      "line": 165,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestOs::testOsPlatformIsCorrect",
+      "line": 117,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestOs::testOsVersionIsCorrect",
+      "line": 123,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testMachineUuidIsNotEmpty",
+      "line": 101,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testProcessBitCount",
+      "line": 27,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testProcessStartTimeIsReasonable",
+      "line": 95,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testProcessTimesIncrease",
+      "line": 63,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testProcessTimesReturnsSaneValues",
+      "line": 53,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testSharedApplicationDataDirectoryExists",
+      "line": 35,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testSharedFontsDirectoryExists",
+      "line": 50,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testSystemBitCountIsInRange",
+      "line": 30,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testThreadTimesIncrease",
+      "line": 87,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testThreadTimesNotGreaterThanProcessTimes",
+      "line": 81,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testThreadTimesReturnsSaneValues",
+      "line": 71,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testUserApplicationDataDirectoryExists",
+      "line": 44,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testUserApplicationDataDirectoryIsWritable",
+      "line": 47,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testUserDocumentsDirectoryExists",
+      "line": 38,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_sysinfo.py",
+      "legacy_name": "tests/python/bluetests/test/test_sysinfo.py::TestSysInfo::testUserDocumentsDirectoryIsWritable",
+      "line": 41,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_context_is_set",
+      "line": 36,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_created_tasklet_not_scheduled",
+      "line": 40,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_get_runtime_after_starting_tasklet",
+      "line": 92,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_get_runtime_before_starting_tasklet",
+      "line": 86,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_get_wallclock_time_after_starting_tasklet",
+      "line": 77,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_get_wallclock_time_before_starting_tasklet",
+      "line": 72,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_id_counter_increments",
+      "line": 101,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_repr",
+      "line": 44,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_tasklet_added_to_weakref_dict",
+      "line": 106,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExt::test_timers",
+      "line": 50,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExtWithCallable::test_args_get_passed",
+      "line": 120,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::TestTaskletExtWithCallable::test_called",
+      "line": 112,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_taskletext.py",
+      "legacy_name": "tests/python/bluetests/test/test_taskletext.py::test_set_exception_notification_handler",
+      "line": 131,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlReader::testCreateObjectFromStream_Simple",
+      "line": 51,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlReader::testCreateObjectFromString_Simple",
+      "line": 41,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testReadSharedString",
+      "line": 250,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testWriteSharedString",
+      "line": 239,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlReaderDouble",
+      "line": 231,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlReaderErrorsFromFile",
+      "line": 287,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlReaderErrorsFromString",
+      "line": 268,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlReaderInt32",
+      "line": 217,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlReaderInt64",
+      "line": 224,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlReaderUInt32",
+      "line": 221,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlReaderUInt64",
+      "line": 228,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlWriterBool",
+      "line": 140,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlWriterDouble",
+      "line": 164,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlWriterInt32",
+      "line": 147,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlWriterInt64",
+      "line": 171,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlWriterString",
+      "line": 126,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlWriterUInt32",
+      "line": 157,
+      "discovery": "source-python",
+      "rust_test": null
+    },
+    {
+      "source": "tests/python/bluetests/test/test_yamlpersistence.py",
+      "legacy_name": "tests/python/bluetests/test/test_yamlpersistence.py::TestYamlWriterAndReader::testYamlWriterUnicodeString",
+      "line": 133,
+      "discovery": "source-python",
+      "rust_test": null
+    }
+  ],
+  "rust_tests": [
+    {
+      "crate_name": "blue",
+      "source": "runtime.rs",
+      "module_path": [
+        "runtime"
+      ],
+      "function": "circular_search_paths_are_rejected_without_committing_candidate",
+      "semantic_name": "blue::runtime::circular_search_paths_are_rejected_without_committing_candidate",
+      "body_name": "__blue_test_body_circular_search_paths_are_rejected_without_committing_candidate"
+    },
+    {
+      "crate_name": "blue",
+      "source": "runtime.rs",
+      "module_path": [
+        "runtime"
+      ],
+      "function": "resource_index_uses_bevy_assets_as_storage",
+      "semantic_name": "blue::runtime::resource_index_uses_bevy_assets_as_storage",
+      "body_name": "__blue_test_body_resource_index_uses_bevy_assets_as_storage"
+    },
+    {
+      "crate_name": "blue",
+      "source": "runtime.rs",
+      "module_path": [
+        "runtime"
+      ],
+      "function": "runtime_enters_running_state_on_first_update",
+      "semantic_name": "blue::runtime::runtime_enters_running_state_on_first_update",
+      "body_name": "__blue_test_body_runtime_enters_running_state_on_first_update"
+    },
+    {
+      "crate_name": "blue",
+      "source": "runtime.rs",
+      "module_path": [
+        "runtime"
+      ],
+      "function": "search_paths_match_blue_set_get_and_clear_semantics",
+      "semantic_name": "blue::runtime::search_paths_match_blue_set_get_and_clear_semantics",
+      "body_name": "__blue_test_body_search_paths_match_blue_set_get_and_clear_semantics"
+    },
+    {
+      "crate_name": "blue",
+      "source": "runtime.rs",
+      "module_path": [
+        "runtime"
+      ],
+      "function": "startup_args_preserve_carbon_has_semantics",
+      "semantic_name": "blue::runtime::startup_args_preserve_carbon_has_semantics",
+      "body_name": "__blue_test_body_startup_args_preserve_carbon_has_semantics"
+    },
+    {
+      "crate_name": "blue-codegen",
+      "source": "source_discovery.rs",
+      "module_path": [
+        "source_discovery"
+      ],
+      "function": "gtest_discovery_preserves_fixture_and_case",
+      "semantic_name": "blue-codegen::source_discovery::gtest_discovery_preserves_fixture_and_case",
+      "body_name": "__blue_test_body_gtest_discovery_preserves_fixture_and_case"
+    },
+    {
+      "crate_name": "blue-codegen",
+      "source": "source_discovery.rs",
+      "module_path": [
+        "source_discovery"
+      ],
+      "function": "python_discovery_preserves_class_scope",
+      "semantic_name": "blue-codegen::source_discovery::python_discovery_preserves_class_scope",
+      "body_name": "__blue_test_body_python_discovery_preserves_class_scope"
+    },
+    {
+      "crate_name": "blueexposure",
+      "source": "registry.rs",
+      "module_path": [
+        "registry"
+      ],
+      "function": "class_registration_is_bevy_native",
+      "semantic_name": "blueexposure::registry::class_registration_is_bevy_native",
+      "body_name": "__blue_test_body_class_registration_is_bevy_native"
+    },
+    {
+      "crate_name": "blueexposure",
+      "source": "registry.rs",
+      "module_path": [
+        "registry"
+      ],
+      "function": "duplicate_registration_is_idempotent_by_name",
+      "semantic_name": "blueexposure::registry::duplicate_registration_is_idempotent_by_name",
+      "body_name": "__blue_test_body_duplicate_registration_is_idempotent_by_name"
+    },
+    {
+      "crate_name": "blueexposure",
+      "source": "registry.rs",
+      "module_path": [
+        "registry"
+      ],
+      "function": "generated_enum_descriptor_registers_with_bevy_registry",
+      "semantic_name": "blueexposure::registry::generated_enum_descriptor_registers_with_bevy_registry",
+      "body_name": "__blue_test_body_generated_enum_descriptor_registers_with_bevy_registry"
+    },
+    {
+      "crate_name": "blueexposure",
+      "source": "registry.rs",
+      "module_path": [
+        "registry"
+      ],
+      "function": "generated_function_descriptor_preserves_carbon_registration_metadata",
+      "semantic_name": "blueexposure::registry::generated_function_descriptor_preserves_carbon_registration_metadata",
+      "body_name": "__blue_test_body_generated_function_descriptor_preserves_carbon_registration_metadata"
+    }
+  ]
+}

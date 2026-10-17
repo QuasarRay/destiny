@@ -1,0 +1,806 @@
+{
+  "functions": [
+    {
+      "body": [
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "self",
+              "op": "Name"
+            },
+            "member": "last_g",
+            "op": "Field"
+          },
+          "value": {
+            "elements": [
+              {
+                "machine_type": "f64",
+                "op": "Literal",
+                "value": 0.0
+              },
+              {
+                "machine_type": "f64",
+                "op": "Literal",
+                "value": 0.0
+              },
+              {
+                "machine_type": "f64",
+                "op": "Literal",
+                "value": 0.0
+              }
+            ],
+            "op": "Array"
+          }
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "self",
+              "op": "Name"
+            },
+            "member": "last_c",
+            "op": "Field"
+          },
+          "value": {
+            "elements": [
+              {
+                "machine_type": "f64",
+                "op": "Literal",
+                "value": 0.0
+              },
+              {
+                "machine_type": "f64",
+                "op": "Literal",
+                "value": 0.0
+              },
+              {
+                "machine_type": "f64",
+                "op": "Literal",
+                "value": 0.0
+              }
+            ],
+            "op": "Array"
+          }
+        }
+      ],
+      "name": "reset",
+      "owner": "Forces",
+      "parameters": [],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:791-793; only after the source live/free control admission"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "x",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "last_g",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 0
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "y",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "last_g",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 1
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "z",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "last_g",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 2
+                  },
+                  "op": "Index"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "destiny_original_spec",
+              "Vec3"
+            ]
+          }
+        }
+      ],
+      "name": "controller",
+      "owner": "Forces",
+      "parameters": [],
+      "receiver": "ref",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "destiny_original_spec",
+          "Vec3"
+        ]
+      },
+      "source_regions": [
+        "src/Ball.h:162-163; binary64 Vector3d representation projection"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "self",
+              "op": "Name"
+            },
+            "member": "last_g",
+            "op": "Field"
+          },
+          "value": {
+            "elements": [
+              {
+                "base": {
+                  "name": "value",
+                  "op": "Name"
+                },
+                "member": "x",
+                "op": "Field"
+              },
+              {
+                "base": {
+                  "name": "value",
+                  "op": "Name"
+                },
+                "member": "y",
+                "op": "Field"
+              },
+              {
+                "base": {
+                  "name": "value",
+                  "op": "Name"
+                },
+                "member": "z",
+                "op": "Field"
+              }
+            ],
+            "op": "Array"
+          }
+        }
+      ],
+      "name": "set_controller",
+      "owner": "Forces",
+      "parameters": [
+        [
+          "value",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "destiny_original_spec",
+              "Vec3"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:899"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "fields": [
+              [
+                "x",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "last_c",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 0
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "y",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "last_c",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 1
+                  },
+                  "op": "Index"
+                }
+              ],
+              [
+                "z",
+                {
+                  "base": {
+                    "base": {
+                      "name": "self",
+                      "op": "Name"
+                    },
+                    "member": "last_c",
+                    "op": "Field"
+                  },
+                  "index": {
+                    "machine_type": "usize",
+                    "op": "Literal",
+                    "value": 2
+                  },
+                  "op": "Index"
+                }
+              ]
+            ],
+            "op": "Record",
+            "path": [
+              "destiny_original_spec",
+              "Vec3"
+            ]
+          }
+        }
+      ],
+      "name": "collision",
+      "owner": "Forces",
+      "parameters": [],
+      "receiver": "ref",
+      "result": {
+        "arguments": [],
+        "kind": "Named",
+        "path": [
+          "destiny_original_spec",
+          "Vec3"
+        ]
+      },
+      "source_regions": [
+        "src/Ball.h:162-163; binary64 Vector3d representation projection"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Assign",
+          "place": {
+            "base": {
+              "name": "self",
+              "op": "Name"
+            },
+            "member": "last_c",
+            "op": "Field"
+          },
+          "value": {
+            "elements": [
+              {
+                "base": {
+                  "name": "value",
+                  "op": "Name"
+                },
+                "member": "x",
+                "op": "Field"
+              },
+              {
+                "base": {
+                  "name": "value",
+                  "op": "Name"
+                },
+                "member": "y",
+                "op": "Field"
+              },
+              {
+                "base": {
+                  "name": "value",
+                  "op": "Name"
+                },
+                "member": "z",
+                "op": "Field"
+              }
+            ],
+            "op": "Array"
+          }
+        }
+      ],
+      "name": "set_collision",
+      "owner": "Forces",
+      "parameters": [
+        [
+          "value",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "destiny_original_spec",
+              "Vec3"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "elements": [],
+        "kind": "Tuple"
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:2493-2499,2995; actual source force publication"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "base": {
+                  "op": "Try",
+                  "value": {
+                    "arguments": [
+                      {
+                        "name": "id",
+                        "op": "Name"
+                      }
+                    ],
+                    "method": "metadata",
+                    "op": "Method",
+                    "receiver": {
+                      "name": "self",
+                      "op": "Name"
+                    }
+                  }
+                },
+                "member": "source_forces",
+                "op": "Field"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "source_force_state",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "ref",
+      "result": {
+        "arguments": [
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "crate",
+              "generated_forces",
+              "Forces"
+            ]
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ball.h:162-163; direct typed view of the single actual metadata owner"
+      ]
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [],
+            "method": "reset",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "op": "Try",
+                "value": {
+                  "arguments": [
+                    {
+                      "name": "id",
+                      "op": "Name"
+                    }
+                  ],
+                  "method": "metadata_mut",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "self",
+                    "op": "Name"
+                  }
+                }
+              },
+              "member": "source_forces",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [],
+            "method": "clear",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "op": "Try",
+                "value": {
+                  "arguments": [
+                    {
+                      "name": "id",
+                      "op": "Name"
+                    }
+                  ],
+                  "method": "metadata_mut",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "self",
+                    "op": "Name"
+                  }
+                }
+              },
+              "member": "source_contacts",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "reset_source_behavior_state",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:791-793; source reset after live/free admission"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "arguments": [
+              {
+                "name": "value",
+                "op": "Name"
+              }
+            ],
+            "method": "set_controller",
+            "op": "Method",
+            "receiver": {
+              "base": {
+                "op": "Try",
+                "value": {
+                  "arguments": [
+                    {
+                      "name": "id",
+                      "op": "Name"
+                    }
+                  ],
+                  "method": "metadata_mut",
+                  "op": "Method",
+                  "receiver": {
+                    "name": "self",
+                    "op": "Name"
+                  }
+                }
+              },
+              "member": "source_forces",
+              "op": "Field"
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "store_source_controller_force",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "id",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "i64"
+            ]
+          }
+        ],
+        [
+          "value",
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "destiny_original_spec",
+              "Vec3"
+            ]
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:899; after actual controller output"
+      ],
+      "visibility": "private"
+    },
+    {
+      "body": [
+        {
+          "body": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "arguments": [
+                  {
+                    "base": {
+                      "name": "body",
+                      "op": "Name"
+                    },
+                    "member": "collision_acceleration",
+                    "op": "Field"
+                  }
+                ],
+                "method": "set_collision",
+                "op": "Method",
+                "receiver": {
+                  "base": {
+                    "op": "Try",
+                    "value": {
+                      "arguments": [
+                        {
+                          "base": {
+                            "name": "body",
+                            "op": "Name"
+                          },
+                          "member": "id",
+                          "op": "Field"
+                        }
+                      ],
+                      "method": "metadata_mut",
+                      "op": "Method",
+                      "receiver": {
+                        "name": "self",
+                        "op": "Name"
+                      }
+                    }
+                  },
+                  "member": "source_forces",
+                  "op": "Field"
+                }
+              }
+            }
+          ],
+          "iterator": {
+            "name": "bodies",
+            "op": "Name"
+          },
+          "name": "body",
+          "op": "For"
+        },
+        {
+          "op": "Return",
+          "value": {
+            "arguments": [
+              {
+                "elements": [],
+                "op": "Tuple"
+              }
+            ],
+            "function": [
+              "Ok"
+            ],
+            "op": "Call"
+          }
+        }
+      ],
+      "name": "store_source_collision_forces",
+      "owner": "CompatRuntime",
+      "parameters": [
+        [
+          "bodies",
+          {
+            "element": {
+              "element": {
+                "arguments": [],
+                "kind": "Named",
+                "path": [
+                  "crate",
+                  "iterative_collision",
+                  "Body"
+                ]
+              },
+              "kind": "Slice"
+            },
+            "kind": "Ref",
+            "mutable": false
+          }
+        ]
+      ],
+      "receiver": "mut",
+      "result": {
+        "arguments": [
+          {
+            "elements": [],
+            "kind": "Tuple"
+          },
+          {
+            "arguments": [],
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ]
+          }
+        ],
+        "kind": "Named",
+        "path": [
+          "Result"
+        ]
+      },
+      "source_regions": [
+        "src/Ballpark.cpp:2493-2499,2995; retained actual solver mutations for both live and dead candidates"
+      ],
+      "visibility": "private"
+    }
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "schema": 1
+}

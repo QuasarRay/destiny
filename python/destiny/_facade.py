@@ -35,46 +35,7 @@ _backend_state_lock = RLock()
 _backend_users: dict[int, tuple[Backend, int]] = {}
 _retired_backends: set[int] = set()
 
-_SUPPORTED_DYNAMIC_PARK_METHODS = frozenset({
-    "AddMushroom",
-    "InitializeBubbles", "CopyBubbles", "GetBubbleAtCoordinates",
-    "GetFollowers",
-    "AdjustTimes",
-    "CheckVisibility",
-    "CloakBall",
-    "GetBallIdsAndDistInRange",
-    "GetBallIdsInCapsule",
-    "GetBallIdsInCone",
-    "GetBallIdsInRange",
-    "GetBallIdsInRangeOfTriangle",
-    "GetBoxCenter",
-    "GetCurrentEgoPos",
-    "GotoPoint",
-    "GotoDirection",
-    "FollowBall",
-    "Orbit",
-    "MissileFollow",
-    "LaunchMissile",
-    "FormationFollow",
-    "ScanCone",
-    "SetBallAgility",
-    "SetBallHarmonic",
-    "SetBoid",
-    "SetBallTroll",
-    "SetBallRigid",
-    "SetBallFree",
-    "SetBallGlobal",
-    "SetBallInteractive",
-    "SetBallMassive",
-    "SetBallRadius",
-    "SetSpeedFraction",
-    "SetNotificationRange",
-    "SetTargetTracking",
-    "Stop",
-    "UncloakBall",
-    "WarpTo",
-    "EntityWarpIn",
-})
+_SUPPORTED_DYNAMIC_PARK_METHODS = frozenset({'AddMushroom', 'InitializeBubbles', 'CopyBubbles', 'GetBubbleAtCoordinates', 'GetFollowers', 'AdjustTimes', 'CheckVisibility', 'CloakBall', 'GetBallIdsAndDistInRange', 'GetBallIdsInCapsule', 'GetBallIdsInCone', 'GetBallIdsInRange', 'GetBallIdsInRangeOfTriangle', 'GetBoxCenter', 'GetCurrentEgoPos', 'GotoPoint', 'GotoDirection', 'FollowBall', 'Orbit', 'MissileFollow', 'LaunchMissile', 'FormationFollow', 'ScanCone', 'SetBallAgility', 'SetBallHarmonic', 'SetBoid', 'SetBallTroll', 'SetBallRigid', 'SetBallFree', 'SetBallGlobal', 'SetBallInteractive', 'SetBallMassive', 'SetBallRadius', 'SetSpeedFraction', 'SetNotificationRange', 'SetTargetTracking', 'Stop', 'UncloakBall', 'WarpTo', 'EntityWarpIn', 'GetBallBox'})
 
 
 def _source_range_operand(value):
@@ -562,23 +523,18 @@ def _ball_property(name: str, *, writable: bool = True):
                     code="invalid_backend_response",
                 )
             return result
-        return _backend_number(value, f"Ball.{name}")
+        return struct.unpack('!f', value['source_f32_bits_v1'].to_bytes(4, 'big'))[0] if name == 'RotationalAgility' and isinstance(value, dict) and (set(value) == {'source_f32_bits_v1'}) and (type(value['source_f32_bits_v1']) is int) and (0 <= value['source_f32_bits_v1'] <= 4294967295) else _backend_number(value, f'Ball.{name}')
 
     if not writable:
         return property(getter)
 
     def setter(self: Ball, value):
-        self._invoke(title, "set", value)
+        self._invoke(title, "set", (float(value) if math.isfinite(value) else {'source_f32_bits_v1': int.from_bytes(struct.pack('!f', value), 'big')}) if name == 'RotationalAgility' else int(value) if name == 'isCloaked' and isinstance(value, bool) else value)
 
     return property(getter, setter)
 
 
-for _field_name in (
-    "mass", "radius", "maxVelocity", "maxAngularVelocity", "x", "y", "z",
-    "vx", "vy", "vz", "wx", "wy", "wz", "rx", "ry", "rz", "rw",
-    "isFree", "isGlobal", "isMassive", "isInteractive", "isCloaked",
-    "Agility", "speedFraction",
-):
+for _field_name in ('mass', 'radius', 'maxVelocity', 'maxAngularVelocity', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'wx', 'wy', 'wz', 'rx', 'ry', 'rz', 'rw', 'isFree', 'isGlobal', 'isMassive', 'isInteractive', 'isCloaked', 'Agility', 'speedFraction', 'RotationalAgility'):
     setattr(Ball, _field_name, _ball_property(_field_name))
 
 for _field_name in ("id", "roll", "pitch", "yaw", "newBubbleId", "oldBubbleId", "effectStamp"):
@@ -1240,6 +1196,12 @@ def _park_method(name: str):
 
     def method(self: Ballpark, *args: Any, **kwargs: Any):
         result = self._invoke(title, "call", *args, **kwargs)
+        if name == 'GetBallBox':
+            if result is None:
+                return None
+            if not (isinstance(result, list) and len(result) == 2):
+                raise BackendCallError('backend returned an invalid box product', code='invalid_backend_response')
+            return (_backend_number(result[0], name), tuple(_backend_vector(result[1], name)))
         if name in {
             "GetBallIdsInCapsule",
             "GetBallIdsInCone",
@@ -1250,7 +1212,7 @@ def _park_method(name: str):
         if name == "GetBallIdsAndDistInRange":
             return _backend_distance_rows(result)
         if name in {"GetBoxCenter", "GetCurrentEgoPos"}:
-            return _backend_vector(result, name)
+            return tuple(_backend_vector(result, name)) if name == 'GetBoxCenter' else _backend_vector(result, name)
         if name == "ScanCone":
             return None if result is None else _backend_id_list(result, name)
         if name == "CheckVisibility":
@@ -1427,7 +1389,7 @@ def _decode_snapshot_response(encoded: Any, *, expected_current_time: int | None
         or type(snapshot.get("schema_version")) is not int
         or snapshot.get("schema_version") != 3
         or not isinstance(snapshot.get("park"), dict)
-        or not expected_park <= set(snapshot["park"]) <= expected_park | {"formations", "local_counter", "local_high_counter"}
+        or not expected_park <= set(snapshot["park"]) <= expected_park | {'formations', 'local_counter', 'local_high_counter', 'roll_parameters', 'source_partition_v1'}
         or not isinstance(snapshot.get("balls"), list)
         or len(snapshot["balls"]) > MAX_SNAPSHOT_BALLS
     ):

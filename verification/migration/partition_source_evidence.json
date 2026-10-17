@@ -1,0 +1,185 @@
+{
+  "invariants": [
+    "One persistent partition owner extends the existing bubble tracker; no second physics/world model is introduced.",
+    "Shared spherical arithmetic retains its original return adapter and exposes the already computed source neighbor modifiers; no duplicated production numeric kernel.",
+    "Box creation recursively retains parents; placement removal releases unowned leaf/ancestor cells; source unchanged-primary/modifier shortcut is retained.",
+    "Actual source position/radius/max-speed, construction, removal and motion phase effects update ownership; GetBallBox reads stored primary ownership.",
+    "Source inflated radius multiplies maximum possible speed by the actual dt; friction and source f32 fields come from the real ECS world.",
+    "Master insertion uses source nearby-top-cell order, monotonic bubble counter and existing transition bookkeeping.",
+    "Complete logical snapshots retain partition ownership/counters; subset/partial-history correspondence remains open.",
+    "ClearAll removes ownership and dictionary bookkeeping while preserving the source bubble counter; InitializeBubbles is the distinct counter reset.",
+    "Preserve the prior Rust finite-coordinate extension beyond the Original defined f64-to-i64 conversion domain. Mark its spatial ownership explicitly undefined; GetBallBox reports the boundary, and snapshots retain that classification. This grants no Original parity outside its defined domain.",
+    "Client evolution retains source uninitialized bubble IDs; no compatibility bubble is fabricated. Source collision kernel admission accepts all source bubble IDs; the existing directed kernel candidate rules are reused unchanged.",
+    "The retained Avian extension receives a derived schedule cache of is_master, refreshed from the single ParkMetadata owner before App::update; client pair filtering ignores bubble labels. This is not full Avian/Original collision correspondence.",
+    "original_motion_input explicitly projects the ECS is_free flag, so actual free-ball radius inflation runs rather than using the specification default. Nonunit-dt source phase/ownership observations exposed this missing input.",
+    "Existing Rust test assertions are retained: the query-extension setup explicitly initializes bubbles before moving to an undefined source coordinate; the Avian isolation fixture selects master mode, where source bubble filtering applies.",
+    "Uninitialized client bubble IDs do not suppress proximity sensors. Retain source master-only negative-label guard while full master liveness is implemented separately; reuse the existing timer, candidate, membership and synchronous callback paths unchanged. Four old fixture failures exposed the artificial client guard after removing fabricated IDs."
+  ],
+  "open_correspondence": [
+    "Full static/master/compound geometry, source box objects and interactions",
+    "Native unordered-map enumeration before exposing GetActiveBoxes, newest hash regression and full platform configurations",
+    "Existing native free/constructor/mini/callback phase differences, authoritative old position/time-factor state and complete history semantics",
+    "Mandatory production refinement, whole-engine source/configuration closure, robustness/performance/platform/release gates",
+    "Master dead-bubble/keep-alive scheduling, full collision/spatial eligibility and dynamic/warp/mushroom phase correspondence remain required; the independent new phase corpus is restricted to collision-free client Stop."
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 122,
+      "region_sha256": "539ff203a6b3ee17c34ec2f579ee8bcc05f5856146944bbd753d7d3f890736f1",
+      "source": "src/Partition.h",
+      "source_sha256": "31bfaf15eedd3f5bf73d7f661376a06b363457c0b045f38e35517260bdc68398",
+      "start": 66
+    },
+    {
+      "end": 170,
+      "region_sha256": "7bf7d0d90a57f557a48e87855022c5fceb62efa1d0b651031941fe3850a3b994",
+      "source": "src/Partition.cpp",
+      "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+      "start": 19
+    },
+    {
+      "end": 237,
+      "region_sha256": "c25673790585b7d1b2e28a50934bdca16857fc87ea594d357b3b6bc017aa9f46",
+      "source": "src/Partition.cpp",
+      "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+      "start": 183
+    },
+    {
+      "end": 522,
+      "region_sha256": "ba18b05d0c141782c8ab13321bc4132547061c985d3eeaca9903915617388b44",
+      "source": "src/Partition.cpp",
+      "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+      "start": 490
+    },
+    {
+      "end": 205,
+      "region_sha256": "b6d48a212e8e2e31ce6138b0bcdcff7b03348622f9495e2b3ad592c0b1c97d25",
+      "source": "src/Box.cpp",
+      "source_sha256": "d72b01c8fc00bb5ac0381c7936fa698a57231812995a3becedba0d2efe4e0fd8",
+      "start": 15
+    },
+    {
+      "end": 282,
+      "region_sha256": "809fc44e51a191adec094cbd8142288ab8db4feb679fd26f736f552d04ec3fb8",
+      "source": "src/Box.cpp",
+      "source_sha256": "d72b01c8fc00bb5ac0381c7936fa698a57231812995a3becedba0d2efe4e0fd8",
+      "start": 220
+    },
+    {
+      "end": 853,
+      "region_sha256": "11da10177318b64e4ce38cb19d177fa190b1c3b4f70eef6a61fce8366d4f664f",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 812
+    },
+    {
+      "end": 2536,
+      "region_sha256": "25e908166e3f5dbae03051f34db1e1ec7ebc135169c014e0a025afe764cfa080",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 2355
+    },
+    {
+      "end": 615,
+      "region_sha256": "0adb12ec4fd0893ad487b00fd9e1c86d529d54eb0adeeac98b7c21aea799ac3d",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 429
+    },
+    {
+      "end": 3219,
+      "region_sha256": "1abf5747d6fa5673e718355217511698605f9cf798c161895cdb06a49cf5c09e",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 3115
+    },
+    {
+      "end": 3455,
+      "region_sha256": "41ceb0f395fd6c5ace2bb95146db50d30a6245e94668f7891a62832f1afa239a",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 3290
+    },
+    {
+      "end": 4720,
+      "region_sha256": "f977782d9c9f31db3747f1e2ecb3435f5a416f08c9b8a94c711c7eb10a36a26d",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 4680
+    },
+    {
+      "end": 4765,
+      "region_sha256": "abb850a76e6ca80cd09e36277c14cd5e1c0485400a5e7da1f76583fafe80000c",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 4738
+    },
+    {
+      "end": 4933,
+      "region_sha256": "f27dcfb595bb636e06105acc7235f79d44c5d80172f9672ce0c85d553b342fb6",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 4880
+    },
+    {
+      "end": 6624,
+      "region_sha256": "de181147d3c9baa5016b11a09e2722af91c8b7e6490d9cd4764060c312a58e8e",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 6565
+    },
+    {
+      "end": 2300,
+      "region_sha256": "4f6f2b32da0822c90196ab62e2e3b14060356586ebcd2f252f6b22e064285098",
+      "source": "src/Thunkers.cpp",
+      "source_sha256": "61acb87a22569561e7a608cd7a9a82698145afd2d5a3671365c24372a035ea17",
+      "start": 2260
+    },
+    {
+      "end": 5953,
+      "region_sha256": "4b45d1da4781b1c83ba26e9fafa76033cc1bca86e09c10332fdab09c7a20675b",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 5896
+    },
+    {
+      "end": 461,
+      "region_sha256": "ab681237dd3efbfa8c064c425a7cf36553dc7cccc6b5f9f43186119b3cf63dc8",
+      "source": "src/Partition.cpp",
+      "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+      "start": 417
+    },
+    {
+      "end": 615,
+      "region_sha256": "0adb12ec4fd0893ad487b00fd9e1c86d529d54eb0adeeac98b7c21aea799ac3d",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 429
+    },
+    {
+      "end": 309,
+      "region_sha256": "0a05937487a056cb4376032305749f7c58e29e182e346a3a01f95f99a501d401",
+      "source": "src/Partition.cpp",
+      "source_sha256": "ed46c5caaf1e2fd926ddb63b3021a4c5034c6a2b67f67ab2ec2a391798a44677",
+      "start": 281
+    },
+    {
+      "end": 150,
+      "region_sha256": "d7fd3a18fe2aeb20fe9251ba37694b071c2d33ca72e8b47141e80ca18cbb773e",
+      "source": "python/destiny/test/ballpark/test_callbacks.py",
+      "source_sha256": "884737d2a9eaf8ae610fe175d1793e5623ccbfa00ca9b1bf0f45ebce2dcf6ee0",
+      "start": 1
+    }
+  ],
+  "proof_credit": false,
+  "reused_git_sources": {
+    "src/bubbles.rs": "0c9ced95a29248d4c9663b68d11365b22c5c10d123c056f70e06d25aec630152",
+    "verification/spec/src/lib.rs": "daffa6636919c82fc851bb8d126125ebbd76c4d7b7bdc2dda12bc5e47a7a1eb5",
+    "verification/spec/src/original_partition.rs": "23cf0ccf3def5f90e8b91f70df4c7b5bef354f8e2d5540178052dd175b4b1e3f"
+  },
+  "reused_sources": {
+    "verification/spec/src/original_park.rs": "16825218b56dcc7328458977f3514cad8ba98016fab31c97152e7e421d9bf09d"
+  },
+  "schema": 1
+}

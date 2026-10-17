@@ -1,0 +1,162 @@
+{
+  "base_commit": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "rules": [
+    {
+      "arity": 3,
+      "decoder": "_backend_vector",
+      "kind": "selected_return_shape",
+      "operation": "GetBoxCenter",
+      "scope": [
+        "_park_method",
+        "method"
+      ],
+      "selector": "name",
+      "shape": "tuple",
+      "source": "src/Thunkers.cpp",
+      "source_evidence": [
+        "PyTuple_New(3)",
+        "PyTuple_SET_ITEM(ret, 0, PyFloat_FromDouble( pos.x ))",
+        "PyTuple_SET_ITEM(ret, 1, PyFloat_FromDouble( pos.y ))",
+        "PyTuple_SET_ITEM(ret, 2, PyFloat_FromDouble( pos.z ))"
+      ],
+      "source_span": [
+        2348,
+        2377
+      ],
+      "source_symbol": "Ballpark::PyGetBoxCenter"
+    },
+    {
+      "argument": "value",
+      "kind": "selected_bool_integer_input",
+      "operation": "isCloaked",
+      "original_cases": [
+        "python/destiny/test/ballpark/test_visibility.py::TestCheckVisibility::test_ball_that_is_cloaked_is_not_an_occlusion",
+        "python/destiny/test/ballpark/test_visibility.py::TestCloaking::test_uncloaked_balls_are_not_cloaked"
+      ],
+      "scope": [
+        "_ball_property",
+        "setter"
+      ],
+      "scope_limit": "Translate Python bool into the existing integer ABI field. Full uint8 domain, raw attribute side effects and notification correspondence remain separate obligations.",
+      "selector": "name",
+      "source": "src/Ball.h",
+      "source_evidence": [
+        "uint8_t isCloaked"
+      ],
+      "source_span": [
+        113,
+        114
+      ]
+    },
+    {
+      "kind": "add_writable_ball_property",
+      "operation": "RotationalAgility",
+      "scope": [],
+      "source": "src/Ball_Blue.cpp",
+      "source_evidence": [
+        "\"RotationalAgility\"",
+        "mRotAgility",
+        "Be::READWRITE | Be::NOTIFY | Be::PERSIST"
+      ],
+      "source_span": [
+        318,
+        324
+      ]
+    },
+    {
+      "decoder": "_backend_number",
+      "kind": "selected_float32_return",
+      "operation": "RotationalAgility",
+      "scope": [
+        "_ball_property",
+        "getter"
+      ],
+      "selector": "name",
+      "source": "src/Ball_Blue.cpp",
+      "source_evidence": [
+        "\"RotationalAgility\"",
+        "mRotAgility",
+        "Be::READWRITE | Be::NOTIFY | Be::PERSIST"
+      ],
+      "source_span": [
+        318,
+        324
+      ]
+    },
+    {
+      "argument": "value",
+      "kind": "selected_float32_argument",
+      "operation": "RotationalAgility",
+      "scope": [
+        "_ball_property",
+        "setter"
+      ],
+      "selector": "name",
+      "source": "src/Ball_Blue.cpp",
+      "source_evidence": [
+        "\"RotationalAgility\"",
+        "mRotAgility",
+        "Be::READWRITE | Be::NOTIFY | Be::PERSIST"
+      ],
+      "source_span": [
+        318,
+        324
+      ]
+    },
+    {
+      "kind": "register_park_method",
+      "source": "src/Thunkers.cpp",
+      "source_evidence": [
+        "PyTuple_New(2)",
+        "PyTuple_New(3)",
+        "PyFloat_FromDouble"
+      ],
+      "source_span": [
+        2260,
+        2300
+      ],
+      "values": [
+        "GetBallBox"
+      ]
+    },
+    {
+      "fields": [
+        "number",
+        "tuple_vector3"
+      ],
+      "kind": "selected_product_return",
+      "operation": "GetBallBox",
+      "source": "src/Thunkers.cpp",
+      "source_evidence": [
+        "PyTuple_New(2)",
+        "PyTuple_New(3)",
+        "PyFloat_FromDouble"
+      ],
+      "source_span": [
+        2260,
+        2300
+      ]
+    },
+    {
+      "kind": "extend_snapshot_optional_fields",
+      "scope_limit": "Existing logical snapshot representation only; preserve native source-owned fields. No Original Blue stream encoding claim.",
+      "source": "src/Thunkers.cpp",
+      "source_evidence": [
+        "PyTuple_New(2)",
+        "PyTuple_New(3)",
+        "PyFloat_FromDouble"
+      ],
+      "source_span": [
+        2260,
+        2300
+      ],
+      "values": [
+        "roll_parameters",
+        "source_partition_v1"
+      ]
+    }
+  ],
+  "schema": 1,
+  "target": "python/destiny/_facade.py"
+}

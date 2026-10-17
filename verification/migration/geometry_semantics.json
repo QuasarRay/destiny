@@ -1,0 +1,91 @@
+{
+  "configuration_sha256": "6be0feb2d79837bd64475c9b40b1bad54ef0dca398d595f430d763da3178732e",
+  "extractor_sha256": "5274e140b7aa210ea5eee6b443be65d4190559061ee60d6b25bb4dbd611e17fb",
+  "functions": [
+    {
+      "expression": {
+        "machine_type": "double",
+        "op": "sqrt",
+        "value": {
+          "left": {
+            "left": {
+              "left": {
+                "machine_type": "double",
+                "name": "x",
+                "op": "field"
+              },
+              "machine_type": "double",
+              "op": "binary",
+              "operator": "*",
+              "right": {
+                "machine_type": "double",
+                "name": "x",
+                "op": "field"
+              }
+            },
+            "machine_type": "double",
+            "op": "binary",
+            "operator": "+",
+            "right": {
+              "left": {
+                "machine_type": "double",
+                "name": "y",
+                "op": "field"
+              },
+              "machine_type": "double",
+              "op": "binary",
+              "operator": "*",
+              "right": {
+                "machine_type": "double",
+                "name": "y",
+                "op": "field"
+              }
+            }
+          },
+          "machine_type": "double",
+          "op": "binary",
+          "operator": "+",
+          "right": {
+            "left": {
+              "machine_type": "double",
+              "name": "z",
+              "op": "field"
+            },
+            "machine_type": "double",
+            "op": "binary",
+            "operator": "*",
+            "right": {
+              "machine_type": "double",
+              "name": "z",
+              "op": "field"
+            }
+          }
+        }
+      },
+      "name": "vector_length",
+      "original_symbol": "Vector3d::Length",
+      "return_type": "double"
+    }
+  ],
+  "generator_sha256": "fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791",
+  "original_revisions": [
+    "ef738406b61ad06bae2f402857e464735ab106a2",
+    "114e89fa584f0e1a81eb0a679aabf41af8870072"
+  ],
+  "reuse": {
+    "fields": {
+      "x": 0,
+      "y": 1,
+      "z": 2
+    },
+    "method": "length",
+    "sources": [
+      "verification/spec/src/geometry.rs",
+      "verification/spec/src/model.rs"
+    ],
+    "type_path": "destiny_original_spec::Vec3"
+  },
+  "rule_version": "scalar-expression-v1",
+  "schema": 1,
+  "source_sha256": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238"
+}

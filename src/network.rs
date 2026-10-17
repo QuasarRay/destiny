@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 //! Authenticated Carbon/Lightyear interoperability for the Destiny facade.
 //!
 //! A product host authenticates a Lightyear link and inserts
@@ -12,9 +17,10 @@ use std::{
     panic::{AssertUnwindSafe, catch_unwind},
 };
 
+use crate::DestinyMaxVelocity;
 use avian3d::prelude::{
     AngularVelocity, Collider, ColliderDisabled, GravityScale, LinearVelocity, Mass,
-    MaxAngularSpeed, MaxLinearSpeed, Position, RigidBody, Rotation,
+    MaxAngularSpeed, Position, RigidBody, Rotation,
 };
 use bevy::prelude::{
     App, Bundle, Commands, Component, Entity, IntoScheduleConfigs, Plugin, PostUpdate, PreUpdate,
@@ -286,7 +292,7 @@ impl Plugin for DestinyCarbonInteropPlugin {
         app.replicate::<LinearVelocity>();
         app.replicate::<AngularVelocity>();
         app.replicate::<Mass>();
-        app.replicate::<MaxLinearSpeed>();
+        app.replicate::<DestinyMaxVelocity>();
         app.replicate::<MaxAngularSpeed>();
         app.replicate::<RigidBody>();
         app.replicate::<Collider>();

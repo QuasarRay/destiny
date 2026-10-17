@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "source": "src/Ballpark.cpp",
+      "start": 915,
+      "end": 961,
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "region_sha256": "0bb162b915f97aa9fa9af29d1a06aabf767f499de05d151a75209ae03fee1511"
+    }
+  ],
+  "reused_sources": {
+    "verification/spec/src/original_park.rs": "16825218b56dcc7328458977f3514cad8ba98016fab31c97152e7e421d9bf09d"
+  },
+  "invariant": "An unaligned warp ball decrements its negative alignment stamp and executes the original goto thrust before integration. Proper warp and newly activated warp do not receive that aligning thrust.",
+  "lowering": "Extract the unchanged b.effect_stamp < 0 guard from the existing reviewed OriginalMode::Warp specification branch that calls original_goto_thrust. Adapt only its ball name and join it with the existing actual Goto dispatch condition; reuse the already production-reachable original goto math/integration. The native existing alignment/activation stamp update precedes this selection.",
+  "production_path": [
+    "CompatRuntime::prepare_motion_tick",
+    "original_goto_thrust",
+    "source collision computation",
+    "source motion publication",
+    "update_all_source_angles"
+  ],
+  "independent_reference": "Unchanged Original TestWarp::test_warpto: initial raw velocity (1,2,3), original helper defaults, WarpTo(100000,200000,300000), ten Evolve steps, Warp mode each tick and all ten original positions rounded to four decimals.",
+  "open_correspondence": [
+    "Proper warp/activation callback meanings, timing and all transition domains",
+    "Original field/setter side effects and dynamic angular orientation",
+    "All core platforms, full source field/feature closure and required refinements"
+  ],
+  "proof_credit": false
+}

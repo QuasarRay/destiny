@@ -1,0 +1,66 @@
+{
+  "invariants": [
+    "Current Avian Position/LinearVelocity retain their one owner; source mOldPos/mOldVel have a distinct mutable bit-preserving slot in the same metadata component.",
+    "New root AddBall initializes old_pos=new_pos-dt*new_vel and old_vel=new_vel; replacement retains old vectors. Commands write both slots.",
+    "Source results are staged before App::update; source-handled current poses are projected static and then published from the actual mutable slot, avoiding a second integration.",
+    "Full logical snapshots preserve all six old/scratch binary64 bit patterns; absent older fields have an explicit current-state fallback.",
+    "Source-handled motion skips legacy Avian damping preparation; its underflow path must not zero the source current velocity before the old/new swap. Fallback preparation remains explicit and unchanged."
+  ],
+  "open_correspondence": [
+    "Automatic per-body callback/FFI publication remains required; typed direct dispatcher is already available and must be reused.",
+    "Old-pose query caches/time interpolation, acceleration host binding and retained/detached generation semantics, miniball initialization, dynamic orientation and complete pending/history state remain open.",
+    "Complete controller/collision interactions, source/configuration inventory, mandatory proofs and quality/release gates remain incomplete."
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 639,
+      "region_sha256": "2deda2175ee197a9de1f7c8beb99306eaaefddb08dde2cf853975dff4f4c6d49",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 429
+    },
+    {
+      "end": 3390,
+      "region_sha256": "5875dd14034ab5ee187c49c4cfe315c7db688df48bf4475491aedfd212228a8f",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 3355
+    },
+    {
+      "end": 4801,
+      "region_sha256": "5e8c2ee11669bc577d688d3b2593fa0fc55b458d97c19b42ae8e87bcecd23805",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 4738
+    },
+    {
+      "end": 120,
+      "region_sha256": "2c7d97291e56bd80175527a07dcf1de25bdda887e1efcab0005ddac93b4cc282",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 70
+    },
+    {
+      "end": 1487,
+      "region_sha256": "5e352f57bd6e29925a871d8e19482bb0ee03062deeca03ac3e52a01bf2fa7f84",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 1466
+    },
+    {
+      "end": 52,
+      "region_sha256": "1eda4e8d62008b0fb1df288a3de6919564d9a2e3a7c351783fbaeea0956b136c",
+      "source": "src/Vector3d.h",
+      "source_sha256": "7d74c8349232c6b31f01f3bbac0f5de2a0fc387c98dfa8449fc71b6035b96238",
+      "start": 8
+    }
+  ],
+  "reused_git_sources": {
+    "src/runtime.rs": "6d6a6b2c8095a10d83355f821a8fe43d75dfbd87ee6b5e94f9e9e27e3d6fbb51"
+  },
+  "reused_sources": {
+    "verification/spec/src/model.rs": "7f4459d1e1d0cdc4763c3fe13d47098699712166638bfd0a0e4992cc07f72f7c"
+  },
+  "schema": 1
+}

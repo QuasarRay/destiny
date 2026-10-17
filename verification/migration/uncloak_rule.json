@@ -1,0 +1,7 @@
+{
+  "kind": "reuse-uncloak-state-guard-v1",
+  "reused_method": "uncloak_ball",
+  "reused_owner": "OriginalParkProjection",
+  "reused_source": "verification/spec/src/original_park.rs",
+  "schema": 1
+}

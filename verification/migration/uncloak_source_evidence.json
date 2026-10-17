@@ -1,0 +1,31 @@
+{
+  "equivalence": "Original IsWarpish is mode == Warp; IsAligningForWarp is IsWarpish && effect_stamp < 0; hence IsWarping is mode == Warp && effect_stamp >= 0 for every i64 stamp. Reuse the existing specification guard, adapting only state access.",
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 5292,
+      "region_sha256": "fd41878c4986fc4617ddf7afc6365e96d1d6bf373923ee335359472faf4bdd16",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 5257
+    },
+    {
+      "end": 1898,
+      "region_sha256": "6e42e22eaaa935ae9bcefe05981bcd2531f99443fadcb34d47681072143fd9c5",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 1885
+    }
+  ],
+  "preserved_statements": [
+    "set_massive(ball_id, true)",
+    "remove_from_sensor_members(ball_id)"
+  ],
+  "production_call_path": "Python Ballpark.UncloakBall -> native ABI -> CompatRuntime::uncloak_ball -> existing ECS metadata and collider mutations guarded together.",
+  "proof_credit": false,
+  "reused_sources": {
+    "verification/spec/src/original_park.rs": "16825218b56dcc7328458977f3514cad8ba98016fab31c97152e7e421d9bf09d"
+  },
+  "schema": 1,
+  "scope_limit": "Fix the proper-warp guard. Sensor ownership, full cloak input domain and warp trajectory correspondence remain separate gaps."
+}

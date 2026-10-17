@@ -1,0 +1,106 @@
+{
+  "invariants": [
+    "Source EvolveMissile uses goto thrust for elapsed milliseconds <=800 and predicts the target afterward, storing the computed goto.",
+    "Environment values are actual friction, dt and integer tick milliseconds; source multiplication order and f32 fields are retained.",
+    "RotationalAgility is a raw f32 field before OnModified; the notification setter only reassigns it or returns, so negative/zero/nonfinite raw state is retained.",
+    "Rotational agility has one metadata owner; finite values serialize as widened numbers and nonfinite values as versioned u32 bit tags; old numeric snapshots are still readable.",
+    "Stationary launch uses the existing source GetRotatedVector path; no quaternion-derived replacement for old scalar orientation.",
+    "Dynamic AddBall retains source nonpositive-to-one rotational initialization, distinct from raw property writes; ordinary new Ball uses the existing source 0.9f default.",
+    "Retained-ball rotation reads the same preserved source scalar angles and unchanged rotation kernel as attached balls; no quaternion fallback is used for the accepted old-orientation configuration."
+  ],
+  "open_correspondence": [
+    "Dynamical orientation and all supported original configurations",
+    "Whole-engine phase/collision/history and typed host-API closure",
+    "Required production refinement and formal source/tool closure",
+    "Full legacy Blue object conversion/ABI remains a later integration requirement",
+    "Dynamic world construction and snapshot restore remain explicitly unsupported; only the already exposed constructor state boundary was observed. No dynamic-evolution or dynamic-snapshot acceptance is credited."
+  ],
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "original_regions": [
+    {
+      "end": 1015,
+      "region_sha256": "f8311d36dd3f8aa57eedbaad86befc2ae6d49a3cc1f55749125340c319dbeaeb",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 972
+    },
+    {
+      "end": 3875,
+      "region_sha256": "97cc763570ee94cb9d31a34ff8bbcc0a3b48c3e74f494443362bcef16f4c561f",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 3798
+    },
+    {
+      "end": 4966,
+      "region_sha256": "1a6437f94f3e0e026bec3553a400446460bd685821e98240dd526319f052af83",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 4958
+    },
+    {
+      "end": 324,
+      "region_sha256": "d61066a0ff702da77185f62986b9db2b45602765fe9dac5f43ede6fcef63bec2",
+      "source": "src/Ball_Blue.cpp",
+      "source_sha256": "cff5977cfabb09dfc69de51b90470ea5329ea8bc22971dada402f06db9fd018b",
+      "start": 318
+    },
+    {
+      "end": 1587,
+      "region_sha256": "680e665c2e62803071e11be37d7f426ec02c810ffa4a7148ee1da974b821afc5",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 1582
+    },
+    {
+      "end": 950,
+      "region_sha256": "f8a0ca2e0998e590f71400fddc9bb76629fb097d33ff72aeb8b08277e3e64947",
+      "source": "src/Thunkers.cpp",
+      "source_sha256": "61acb87a22569561e7a608cd7a9a82698145afd2d5a3671365c24372a035ea17",
+      "start": 857
+    },
+    {
+      "end": 2203,
+      "region_sha256": "a32ac9171d2116ee13c3208db4cab18714fc31db10c06adda2017e5b3a5e62df",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 2191
+    },
+    {
+      "end": 3552,
+      "region_sha256": "14b25d2d7c64cb375673d9186fbe21b49af06db56d3c92d8f497b8f7012121c6",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 3551
+    },
+    {
+      "end": 85,
+      "region_sha256": "7484eb9b41d355599fa828951b2710802f5976db5cb01dfe40715d2780e9b9bd",
+      "source": "src/Ball.cpp",
+      "source_sha256": "cac570282018a3703fc5f08b857140fe6f55de2c30b1267a65a1273fbe12aae4",
+      "start": 65
+    },
+    {
+      "end": 1426,
+      "region_sha256": "64f0bec4eca9035f6df57ca035f634976d38a0d95829b0a940abe16313bcaf04",
+      "source": "src/Ballpark.cpp",
+      "source_sha256": "c8d462d295edbb24567e953bce983db8d0af791fb9aafb9189fb7ad00fb0162a",
+      "start": 1398
+    }
+  ],
+  "production_sites": [
+    "src/runtime.rs::get_ball_property",
+    "src/runtime.rs::set_ball_property",
+    "src/runtime.rs::prepare_motion_tick",
+    "src/runtime.rs::LaunchMissile dispatch",
+    "src/runtime.rs::retained_ball_call GetRotatedVector",
+    "src/generated_missile.rs",
+    "python/destiny/_facade.py property mappings"
+  ],
+  "proof_credit": false,
+  "reused_sources": {
+    "src/missile.rs": "7a0b3eef47938b97a98c66f33330786c5a07c17ad5fb26667a2286d9c7f45dd0",
+    "verification/spec/src/original_motion.rs": "93e97e03bd68e5422db3c7027e6c2e4daddb75ab79b8cf50e61bea5187980478"
+  },
+  "schema": 1
+}

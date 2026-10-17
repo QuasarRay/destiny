@@ -1,5 +1,42 @@
 # Compatibility contract
 
+The complete migration targets Original Destiny at
+`114e89fa584f0e1a81eb0a679aabf41af8870072`.
+[Latest-source migration records](verification/migration/README.md) retain the
+additional partition regression and all prior Rust work. The differences below
+are historical compatibility boundaries and remain open parity obligations.
+They are not authorized exclusions from the complete migration.
+
+Distance queries now use a generated adapter to the existing Rust source-order
+binary64 norm, checked against the original header. `GetBoxCenter` returns an
+original-style Python tuple and Boolean `isCloaked` assignments are represented
+as integers at the existing ABI boundary. These scoped corrections do not
+establish complete numeric, controller, private-format or platform equivalence.
+Uncloaking now guards the massive-state and sensor-membership changes with the
+existing source-backed proper-warp predicate. Full cloak/sensor semantics remain
+separate obligations.
+
+Generated source-owned yaw/pitch/roll and six prior/angular-rate fields now live
+in Bevy ball metadata. The command-time snap and ordered post-motion update
+are distinct from quaternion presentation. Formation uses actual loaded offsets
+and the retained source rotation/thrust kernels; both original ten-step traces
+pass directly through Rust. These scoped results leave dynamical orientation,
+collision-history correspondence and complete controller domains open.
+
+Missile thrust now preserves the source initial/late phase boundary and reads
+actual world friction, duration and integer tick milliseconds. Existing source
+admission/launch/field kernels are reused. All four original missile scenarios
+pass through the native library and direct headless worlds; independent C++
+samples check the numeric transition and non-default-angle launch/query paths.
+Retained-ball rotation reads the preserved scalar angles through the same
+kernel as attached balls. Full interaction, callback, target-loss and supported
+configuration coverage remains open.
+
+The active milestone is the standalone world engine. Original Blue hosting and
+private representation are later adapter work; world semantics exposed through
+those boundaries remain core requirements. Mixed fixtures retain linked core
+and adapter obligations in the same queue. Unknown semantics block acceptance.
+
 ## Mapping, reachability, and conformance are separate
 
 `registry/title_mapping.json` records whether a stock Bevy-family API resembles
@@ -18,25 +55,59 @@ Python or Rust constants drift from it.
 
 ## Runtime differences
 
-- Avian f64 `Position` and `Rotation` are authoritative. Bevy `Transform` is a
+- Avian f64 `Position` and `Rotation` own their native state; the nine original
+  scalar angular fields have their separate source-defined owner in
+  `DestinyBallMetadata.source_angles`. Bevy `Transform` is a
   bounded f32 presentation projection; Avian-to-Transform synchronization is
   disabled and the wrapper updates it explicitly.
 - `DestinyMass` keeps the f64 API value. Avian's mass component is a bounded
   f32 solver projection: positive underflow clamps to `f32::MIN_POSITIVE`,
   overflow clamps to `f32::MAX`, and exact zero retains Avian's zero sentinel.
 - Space friction follows the supported exponential free-flight contract.
-  Contact material response remains Avian behavior.
-- Bubble IDs filter Destiny-to-Destiny collision pairs. Global balls can
-  collide across bubbles. Pending-removal entities are filtered out.
+  Existing source collision paths coexist with Avian fallback behavior;
+  complete contact-response correspondence remains unresolved.
+- `DestinyBallMetadata.source_contacts` retains source `mCollisions` IDs in
+  order, including duplicates, and full logical snapshots preserve that list.
+  Live/free behavior admission clears it with source force state. The gradient
+  kernel populates it before source angle updates; Avian contact flags do not
+  select the source warp direction. Iterative location IDs remain a distinct
+  projection. Moved-missile late append, owner self-collision and synchronous
+  per-body `DoCollision` dispatch are still required migration work.
+- The direct Rust source dispatcher captures list size once and reads current
+  contact IDs and all three force bit patterns between typed host notices.
+  Nested calls own independent cursors. Normally returning host failure emits
+  an immediate error notice and continues. Cursors reject other worlds and
+  cancel replaced owners; list shrink reports a Rust error for an unsafe source
+  case. These APIs do not yet provide automatic per-missile tick dispatch or
+  complete Original PyOS/error-unwinding correspondence.
+- Master bubble IDs filter Destiny-to-Destiny collision pairs. Global balls
+  can collide across bubbles. Client pairs ignore bubble labels, and
+  pending-removal entities are filtered out.
 - Static balls use compound mini geometry. Dynamic balls retain the descriptors
   but use their root sphere.
-- The standalone ABI assigns still-unassigned balls to compatibility bubble 0
-  after their first evolution. An embedded product can assign real bubbles.
+- Client evolution preserves uninitialized bubble IDs until explicit source
+  initialization. Master insertion maintains source partition labels and its
+  bubble counter. Source collision kernels admit all numeric bubble labels;
+  client collision eligibility does not depend on their numeric values. Full
+  master dead-bubble/keep-alive scheduling and partition correspondence remain
+  open migration obligations.
 - `ApplyImpulsiveForceAtPosition` changes a nonreplicated presentation angular
   component, never authoritative linear or angular motion.
-- `speedFraction` is state-only. No unsupported steering controller consumes it.
+- Implemented source goto/follow/orbit/formation/missile thrust consumes `speedFraction`.
+  Complete controller domains and interactions remain parity obligations.
+- `DestinyMaxVelocity` owns the source maximum-velocity parameter, including
+  getters/setters, snapshots, checkpoint restore and optional replication.
+  Source thrust reads it; balls may retain greater actual speed during stop
+  decay. The runtime no longer installs Avian `MaxLinearSpeed` for this field.
+  API storage remains f64 and source motion narrows to f32; full source API
+  rounding and domain correspondence remain open.
 - Proximity sensors are a deterministic bounded compatibility scheduler, not
   Avian `Sensor` colliders or Avian contact events.
+- `RotationalAgility` has one f32 metadata owner, including retained detached
+  generations. Raw property writes preserve zero, negative and nonfinite state;
+  the source dynamic constructor has its separate nonpositive-to-one rule.
+  Complete dynamical-orientation worlds and dynamic snapshot restore remain
+  explicitly unsupported.
 
 ## Query and lifecycle policy
 
@@ -57,6 +128,15 @@ Streams contain strict UTF-8 JSON identified by
 Unknown/duplicate fields, duplicate IDs, invalid references, nonfinite or
 solver-unsafe values, unsupported settings, and count/byte overflows fail
 before recoverable live mutation.
+The nine source angular fields use u64 bit patterns, so snapshots preserve
+their nonfinite values, NaN payloads and signed zero. Missing angular fields in
+older snapshots default to zero for compatibility; full historical-format
+reconstruction and future-state equivalence remain open.
+Rotational agility retains numeric JSON compatibility for finite values and
+uses `{ "source_f32_bits_v1": <u32> }` for nonfinite values. Old numeric fields
+remain readable. The codec preserves signed zero and NaN payloads in the
+accepted ordinary-orientation snapshot path. These are logical state records;
+Original Blue conversion, stream layout and ABI remain separate obligations.
 
 - Full mode `0` replaces park metadata, lifecycle, and the entity set.
 - Partial mode `1` is rewind mode: it restores time/lifecycle and removes

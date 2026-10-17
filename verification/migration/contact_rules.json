@@ -1,0 +1,1890 @@
+{
+  "schema": 1,
+  "original_commit": "114e89fa584f0e1a81eb0a679aabf41af8870072",
+  "functions": [
+    {
+      "name": "source_contact_ids",
+      "owner": "CompatRuntime",
+      "receiver": "ref",
+      "parameters": [
+        [
+          "id",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ],
+            "arguments": []
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Result"
+        ],
+        "arguments": [
+          {
+            "kind": "Named",
+            "path": [
+              "Vec"
+            ],
+            "arguments": [
+              {
+                "kind": "Named",
+                "path": [
+                  "i64"
+                ],
+                "arguments": []
+              }
+            ]
+          },
+          {
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "op": "Call",
+            "function": [
+              "Ok"
+            ],
+            "arguments": [
+              {
+                "op": "Method",
+                "receiver": {
+                  "op": "Field",
+                  "base": {
+                    "op": "Try",
+                    "value": {
+                      "op": "Method",
+                      "receiver": {
+                        "op": "Name",
+                        "name": "self"
+                      },
+                      "method": "metadata",
+                      "arguments": [
+                        {
+                          "op": "Name",
+                          "name": "id"
+                        }
+                      ]
+                    }
+                  },
+                  "member": "source_contacts"
+                },
+                "method": "clone",
+                "arguments": []
+              }
+            ]
+          }
+        }
+      ],
+      "source_regions": [
+        "src/Ball.h:148-165; mCollisions ordered identifiers"
+      ],
+      "visibility": "public"
+    },
+    {
+      "name": "source_collision_location_ids",
+      "owner": "CompatRuntime",
+      "receiver": "ref",
+      "parameters": [
+        [
+          "id",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ],
+            "arguments": []
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Result"
+        ],
+        "arguments": [
+          {
+            "kind": "Named",
+            "path": [
+              "Vec"
+            ],
+            "arguments": [
+              {
+                "kind": "Named",
+                "path": [
+                  "i64"
+                ],
+                "arguments": []
+              }
+            ]
+          },
+          {
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "Evaluate",
+          "value": {
+            "op": "Try",
+            "value": {
+              "op": "Method",
+              "receiver": {
+                "op": "Name",
+                "name": "self"
+              },
+              "method": "entity",
+              "arguments": [
+                {
+                  "op": "Name",
+                  "name": "id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "op": "Call",
+            "function": [
+              "Ok"
+            ],
+            "arguments": [
+              {
+                "op": "Method",
+                "receiver": {
+                  "op": "Method",
+                  "receiver": {
+                    "op": "Method",
+                    "receiver": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "self"
+                      },
+                      "member": "app"
+                    },
+                    "method": "world",
+                    "arguments": []
+                  },
+                  "method": "resource",
+                  "arguments": [],
+                  "type_arguments": [
+                    {
+                      "kind": "Named",
+                      "path": [
+                        "crate",
+                        "generated_liveness",
+                        "Frame"
+                      ],
+                      "arguments": []
+                    }
+                  ]
+                },
+                "method": "contact_ids",
+                "arguments": [
+                  {
+                    "op": "Name",
+                    "name": "id"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "source_regions": [
+        "src/Ballpark.cpp:617-626; source location projection before late missile publication"
+      ],
+      "visibility": "public"
+    },
+    {
+      "name": "store_source_contacts",
+      "owner": "CompatRuntime",
+      "receiver": "mut",
+      "parameters": [
+        [
+          "trace",
+          {
+            "kind": "Named",
+            "path": [
+              "crate",
+              "iterative_collision",
+              "ContactTrace"
+            ],
+            "arguments": []
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Result"
+        ],
+        "arguments": [
+          {
+            "kind": "Tuple",
+            "elements": []
+          },
+          {
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "If",
+          "condition": {
+            "op": "Field",
+            "base": {
+              "op": "Field",
+              "base": {
+                "op": "Name",
+                "name": "self"
+              },
+              "member": "park"
+            },
+            "member": "use_iterative_collision"
+          },
+          "then": [
+            {
+              "op": "Assign",
+              "place": {
+                "op": "Field",
+                "base": {
+                  "op": "Method",
+                  "receiver": {
+                    "op": "Method",
+                    "receiver": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "self"
+                      },
+                      "member": "app"
+                    },
+                    "method": "world_mut",
+                    "arguments": []
+                  },
+                  "method": "resource_mut",
+                  "arguments": [],
+                  "type_arguments": [
+                    {
+                      "kind": "Named",
+                      "path": [
+                        "crate",
+                        "generated_liveness",
+                        "Frame"
+                      ],
+                      "arguments": []
+                    }
+                  ]
+                },
+                "member": "contact_locations"
+              },
+              "value": {
+                "op": "Name",
+                "name": "trace"
+              }
+            }
+          ],
+          "otherwise": [
+            {
+              "op": "For",
+              "name": "row",
+              "iterator": {
+                "op": "Name",
+                "name": "trace"
+              },
+              "body": [
+                {
+                  "op": "Evaluate",
+                  "value": {
+                    "op": "Method",
+                    "receiver": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Try",
+                        "value": {
+                          "op": "Method",
+                          "receiver": {
+                            "op": "Name",
+                            "name": "self"
+                          },
+                          "method": "metadata_mut",
+                          "arguments": [
+                            {
+                              "op": "Field",
+                              "base": {
+                                "op": "Name",
+                                "name": "row"
+                              },
+                              "member": "0"
+                            }
+                          ]
+                        }
+                      },
+                      "member": "source_contacts"
+                    },
+                    "method": "extend",
+                    "arguments": [
+                      {
+                        "op": "Field",
+                        "base": {
+                          "op": "Name",
+                          "name": "row"
+                        },
+                        "member": "1"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "Return",
+          "value": {
+            "op": "Call",
+            "function": [
+              "Ok"
+            ],
+            "arguments": [
+              {
+                "op": "Tuple",
+                "elements": []
+              }
+            ]
+          }
+        }
+      ],
+      "source_regions": [
+        "src/Ballpark.cpp:791-793; reset during live behavior; src/Ballpark.cpp:2745-3005; gradient appends before angular update; iterative locations remain distinct until missile publication"
+      ],
+      "visibility": "private"
+    },
+    {
+      "name": "contact_ids",
+      "owner": "Frame",
+      "receiver": "ref",
+      "parameters": [
+        [
+          "id",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ],
+            "arguments": []
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Vec"
+        ],
+        "arguments": [
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "op": "Method",
+            "receiver": {
+              "op": "Method",
+              "receiver": {
+                "op": "Method",
+                "receiver": {
+                  "op": "Method",
+                  "receiver": {
+                    "op": "Field",
+                    "base": {
+                      "op": "Name",
+                      "name": "self"
+                    },
+                    "member": "contact_locations"
+                  },
+                  "method": "iter",
+                  "arguments": []
+                },
+                "method": "find",
+                "arguments": [
+                  {
+                    "op": "Closure",
+                    "parameters": [
+                      "row"
+                    ],
+                    "expression": {
+                      "op": "Binary",
+                      "operator": "==",
+                      "left": {
+                        "op": "Field",
+                        "base": {
+                          "op": "Name",
+                          "name": "row"
+                        },
+                        "member": "0"
+                      },
+                      "right": {
+                        "op": "Name",
+                        "name": "id"
+                      }
+                    }
+                  }
+                ]
+              },
+              "method": "map",
+              "arguments": [
+                {
+                  "op": "Closure",
+                  "parameters": [
+                    "row"
+                  ],
+                  "expression": {
+                    "op": "Method",
+                    "receiver": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "row"
+                      },
+                      "member": "1"
+                    },
+                    "method": "clone",
+                    "arguments": []
+                  }
+                }
+              ]
+            },
+            "method": "unwrap_or_default",
+            "arguments": []
+          }
+        }
+      ],
+      "source_regions": [
+        "src/Ballpark.cpp:617-626; derived ordered ID projection only"
+      ],
+      "visibility": "crate"
+    },
+    {
+      "name": "append_source_contacts",
+      "owner": null,
+      "receiver": null,
+      "parameters": [
+        [
+          "target",
+          {
+            "kind": "Ref",
+            "element": {
+              "kind": "Named",
+              "path": [
+                "Vec"
+              ],
+              "arguments": [
+                {
+                  "kind": "Named",
+                  "path": [
+                    "i64"
+                  ],
+                  "arguments": []
+                }
+              ]
+            },
+            "mutable": true
+          }
+        ],
+        [
+          "ball",
+          {
+            "kind": "Ref",
+            "element": {
+              "kind": "Named",
+              "path": [
+                "OriginalParkBall"
+              ],
+              "arguments": []
+            },
+            "mutable": false
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Tuple",
+        "elements": []
+      },
+      "body": [
+        {
+          "op": "For",
+          "name": "index",
+          "iterator": {
+            "op": "Range",
+            "start": {
+              "op": "Literal",
+              "value": 0,
+              "machine_type": "usize"
+            },
+            "end": {
+              "op": "Method",
+              "receiver": {
+                "op": "Field",
+                "base": {
+                  "op": "Name",
+                  "name": "ball"
+                },
+                "member": "collisions"
+              },
+              "method": "len",
+              "arguments": []
+            }
+          },
+          "body": [
+            {
+              "op": "Evaluate",
+              "value": {
+                "op": "Method",
+                "receiver": {
+                  "op": "Name",
+                  "name": "target"
+                },
+                "method": "push",
+                "arguments": [
+                  {
+                    "op": "Method",
+                    "receiver": {
+                      "op": "Method",
+                      "receiver": {
+                        "op": "Field",
+                        "base": {
+                          "op": "Name",
+                          "name": "ball"
+                        },
+                        "member": "collisions"
+                      },
+                      "method": "get",
+                      "arguments": [
+                        {
+                          "op": "Name",
+                          "name": "index"
+                        }
+                      ]
+                    },
+                    "method": "expect",
+                    "arguments": [
+                      {
+                        "op": "Literal",
+                        "value": "collision list representation invariant",
+                        "machine_type": "str"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "source_regions": [
+        "src/Ballpark.cpp:3005; preserve each retained kernel append, including recursive duplicates"
+      ],
+      "visibility": "private"
+    },
+    {
+      "name": "source_location_contacts",
+      "owner": null,
+      "receiver": null,
+      "parameters": [
+        [
+          "properties",
+          {
+            "kind": "Named",
+            "path": [
+              "Option"
+            ],
+            "arguments": [
+              {
+                "kind": "Ref",
+                "element": {
+                  "kind": "Named",
+                  "path": [
+                    "Properties"
+                  ],
+                  "arguments": []
+                },
+                "mutable": false
+              }
+            ]
+          }
+        ],
+        [
+          "statics",
+          {
+            "kind": "Ref",
+            "element": {
+              "kind": "Slice",
+              "element": {
+                "kind": "Named",
+                "path": [
+                  "StaticGeometry"
+                ],
+                "arguments": []
+              }
+            },
+            "mutable": false
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Vec"
+        ],
+        "arguments": [
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "Let",
+          "name": "ids",
+          "value": {
+            "op": "Call",
+            "function": [
+              "Vec",
+              "new"
+            ],
+            "arguments": []
+          },
+          "mutable": true
+        },
+        {
+          "op": "IfSome",
+          "name": "properties",
+          "value": {
+            "op": "Name",
+            "name": "properties"
+          },
+          "then": [
+            {
+              "op": "For",
+              "name": "location",
+              "iterator": {
+                "op": "Ref",
+                "value": {
+                  "op": "Field",
+                  "base": {
+                    "op": "Name",
+                    "name": "properties"
+                  },
+                  "member": "locations"
+                }
+              },
+              "body": [
+                {
+                  "op": "Let",
+                  "name": "id",
+                  "value": {
+                    "op": "Match",
+                    "value": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "location"
+                      },
+                      "member": "collider"
+                    },
+                    "arms": [
+                      [
+                        {
+                          "kind": "Path",
+                          "components": [
+                            "ColliderKey",
+                            "None"
+                          ]
+                        },
+                        {
+                          "op": "Literal",
+                          "value": -1,
+                          "machine_type": "i64"
+                        }
+                      ],
+                      [
+                        {
+                          "kind": "Tuple",
+                          "components": [
+                            "ColliderKey",
+                            "Ball"
+                          ],
+                          "bindings": [
+                            "id"
+                          ]
+                        },
+                        {
+                          "op": "Name",
+                          "name": "id"
+                        }
+                      ],
+                      [
+                        {
+                          "kind": "Tuple",
+                          "components": [
+                            "ColliderKey",
+                            "Static"
+                          ],
+                          "bindings": [
+                            "index"
+                          ]
+                        },
+                        {
+                          "op": "Method",
+                          "receiver": {
+                            "op": "Field",
+                            "base": {
+                              "op": "Index",
+                              "base": {
+                                "op": "Name",
+                                "name": "statics"
+                              },
+                              "index": {
+                                "op": "Name",
+                                "name": "index"
+                              }
+                            },
+                            "member": "shape"
+                          },
+                          "method": "id",
+                          "arguments": []
+                        }
+                      ]
+                    ]
+                  },
+                  "mutable": false
+                },
+                {
+                  "op": "If",
+                  "condition": {
+                    "op": "Binary",
+                    "operator": "!=",
+                    "left": {
+                      "op": "Name",
+                      "name": "id"
+                    },
+                    "right": {
+                      "op": "Literal",
+                      "value": -1,
+                      "machine_type": "i64"
+                    }
+                  },
+                  "then": [
+                    {
+                      "op": "Evaluate",
+                      "value": {
+                        "op": "Method",
+                        "receiver": {
+                          "op": "Name",
+                          "name": "ids"
+                        },
+                        "method": "push",
+                        "arguments": [
+                          {
+                            "op": "Name",
+                            "name": "id"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "otherwise": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "Return",
+          "value": {
+            "op": "Name",
+            "name": "ids"
+          }
+        }
+      ],
+      "source_regions": [
+        "src/Ballpark.cpp:617-626; loc.collider != -1, preserve order/duplicates/zero and actual collider IDs"
+      ],
+      "visibility": "private"
+    },
+    {
+      "name": "begin_source_collision_pass",
+      "owner": "CompatRuntime",
+      "receiver": "ref",
+      "parameters": [
+        [
+          "id",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ],
+            "arguments": []
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Result"
+        ],
+        "arguments": [
+          {
+            "kind": "Named",
+            "path": [
+              "crate",
+              "generated_contacts",
+              "CollisionPass"
+            ],
+            "arguments": []
+          },
+          {
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "Let",
+          "name": "generation",
+          "value": {
+            "op": "Unary",
+            "operator": "*",
+            "value": {
+              "op": "Try",
+              "value": {
+                "op": "Method",
+                "receiver": {
+                  "op": "Method",
+                  "receiver": {
+                    "op": "Field",
+                    "base": {
+                      "op": "Name",
+                      "name": "self"
+                    },
+                    "member": "ball_generations"
+                  },
+                  "method": "get",
+                  "arguments": [
+                    {
+                      "op": "Ref",
+                      "value": {
+                        "op": "Name",
+                        "name": "id"
+                      },
+                      "mutable": false
+                    }
+                  ]
+                },
+                "method": "ok_or",
+                "arguments": [
+                  {
+                    "op": "Call",
+                    "function": [
+                      "CompatError",
+                      "BallNotFound"
+                    ],
+                    "arguments": [
+                      {
+                        "op": "Name",
+                        "name": "id"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "mutable": false
+        },
+        {
+          "op": "Let",
+          "name": "limit",
+          "value": {
+            "op": "Method",
+            "receiver": {
+              "op": "Field",
+              "base": {
+                "op": "Try",
+                "value": {
+                  "op": "Method",
+                  "receiver": {
+                    "op": "Name",
+                    "name": "self"
+                  },
+                  "method": "metadata",
+                  "arguments": [
+                    {
+                      "op": "Name",
+                      "name": "id"
+                    }
+                  ]
+                }
+              },
+              "member": "source_contacts"
+            },
+            "method": "len",
+            "arguments": []
+          },
+          "mutable": false
+        },
+        {
+          "op": "Return",
+          "value": {
+            "op": "Call",
+            "function": [
+              "Ok"
+            ],
+            "arguments": [
+              {
+                "op": "Record",
+                "path": [
+                  "crate",
+                  "generated_contacts",
+                  "CollisionPass"
+                ],
+                "fields": [
+                  [
+                    "world",
+                    {
+                      "op": "Method",
+                      "receiver": {
+                        "op": "Method",
+                        "receiver": {
+                          "op": "Field",
+                          "base": {
+                            "op": "Name",
+                            "name": "self"
+                          },
+                          "member": "app"
+                        },
+                        "method": "world",
+                        "arguments": []
+                      },
+                      "method": "id",
+                      "arguments": []
+                    }
+                  ],
+                  [
+                    "entity",
+                    {
+                      "op": "Try",
+                      "value": {
+                        "op": "Method",
+                        "receiver": {
+                          "op": "Name",
+                          "name": "self"
+                        },
+                        "method": "entity",
+                        "arguments": [
+                          {
+                            "op": "Name",
+                            "name": "id"
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  [
+                    "owner",
+                    {
+                      "op": "Name",
+                      "name": "id"
+                    }
+                  ],
+                  [
+                    "generation",
+                    {
+                      "op": "Name",
+                      "name": "generation"
+                    }
+                  ],
+                  [
+                    "limit",
+                    {
+                      "op": "Name",
+                      "name": "limit"
+                    }
+                  ],
+                  [
+                    "index",
+                    {
+                      "op": "Literal",
+                      "value": 0,
+                      "machine_type": "usize"
+                    }
+                  ],
+                  [
+                    "failures",
+                    {
+                      "op": "Literal",
+                      "value": 0,
+                      "machine_type": "usize"
+                    }
+                  ]
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "visibility": "public",
+      "source_regions": [
+        "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"
+      ]
+    },
+    {
+      "name": "next_source_collision",
+      "owner": "CompatRuntime",
+      "receiver": "ref",
+      "parameters": [
+        [
+          "pass",
+          {
+            "kind": "Ref",
+            "element": {
+              "kind": "Named",
+              "path": [
+                "crate",
+                "generated_contacts",
+                "CollisionPass"
+              ],
+              "arguments": []
+            },
+            "mutable": true
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Result"
+        ],
+        "arguments": [
+          {
+            "kind": "Named",
+            "path": [
+              "Option"
+            ],
+            "arguments": [
+              {
+                "kind": "Named",
+                "path": [
+                  "crate",
+                  "generated_contacts",
+                  "CollisionEvent"
+                ],
+                "arguments": []
+              }
+            ]
+          },
+          {
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "If",
+          "condition": {
+            "op": "Binary",
+            "operator": "!=",
+            "left": {
+              "op": "Field",
+              "base": {
+                "op": "Name",
+                "name": "pass"
+              },
+              "member": "world"
+            },
+            "right": {
+              "op": "Method",
+              "receiver": {
+                "op": "Method",
+                "receiver": {
+                  "op": "Field",
+                  "base": {
+                    "op": "Name",
+                    "name": "self"
+                  },
+                  "member": "app"
+                },
+                "method": "world",
+                "arguments": []
+              },
+              "method": "id",
+              "arguments": []
+            }
+          },
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "op": "Call",
+                "function": [
+                  "Err"
+                ],
+                "arguments": [
+                  {
+                    "op": "Call",
+                    "function": [
+                      "CompatError",
+                      "InvalidRequest"
+                    ],
+                    "arguments": [
+                      {
+                        "op": "Call",
+                        "function": [
+                          "String",
+                          "from"
+                        ],
+                        "arguments": [
+                          {
+                            "op": "Literal",
+                            "machine_type": "str",
+                            "value": "source collision cursor belongs to a different world"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "op": "If",
+          "condition": {
+            "op": "Binary",
+            "operator": "||",
+            "left": {
+              "op": "Binary",
+              "operator": "||",
+              "left": {
+                "op": "Binary",
+                "operator": ">=",
+                "left": {
+                  "op": "Field",
+                  "base": {
+                    "op": "Name",
+                    "name": "pass"
+                  },
+                  "member": "index"
+                },
+                "right": {
+                  "op": "Field",
+                  "base": {
+                    "op": "Name",
+                    "name": "pass"
+                  },
+                  "member": "limit"
+                }
+              },
+              "right": {
+                "op": "Binary",
+                "operator": "!=",
+                "left": {
+                  "op": "Method",
+                  "receiver": {
+                    "op": "Field",
+                    "base": {
+                      "op": "Name",
+                      "name": "self"
+                    },
+                    "member": "ball_generations"
+                  },
+                  "method": "get",
+                  "arguments": [
+                    {
+                      "op": "Ref",
+                      "value": {
+                        "op": "Field",
+                        "base": {
+                          "op": "Name",
+                          "name": "pass"
+                        },
+                        "member": "owner"
+                      },
+                      "mutable": false
+                    }
+                  ]
+                },
+                "right": {
+                  "op": "Call",
+                  "function": [
+                    "Some"
+                  ],
+                  "arguments": [
+                    {
+                      "op": "Ref",
+                      "value": {
+                        "op": "Field",
+                        "base": {
+                          "op": "Name",
+                          "name": "pass"
+                        },
+                        "member": "generation"
+                      },
+                      "mutable": false
+                    }
+                  ]
+                }
+              }
+            },
+            "right": {
+              "op": "Binary",
+              "operator": "!=",
+              "left": {
+                "op": "Method",
+                "receiver": {
+                  "op": "Field",
+                  "base": {
+                    "op": "Name",
+                    "name": "self"
+                  },
+                  "member": "balls"
+                },
+                "method": "get",
+                "arguments": [
+                  {
+                    "op": "Ref",
+                    "value": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "pass"
+                      },
+                      "member": "owner"
+                    }
+                  }
+                ]
+              },
+              "right": {
+                "op": "Call",
+                "function": [
+                  "Some"
+                ],
+                "arguments": [
+                  {
+                    "op": "Ref",
+                    "value": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "pass"
+                      },
+                      "member": "entity"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "then": [
+            {
+              "op": "Return",
+              "value": {
+                "op": "Call",
+                "function": [
+                  "Ok"
+                ],
+                "arguments": [
+                  {
+                    "op": "Name",
+                    "name": "None"
+                  }
+                ]
+              }
+            }
+          ],
+          "otherwise": []
+        },
+        {
+          "op": "Let",
+          "name": "metadata",
+          "value": {
+            "op": "Try",
+            "value": {
+              "op": "Method",
+              "receiver": {
+                "op": "Name",
+                "name": "self"
+              },
+              "method": "metadata",
+              "arguments": [
+                {
+                  "op": "Field",
+                  "base": {
+                    "op": "Name",
+                    "name": "pass"
+                  },
+                  "member": "owner"
+                }
+              ]
+            }
+          },
+          "mutable": false
+        },
+        {
+          "op": "Let",
+          "name": "other_id",
+          "value": {
+            "op": "Unary",
+            "operator": "*",
+            "value": {
+              "op": "Try",
+              "value": {
+                "op": "Method",
+                "receiver": {
+                  "op": "Method",
+                  "receiver": {
+                    "op": "Field",
+                    "base": {
+                      "op": "Name",
+                      "name": "metadata"
+                    },
+                    "member": "source_contacts"
+                  },
+                  "method": "get",
+                  "arguments": [
+                    {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "pass"
+                      },
+                      "member": "index"
+                    }
+                  ]
+                },
+                "method": "ok_or",
+                "arguments": [
+                  {
+                    "op": "Call",
+                    "function": [
+                      "CompatError",
+                      "InvalidRequest"
+                    ],
+                    "arguments": [
+                      {
+                        "op": "Call",
+                        "function": [
+                          "String",
+                          "from"
+                        ],
+                        "arguments": [
+                          {
+                            "op": "Literal",
+                            "value": "source collision list shrank below its captured dispatch size",
+                            "machine_type": "str"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "mutable": false
+        },
+        {
+          "op": "Let",
+          "name": "event",
+          "value": {
+            "op": "Record",
+            "path": [
+              "crate",
+              "generated_contacts",
+              "CollisionEvent"
+            ],
+            "fields": [
+              [
+                "ball_id",
+                {
+                  "op": "Field",
+                  "base": {
+                    "op": "Name",
+                    "name": "pass"
+                  },
+                  "member": "owner"
+                }
+              ],
+              [
+                "other_id",
+                {
+                  "op": "Name",
+                  "name": "other_id"
+                }
+              ],
+              [
+                "acceleration",
+                {
+                  "op": "Field",
+                  "base": {
+                    "op": "Field",
+                    "base": {
+                      "op": "Name",
+                      "name": "metadata"
+                    },
+                    "member": "source_forces"
+                  },
+                  "member": "last_c"
+                }
+              ]
+            ]
+          },
+          "mutable": false
+        },
+        {
+          "op": "Assign",
+          "place": {
+            "op": "Field",
+            "base": {
+              "op": "Name",
+              "name": "pass"
+            },
+            "member": "index"
+          },
+          "value": {
+            "op": "Binary",
+            "operator": "+",
+            "left": {
+              "op": "Field",
+              "base": {
+                "op": "Name",
+                "name": "pass"
+              },
+              "member": "index"
+            },
+            "right": {
+              "op": "Literal",
+              "value": 1,
+              "machine_type": "usize"
+            }
+          }
+        },
+        {
+          "op": "Return",
+          "value": {
+            "op": "Call",
+            "function": [
+              "Ok"
+            ],
+            "arguments": [
+              {
+                "op": "Call",
+                "function": [
+                  "Some"
+                ],
+                "arguments": [
+                  {
+                    "op": "Name",
+                    "name": "event"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "visibility": "public",
+      "source_regions": [
+        "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"
+      ]
+    },
+    {
+      "name": "dispatch_source_collisions",
+      "owner": "CompatRuntime",
+      "receiver": "mut",
+      "parameters": [
+        [
+          "id",
+          {
+            "kind": "Named",
+            "path": [
+              "i64"
+            ],
+            "arguments": []
+          }
+        ],
+        [
+          "observer",
+          {
+            "kind": "Ref",
+            "element": {
+              "kind": "Callback",
+              "parameters": [
+                {
+                  "kind": "Ref",
+                  "element": {
+                    "kind": "Named",
+                    "path": [
+                      "CompatRuntime"
+                    ],
+                    "arguments": []
+                  },
+                  "mutable": true
+                },
+                {
+                  "kind": "Named",
+                  "path": [
+                    "crate",
+                    "generated_contacts",
+                    "CollisionNotice"
+                  ],
+                  "arguments": []
+                }
+              ],
+              "result": {
+                "kind": "Named",
+                "path": [
+                  "bool"
+                ],
+                "arguments": []
+              }
+            },
+            "mutable": true
+          }
+        ]
+      ],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "Result"
+        ],
+        "arguments": [
+          {
+            "kind": "Named",
+            "path": [
+              "crate",
+              "generated_contacts",
+              "CollisionPass"
+            ],
+            "arguments": []
+          },
+          {
+            "kind": "Named",
+            "path": [
+              "CompatError"
+            ],
+            "arguments": []
+          }
+        ]
+      },
+      "body": [
+        {
+          "op": "Let",
+          "name": "pass",
+          "value": {
+            "op": "Try",
+            "value": {
+              "op": "Method",
+              "receiver": {
+                "op": "Name",
+                "name": "self"
+              },
+              "method": "begin_source_collision_pass",
+              "arguments": [
+                {
+                  "op": "Name",
+                  "name": "id"
+                }
+              ]
+            }
+          },
+          "mutable": true
+        },
+        {
+          "op": "WhileSome",
+          "name": "event",
+          "value": {
+            "op": "Try",
+            "value": {
+              "op": "Method",
+              "receiver": {
+                "op": "Name",
+                "name": "self"
+              },
+              "method": "next_source_collision",
+              "arguments": [
+                {
+                  "op": "Ref",
+                  "value": {
+                    "op": "Name",
+                    "name": "pass"
+                  },
+                  "mutable": true
+                }
+              ]
+            }
+          },
+          "body": [
+            {
+              "op": "If",
+              "condition": {
+                "op": "Unary",
+                "operator": "!",
+                "value": {
+                  "op": "Call",
+                  "function": [
+                    "observer"
+                  ],
+                  "arguments": [
+                    {
+                      "op": "Name",
+                      "name": "self"
+                    },
+                    {
+                      "op": "Call",
+                      "function": [
+                        "crate",
+                        "generated_contacts",
+                        "CollisionNotice",
+                        "Contact"
+                      ],
+                      "arguments": [
+                        {
+                          "op": "Name",
+                          "name": "event"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "then": [
+                {
+                  "op": "Assign",
+                  "place": {
+                    "op": "Field",
+                    "base": {
+                      "op": "Name",
+                      "name": "pass"
+                    },
+                    "member": "failures"
+                  },
+                  "value": {
+                    "op": "Binary",
+                    "operator": "+",
+                    "left": {
+                      "op": "Field",
+                      "base": {
+                        "op": "Name",
+                        "name": "pass"
+                      },
+                      "member": "failures"
+                    },
+                    "right": {
+                      "op": "Literal",
+                      "value": 1,
+                      "machine_type": "usize"
+                    }
+                  }
+                },
+                {
+                  "op": "Evaluate",
+                  "value": {
+                    "op": "Call",
+                    "function": [
+                      "observer"
+                    ],
+                    "arguments": [
+                      {
+                        "op": "Name",
+                        "name": "self"
+                      },
+                      {
+                        "op": "Record",
+                        "path": [
+                          "crate",
+                          "generated_contacts",
+                          "CollisionNotice",
+                          "HostError"
+                        ],
+                        "fields": [
+                          [
+                            "ball_id",
+                            {
+                              "op": "Field",
+                              "base": {
+                                "op": "Name",
+                                "name": "event"
+                              },
+                              "member": "ball_id"
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "otherwise": []
+            }
+          ]
+        },
+        {
+          "op": "Return",
+          "value": {
+            "op": "Call",
+            "function": [
+              "Ok"
+            ],
+            "arguments": [
+              {
+                "op": "Name",
+                "name": "pass"
+              }
+            ]
+          }
+        }
+      ],
+      "visibility": "public",
+      "source_regions": [
+        "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"
+      ]
+    },
+    {
+      "name": "delivered_count",
+      "owner": "CollisionPass",
+      "receiver": "ref",
+      "parameters": [],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "usize"
+        ],
+        "arguments": []
+      },
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "op": "Field",
+            "base": {
+              "op": "Name",
+              "name": "self"
+            },
+            "member": "index"
+          }
+        }
+      ],
+      "visibility": "public",
+      "source_regions": [
+        "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"
+      ]
+    },
+    {
+      "name": "captured_count",
+      "owner": "CollisionPass",
+      "receiver": "ref",
+      "parameters": [],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "usize"
+        ],
+        "arguments": []
+      },
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "op": "Field",
+            "base": {
+              "op": "Name",
+              "name": "self"
+            },
+            "member": "limit"
+          }
+        }
+      ],
+      "visibility": "public",
+      "source_regions": [
+        "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"
+      ]
+    },
+    {
+      "name": "host_error_count",
+      "owner": "CollisionPass",
+      "receiver": "ref",
+      "parameters": [],
+      "result": {
+        "kind": "Named",
+        "path": [
+          "usize"
+        ],
+        "arguments": []
+      },
+      "body": [
+        {
+          "op": "Return",
+          "value": {
+            "op": "Field",
+            "base": {
+              "op": "Name",
+              "name": "self"
+            },
+            "member": "failures"
+          }
+        }
+      ],
+      "visibility": "public",
+      "source_regions": [
+        "src/Ball.cpp:468-488; capture size once, reread mCollisions[i]/mLastC at each SendEvent, PyError then continue; typed host boundary"
+      ]
+    }
+  ]
+}

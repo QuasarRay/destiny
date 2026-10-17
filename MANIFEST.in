@@ -1,5 +1,8 @@
 include Cargo.lock Cargo.toml rust-toolchain.toml CMakeLists.txt LICENSE README.md COMPATIBILITY.md VERIFICATION.md IMPLEMENTATION_STATUS.md REMEDIATION_STATUS.md V3_REMEDIATION_STATUS.md V4_REMEDIATION_STATUS.md RELEASE_GATES.md SECURITY.md ARTIFACT_MANIFEST.md THIRD_PARTY_NOTICES.md deny.toml
 recursive-include src *.rs
+include verification/spec/Cargo.toml verification/spec/Cargo.lock
+recursive-include verification/spec/src *.rs
+recursive-include verification/licenses *
 recursive-include include *.h *.hpp
 recursive-include cmake *.cmake
 recursive-include registry *.json

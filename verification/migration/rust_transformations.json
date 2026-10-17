@@ -1,0 +1,110 @@
+{
+  "check": "python tools/migrate_destiny.py generate --check",
+  "generator_sha256": "fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791",
+  "preserved_rust_base": "8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268",
+  "regenerate": "python tools/migrate_destiny.py generate",
+  "schema": 1,
+  "scope": "Clean staging starts from preserved immutable Rust inputs. Drift comparison never deletes user files.",
+  "semantic_input_sha256": "dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5",
+  "source_evidence_sha256": {
+    "angular_source_evidence.json": "2de73a55dbf99553ff6480a2f527b61293fcae74f67e1338f08b370b5df71a59",
+    "contact_source_evidence.json": "dc40672c99484eb521d9d9be8f63269b1d5e71360a5c654d80cf49fa043540e1",
+    "force_source_evidence.json": "c8271e6edf521983f73ed26b4163d13e512e1e9483e3f1605db180cbd7dee9c2",
+    "kinematic_source_evidence.json": "efd4402f2e8715de578d65b47986a8c42a54bfc57c898055309ffba67b8fb0fa",
+    "liveness_source_evidence.json": "b9bef16013816b0f8f48e0d3c99918a90b9990737e50e63365c82829d065780b",
+    "missile_source_evidence.json": "1041131ce3e9c1ac9b5310ad8fdeb6a3095b632b58b4b3dd9aba983c135af722",
+    "partition_source_evidence.json": "b50c729ce7e7ab8405561c9fd6a66e874e6fda99748bc5786facd7817197e218",
+    "speed_source_evidence.json": "b96747703642432fdfc48a13c4918a86bffcef6c12b92702c74d6525219019b8",
+    "uncloak_source_evidence.json": "58a414c44ceca0c9a58b11a2a2bef7f2641b1dcaf40f91be3979f7b900431956",
+    "warp_alignment_source_evidence.json": "f0db5cc89a429beb6868224183b1dac2b045bcbea9d82c9fa09967d6ad8fff99"
+  },
+  "state_rule_evidence_sha256": "58a414c44ceca0c9a58b11a2a2bef7f2641b1dcaf40f91be3979f7b900431956",
+  "targets": {
+    "src/bubbles.rs": {
+      "mode": "partition-bubbles",
+      "output_sha256": "4e62e655372ac40fdc772f2084b39f9fb5a58bf1b409ea1110fb3fa7698565bd",
+      "preserved_base_sha256": "0c9ced95a29248d4c9663b68d11365b22c5c10d123c056f70e06d25aec630152"
+    },
+    "src/generated_angular.rs": {
+      "mode": "angular-emit",
+      "output_sha256": "3102ea9b5b3643598d1eb1e4bc7e4e7bebe77cbacd99536f4643e4687d3302b7"
+    },
+    "src/generated_contacts.rs": {
+      "mode": "contact-emit",
+      "output_sha256": "aabfc38f048c0ca6908569d8170d8fe46c5b2ff4f5b6621b8969d47df74cc0e4"
+    },
+    "src/generated_forces.rs": {
+      "mode": "force-emit",
+      "output_sha256": "8880171d77bb2224504d7446fec5ae55298846cab928aefd2fd56c5c49acf3f0"
+    },
+    "src/generated_geometry.rs": {
+      "mode": "emit",
+      "output_sha256": "83eea21c49b8b8e919aef7599b0e2ed4f3f3c1f72eadaf37e51e7a5b4ba5011c"
+    },
+    "src/generated_kinematics.rs": {
+      "mode": "kinematic-emit",
+      "output_sha256": "e2c19034193b480b5ff8701184028547662703be20946217cb26bb6ce8ff02a3"
+    },
+    "src/generated_liveness.rs": {
+      "mode": "liveness-emit",
+      "output_sha256": "1ee29c15b51b1e148f21ec7e1b8612909c73b6ab5d059465b0d56cc2cfc51756"
+    },
+    "src/generated_missile.rs": {
+      "mode": "missile-emit",
+      "output_sha256": "5e5029ae9f0f6054ad41086b67647d59aa8e66beb8c1ecac8f92dec0aaa453bc"
+    },
+    "src/generated_partition.rs": {
+      "mode": "partition-emit",
+      "output_sha256": "457bb942079c3baed2547ac151360882a2dcd3c6a3e87efddf1a8df445638769"
+    },
+    "src/iterative_collision.rs": {
+      "mode": "liveness-iterative",
+      "output_sha256": "59d18c0c703e7a68c4ed3b06e7fa3228d2c70533690c77dcb3f5a374a84bb9ca",
+      "preserved_base_sha256": "a373aa8fc14fba24e74aa75e099b2615c9367c7dc925d63fb6e558f54d63efe7"
+    },
+    "src/lib.rs": {
+      "mode": "module",
+      "output_sha256": "c442f6d7de7fc096d5efff5708ad86634ddb44fe256f8e278e7f99f7d072e08e",
+      "preserved_base_sha256": "9e93217f8d99b7ae5a6aa4f58ec71c4eefd9bf101851c9cf931c800c9f8ad6cb"
+    },
+    "src/network.rs": {
+      "mode": "speed-network",
+      "output_sha256": "5cf182f472077053a8fe6868e2afa0e261ae63f502904f6374606b36e40ebf9a",
+      "preserved_base_sha256": "17707afa2764dd01ab34f3a5212d079062cb78013054d57c0843b87f6b4f027f"
+    },
+    "src/noniterative_collision.rs": {
+      "mode": "liveness-noniterative",
+      "output_sha256": "56d02da2e1b6a2d6251f3c28cfb38a0b66c3be29bf85a879a3cd604876a2d5bf",
+      "preserved_base_sha256": "efdd330e94abcf111335c1cfc35c9bac17064475ad7a45438d81746762923d93"
+    },
+    "src/runtime.rs": {
+      "mode": "transform",
+      "output_sha256": "e2bb4b853c3cc027a16c09f32f141cd3808431244eec427bd6a955e34a230b11",
+      "preserved_base_sha256": "6d6a6b2c8095a10d83355f821a8fe43d75dfbd87ee6b5e94f9e9e27e3d6fbb51"
+    },
+    "verification/kani/src/generated_geometry_contracts.rs": {
+      "mode": "harness",
+      "output_sha256": "9618b49aba681a99b2864d1da0aa3a7bd9ff020c50e7b18d0910fceacd242f90"
+    },
+    "verification/kani/src/iterative_sphere_production_contracts.rs": {
+      "mode": "liveness-fixture",
+      "output_sha256": "b68d119310f34e354b91e1df3024691e7d07e8e42277b95eb6f15d9c6010d341",
+      "preserved_base_sha256": "20fed49d85cf7c1f77db99b4b4445e183708690f2e0fd05eb42d634d7d40836b"
+    },
+    "verification/kani/src/noniterative_production_contracts.rs": {
+      "mode": "liveness-fixture",
+      "output_sha256": "9d8e8f8e0c635912ab1f8a597229fc435fb72e22d56065cf047c5845434d62a1",
+      "preserved_base_sha256": "02fe5748be1e31ae281ba69c534424441f4988c2a9c8111e8ab61d272ce27310"
+    },
+    "verification/spec/src/lib.rs": {
+      "mode": "partition-spec-lib",
+      "output_sha256": "15633f5755dd91f86cd3b00cdbad22557ebee4bb8cd2a7d9db59bc6eab909752",
+      "preserved_base_sha256": "daffa6636919c82fc851bb8d126125ebbd76c4d7b7bdc2dda12bc5e47a7a1eb5"
+    },
+    "verification/spec/src/original_partition.rs": {
+      "mode": "partition-spec",
+      "output_sha256": "a56cc1c37ec5f05f7e1d2a81633029c8fc1478e64d1659bffd416d56dbc85d83",
+      "preserved_base_sha256": "23cf0ccf3def5f90e8b91f70df4c7b5bef354f8e2d5540178052dd175b4b1e3f"
+    }
+  }
+}

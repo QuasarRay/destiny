@@ -1,3 +1,8 @@
+// Migration source: 114e89fa584f0e1a81eb0a679aabf41af8870072; preserved Rust base: 8bf4fadf7ad457d933f7bf48d63ba5a43b5a0268.
+// Generator SHA-256: fab6b6ba81c834a4a6224bd137e0ffe899a9932f120b3ff854f4daaf182ab791.
+// Semantic bundle SHA-256: dbe1c2b4c433d1c53c9f3d1df8c78e05f02d5ab2989d8b79cd838e13704c96c5.
+// Source/rule/configuration mappings: verification/migration/rust_transformations.json.
+// Regenerate: python tools/migrate_destiny.py generate
 // Copyright © 2014-2023 CCP ehf. MIT license, retained from original Destiny.
 //! Spherical-ball partition construction from Partition.cpp and Ball.cpp.
 //!
@@ -29,7 +34,7 @@ impl CellKey {
             z: self.z >> 2,
         }
     }
-    pub(crate) fn offset(self, x: i64, y: i64, z: i64, grid: i64) -> Self {
+    pub fn offset(self, x: i64, y: i64, z: i64, grid: i64) -> Self {
         Self {
             x: (self.x + x).clamp(0, grid - 1),
             y: (self.y + y).clamp(0, grid - 1),
@@ -92,11 +97,11 @@ pub fn primary_key(position: Vec3, level: u32) -> Option<CellKey> {
     })
 }
 
-pub(crate) fn box_width(level: u32) -> Option<f64> {
+pub fn box_width(level: u32) -> Option<f64> {
     (level < 8).then(|| TOP_WIDTH / ((1_u64 << (2 * level)) as f64))
 }
 
-pub(crate) fn box_low(key: CellKey, level: u32) -> Option<Vec3> {
+pub fn box_low(key: CellKey, level: u32) -> Option<Vec3> {
     let width = box_width(level)?;
     let grid = 1_i64 << (23 + 2 * level);
     let center = width * (grid as f64) * 0.5;
@@ -107,7 +112,7 @@ pub(crate) fn box_low(key: CellKey, level: u32) -> Option<Vec3> {
     })
 }
 
-pub(crate) fn box_snapshot(key: CellKey, level: u32) -> Option<(f64, (f64, f64, f64))> {
+pub fn box_snapshot(key: CellKey, level: u32) -> Option<(f64, (f64, f64, f64))> {
     let lo = box_low(key, level)?;
     let hi = box_low(
         CellKey {
@@ -463,11 +468,15 @@ fn point_cell_keys(
     inflated: f64,
     allow_large_branch: bool,
 ) -> Option<SphericalCellKeys> {
-    // GetBox compares the inflated radius but casts only the coordinates.
-    // A NaN inflation therefore selects level seven and zero modifiers; it
-    // does not make a finite-coordinate insertion an undefined integer cast.
-    // Preserve infinities and NaNs in those comparisons. coordinate() retains
-    // the actual C++ conversion-domain check for the position itself.
+    point_cell_keys_with_modifiers(position, radius, inflated, allow_large_branch)
+        .map(|(keys, _)| keys)
+}
+pub fn point_cell_keys_with_modifiers(
+    position: Vec3,
+    radius: f32,
+    inflated: f64,
+    allow_large_branch: bool,
+) -> Option<(SphericalCellKeys, [i64; 3])> {
     let level = partition_level(inflated);
     let key = primary_key(position, level)?;
     let width = TOP_WIDTH / ((1_u64 << (2 * level)) as f64);
@@ -519,7 +528,6 @@ fn point_cell_keys(
             x += 1;
         }
     } else {
-        // Ball::InsertInBoxes inserts x/y/z followed by xy/xz/yz/xyz.
         let offsets = [
             (mx != 0, mx, 0, 0),
             (my != 0, 0, my, 0),
@@ -539,7 +547,7 @@ fn point_cell_keys(
             j += 1;
         }
     }
-    Some(result)
+    Some((result, [mx, my, mz]))
 }
 
 fn add_sphere_key(sphere: &mut SphericalCellKeys, key: CellKey) -> Option<()> {

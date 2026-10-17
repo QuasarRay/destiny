@@ -1,0 +1,19 @@
+[package]
+name = "blueexposure"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+bevy.workspace = true
+pyo3.workspace = true
+blue-macros = { path = "../blue-macros" }
+delegate.workspace = true
+derive_more.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

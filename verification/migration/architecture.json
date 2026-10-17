@@ -1,0 +1,1358 @@
+{
+  "components": [
+    {
+      "fact": "observed",
+      "id": "C-python",
+      "path": "python/destiny/_facade.py",
+      "role": "Python objects, property bindings and native-call representations"
+    },
+    {
+      "fact": "observed",
+      "id": "C-abi",
+      "path": "src/ffi.rs",
+      "role": "Opaque C runtime ownership, request envelopes and callback boundary"
+    },
+    {
+      "fact": "observed",
+      "id": "C-runtime",
+      "path": "src/runtime.rs",
+      "role": "Owns Bevy App, stable ID/entity associations, lifecycle and API dispatch"
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-geometry",
+      "path": "src/generated_geometry.rs",
+      "role": "Generated representation adapter, used at three native distance call sites"
+    },
+    {
+      "fact": "observed",
+      "id": "C-spec-math",
+      "path": "verification/spec/src/geometry.rs",
+      "role": "Existing Vec3 length method reused by the generated production adapter"
+    },
+    {
+      "fact": "observed",
+      "id": "C-model",
+      "path": "verification/spec/src/model.rs",
+      "role": "Existing Vec3 f64 field representation and norm_squared expression"
+    },
+    {
+      "fact": "observed",
+      "id": "C-network",
+      "path": "src/network.rs",
+      "role": "Optional Carbon-style Lightyear/Replicon component and message integration"
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-generation",
+      "path": "verification/codegen/src/main.rs",
+      "role": "Genco source emission, Rust syntax comparison and span-preserving transformations"
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-extraction",
+      "path": "verification/tools/extract_cpp_semantics.cpp",
+      "role": "Restricted compiler-resolved scalar expression extraction"
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-oracle",
+      "path": "verification/tools/check_geometry_migration.py",
+      "role": "Independent original-header oracle and actual native query comparison"
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-state-guard",
+      "path": "verification/migration/uncloak_source_evidence.json",
+      "role": "Original-source bindings and unchanged specification guard transplanted into native uncloak mutation region"
+    },
+    {
+      "fact": "implemented_scoped_evidence",
+      "id": "C-angular",
+      "path": "src/generated_angular.rs",
+      "role": "Unbounded source angular transition and formation arithmetic invoked by actual Bevy runtime; bit-preserving angular state codec"
+    },
+    {
+      "fact": "implemented",
+      "id": "C-angular-generation",
+      "path": "verification/codegen/src/angular.rs",
+      "role": "Source AST transplantation, reusable field/input/environment lowering and runtime wiring transformations"
+    },
+    {
+      "fact": "implemented_host_scope",
+      "id": "C-angular-oracle",
+      "path": "verification/tools/check_angular_migration.py",
+      "role": "Unchanged original angular source slice and independent binary64 observations; no Blue/layout oracle"
+    },
+    {
+      "fact": "partial_inventory",
+      "id": "C-world-scope",
+      "path": "verification/migration/world_scope.json",
+      "role": "Partial source-bound semantic classification and core features; unknowns block completion"
+    },
+    {
+      "fact": "implemented_rejection_with_open_readers",
+      "id": "C-acceptance",
+      "path": "verification/tools/update_migration.py",
+      "role": "Single queue writer and separate core/full rejection reports; incomplete full inventory and assurance readers remain explicit"
+    },
+    {
+      "fact": "implemented_scoped_evidence",
+      "id": "C-speed-generation",
+      "path": "verification/codegen/src/speed.rs",
+      "role": "Preserves source maximum-velocity parameter with a custom ECS type and removes generic caps by span-preserving AST transformations; orders source collision inputs before Avian preparation"
+    },
+    {
+      "fact": "implemented_host_scope",
+      "id": "C-stop-oracle",
+      "path": "verification/tools/check_stop_migration.py",
+      "role": "Unchanged original EvolveStop, SetBallTimeFactor and Integrate source slice with real Vector3d operations; host-scoped independent position/velocity bits"
+    },
+    {
+      "fact": "implemented_scoped_evidence",
+      "id": "C-warp-generation",
+      "path": "verification/codegen/src/warp.rs",
+      "role": "Transplants the reviewed source alignment guard into actual goto-thrust dispatch, preserving proper-warp selection"
+    },
+    {
+      "fact": "implemented_scoped_evidence",
+      "id": "C-missile",
+      "path": "src/generated_missile.rs",
+      "role": "Environment-aware source missile arithmetic and exact binary32 state codec; one actual runtime path"
+    },
+    {
+      "fact": "implemented_scoped_evidence",
+      "id": "C-missile-generation",
+      "path": "verification/codegen/src/missile.rs",
+      "role": "Reviewed AST reuse plus source field/property, launch, retained-query and Bevy tick wiring; deterministic staging"
+    },
+    {
+      "fact": "implemented_host_scope",
+      "id": "C-missile-oracle",
+      "path": "verification/tools/check_missile_migration.py",
+      "role": "Unchanged original missile, field, integration and launch source slices with actual pinned Carbon/DirectX math"
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-partition",
+      "path": "src/generated_partition.rs",
+      "role": "Persistent box/primary/membership ownership in the existing Tracking resource, generated from typed source rules and shared numeric kernels."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-partition-generation",
+      "path": "verification/codegen/src/partition.rs",
+      "role": "Span-preserving runtime/spec/bubble transformations and typed state-rule emission; all outputs stage and pass edit guards before replacement."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-partition-oracle",
+      "path": "verification/tools/check_partition_migration.py",
+      "role": "Unchanged Original allocator, Box/Partition and spherical Ball source observations; explicit external/null-object boundaries. The same checker also extracts unchanged source liveness/membership methods and runs them with real CPython integer/dictionary/set dependencies; this is validation-only and not Blue hosting."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-liveness",
+      "path": "src/generated_liveness.rs",
+      "role": "Source is-dead predicate, logical membership view and derived ECS phase cache. Actual state remains in the existing Tracking owner."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-liveness-generation",
+      "path": "verification/codegen/src/liveness.rs",
+      "role": "Existing typed IR and span editor generate membership effects, phase scheduling and collision inputs; no duplicate runtime algorithm."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-forces",
+      "path": "src/generated_forces.rs",
+      "role": "Typed source mLastG/mLastC value with lossless snapshot bit representation; actual ownership is the existing DestinyBallMetadata component."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-forces-generation",
+      "path": "verification/codegen/src/forces.rs",
+      "role": "Existing typed rules/span editor generate state flow and recorded signature/field adaptations, preserving collision arithmetic and fixture assertions."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-contacts-generation",
+      "path": "verification/codegen/src/contacts.rs",
+      "role": "Reuse existing typed semantic rules and span transformations for contact ownership, kernel output transport, snapshots and source angular input. No second collision algorithm or queue."
+    },
+    {
+      "fact": "newly_chosen",
+      "id": "C-source-dispatch",
+      "path": "src/generated_contacts.rs",
+      "role": "Typed contact/error messages and operation-owned source cursor representation. Actual execution is generated Runtime methods over the existing metadata owner, not a second collision engine or queue."
+    }
+  ],
+  "concerns": [
+    {
+      "id": "Q-behavior",
+      "requirement": "Retain every defined original behavior and older obligation under latest source authority."
+    },
+    {
+      "id": "Q-interfaces",
+      "requirement": "Deliver the standalone core API/state/event contract first; preserve later Python/Blue/ABI/transport adapter obligations and keep their world semantics in the core."
+    },
+    {
+      "id": "Q-reproduce",
+      "requirement": "Generate changed domain behavior deterministically; preserve existing correct Rust without duplication."
+    },
+    {
+      "id": "Q-state",
+      "requirement": "Keep stable Destiny IDs, Bevy entity identity, pending state and snapshot ownership explicit."
+    },
+    {
+      "id": "Q-order",
+      "requirement": "Preserve stepping, callbacks and dependent-system order and avoid double integration."
+    },
+    {
+      "id": "Q-evidence",
+      "requirement": "Separate documentation, mapping, runtime observations, specification proof and production refinement."
+    },
+    {
+      "id": "Q-platforms",
+      "requirement": "Map source semantic configurations to a standalone core target matrix; validate engine release requirements, preserving later host release obligations separately."
+    }
+  ],
+  "correspondence_rules": [
+    "Every view concern must identify a declared requirement.",
+    "Every relationship endpoint and view component must resolve to an existing component/path.",
+    "Every concern must appear in at least one view and every consequential decision must identify its concerns.",
+    "Only current validated evidence can discharge implementation or assurance obligations; these architecture records cannot do so."
+  ],
+  "decisions": [
+    {
+      "alternatives": "Remain on the older catalog authority; support both revisions as separate targets.",
+      "concerns": [
+        "Q-behavior",
+        "Q-reproduce"
+      ],
+      "consequences": "The full matrix has 532 cases. Historical 531-case Aegis/catalog metadata remains historical and cannot define the complete denominator.",
+      "decision": "Use main at 114e89fa584f0e1a81eb0a679aabf41af8870072, selected by the user, while retaining the 531-case earlier catalog as a source-equal subset and the new partition regression.",
+      "id": "ADR-001",
+      "rationale": "The user explicitly requested the newest source and preservation of existing Rust work.",
+      "status": "chosen",
+      "title": "Pin latest Original Destiny and preserve Rust history"
+    },
+    {
+      "alternatives": "Emit another copy of the arithmetic; retain the scaled norm.",
+      "concerns": [
+        "Q-reproduce",
+        "Q-behavior"
+      ],
+      "consequences": "Changing the reused methods invalidates the generator identity and requires renewed equivalence review and differential execution.",
+      "decision": "Reuse existing Vec3::length/norm_squared after comparing their Rust syntax tree to the compiler-extracted C++ expression. Generate only the representation adapter and selected caller rewrites.",
+      "id": "ADR-002",
+      "rationale": "Existing arithmetic already matches the original grouping. Reuse prevents duplicated implementations and preserves existing tested work.",
+      "status": "chosen",
+      "title": "Reuse source-equivalent Rust math through generated adapters"
+    },
+    {
+      "alternatives": "Keep scale-normalized length; permit an arbitrary numeric tolerance.",
+      "concerns": [
+        "Q-behavior",
+        "Q-evidence"
+      ],
+      "consequences": "Current finite admitted-query checks pass exact comparisons in debug and optimized Linux builds. Nonfinite API domains and other platforms remain separate obligations.",
+      "decision": "Evaluate original binary64 multiplication/addition grouping and sqrt, including finite underflow behavior, rather than the scaled vector norm at the three distance sites.",
+      "id": "ADR-003",
+      "rationale": "Independent original-header observations detected bit differences. No tolerance relaxation was needed.",
+      "status": "chosen_for_distance_slice",
+      "title": "Retain numeric expression order"
+    },
+    {
+      "alternatives": "Handwrite per-feature wrappers; alter original test assertions.",
+      "concerns": [
+        "Q-interfaces",
+        "Q-reproduce"
+      ],
+      "consequences": "The three affected original cases pass natively. Full uint8 cloak-domain, raw attribute side effects and notification semantics remain unresolved.",
+      "decision": "Use recorded AST rules for the original GetBoxCenter tuple result and Boolean-to-integer isCloaked input conversion.",
+      "id": "ADR-004",
+      "rationale": "Original tuple construction and unchanged original fixture expectations define the boundary. The rules preserve the existing dispatch path and surrounding code.",
+      "status": "chosen_for_two_rules",
+      "title": "Generate Python representation conversions"
+    },
+    {
+      "alternatives": "Replace all physics immediately; treat Avian behavior as original behavior.",
+      "concerns": [
+        "Q-state",
+        "Q-order"
+      ],
+      "consequences": "Controller traces, double-integration prevention and complete future-state restore relations remain acceptance blockers.",
+      "decision": "Retain observed Avian f64 ownership and explicit synchronization configuration; do not claim original collision or snapshot parity from it.",
+      "id": "ADR-005",
+      "rationale": "The runtime already contains validated local work. Complete algorithm correspondence requires additional source-bound generation and evidence.",
+      "status": "observed_design_with_open_parity_gap",
+      "title": "Keep physics ownership and snapshot differences visible"
+    },
+    {
+      "alternatives": "Treat portable formats as binary-compatible; drop inaccessible configurations.",
+      "concerns": [
+        "Q-interfaces",
+        "Q-platforms"
+      ],
+      "consequences": "Local Linux linked consumers and a clean wheel installation are observations. Original Carbon dependencies, the Windows/macOS matrix, complete notices and authenticated deployment remain required.",
+      "decision": "Retain established private Blue/stream and full platform obligations even though portable JSON and C wrappers build locally.",
+      "id": "ADR-006",
+      "rationale": "Neither alternative satisfies the user's parity contract.",
+      "status": "unresolved_product_requirements",
+      "title": "Keep private ABI, wire and platform gates open"
+    },
+    {
+      "alternatives": "Require every analyzer to process the entire source before translation; label arbitrary JSON a CPG.",
+      "concerns": [
+        "Q-evidence",
+        "Q-reproduce"
+      ],
+      "consequences": "Full compile configurations and required graph/semantic questions must still be resolved before overall acceptance.",
+      "decision": "Use compiler records, emitted XML and narrow typed semantics for current generation. Keep Joern/CodeQL/SVF/PhASAR/KLEE roles and incomplete layers explicit.",
+      "id": "ADR-007",
+      "rationale": "Neither produces missing runtime behavior or valid proof evidence. The selected scalar rule has no unresolved pointer-flow question.",
+      "status": "chosen",
+      "title": "Bound optional analysis and retain incomplete layers"
+    },
+    {
+      "alternatives": "Copy the bounded projection into production; handwrite a separate cloak state machine; treat all states as non-warp.",
+      "concerns": [
+        "Q-behavior",
+        "Q-state",
+        "Q-reproduce"
+      ],
+      "consequences": "The unchanged proper-warp original fixture passes natively. Full cloak input domains, sensor semantics, warp trajectories and formal production correspondence remain open.",
+      "decision": "Extract the existing OriginalParkProjection::uncloak_ball condition and adapt its mode/stamp field reads through the native runtime. Wrap the existing set_massive and sensor-membership statements together using a recorded syntax transformation.",
+      "id": "ADR-008",
+      "rationale": "The existing guard expresses the original IsWarpish/IsAligningForWarp relation for signed integer stamps. Reuse preserves prior verified specification work and removes a known native fixture mismatch without duplicating projection storage.",
+      "status": "chosen_for_uncloak_guard",
+      "title": "Reuse the original proper-warp guard at the native mutation boundary"
+    },
+    {
+      "alternatives": "Derive source yaw/pitch/roll from quaternion orientation; reset angles on every internal velocity write; reuse bounded model collections as the world.",
+      "concerns": [
+        "Q-state",
+        "Q-order",
+        "Q-behavior",
+        "Q-reproduce"
+      ],
+      "consequences": "Original angle and both formation fixtures now pass; exact angular-bit preservation and scoped future replay are tested. Dynamic orientation, collision-history correspondence, complete state closure and formal production refinement remain required.",
+      "decision": "Keep the nine source scalar fields in existing Bevy metadata and encode their exact f64 bits in snapshots. Generate angular transitions from the reviewed existing specification AST. Reuse only formation arithmetic with the actual world-loaded offsets and original old-orientation rotation kernel, leaving bounded proof-model tables out of production.",
+      "id": "ADR-009",
+      "rationale": "Original Ball fields and command/post-motion ordering determine formation behavior. Quaternion reconstruction and internal snapping failed unchanged original traces. Original arithmetic can yield nonfinite angle values, so a finite-only snapshot filter changes its valid state domain.",
+      "status": "chosen_for_angular_formation_batch",
+      "title": "Own source angular state and reuse unbounded formation arithmetic"
+    },
+    {
+      "alternatives": "Let missing Blue halt unrelated mechanics; classify every Blue import as an adapter obligation; create a separate world queue.",
+      "concerns": [
+        "Q-behavior",
+        "Q-interfaces",
+        "Q-evidence",
+        "Q-platforms"
+      ],
+      "consequences": "Core and full reports come from one inventory. Full remains incomplete for deferred adapters. Core remains incomplete for unknowns, missing feature/configuration extraction and required assurance/production evidence; current rejection checks do not claim a complete closure audit.",
+      "decision": "Classify original obligations by source semantics as WORLD_CORE, HOST_ADAPTER, MIXED or UNKNOWN within the existing canonical queue. Split mixed fixtures into linked core and adapter obligations. Keep Blue-only requirements deferred with reasons; all unknown semantics and core proofs block core completion.",
+      "id": "ADR-010",
+      "rationale": "The active milestone requires all world semantics independently of legacy hosting. A stream fixture also observes world membership and transferred fields. Hosting failures cannot erase those assertions.",
+      "status": "chosen_by_current_world_engine_instruction",
+      "title": "Separate standalone core acceptance from later Original Blue integration"
+    },
+    {
+      "alternatives": "Keep the generic speed cap and relax the original stop fixture; retain two copies of the source speed parameter; compute source collision inputs after damping may zero them.",
+      "concerns": [
+        "Q-behavior",
+        "Q-state",
+        "Q-order",
+        "Q-reproduce"
+      ],
+      "consequences": "Both collision variants now pass the original stop trace and scoped exact original position/velocity comparisons. Snapshot and optional replication retain one parameter owner. Full f32 API/domain, contacts, dynamic orientation, supported platform and required proof coverage remain open.",
+      "decision": "Generate DestinyMaxVelocity from the existing scalar component declaration and route parameter storage, access and optional replication through it. Remove explicit non-source speed clamps. Prepare source collision outputs before invoking the existing Avian damping setup, then retain the existing source publication phase.",
+      "id": "ADR-011",
+      "rationale": "Original EvolveStop and Integrate admit velocities above mMaxVel, which is used by thrust. Both unchanged ten-step traces failed under the generic cap. Independent original C++ case 6 additionally showed that pre-collision zeroing on exponential underflow lost finite displacement.",
+      "status": "chosen_for_source_stop_batch",
+      "title": "Separate the source speed parameter and preserve pre-integration collision inputs"
+    },
+    {
+      "alternatives": "Keep zero acceleration while aligning; handwrite a separate warp steering implementation; treat a passing alignment fixture as all warp behavior.",
+      "concerns": [
+        "Q-behavior",
+        "Q-order",
+        "Q-reproduce"
+      ],
+      "consequences": "All ten original positions and per-step Warp mode assertions pass in the direct Rust scenario. Proper-warp/activation event semantics, transition domains, source field side effects and required proofs remain open.",
+      "decision": "Extract the existing reviewed OriginalMode::Warp negative effect-stamp guard and combine it with the actual Goto dispatch condition. Reuse the current original_goto_thrust, source collision and integration paths.",
+      "id": "ADR-012",
+      "rationale": "Original EvolveWarp delegates to EvolveGoto before proper warp. The original and direct Rust ten-step traces exposed missing alignment acceleration at the first step.",
+      "status": "chosen_for_alignment_dispatch",
+      "title": "Route aligning warp through source goto thrust"
+    },
+    {
+      "alternatives": "Keep missing missile acceleration or a fixed 1000ms/friction projection; duplicate the missile controller by hand.",
+      "concerns": [
+        "Q-behavior",
+        "Q-order",
+        "Q-reproduce"
+      ],
+      "consequences": "Original launch/20-step/collider assertions, 42 scoped source transitions and future snapshot replay pass. Full interaction/target-loss/callback/configuration domains and required refinement remain open.",
+      "decision": "AST-transplant only the unbounded original missile arithmetic, replacing fixed model friction/dt/tick with actual runtime inputs and retaining source phase comparisons. The real Bevy motion preparation calls it; existing admission/launch/field kernels remain single implementations.",
+      "id": "ADR-013",
+      "rationale": "The four original fixtures previously could not finish setup and the actual mode dispatch omitted source thrust. Variable-clock/friction original C++ cases exercise the 800ms boundary and both late-target branches.",
+      "status": "chosen_for_missile_batch",
+      "title": "Reuse source missile steering with actual world environment"
+    },
+    {
+      "alternatives": "Clamp the raw property as though it were only SetBallAngularAgility; retain f64 shadow state; serialize NaNs as null.",
+      "concerns": [
+        "Q-behavior",
+        "Q-state",
+        "Q-reproduce"
+      ],
+      "consequences": "Fifteen raw patterns survive ordinary snapshots; retained old generations mutate independently of replacement balls. Dynamic evolution and full dynamic snapshot restore are still rejected; this is no claim of their implementation or Blue ABI equivalence.",
+      "decision": "Generate one f32 metadata/snapshot field. Preserve raw writes, including negative/zero/nonfinite values, because OnModified follows the field prewrite. Reuse the existing nonpositive-to-one AST for the distinct dynamic-constructor rule. Finite JSON numbers remain readable; a versioned u32 tag preserves nonfinite payloads.",
+      "id": "ADR-014",
+      "rationale": "MAP_ATTRIBUTE uses READWRITE/NOTIFY/PERSIST on mRotAgility. The notification setter returns or writes that same float; the dynamic constructor has a separate <=0 -> 1 rule. Independent original C++ scalar observations distinguish those contracts.",
+      "status": "chosen_for_source_field_storage",
+      "title": "Store rotational agility with source binary32 semantics"
+    },
+    {
+      "alternatives": "Use Avian Rotation for launch or snapshot quaternion for a removed ball; duplicate matrix arithmetic.",
+      "concerns": [
+        "Q-behavior",
+        "Q-state",
+        "Q-reproduce"
+      ],
+      "consequences": "Eighteen source cases match all launch, attached-query and detached-query lanes. Other platform/math/dynamic-orientation branches and required proofs remain open.",
+      "decision": "Route stationary launch and detached GetRotatedVector through the same existing generated scalar-angle adapter and reviewed rotation kernel as attached queries. Preserve the source angles already captured in metadata and retained snapshots.",
+      "id": "ADR-015",
+      "rationale": "Original Ball::GetRotatedVector uses its current scalar angles in the accepted old-orientation branch. The independent source-pinned Carbon/DirectX oracle exposed the removed-ball quaternion discrepancy at non-default yaw.",
+      "status": "chosen_for_orientation_reuse",
+      "title": "Use source scalar rotation for launch and retained-object queries"
+    },
+    {
+      "alternatives": "Duplicate a spatial world; compute boxes at query time; impose bounded proof-model storage on runtime objects.",
+      "concerns": [
+        "Q-state",
+        "Q-behavior",
+        "Q-reproduce",
+        "Q-evidence"
+      ],
+      "consequences": "Both Original fixtures and 82 independent fixed-object C++ transitions pass in the real headless world. Dynamic/static/full-history/active-box/object/order and required proof gates remain open. Generation stages all guarded outputs to prevent partial replacement.",
+      "decision": "Extend Tracking with unbounded leaf/parent/primary ownership and source master counter/neighbor transitions. Reuse the existing partition arithmetic through AST exposure of modifiers, and preserve lifecycle/snapshot state. All new behavior is generated from typed source rules.",
+      "id": "ADR-016",
+      "rationale": "A GetBallBox query must observe mMyBox and immediate setter/lifetime effects. Recomputing from current coordinates loses source stale ownership and shared-box history. Existing Rust extreme finite coordinates exceed the Original defined integer conversion domain; retain them with an explicit undefined partition marker.",
+      "status": "chosen_for_spherical_partition_slice",
+      "title": "Retain persistent source partition ownership in the existing bubble tracker"
+    },
+    {
+      "alternatives": "Keep synthetic metadata; special-case label zero; duplicate source numeric or collision engines.",
+      "concerns": [
+        "Q-state",
+        "Q-behavior",
+        "Q-evidence"
+      ],
+      "consequences": "Eighty client source phase states, including 48 nonunit-dt ticks, match real ownership and numeric observations. Collision label invariance holds for both response modes. Full master dead-bubble/keep-alive and complete collision/world correspondence remain open. Removing fabricated bubbles exposed an artificial client proximity guard; the generated correction retains source client sensor execution without initialized labels. Eight unchanged Original scenarios/nine event-list assertions are preserved in the headless host.",
+      "decision": "Remove synthetic tick-time bubble assignment; admit every source bubble ID to the existing collision kernels. Project actual ECS is_free into source arithmetic. The retained Avian extension reads a derived is_master cache refreshed from ParkMetadata before its schedule and ignores client bubble labels.",
+      "id": "ADR-017",
+      "rationale": "An independent unchanged C++ phase trace exposed synthetic client state and missing free-ball inflation. A source-backed collision invariance check exposed fallback physics selected solely by a client numeric label.",
+      "status": "chosen_for_client_phase_correction",
+      "title": "Keep source bubble lifecycle and all numeric labels in motion"
+    },
+    {
+      "alternatives": "Inferring membership from current ball flags; a second tracker or physics integrator; recomputing the source cached flag during later phases.",
+      "concerns": [
+        "Q-state",
+        "Q-behavior",
+        "Q-evidence"
+      ],
+      "consequences": "One authoritative membership owner is serialized in source_partition_v1; the entity-keyed frame cache is derived and cleared at tick finish. Real CPython/C++ methods independently check typed set semantics. Full collision history, reentrancy, pending-work snapshots, malformed host objects, all configurations and mandatory proofs remain open. Existing client collision proof-fixture constructors receive the explicit live input through AST adaptation; all four concrete tests run in the existing engine library against actual kernels. Whole Kani crate imports and old partition fixture APIs remain incomplete, separately from successful ordinary test execution.",
+      "decision": "Extend Tracking with separate keep-alive registration and group membership using source-bound typed rules. Cache dead free entities before control; skip source phases and temporarily project those entities to static rigid bodies for the existing Avian schedule. Re-read liveness for proximity and preserve the final check/clear.",
+      "id": "ADR-018",
+      "rationale": "Original InDeadBubble reads actual sets, including stale or phantom IDs, and exempts warp mode. Inferring membership from current balls or recomputing motion gating after callbacks changes the source behavior.",
+      "status": "chosen_for_partial_master_liveness",
+      "title": "Keep liveness membership in its existing owner and cache source phase decisions"
+    },
+    {
+      "alternatives": "Zeroed candidate defaults, a second force map, copied collision algorithms or a bounded projection as the runtime owner.",
+      "concerns": [
+        "Q-state",
+        "Q-behavior",
+        "Q-evidence"
+      ],
+      "consequences": "A 3D unchanged-C++ corpus and actual runtime snapshots/replay checks exercise the new data flow. Full collision locations/last-collision/callback histories, dynamic orientation and mandatory core proofs remain incomplete. Old logical snapshots default the newly represented fields to zero.",
+      "decision": "Generate one Forces value in each existing ball metadata owner, with lossless binary64 logical snapshot representation. Reset on actual live/free control admission, retain computed controller output, project real forces for all collision candidates and commit solver mutations including dead neighbours. Remove the redundant PreparedMotion acceleration field.",
+      "id": "ADR-019",
+      "rationale": "Original skips force reset for dead bodies; their retained force can change another live body prediction. The actual failing headless comparison exposed zeroed scratch inputs. Both source response kernels already contained the force arithmetic and are reused.",
+      "status": "chosen_for_partial_force_history",
+      "title": "Retain source controller and collision forces in the existing ball metadata"
+    },
+    {
+      "alternatives": "Using Avian CollidingEntities, deduplicating IDs, inventing static IDs, or queueing all collision callbacks after full-world publication.",
+      "concerns": [
+        "Q-state",
+        "Q-behavior",
+        "Q-evidence"
+      ],
+      "consequences": "Six direct headless witnesses cover C++ warp bits, 130 sorted original Potential contacts, old/full snapshots, source admission reset/retention and real iterative location identity zero. Missile publication/dispatch continuation, full source locations/history and mandatory proofs remain open.",
+      "decision": "Generate mCollisions in the existing metadata owner and full logical snapshots. Reset at live/free behavior admission; preserve ordered kernel gradient IDs before angular updates. Project iterative location IDs separately in the existing derived Frame resource.",
+      "id": "ADR-020",
+      "rationale": "Source CalculateYawPitchRoll reads mCollisions, while iterative locations are appended only for moved missiles after angle update and partition reinsertion. An actual failing runtime test exposed different yaw/pitch caused by unrelated Avian contact flags.",
+      "status": "chosen_for_partial_contact_history",
+      "title": "Keep source contact IDs distinct from Avian contacts and iterative locations"
+    },
+    {
+      "alternatives": "Prebuilding a whole event payload list, deduplicating IDs, sharing a global cursor, serializing f64 through JSON on the typed core path, or substituting an end-of-tick event drain for per-body publication.",
+      "concerns": [
+        "Q-state",
+        "Q-behavior",
+        "Q-evidence"
+      ],
+      "consequences": "Six independent C++ cases yield 319 contacts and three host-error notices, including same-owner recursive dispatch. Typed real-gradient output, nesting, foreign-world/owner replacement and unsafe-list-shrink handling have headless witnesses. Automatic missile publication/FFI wiring and mandatory proof/host/lifetime correspondence remain open.",
+      "decision": "Generate a typed CollisionPass that captures vector size and source owner identity once. next_source_collision rereads current IDs/LastC for every notice. dispatch_source_collisions drives that same cursor and emits immediate typed host-error notices while continuing after a false host result.",
+      "id": "ADR-021",
+      "rationale": "A copied event batch would lose force/ID mutations and nested calls. The unchanged C++ dispatcher shows appended contacts are outside the current captured count, while recursive dispatch captures its own count and observes current data.",
+      "status": "chosen_for_partial_collision_dispatch",
+      "title": "Use one operation-owned collision cursor for typed source dispatch"
+    }
+  ],
+  "entity": "Standalone Destiny Rust/Bevy world engine, with later Original Blue host integration",
+  "profile": "Architecture description alignment profile for ISO/IEC/IEEE 42010:2022; no conformance assessment or certification",
+  "relationships": [
+    {
+      "from": "C-python",
+      "relation": "Python backend submits ABI calls",
+      "to": "C-abi"
+    },
+    {
+      "from": "C-abi",
+      "relation": "dispatches into owned runtime",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-runtime",
+      "relation": "reads Bevy Position and invokes distance adapter",
+      "to": "C-geometry"
+    },
+    {
+      "from": "C-geometry",
+      "relation": "delegates after syntax/IR equivalence check",
+      "to": "C-spec-math"
+    },
+    {
+      "from": "C-spec-math",
+      "relation": "calls norm_squared with source expression order",
+      "to": "C-model"
+    },
+    {
+      "from": "C-extraction",
+      "relation": "provides typed source expressions and compiler identities",
+      "to": "C-generation"
+    },
+    {
+      "from": "C-generation",
+      "relation": "reproduces adapter and rewrites selected call sites",
+      "to": "C-geometry"
+    },
+    {
+      "from": "C-oracle",
+      "relation": "exercises real native API boundary",
+      "to": "C-python"
+    },
+    {
+      "from": "C-runtime",
+      "relation": "optional integration; host owns actual authenticated transport",
+      "to": "C-network"
+    },
+    {
+      "from": "C-generation",
+      "relation": "checks pinned source regions and extracts the existing specification condition",
+      "to": "C-state-guard"
+    },
+    {
+      "from": "C-state-guard",
+      "relation": "guards existing massive-state and sensor-membership mutations without bounded projection storage",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-runtime",
+      "relation": "owns Angles in DestinyBallMetadata and invokes command snap, post-motion updates, formation thrust and source rotation",
+      "to": "C-angular"
+    },
+    {
+      "from": "C-angular-generation",
+      "relation": "extracts existing reviewed AST kernels and emits deterministic unbounded state/glue",
+      "to": "C-angular"
+    },
+    {
+      "from": "C-angular-generation",
+      "relation": "rewrites velocity, tick, snapshot/restore, getters and formation dispatch through source-bound AST passes",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-angular-oracle",
+      "relation": "independent unchanged C++ expected bits are asserted by Rust tests",
+      "to": "C-angular"
+    },
+    {
+      "from": "C-acceptance",
+      "relation": "validates original digests/assertion coverage and routes core and adapter obligations without dropping unknowns",
+      "to": "C-world-scope"
+    },
+    {
+      "from": "C-speed-generation",
+      "relation": "rewrites the original parameter storage/access paths and relocates existing damping preparation after source collision computation",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-speed-generation",
+      "relation": "preserves optional parameter replication using the same authoritative custom component",
+      "to": "C-network"
+    },
+    {
+      "from": "C-stop-oracle",
+      "relation": "supplies independent expected position/velocity bit patterns to actual Bevy integration tests",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-warp-generation",
+      "relation": "extends actual Goto thrust selection with the source negative-stamp aligning-warp condition",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-runtime",
+      "relation": "Actual Evolve reads source missile fields and world friction, duration and integer tick milliseconds; state setters and snapshots share the binary32 owner",
+      "to": "C-missile"
+    },
+    {
+      "from": "C-missile-generation",
+      "relation": "Transplants source arithmetic, connects actual steering selection, reuses scalar normalization and source rotation for launch/retained objects",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-missile-oracle",
+      "relation": "Supplies independent expected numeric bits for actual headless world integration and source-oriented launch/retained queries",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-runtime",
+      "relation": "Projects real ECS source fields into shared arithmetic and source-owned insertion/removal rules at command/tick/lifecycle boundaries",
+      "to": "C-partition"
+    },
+    {
+      "from": "C-partition-generation",
+      "relation": "Emits typed ownership state rules and reuses reviewed source numeric kernels",
+      "to": "C-partition"
+    },
+    {
+      "from": "C-partition-oracle",
+      "relation": "Provides independent expected box ownership/counter state after 82 original spherical transitions",
+      "to": "C-runtime"
+    },
+    {
+      "from": "C-runtime",
+      "relation": "Caches source dead entities before motion and projects schedule components; samples liveness again for notifications.",
+      "to": "C-liveness"
+    },
+    {
+      "from": "C-liveness-generation",
+      "relation": "Emits typed rules and generic ECS representation projection.",
+      "to": "C-liveness"
+    },
+    {
+      "from": "C-runtime",
+      "relation": "Owns one persistent force value per ball and applies source reset/controller/collision phase transitions.",
+      "to": "C-forces"
+    },
+    {
+      "from": "C-forces-generation",
+      "relation": "Emits typed field semantics and representation adapters.",
+      "to": "C-forces"
+    }
+  ],
+  "schema": 1,
+  "scope": "Observed generated distance, proper-warp uncloak, source-owned scalar angular state, angular snapshot/replay and formation wiring. Standalone core completion comes first; Original Blue hosting is deferred. Full world-feature, assurance, platform and production-quality gates remain open. Generated source stop integration now retains uncapped input velocity, with a custom maximum-velocity parameter and source collision preparation before Avian damping setup. The generated aligning-warp dispatch now delegates to the existing source goto thrust while the effect stamp remains negative. Generated spherical partition ownership now extends the existing bubble tracker, with source-defined parent/shared lifetime, master insertion and live GetBallBox queries. Complete/full acceptance remains open.",
+  "stakeholders": [
+    {
+      "concerns": [
+        "Q-behavior",
+        "Q-interfaces"
+      ],
+      "id": "S-consumer",
+      "role": "Original Destiny consumers"
+    },
+    {
+      "concerns": [
+        "Q-reproduce",
+        "Q-state",
+        "Q-order"
+      ],
+      "id": "S-maintainer",
+      "role": "Runtime and generator maintainers"
+    },
+    {
+      "concerns": [
+        "Q-evidence",
+        "Q-platforms",
+        "Q-behavior"
+      ],
+      "id": "S-reviewer",
+      "role": "Verification and release reviewers"
+    }
+  ],
+  "standard": "https://www.iso.org/standard/74393.html",
+  "unresolved": [
+    "Complete feature/configuration inventory and compiler extraction",
+    "Remaining original fixture failures and missing Blue execution",
+    "Kani/Verus production correspondence and all required proof obligations",
+    "Original controller, collision, snapshot and private wire behavior",
+    "Windows/macOS, full package matrix, complete notices/archive and real transport acceptance",
+    "Complete standalone host API, field/effect ownership, core target matrix and production-quality receipt readers",
+    "Dynamic angular orientation, collision-history correspondence, stop/warp and interacting controller fidelity",
+    "Original Blue host integration is a later milestone; its world semantics remain core",
+    "Complete source partition static/dynamic/OBB effects, native unordered-map order, object identity/lifetime and complete snapshot/history validation; newest KeyHash regression retained.",
+    "Original master InDeadBubble interactive/keep-alive scheduling is not yet implemented in runtime; preserve all dependent evolution/proximity obligations.",
+    "Moved-missile-only late contact append and per-body, reentrant DoCollision dispatch must precede following body publication; full pending-state/location/history correspondence remains required.",
+    "Source old/new pose slots are mutable authoritative phase state: source AddBall initializes old_pos=new_pos-dt*new_vel only on creation and retains it on replacement; setters write both slots and Evolve swaps them. The current immutable motion plan cannot implement callback-time writes to later pending results. This is required core work before exact publication, not a host-only omission."
+  ],
+  "views": [
+    {
+      "components": [
+        "C-python",
+        "C-abi",
+        "C-runtime",
+        "C-generation",
+        "C-world-scope",
+        "C-acceptance",
+        "C-partition"
+      ],
+      "concerns": [
+        "Q-behavior",
+        "Q-interfaces",
+        "Q-reproduce"
+      ],
+      "description": "Latest Original Destiny is pinned independently of the Rust development branch. Prior Rust was preserved through a verified fast-forward. Source/file inventories and all 532 original cases remain visible; a complete feature denominator is not established. The current milestone is the complete standalone world engine. No complete typed host API, full state/effect denominator or production-ready acceptance is claimed; Original Blue integration remains planned.",
+      "file": "overview.md",
+      "id": "V-overview",
+      "model_kind": "Context and requirements",
+      "name": "Architecture overview"
+    },
+    {
+      "components": [
+        "C-python",
+        "C-abi",
+        "C-runtime",
+        "C-geometry",
+        "C-spec-math",
+        "C-model",
+        "C-generation",
+        "C-extraction",
+        "C-state-guard",
+        "C-angular",
+        "C-angular-generation",
+        "C-speed-generation",
+        "C-warp-generation",
+        "C-missile",
+        "C-missile-generation",
+        "C-partition",
+        "C-partition-generation",
+        "C-liveness",
+        "C-liveness-generation",
+        "C-forces",
+        "C-forces-generation"
+      ],
+      "concerns": [
+        "Q-reproduce",
+        "Q-interfaces"
+      ],
+      "description": "Consumers build the tracked generated adapter with ordinary locked Cargo dependencies. Clang, Doxygen and Genco are maintainer tools. The original C++ header is used only by the independent oracle. Existing specification crate math is production-reachable through the new adapter.",
+      "file": "components.md",
+      "id": "V-components",
+      "model_kind": "Directed component dependency graph",
+      "name": "Component and dependency view"
+    },
+    {
+      "components": [
+        "C-abi",
+        "C-runtime",
+        "C-geometry",
+        "C-spec-math",
+        "C-state-guard",
+        "C-angular",
+        "C-speed-generation",
+        "C-warp-generation",
+        "C-missile",
+        "C-partition",
+        "C-contacts-generation",
+        "C-source-dispatch"
+      ],
+      "concerns": [
+        "Q-order",
+        "Q-behavior"
+      ],
+      "description": "Distance getters read Bevy World Position components without advancing the clock. Evolve uses explicit fixed timesteps and App::update. The swept-bounds system runs in PhysicsSchedule after Avian UpdateAabbs and before CollectCollisions. Physics transform synchronization is disabled. Original controller/collision correspondence and the complete callback ordering relation remain separate unresolved obligations. Uncloak copies the source-backed proper-warp condition through a recorded syntax transformation; the native ECS mutation statements remain the existing ones. SetBallVelocity snaps the scalar angles at the command boundary. Internal velocity publication does not snap. After the ordered motion step, free non-mushroom old-orientation balls update all nine scalar fields before current_time advances. Formation uses actual loaded offsets, leader rotation and the existing goto thrust/integration. Dynamic orientation, source collision-history correspondence and all interaction variants remain open. Source Stop applies Y damping before collision computation. Original source collision outputs are prepared before Avian damping setup can zero underflowed velocities; the existing publication path then commits them after the App update. DestinyMaxVelocity supplies thrust/input metadata through one ECS component and no longer activates the Avian hard speed cap. An unaligned Warp ball receives the existing source goto thrust after decrementing its alignment stamp. A newly activated or proper warp follows the existing proper-warp selection. Activation events and the complete transition family remain open. Generated position/radius/max-speed/lifecycle adapters update persistent ownership immediately. Motion updates ownership after source angle state at the source displacement threshold; further dynamic/controller phase equivalence remains open. Client evolution retains uninitialized source bubble IDs. Source collision kernels accept arbitrary numeric labels; the Avian extension reads current master/client policy through a derived schedule cache. Source client proximity timers/candidates/events run without initialized bubble labels; full master liveness and geometric candidate correspondence remain open.",
+      "file": "runtime.md",
+      "id": "V-runtime",
+      "model_kind": "Call path and scheduling constraints",
+      "name": "Runtime and scheduling view"
+    },
+    {
+      "components": [
+        "C-runtime",
+        "C-model",
+        "C-python",
+        "C-abi",
+        "C-angular",
+        "C-missile",
+        "C-partition",
+        "C-contacts-generation",
+        "C-source-dispatch"
+      ],
+      "concerns": [
+        "Q-state",
+        "Q-behavior"
+      ],
+      "description": "DestinyBallId and runtime ID/entity maps separate stable IDs from Bevy entity identity. Avian f64 Position/Rotation and Destiny metadata carry native state. The generated geometry adapter copies three f64 lanes into the existing Vec3 value type. Snapshot v3 is logical-authoritative JSON; original private binary bytes, solver transients and complete pending-state future equivalence remain gaps. Nine angular/history f64 fields have a single owner in DestinyBallMetadata. Their snapshot representation stores u64 bit patterns, including nonfinite values and signed zero. Roll parameters are park inputs and survive restore. Twelve subsequent steps agree after restore in the scoped integration test. Older snapshot reconstruction and complete history/event equivalence remain open. DestinyMaxVelocity is the single maximum-velocity parameter owner, including checkpoint, snapshot, getter/setter and optional replication paths. Existing API storage is f64 and source motion kernels narrow to f32; complete source API rounding correspondence remains open. The existing Tracking resource owns partition boxes, placements, parent lifetime and source counter. Logical full snapshots retain exact stored ownership, including stale placement and explicitly undefined cast-domain extensions; partial/static/history correspondence remains open.",
+      "file": "state.md",
+      "id": "V-state",
+      "model_kind": "Ownership and representation",
+      "name": "State and data view"
+    },
+    {
+      "components": [
+        "C-python",
+        "C-abi",
+        "C-runtime",
+        "C-network"
+      ],
+      "concerns": [
+        "Q-platforms",
+        "Q-interfaces"
+      ],
+      "description": "The current engine builds as rlib/staticlib/cdylib with --no-default-features and no Blue runtime. Direct Rust tests exercise real Bevy worlds and formation evolution. The existing optional carbon-network feature still compiles, but original Blue/Blueexposure/exefile hosting, wheels and authenticated transport are later integration work. Previous Linux ABI/wheel observations predate the angular source change and are historical. The original twelve Windows/macOS presets still require semantic mapping to the core target matrix; no cross-platform completion is claimed.",
+      "file": "deployment.md",
+      "id": "V-deployment",
+      "model_kind": "Consumer and platform boundaries",
+      "name": "Deployment and integration view"
+    },
+    {
+      "components": [
+        "C-extraction",
+        "C-generation",
+        "C-oracle",
+        "C-geometry",
+        "C-spec-math",
+        "C-state-guard",
+        "C-angular",
+        "C-angular-oracle",
+        "C-world-scope",
+        "C-acceptance",
+        "C-stop-oracle",
+        "C-warp-generation",
+        "C-missile",
+        "C-missile-generation",
+        "C-missile-oracle",
+        "C-partition",
+        "C-partition-generation",
+        "C-partition-oracle",
+        "C-contacts-generation",
+        "C-source-dispatch"
+      ],
+      "concerns": [
+        "Q-evidence",
+        "Q-reproduce",
+        "Q-behavior"
+      ],
+      "description": "Compiler extraction establishes the scalar expression structure; syntax comparison checks the existing Rust kernel before reuse. Independent original C++ numeric traces check actual native queries. XML is documentation evidence. Kani observations and Verus scope are separate; generated artifacts, fixture passes and oracle agreement do not grant production refinement or universal equivalence. Angular tests compare 1,224 exact field bits from 136 unchanged original C++ transitions. Direct Rust formation scenarios preserve original fixture setup/order/ten-step coordinates and four-decimal comparison. These are host-scoped observations. Core/full reports share one canonical inventory; unknown or mixed core semantics cannot be deferred because Blue is unavailable. Independent unchanged C++ stop/time-factor/integration samples additionally check all six position/velocity lanes in both source collision configurations. The initial fixtures and an exponential-underflow observation exposed distinct cap and phase-order errors before their fixes. The extended unchanged C++ partition oracle covers 80 client Stop environment/mutation/motion states at four timesteps, and source-backed client-label invariance checks exercise both collision modes.",
+      "file": "verification.md",
+      "id": "V-verification",
+      "model_kind": "Evidence and trust-boundary graph",
+      "name": "Verification and provenance view"
+    }
+  ],
+  "world_feature_links": [
+    {
+      "decision": "ADR-009",
+      "id": "state.angular",
+      "production_paths": [
+        "src/generated_angular.rs",
+        "src/runtime.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ball.cpp:335-466",
+        "src/Ball.cpp:777-807",
+        "src/Ball.h:140-150"
+      ],
+      "witnesses": [
+        "original_cpp_angular_transitions_match_exact_bits",
+        "velocity_command_reaches_source_owned_angular_state"
+      ]
+    },
+    {
+      "decision": "ADR-009",
+      "id": "controller.formation",
+      "production_paths": [
+        "src/generated_angular.rs",
+        "src/runtime.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ballpark.cpp:1023-1066",
+        "src/Ball.cpp:2191-2203"
+      ],
+      "witnesses": [
+        "moving_formation_matches_original_ten_step_trace",
+        "stopped_formation_matches_original_ten_step_trace"
+      ]
+    },
+    {
+      "decision": "ADR-009",
+      "id": "snapshot.angular",
+      "production_paths": [
+        "src/generated_angular.rs",
+        "src/runtime.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ball.cpp:335-466",
+        "src/Ball.h:140-150"
+      ],
+      "witnesses": [
+        "world_snapshot_preserves_each_angular_bit_pattern",
+        "restored_angles_and_roll_inputs_produce_the_same_future"
+      ]
+    },
+    {
+      "decision": "ADR-010",
+      "id": "history.external-state-transfer",
+      "production_paths": [
+        "src/runtime.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "python/destiny/test/ballpark/test_stream_read_write.py:67-75"
+      ],
+      "witnesses": []
+    },
+    {
+      "decision": "ADR-010",
+      "id": "spatial.partition-hash",
+      "production_paths": [],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "tests/TestPartition.cpp:5-13"
+      ],
+      "witnesses": []
+    },
+    {
+      "decision": "ADR-011",
+      "id": "controller.stop",
+      "production_paths": [
+        "src/runtime.rs",
+        "src/iterative_collision.rs",
+        "src/noniterative_collision.rs",
+        "verification/spec/src/original_motion.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ballpark.cpp:1339-1345",
+        "src/Ballpark.cpp:751-776",
+        "src/Ballpark.cpp:429-515"
+      ],
+      "witnesses": [
+        "stop_velocity_matches_original_ten_step_trace",
+        "iterative_stop_velocity_matches_original_ten_step_trace",
+        "stopped_ball_preserves_original_zero_position_each_tick",
+        "stop_motion_matches_unchanged_cpp_position_and_velocity_bits"
+      ]
+    },
+    {
+      "decision": "ADR-011",
+      "id": "state.max-velocity",
+      "production_paths": [
+        "src/runtime.rs",
+        "src/network.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ball.h:125-133",
+        "src/Ballpark.cpp:1394-1433"
+      ],
+      "witnesses": [
+        "source_max_velocity_does_not_cap_stop_motion",
+        "stop_motion_matches_unchanged_cpp_position_and_velocity_bits"
+      ]
+    },
+    {
+      "decision": "ADR-012",
+      "id": "controller.warp-alignment",
+      "production_paths": [
+        "src/runtime.rs",
+        "verification/spec/src/original_motion.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ballpark.cpp:915-961"
+      ],
+      "witnesses": [
+        "warp_alignment_matches_original_ten_step_positions_and_mode"
+      ]
+    },
+    {
+      "decision": "ADR-013",
+      "id": "controller.missile",
+      "production_paths": [
+        "src/generated_missile.rs",
+        "src/missile.rs",
+        "src/runtime.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ballpark.cpp:972-1015",
+        "src/Ballpark.cpp:3798-3873"
+      ],
+      "witnesses": [
+        "original_non_aimed_stationary_missile_fixture",
+        "original_non_aimed_moving_missile_fixture",
+        "original_aimed_nonmassive_missile_fixture",
+        "original_aimed_massive_missile_fixture",
+        "missile_motion_matches_unchanged_cpp_bits_with_real_clock_and_friction",
+        "restored_missile_preserves_tracking_and_twenty_future_ticks"
+      ]
+    },
+    {
+      "decision": "ADR-014",
+      "id": "state.rotational-agility",
+      "production_paths": [
+        "src/generated_missile.rs",
+        "src/runtime.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ball.cpp:79-79",
+        "src/Ball.cpp:1582-1585",
+        "src/Ball_Blue.cpp:318-324",
+        "src/Ballpark.cpp:3551-3552",
+        "src/Ballpark.cpp:4958-4966"
+      ],
+      "witnesses": [
+        "raw_rotational_agility_preserves_cpp_f32_state_and_snapshot_bits",
+        "retained_rotational_agility_mutates_the_original_detached_generation",
+        "dynamic_constructor_normalizes_only_the_source_nonpositive_domain"
+      ]
+    },
+    {
+      "decision": "ADR-015",
+      "id": "motion.source-rotation",
+      "production_paths": [
+        "src/runtime.rs",
+        "src/generated_angular.rs",
+        "verification/spec/src/original_rotation.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ball.cpp:2191-2203",
+        "src/Thunkers.cpp:898-926"
+      ],
+      "witnesses": [
+        "stationary_launch_and_retained_rotation_match_original_cpp_math_bits"
+      ]
+    },
+    {
+      "decision": "ADR-017",
+      "id": "spatial.partition-ownership",
+      "production_paths": [
+        "src/runtime.rs",
+        "src/generated_partition.rs",
+        "src/bubbles.rs",
+        "verification/spec/src/original_partition.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Partition.h:66-122",
+        "src/Partition.cpp:19-170",
+        "src/Partition.cpp:183-237",
+        "src/Partition.cpp:490-522",
+        "src/Box.cpp:15-205",
+        "src/Box.cpp:220-282",
+        "src/Ball.cpp:812-853",
+        "src/Ball.cpp:2355-2536",
+        "src/Ballpark.cpp:429-615",
+        "src/Ballpark.cpp:3115-3219",
+        "src/Ballpark.cpp:3290-3455",
+        "src/Ballpark.cpp:4680-4720",
+        "src/Ballpark.cpp:4738-4765",
+        "src/Ballpark.cpp:4880-4933",
+        "src/Ballpark.cpp:6565-6624",
+        "src/Thunkers.cpp:2260-2300",
+        "src/Ballpark.cpp:5896-5953",
+        "src/Partition.cpp:417-461",
+        "src/Ballpark.cpp:429-615",
+        "src/Ballpark.cpp:6216-6260",
+        "python/destiny/test/ballpark/test_boxes_and_bubbles.py:8-22"
+      ],
+      "witnesses": [
+        "original_box_zero_zero_zero",
+        "original_box_zero_zero_one",
+        "partition_ownership_matches_unchanged_cpp_after_every_mutation",
+        "source_partition_is_unbounded_and_retains_stale_ownership_in_snapshots",
+        "malformed_partition_snapshots_reject_without_mutation",
+        "retained_rust_extreme_coordinates_keep_explicit_partition_limits",
+        "client_motion_and_partition_match_original_nonunit_dt_phases",
+        "collision_motion_ignores_client_numeric_bubble_labels",
+        "original_can_initialize_bubbles",
+        "original_can_initialize_bubble_for_specific_ball"
+      ]
+    },
+    {
+      "decision": "ADR-018",
+      "id": "scheduling.master-bubble-liveness",
+      "production_paths": [
+        "src/generated_liveness.rs",
+        "src/bubbles.rs",
+        "src/runtime.rs",
+        "src/iterative_collision.rs",
+        "src/noniterative_collision.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "src/Ballpark.cpp:429-615",
+        "src/Ballpark.cpp:6216-6280",
+        "src/Ballpark.cpp:5832-5890",
+        "src/Ballpark.cpp:6745-6770"
+      ],
+      "witnesses": [
+        "master_dead_bubble_freezes_source_phases",
+        "original_cpython_liveness_membership_and_all_mode_queries",
+        "master_liveness_motion_decision_is_cached_until_tick_finish",
+        "source_interactive_same_flag_and_keep_alive_registry_are_distinct",
+        "source_liveness_snapshot_and_future_replay_have_no_model_capacity_cap",
+        "source_dead_sensor_final_pass_clears_members_then_live_sensor_reenters"
+      ]
+    },
+    {
+      "decision": "ADR-017",
+      "id": "proximity.client-sensors",
+      "production_paths": [
+        "src/runtime.rs",
+        "src/proximity.rs"
+      ],
+      "record": "verification/migration/world_scope.json",
+      "source_regions": [
+        "python/destiny/test/ballpark/test_callbacks.py:7-107",
+        "python/destiny/test/helpers.py:159-204",
+        "src/Partition.cpp:281-309",
+        "src/Partition.cpp:417-461",
+        "src/Ball.cpp:494-518"
+      ],
+      "witnesses": [
+        "original_client_proximity_assertions_without_bubble_initialization"
+      ]
+    },
+    {
+      "decision": "ADR-019",
+      "id": "state.controller-collision-forces",
+      "production_paths": [
+        "src/generated_forces.rs",
+        "src/runtime.rs",
+        "src/iterative_collision.rs",
+        "src/noniterative_collision.rs"
+      ],
+      "record": "verification/migration/force_source_evidence.json",
+      "source_regions": [
+        "src/Ballpark.cpp:429-488",
+        "src/Ballpark.cpp:780-902",
+        "src/Ballpark.cpp:1398-1426",
+        "src/Ballpark.cpp:2198-2211",
+        "src/Ballpark.cpp:2479-2501",
+        "src/Ballpark.cpp:2716-2741",
+        "src/Ballpark.cpp:2789-3005",
+        "src/Ball.h:148-165",
+        "src/Vector3d.h:8-20"
+      ],
+      "witnesses": [
+        "dead_global_force_changes_live_gradient_prediction_against_original_cpp",
+        "dead_candidate_receives_iterative_overlap_force_without_pose_publication",
+        "source_force_snapshot_replays_both_actual_collision_paths",
+        "source_force_reset_occurs_only_after_dead_body_becomes_live",
+        "force_snapshot_bits_survive_nonfinite_values_and_old_snapshot_defaults"
+      ]
+    },
+    {
+      "decision": "ADR-020",
+      "id": "collision.source-contact-state",
+      "production_paths": [
+        "src/runtime.rs",
+        "src/noniterative_collision.rs",
+        "src/iterative_collision.rs",
+        "src/generated_liveness.rs"
+      ],
+      "record": "verification/migration/contact_source_evidence.json",
+      "source_regions": [
+        "src/Ball.cpp:335-488",
+        "src/Ballpark.cpp:530-639",
+        "src/Ballpark.cpp:780-795",
+        "src/Ballpark.cpp:2745-3006",
+        "src/Ball.h:148-165"
+      ],
+      "witnesses": [
+        "avian_contacts_do_not_change_source_warp_angle_admission",
+        "actual_source_contacts_select_cpp_warp_angles_independently_of_avian",
+        "contacts_snapshot_preserves_order_duplicates_full_ids_and_old_defaults",
+        "contacts_reset_only_after_live_free_behavior_admission",
+        "gradient_retains_130_original_cpp_contact_ids_without_a_world_capacity_limit",
+        "iterative_location_ids_remain_separate_before_late_missile_dispatch"
+      ]
+    },
+    {
+      "decision": "ADR-021",
+      "id": "events.source-collision-dispatch",
+      "production_paths": [
+        "src/generated_contacts.rs",
+        "src/runtime.rs"
+      ],
+      "record": "verification/migration/contact_source_evidence.json",
+      "source_regions": [
+        "src/Ball.cpp:335-488"
+      ],
+      "witnesses": [
+        "direct_source_dispatch_matches_unchanged_cpp_reentrant_traces",
+        "operation_owned_source_collision_cursors_support_nested_dispatch",
+        "unsafe_source_list_shrink_is_an_explicit_rust_error_after_prior_effects",
+        "real_gradient_output_reaches_the_same_typed_source_dispatcher",
+        "source_collision_cursors_reject_other_worlds_and_cancel_replaced_owners"
+      ]
+    },
+    {
+      "decision": "ADR-021",
+      "id": "state.old-new-kinematics",
+      "production_paths": [],
+      "record": "verification/migration/next_batch.json",
+      "source_regions": [
+        "src/Ballpark.cpp:429-639",
+        "src/Ballpark.cpp:3355-3390",
+        "src/Ballpark.cpp:4738-4801"
+      ],
+      "witnesses": [
+        "source_old_new_pose_commands_and_callback_publication_match_original_cpp"
+      ]
+    }
+  ],
+  "world_state_records": [
+    {
+      "field": "yaw",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "pitch",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "roll",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "old_yaw",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "old_pitch",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "old_roll",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "roll_speed",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "old_roll_speed",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "yaw_delta",
+      "mutation": "generated command snap and ordered post-motion transition",
+      "owner": "DestinyBallMetadata.source_angles",
+      "snapshot": "u64 exact f64 bits; restore into the same metadata owner"
+    },
+    {
+      "field": "max_velocity",
+      "mutation": "existing parameter setters; source thrust reads its f32 projection; no generic speed cap",
+      "owner": "DestinyMaxVelocity",
+      "snapshot": "existing max_velocity f64 field and typed checkpoint component; original API rounding remains open"
+    },
+    {
+      "field": "angular_agility / RotationalAgility",
+      "mutation": "Source raw property prewrite/notification, detached generation state, and distinct source nonpositive-to-one dynamic-constructor normalization",
+      "owner": "DestinyBallMetadata.angular_agility (f32)",
+      "snapshot": "Finite numeric compatibility; nonfinite source_f32_bits_v1 u32 payloads; exact restore into the same owner. Dynamic world restore remains unsupported."
+    },
+    {
+      "field": "source partition primary/modifiers/owned boxes, parents and master bubble counter",
+      "mutation": "Source-backed construction, position/radius/max-speed/free-to-fixed effects, removal/ClearAll and thresholded motion insertion; InitializeBubbles resets labels/counter separately.",
+      "owner": "bubbles::Tracking.partition (one existing tracker, unbounded Vec state)",
+      "snapshot": "Optional source_partition_v1 logical field retains stored ownership/counter; finite Rust extension beyond Original defined i64-cast domain remains explicit. Full dictionary/static/partial/history invariants remain required."
+    },
+    {
+      "field": "is_free and master/client collision context",
+      "mutation": "Actual free state projects into original_motion_input. A non-authoritative CollisionContext resource is refreshed from ParkMetadata immediately before App::update. Client ticks do not assign bubble IDs.",
+      "owner": "DestinyBallMetadata.is_free and ParkMetadata.is_master",
+      "snapshot": "Authoritative fields retain existing snapshot owners; the derived physics schedule cache is rebuilt before use and has no second serialized owner."
+    },
+    {
+      "field": "Interactive membership, registered keep-alive IDs and keep-alive group membership",
+      "mutation": "Typed source rules preserve same-flag setter behavior, add-before-remove transition order and independent registration/direct set mutation. ClearBubbles/initialization clears all three sets.",
+      "owner": "bubbles::Tracking (existing single owner, native unbounded collections)",
+      "snapshot": "Existing full logical source_partition_v1 retains the sets, including stale/phantom IDs. Legacy aliased dictionaries and pending-work/history semantics remain open."
+    },
+    {
+      "field": "Cached per-tick dead free entity set",
+      "mutation": "Sampled before each free body control phase, keyed by Entity to avoid stale Destiny-ID replacement, consulted through collision/integration/publication and cleared at finish. Proximity samples live membership separately.",
+      "owner": "generated_liveness::Frame (derived ECS resource)",
+      "snapshot": "Derived between-phase resource is not serialized. Mid-evolution snapshot/restore and error-path correspondence remain explicit unresolved obligations."
+    },
+    {
+      "field": "Source mLastG/mLastC controller and collision acceleration",
+      "mutation": "Reset only at live/free behavior admission, store actual controller thrust, read retained values for collision candidates, commit source solver collision-force writes even when the neighbour pose is frozen.",
+      "owner": "DestinyBallMetadata.source_forces; solver Body is temporary computation data",
+      "snapshot": "Forces codec preserves all six binary64 bit patterns in full logical BallSnapshot fields. Missing old-version logical fields default to zero. Intermediate collision locations, pending callbacks and complete history remain open."
+    },
+    {
+      "field": "Source Ball::mCollisions ordered contact IDs",
+      "mutation": "Live/free behavior resets alongside force state. Actual gradient kernel scratch appends are transported without deduplication before angle updates; angular input reads this owner.",
+      "owner": "DestinyBallMetadata.source_contacts",
+      "snapshot": "BallSnapshot retains all signed 64-bit IDs, duplicates and order; older absent fields default empty. Pending per-body publication/callback state remains open."
+    },
+    {
+      "field": "Derived iterative location collider-ID projection",
+      "mutation": "Replaced from actual iterative solver locations using ball IDs or existing registered static geometry IDs, skipping only source collider -1. Does not populate source mCollisions before angles.",
+      "owner": "generated_liveness::Frame.contact_locations",
+      "snapshot": "Full source location/time/history persistence and late missile append/dispatch remain open; the derived ID-only frame is not a complete source collision cache."
+    },
+    {
+      "field": "Captured source collision dispatch size and current index",
+      "mutation": "Capture count once; each next rereads current contact ID/LastC. Nested passes have independent cursors; normally returning host error is observed immediately and does not terminate dispatch.",
+      "owner": "CollisionPass owned by the calling operation, bound to WorldId/Entity/ball generation",
+      "snapshot": "Operation cursors are transient and intentionally not serialized. Complete pending Evolve/publication/history snapshots and original lifetime/error correspondence remain required."
+    }
+  ]
+}
