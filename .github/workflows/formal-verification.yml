@@ -142,6 +142,8 @@ jobs:
               "contracted_arithmetic",
               "contracted_result_valid",
               "contracted_result_invalid",
+              "contracted_result_add_valid",
+              "contracted_result_add_invalid",
           }
           by_name={}
           for row in rows:
@@ -319,6 +321,11 @@ jobs:
             --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
             --function contracted_result_valid --verus "$VERUS_BIN" > fixture-contract-result-valid.json
 
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/contracts/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
+            --function contracted_result_add_valid --verus "$VERUS_BIN" > fixture-contract-result-add-valid.json
+
           set +e
           cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
@@ -365,6 +372,11 @@ jobs:
             --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
             --function contracted_result_invalid --verus "$VERUS_BIN" > fixture-contract-result-invalid.json
           contract_result_invalid_rc=$?
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/contracts/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
+            --function contracted_result_add_invalid --verus "$VERUS_BIN" > fixture-contract-result-add-invalid.json
+          contract_result_add_invalid_rc=$?
           set -e
           test "$invalid_rc" -eq 1
           test "$contradictory_rc" -eq 1
@@ -375,6 +387,7 @@ jobs:
           test "$contract_vacuous_rc" -eq 1
           test "$contract_arithmetic_rc" -eq 1
           test "$contract_result_invalid_rc" -eq 1
+          test "$contract_result_add_invalid_rc" -eq 1
 
           python3 - <<'PY'
           import json
@@ -397,6 +410,8 @@ jobs:
           contract_arithmetic=json.loads(Path("fixture-contract-arithmetic.json").read_text())
           contract_result_valid=json.loads(Path("fixture-contract-result-valid.json").read_text())
           contract_result_invalid=json.loads(Path("fixture-contract-result-invalid.json").read_text())
+          contract_result_add_valid=json.loads(Path("fixture-contract-result-add-valid.json").read_text())
+          contract_result_add_invalid=json.loads(Path("fixture-contract-result-add-invalid.json").read_text())
           assert branch["status"] == "checked_valid", branch
           assert loop["status"] == "checked_valid", loop
           assert independent["status"] == "checked_valid", independent
@@ -434,6 +449,18 @@ jobs:
               "(__destiny_result == x)"
           ], contract_result_valid
           assert contract_result_invalid["status"] == "proof_failure", contract_result_invalid
+          assert contract_result_add_valid["status"] == "checked_valid", contract_result_add_valid
+          assert contract_result_add_valid["contract_requires"] == ["(x < 255)"], contract_result_add_valid
+          assert len(contract_result_add_valid["contract_arithmetic_guards"]) == 1, contract_result_add_valid
+          assert contract_result_add_valid["contract_arithmetic_guards"][0] == {
+              "clause_kind":"ensures",
+              "expression":"__destiny_result == x + 1",
+              "guard":"(x <= 254)",
+              "rust_type":"u8",
+              "operator":"+",
+          }, contract_result_add_valid
+          assert "(x <= 254)" in contract_result_add_valid["contract_ensures"][0], contract_result_add_valid
+          assert contract_result_add_invalid["status"] == "proof_failure", contract_result_add_invalid
           assert loop["bounds"] == [{
               "kind":"literal_for_exhaustive_unroll",
               "start":0,
@@ -487,6 +514,8 @@ jobs:
             fixture-contract-arithmetic.json
             fixture-contract-result-valid.json
             fixture-contract-result-invalid.json
+            fixture-contract-result-add-valid.json
+            fixture-contract-result-add-invalid.json
             fixture-capabilities.json
 
   kani-reference-replay:
