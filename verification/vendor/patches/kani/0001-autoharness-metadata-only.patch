@@ -1974,7 +1974,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kani_middle/attributes.rs
 --- a/kani-compiler/src/kani_middle/attributes.rs
 +++ b/kani-compiler/src/kani_middle/attributes.rs
-@@ -1,1412 +1,1449 @@
+@@ -1,1412 +1,1455 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module contains code for processing Rust attributes (like `kani::proof`).
@@ -3722,6 +3722,12 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +        Some((Symbol::intern(check_name), parts.map(str::to_owned).collect()))
 +    }
 +
++    /// Raw post-expansion checked_with value, exposed only for validating the KVerus transport.
++    pub fn kverus_checked_with_raw(&self) -> Option<String> {
++        let attr = self.expect_maybe_one(KaniAttributeKind::CheckedWith)?;
++        expect_key_string_value(self.tcx.sess, attr).ok().map(|value| value.to_string())
++    }
++
 +    /// Return KVerus clause payloads packed into Kani's single checked_with value.
 +    pub fn kverus_contract_clauses(&self) -> Vec<String> {
 +        const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
@@ -4839,7 +4845,7 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
 --- a/kani-compiler/src/kani_middle/metadata.rs
 +++ b/kani-compiler/src/kani_middle/metadata.rs
-@@ -1,173 +1,210 @@
+@@ -1,173 +1,216 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module handles Kani metadata generation. For example, generating HarnessMetadata for a
@@ -5117,7 +5123,13 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +        let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
 +
 +        if attributes.has_contract() {
++            let raw_checked_with = attributes.kverus_checked_with_raw();
 +            let clauses = decode_contract_clauses(attributes.kverus_contract_clauses(), &function);
++            if clauses.is_empty() {
++                panic!(
++                    "KVERUS_CONTRACT_TRANSPORT_EMPTY function={function} checked_with={raw_checked_with:?}"
++                );
++            }
 +            fn_to_data.insert(
 +                item.def_id(),
 +                ContractedFunction { function, file, harnesses: vec![], clauses },
