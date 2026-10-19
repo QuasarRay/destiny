@@ -41,7 +41,7 @@
         {
           "id": "0001-autoharness-metadata-only",
           "path": "verification/vendor/patches/kani/0001-autoharness-metadata-only.patch",
-          "sha256": "f6f61cccb99c9b31f21b8a977d29b26405aa1a4d1c24a5ca07f2cb1f5c702083",
+          "sha256": "1adc5318ae5b6bb01c475603510249fe35a55089833a27049bdcc0e995f7219d",
           "upstream_files": [
             "kani-driver/src/autoharness/mod.rs",
             "kani-driver/src/project.rs",
