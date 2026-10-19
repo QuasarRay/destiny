@@ -1549,7 +1549,7 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
 diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 --- a/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 +++ b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
-@@ -1,180 +1,227 @@
+@@ -1,180 +1,226 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -
@@ -1746,11 +1746,11 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +static KVERUS_CONTRACT_CLAUSE_MARKER_ID: AtomicUsize = AtomicUsize::new(0);
 +
 +impl<'a> ContractConditionsHandler<'a> {
-+    /// Materialize one Kani-parsed contract clause as a named module-level sibling item.
++    /// Materialize one Kani-parsed contract clause as a named module-level static string.
 +    ///
-+    /// Named const items are part of rustc_public::all_local_items(). A process-local
-+    /// atomic only supplies collision-free generated identifiers; the identifier is not
-+    /// evidence and never participates in the exported clause semantics.
++    /// The payload is compiler-visible constant data, not an attribute. Kani's metadata
++    /// pass recognizes the generated item name and reads the initializer through rustc
++    /// constant evaluation.
 +    fn contract_clause_marker(&self) -> TokenStream {
 +        let (kind, expression) = match &self.condition_type {
 +            super::ContractConditionsData::Requires { attr } => {
@@ -1778,9 +1778,8 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            Span::call_site(),
 +        );
 +        quote!(
-+            #[allow(dead_code)]
-+            #[kanitool::fn_marker = #marker]
-+            const #marker_ident: () = ();
++            #[allow(dead_code, non_upper_case_globals)]
++            static #marker_ident: &str = #marker;
 +        )
 +    }
 +
@@ -1960,7 +1959,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
 --- a/kani-compiler/src/kani_middle/metadata.rs
 +++ b/kani-compiler/src/kani_middle/metadata.rs
-@@ -1,173 +1,220 @@
+@@ -1,173 +1,231 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module handles Kani metadata generation. For example, generating HarnessMetadata for a
@@ -2231,17 +2230,28 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +        }
 +    }
 +
-+    // Recover Kani-parsed clauses from named module-level sibling marker items.
++    // Recover Kani-parsed clauses from compiler-visible static string marker items.
++    const MARKER_ITEM_PREFIX: &str = "__kani_kverus_contract_clause_";
 +    const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
 +    for item in rustc_public::all_local_items() {
-+        let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
-+        let Some(marker) = attributes.fn_marker() else {
++        let item_name = strip_local_crate_prefix(item.name());
++        if !item_name.rsplit("::").next().is_some_and(|name| name.starts_with(MARKER_ITEM_PREFIX)) {
 +            continue;
-+        };
-+        let marker = marker.as_str();
-+        let Some(payload) = marker.strip_prefix(CLAUSE_PREFIX) else {
-+            continue;
-+        };
++        }
++
++        let marker_def = rustc_public::rustc_internal::internal(tcx, item.def_id());
++        let value = tcx.const_eval_poly(marker_def).unwrap_or_else(|error| {
++            panic!("failed to evaluate KVerus contract clause marker {item_name}: {error:?}")
++        });
++        let bytes = value.try_get_slice_bytes_for_diagnostics(tcx).unwrap_or_else(|| {
++            panic!("KVerus contract clause marker is not a string constant: {item_name}")
++        });
++        let marker = std::str::from_utf8(bytes).unwrap_or_else(|error| {
++            panic!("KVerus contract clause marker is not UTF-8: {error}")
++        });
++        let payload = marker.strip_prefix(CLAUSE_PREFIX).unwrap_or_else(|| {
++            panic!("malformed internal KVerus contract clause marker: {marker}")
++        });
 +        let mut parts = payload.splitn(3, ':');
 +        let function_leaf = parts.next().unwrap_or_default();
 +        let kind = parts.next().unwrap_or_default();
@@ -2255,7 +2265,7 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +            "modifies" => ContractClauseKind::Modifies,
 +            _ => panic!("unknown internal KVerus contract clause kind: {kind}"),
 +        };
-+        let marker_def = rustc_public::rustc_internal::internal(tcx, item.def_id());
++
 +        let marker_module = tcx.parent(marker_def);
 +        let (_, contracted) = fn_to_data
 +            .iter_mut()
