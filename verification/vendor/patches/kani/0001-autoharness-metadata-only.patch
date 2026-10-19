@@ -1549,7 +1549,7 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
 diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 --- a/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 +++ b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
-@@ -1,180 +1,271 @@
+@@ -1,180 +1,274 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -
@@ -1781,10 +1781,13 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +    /// This is discovery evidence, never proof credit. KVerus binds the record back to
 +    /// Kani's ContractedFunction inventory and fails closed on missing or ambiguous identities.
 +    fn record_contract_clause_evidence(&self, function: &str, kind: &str, expression: &str) {
-+        let Some(directory) = std::env::var_os("KVERUS_CONTRACT_CLAUSE_DIR") else {
-+            return;
++        let directory = if let Some(directory) = std::env::var_os("KVERUS_CONTRACT_CLAUSE_DIR") {
++            std::path::PathBuf::from(directory)
++        } else {
++            std::env::current_dir()
++                .expect("failed to resolve KVerus contract-clause working directory")
++                .join("kani-contract-clauses")
 +        };
-+        let directory = std::path::PathBuf::from(directory);
 +        std::fs::create_dir_all(&directory)
 +            .expect("failed to create KVerus contract-clause evidence directory");
 +
