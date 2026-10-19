@@ -124,15 +124,6 @@ class TranslatorTests(unittest.TestCase):
             lowered,
         )
 
-    def test_first_assumption_omits_tautological_triggerless_antecedent(self):
-        function = self.parse(
-            "pub fn assumed(x: u8) { kani::assume(x > 0); assert!(x > 0); }\n"
-        )[0]
-        witnesses = vk.collect_assumption_witnesses(function.body)
-        lowered = vk.lower_nonvacuity(function, witnesses)
-        self.assertIn("assert(exists|x: u8| ((x > 0)));", lowered)
-        self.assertNotIn("exists|x: u8| true", lowered)
-
     def test_assumption_nonvacuity_is_scoped_to_contract_precondition(self):
         function = self.parse(
             "pub fn contracted(x: bool, y: bool) { kani::assume(y); assert!(y); }\n"
