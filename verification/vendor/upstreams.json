@@ -45,24 +45,26 @@
             "kani-driver/src/autoharness/mod.rs",
             "kani-driver/src/project.rs",
             "library/kani_macros/src/sysroot/contracts/bootstrap.rs",
+            "kani-compiler/src/kani_middle/attributes.rs",
             "kani-compiler/src/kani_middle/metadata.rs",
             "kani_metadata/src/lib.rs"
           ],
           "postimage_git_blobs": {
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
-            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "d63e223782f9132935177e458f05e657437be90b",
-            "kani-compiler/src/kani_middle/metadata.rs": "53591b190aba0a8bcae77ee2e74ceb58b417caef",
-            "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a"
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "a1ecdfda3d21a72d120fe933d1178698c1789b9d",
+            "kani-compiler/src/kani_middle/metadata.rs": "fec588fa5e3ef52c18e767bd0558e0d1998aee12",
+            "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a",
+            "kani-compiler/src/kani_middle/attributes.rs": "d7c64c850a413aaafce0f9113920dc2c2402dec8"
           },
-          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses in explicitly invoked local helpers carrying Kani's existing fn_marker attribute. gen_contracts_metadata reads the definition-level FnDef body directly and recovers marker calls from its stable MIR, so generic definitions do not require invented monomorphic instances.",
-          "git_blob": "9fd5a774cf9d4d24018ca1124b5b57f73b72d4d0"
+          "purpose": "Make autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses as repeated, recognized kanitool::kverus_contract_clause name-value attributes directly on each expanded contracted function. KaniAttributes validates and exposes those payloads; gen_contracts_metadata decodes only the envelope, so no second Rust contract parser is introduced.",
+          "git_blob": "2d948fb6d3585ef0c42ab768c5c11d43f8bb4283"
         }
       ]
     }
   },
   "current_boundary": {
-    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani-parsed contract clauses are embedded as no-op marker calls inside the expanded contracted function and recovered from the definition-level FnDef stable MIR using Kani's existing fn_marker mechanism. Metadata carries no proof credit.",
+    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani's proc-macro parser emits every parsed contract clause as a recognized repeated internal name-value attribute on the contracted function definition; KaniAttributes validates/reads it and compiler metadata exports it. Clause metadata carries no proof credit.",
     "default_engine": "verus"
   },
   "repository_gitlinks": [
