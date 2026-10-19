@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import stat
 import subprocess
 import tempfile
@@ -17,6 +18,81 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def read_clause_evidence(directory: Path) -> list[dict[str, str]]:
+    records = []
+    for path in sorted(directory.glob("*.clause")):
+        parts = path.read_text(encoding="utf-8").split("\n", 4)
+        if len(parts) != 5 or parts[0] != "kverus_contract_clause_v1":
+            raise SystemExit(f"Malformed KVerus contract-clause evidence: {path}")
+        _, crate_name, function, kind, expression = parts
+        if not function or kind not in {"requires", "ensures", "modifies"} or not expression.strip():
+            raise SystemExit(f"Invalid KVerus contract-clause evidence: {path}")
+        records.append({
+            "path": str(path),
+            "sha256": digest(path),
+            "crate_name": crate_name.replace("-", "_"),
+            "function": function,
+            "kind": kind,
+            "expression": expression,
+        })
+    return records
+
+
+def bind_clause_evidence(metadata: list[dict], records: list[dict[str, str]]) -> None:
+    targets = []
+    for payload in metadata:
+        crate_name = payload.get("crate_name")
+        if not isinstance(crate_name, str) or not crate_name:
+            raise SystemExit("Kani metadata is missing crate_name")
+        rows = payload.get("contracted_functions", [])
+        if not isinstance(rows, list):
+            raise SystemExit(f"Malformed contracted_functions metadata for {crate_name}")
+        for row in rows:
+            if not isinstance(row, dict) or not isinstance(row.get("function"), str):
+                raise SystemExit(f"Malformed contracted function metadata for {crate_name}")
+            targets.append((crate_name.replace("-", "_"), row))
+
+    for record in records:
+        matches = [
+            row
+            for crate_name, row in targets
+            if row["function"].rsplit("::", 1)[-1] == record["function"]
+            and (not record["crate_name"] or crate_name == record["crate_name"])
+        ]
+        if len(matches) != 1:
+            raise SystemExit(
+                "KVerus parser clause does not map to exactly one Kani contracted function: "
+                f"{record['crate_name']}::{record['function']} -> {len(matches)} matches"
+            )
+        row = matches[0]
+        clauses = row.setdefault("clauses", [])
+        if not isinstance(clauses, list):
+            raise SystemExit(f"Malformed clauses metadata for {row['function']}")
+        clause = {"kind": record["kind"], "expression": record["expression"]}
+        if clause not in clauses:
+            clauses.append(clause)
+
+    for _, row in targets:
+        clauses = row.setdefault("clauses", [])
+        if not clauses:
+            raise SystemExit(
+                f"Kani reports {row['function']} as contracted but KVerus received no "
+                "Kani-parser clause evidence"
+            )
+        unique = {
+            (clause.get("kind"), clause.get("expression"))
+            for clause in clauses
+            if isinstance(clause, dict)
+        }
+        if len(unique) != len(clauses):
+            clauses[:] = [
+                {"kind": kind, "expression": expression}
+                for kind, expression in sorted(unique)
+            ]
+        else:
+            clauses.sort(key=lambda clause: (clause["kind"], clause["expression"]))
 
 
 def main() -> int:
@@ -69,6 +145,10 @@ def main() -> int:
     manifest = args.manifest_path.resolve(strict=True)
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
+    clause_dir = out / "kani-contract-clauses"
+    if clause_dir.exists():
+        shutil.rmtree(clause_dir)
+    clause_dir.mkdir(parents=True)
     forbidden_log = out / "forbidden-backend-tools.log"
     if forbidden_log.exists():
         forbidden_log.unlink()
@@ -85,6 +165,7 @@ def main() -> int:
 
         env = os.environ.copy()
         env["PATH"] = str(blocker) + os.pathsep + env.get("PATH", "")
+        env["KVERUS_CONTRACT_CLAUSE_DIR"] = str(clause_dir)
         cmd = [
             str(driver),
             "autoharness",
@@ -121,6 +202,10 @@ def main() -> int:
         if not isinstance(payload, dict):
             raise SystemExit(f"Malformed Kani metadata object: {path}")
         combined.append(payload)
+
+    clause_evidence = read_clause_evidence(clause_dir)
+    bind_clause_evidence(combined, clause_evidence)
+
     combined_path = out / "kani-metadata.json"
     combined_path.write_text(
         json.dumps(combined, indent=2, sort_keys=True) + "\n",
@@ -141,6 +226,12 @@ def main() -> int:
             "path": str(proc_macro),
             "sha256": digest(proc_macro),
             "kverus_transport_marker": proc_macro_marker.decode("ascii"),
+        },
+        "contract_clause_evidence": {
+            "source": "patched_kani_macros_syn_parser",
+            "directory": str(clause_dir.relative_to(ROOT)),
+            "proof_credit": False,
+            "records": clause_evidence,
         },
         "combined_metadata": {
             "path": str(combined_path.relative_to(ROOT)),

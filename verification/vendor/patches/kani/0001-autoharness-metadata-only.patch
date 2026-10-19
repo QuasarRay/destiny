@@ -1549,7 +1549,7 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
 diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 --- a/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 +++ b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
-@@ -1,180 +1,241 @@
+@@ -1,180 +1,271 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -
@@ -1738,7 +1738,10 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +
 +use proc_macro2::{Ident, Span, TokenStream};
 +use quote::{ToTokens, quote};
++use std::sync::atomic::{AtomicU64, Ordering};
 +use syn::{Expr, ItemFn, Stmt};
++
++static KVERUS_CLAUSE_EVIDENCE_ID: AtomicU64 = AtomicU64::new(0);
 +
 +use super::{ContractConditionsHandler, INTERNAL_RESULT_IDENT, helpers::*};
 +
@@ -1769,7 +1772,34 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            panic!("KVerus contract clause expression contains reserved metadata delimiter")
 +        }
 +        let function = self.annotated_fn.sig.ident.to_string();
++        self.record_contract_clause_evidence(&function, kind, &expression);
 +        format!("kverus_contract_clause:{function}:{kind}:{expression}")
++    }
++
++    /// Persist the already-parsed Kani clause before rustc lowers the expanded function.
++    ///
++    /// This is discovery evidence, never proof credit. KVerus binds the record back to
++    /// Kani's ContractedFunction inventory and fails closed on missing or ambiguous identities.
++    fn record_contract_clause_evidence(&self, function: &str, kind: &str, expression: &str) {
++        let Some(directory) = std::env::var_os("KVERUS_CONTRACT_CLAUSE_DIR") else {
++            return;
++        };
++        let directory = std::path::PathBuf::from(directory);
++        std::fs::create_dir_all(&directory)
++            .expect("failed to create KVerus contract-clause evidence directory");
++
++        let crate_name = std::env::var("CARGO_CRATE_NAME").unwrap_or_default();
++        let id = KVERUS_CLAUSE_EVIDENCE_ID.fetch_add(1, Ordering::Relaxed);
++        let pid = std::process::id();
++        let temporary = directory.join(format!(".{pid}-{id}.tmp"));
++        let final_path = directory.join(format!("{pid}-{id}.clause"));
++        let payload = format!(
++            "kverus_contract_clause_v1\n{crate_name}\n{function}\n{kind}\n{expression}"
++        );
++        std::fs::write(&temporary, payload)
++            .expect("failed to write KVerus contract-clause evidence");
++        std::fs::rename(&temporary, &final_path)
++            .expect("failed to publish KVerus contract-clause evidence");
 +    }
 +
 +    fn append_contract_clause_to_checked_with(&self, annotated_fn: &mut ItemFn) {
