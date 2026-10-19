@@ -46,6 +46,26 @@ def main() -> int:
             "Selected Kani driver is not paired with the patched KVerus kani-compiler"
         )
 
+    kani_root = driver.parent.parent
+    proc_macro_candidates = sorted(
+        path
+        for pattern in ("libkani_macros*.so", "libkani_macros*.dylib", "kani_macros*.dll")
+        for path in (kani_root / "lib").glob(pattern)
+        if path.is_file()
+    )
+    if len(proc_macro_candidates) != 1:
+        raise SystemExit(
+            "Expected exactly one Kani proc-macro library in the dev sysroot; "
+            f"found {[str(path) for path in proc_macro_candidates]}"
+        )
+    proc_macro = proc_macro_candidates[0].resolve(strict=True)
+    proc_macro_marker = b"kverus_contract_clause"
+    if proc_macro_marker not in proc_macro.read_bytes():
+        raise SystemExit(
+            "Selected Kani dev sysroot does not contain the patched KVerus kani_macros "
+            "contract transport"
+        )
+
     manifest = args.manifest_path.resolve(strict=True)
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -116,6 +136,11 @@ def main() -> int:
             "path": str(compiler),
             "sha256": digest(compiler),
             "kverus_transport_marker": compiler_marker.decode("ascii"),
+        },
+        "proc_macro": {
+            "path": str(proc_macro),
+            "sha256": digest(proc_macro),
+            "kverus_transport_marker": proc_macro_marker.decode("ascii"),
         },
         "combined_metadata": {
             "path": str(combined_path.relative_to(ROOT)),
