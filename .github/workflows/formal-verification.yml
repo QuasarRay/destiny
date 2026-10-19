@@ -101,7 +101,7 @@ jobs:
           cargo +nightly-2026-08-21 test -p kani_metadata
           RUSTFLAGS=--cfg=kani_sysroot cargo +nightly-2026-08-21 test -p kani_macros --features syn/extra-traits --lib
 
-      - name: Prepare Kani discovery and reviewed Verus binding through KVerus
+      - name: Prepare and finalize reviewed KVerus orchestration boundary
         run: |
           set -euo pipefail
           out=".aegis/destiny/kani-autoharness-discovery"
@@ -145,11 +145,48 @@ jobs:
           assert receipt["controller_obligation_count"] == len(binding["controller_obligations"]), receipt
           assert receipt["contract_inventory_count"] == binding["contract_inventory_count"], receipt
           assert receipt["contract_clause_count"] == binding["contract_clause_count"], receipt
-          print(json.dumps({
-              "default_engine": receipt["default_engine"],
-              "selected": receipt["selected_count"],
-              "proof_credit": receipt["proof_credit"],
-          }, sort_keys=True))
+
+          campaign=root/"synthetic-finalization-campaign"
+          campaign.mkdir(parents=True, exist_ok=True)
+          (campaign/"binding.json").write_text(json.dumps({"status":"BOUND"})+"\n")
+          (campaign/"audit.json").write_text(json.dumps({"status":"CHECKED_SCOPED"})+"\n")
+          for obligation in binding["controller_obligations"]:
+              (campaign/f"{obligation}.json").write_text(
+                  json.dumps({"status":"CHECKED_SCOPED"})+"\n"
+              )
+          PY
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            finalize-reviewed \
+            --reviewed-dir "$out" \
+            --campaign-dir "$out/synthetic-finalization-campaign" \
+            > "$out/reviewed-finalization-stdout.json"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          binding=json.loads((root/"verus-binding.json").read_text())
+          campaign_binding=json.loads((root/"verus-receipt-binding.json").read_text())
+          receipt=json.loads((root/"reviewed-finalization-receipt.json").read_text())
+          stdout_receipt=json.loads((root/"reviewed-finalization-stdout.json").read_text())
+
+          assert receipt == stdout_receipt, (receipt, stdout_receipt)
+          assert campaign_binding["status"] == "KANI_SELECTED_VERUS_CHECKED_SCOPED", campaign_binding
+          assert campaign_binding["engine"] == "verus", campaign_binding
+          assert campaign_binding["kani_proof_credit"] is False, campaign_binding
+          assert campaign_binding["verus_checked_scoped"] is True, campaign_binding
+
+          assert receipt["status"] == "KVERUS_REVIEWED_VERUS_FINALIZED", receipt
+          assert receipt["engine"] == "verus", receipt
+          assert receipt["kani_proof_credit"] is False, receipt
+          assert receipt["verus_checked_scoped"] is True, receipt
+          assert receipt["campaign_binding_status"] == "KANI_SELECTED_VERUS_CHECKED_SCOPED", receipt
+          assert receipt["checked_receipt_count"] == len(binding["controller_obligations"]), receipt
+          assert receipt["contract_inventory_count"] == binding["contract_inventory_count"], receipt
+          assert receipt["contract_clause_count"] == binding["contract_clause_count"], receipt
           PY
 
       - name: Discover the generated-obligation fixture corpus through the same Kani compiler path
@@ -560,12 +597,30 @@ jobs:
           python3 -B verification/tools/check_concurrency_acceptance.py --structure-only
           python3 -B verification/tools/run_verus_campaign.py --verus "$VERUS_BIN"
 
-      - name: Bind Kani-selected identities to the fresh Verus campaign receipts
+      - name: Finalize Kani-selected identities against the fresh Verus campaign
         run: |
-          python3 -B verification/tools/bind_kani_verus.py check-campaign \
-            --binding .aegis/destiny/kani-autoharness-discovery/verus-binding.json \
+          set -euo pipefail
+          reviewed=".aegis/destiny/kani-autoharness-discovery"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            finalize-reviewed \
+            --reviewed-dir "$reviewed" \
             --campaign-dir .aegis/destiny/verus-final-campaign \
-            --output .aegis/destiny/kani-autoharness-discovery/verus-receipt-binding.json
+            > "$reviewed/reviewed-finalization-stdout.json"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          receipt=json.loads((root/"reviewed-finalization-receipt.json").read_text())
+          stdout_receipt=json.loads((root/"reviewed-finalization-stdout.json").read_text())
+          campaign_binding=json.loads((root/"verus-receipt-binding.json").read_text())
+          assert receipt == stdout_receipt, (receipt, stdout_receipt)
+          assert receipt["status"] == "KVERUS_REVIEWED_VERUS_FINALIZED", receipt
+          assert receipt["engine"] == "verus", receipt
+          assert receipt["kani_proof_credit"] is False, receipt
+          assert receipt["verus_checked_scoped"] is True, receipt
+          assert campaign_binding["status"] == "KANI_SELECTED_VERUS_CHECKED_SCOPED", campaign_binding
+          PY
 
       - name: Retain complete counted results, VIR inventories and scope audit
         if: always()

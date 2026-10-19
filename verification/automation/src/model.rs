@@ -112,6 +112,7 @@ pub enum AutomationCommand {
     Plan { path: String },
     Prepare { manifest_path: String, output_dir: String },
     PrepareReviewed { manifest_path: String, output_dir: String },
+    FinalizeReviewed { reviewed_dir: String, campaign_dir: String },
     Explain,
     Verify { args: Vec<String> },
     ReplayKaniReference { args: Vec<String> },
@@ -132,4 +133,22 @@ pub struct ReviewedPreparationReceipt {
     pub controller_obligation_count: usize,
     pub contract_inventory_count: usize,
     pub contract_clause_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedFinalizationReceipt {
+    pub schema: u32,
+    pub status: &'static str,
+    pub engine: &'static str,
+    pub kani_proof_credit: bool,
+    pub verus_checked_scoped: bool,
+    pub reviewed_dir: String,
+    pub campaign_dir: String,
+    pub binding_path: String,
+    pub campaign_binding_path: String,
+    pub campaign_binding_status: String,
+    pub checked_receipt_count: usize,
+    pub contract_inventory_count: usize,
+    pub contract_clause_count: usize,
+    pub translation_correctness: String,
 }

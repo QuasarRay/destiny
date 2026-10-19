@@ -95,7 +95,9 @@
   "execution_orchestration": {
     "project_layout": "CGP ProjectLayout provider",
     "python_tool_execution": "CGP PythonToolRunner provider",
-    "unsafe_code": false
+    "unsafe_code": false,
+    "json_python_tool_execution": "CGP JsonPythonToolRunner over PythonToolRunner",
+    "json_artifact_loading": "CGP JsonArtifactStore over ArtifactStore"
   },
   "preparation": {
     "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
@@ -134,5 +136,30 @@
     "command_identity": "validated and canonically rendered through proc_macro2 + safe arcane-rs/synthez ToTokens replay",
     "string_parsing_in_main": false,
     "unsafe_code": false
+  },
+  "reviewed_campaign_finalization": {
+    "command": "finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP ReviewedCampaignFinalization delegates to the existing bind_kani_verus.py check-campaign path",
+    "requires": [
+      "reviewed directory containing verus-binding.json from prepare-reviewed",
+      "campaign directory containing binding.json and audit.json",
+      "one fresh CHECKED_SCOPED receipt per selected controller obligation"
+    ],
+    "validates": [
+      "campaign binder schema 1",
+      "status KANI_SELECTED_VERUS_CHECKED_SCOPED",
+      "engine remains verus",
+      "Kani proof credit remains false",
+      "Verus checked-scoped marker is true",
+      "checked receipt inventory is nonempty",
+      "subprocess JSON equals persisted campaign binding JSON"
+    ],
+    "emits": [
+      "verus-receipt-binding.json",
+      "reviewed-finalization-receipt.json"
+    ],
+    "proof_credit_scope": "existing reviewed Verus CHECKED_SCOPED campaign receipts only",
+    "kani_proof_credit": false
   }
 }

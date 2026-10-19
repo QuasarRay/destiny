@@ -86,3 +86,33 @@ of parsing flag strings itself. Static command names are converted to Rust-style
 identifiers and replayed through `proc_macro2` plus the safe `synthez::ToTokens`
 wrapper, giving the command catalog the same unsafe-free macro boundary as contract
 token diagnostics. `arcane-rs/delegation` remains intentionally excluded.
+
+## Fifth slice: reviewed campaign finalization and shared JSON tool boundary
+
+`ReviewedCampaignFinalization` composes the existing
+`verification/tools/bind_kani_verus.py check-campaign` path instead of duplicating its
+receipt validation semantics. The new
+`finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>` command:
+
+1. reuses `verus-binding.json` produced by `prepare-reviewed`;
+2. invokes the existing campaign binder through the CGP JSON subprocess runner;
+3. requires the subprocess JSON and persisted `verus-receipt-binding.json` to be
+   structurally identical;
+4. validates the binder's public schema/status/engine/Kani-credit/scoped-Verus invariants;
+5. writes `reviewed-finalization-receipt.json` with the checked receipt count and
+   contract metadata counts.
+
+This command does not run Verus and cannot manufacture proof receipts. Its
+`verus_checked_scoped = true` value is accepted only when the existing binder has
+validated a campaign directory containing the required fresh `CHECKED_SCOPED` receipts.
+
+Two orchestration concerns are now reusable CGP providers:
+
+- `JsonPythonToolRunner` owns captured Python subprocess execution, nonzero-exit
+  diagnostics, and JSON stdout decoding;
+- `JsonArtifactStore` owns JSON artifact loading on top of the existing atomic
+  `ArtifactStore`.
+
+The command catalog gains `finalize-reviewed`, so its identifier also passes through
+the existing `proc_macro2` + safe `arcane-rs/synthez` token replay boundary. No
+Rust-to-Verus translation semantics changed in this slice.

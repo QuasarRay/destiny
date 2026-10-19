@@ -5,14 +5,16 @@ mod model;
 
 pub use components::{
     CanBuildAutomationPlan, CanCanonicalizeContractClause, CanDescribeCommands,
-    CanNormalizeMetadata, CanParseMetadataBytes, CanPrepareAutomation,
-    CanPrepareReviewedBinding, CanReadWriteArtifacts, CanRouteCommand, CanRunPythonTool,
+    CanFinalizeReviewedCampaign, CanNormalizeMetadata, CanParseMetadataBytes,
+    CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
+    CanReadWriteArtifacts, CanRouteCommand, CanRunJsonPythonTool, CanRunPythonTool,
     CanValidateContractClause, HasProjectRoot, KVerusContext,
 };
 pub use model::{
     AutomationCommand, AutomationPlan, CommandDescriptor, ContractDiscovery, ContractPlan,
     DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport, PlanCounts,
-    PlannedContractClause, PreparationReceipt, ReviewedPreparationReceipt,
+    PlannedContractClause, PreparationReceipt, ReviewedFinalizationReceipt,
+    ReviewedPreparationReceipt,
 };
 
 use kani_metadata::KaniMetadata;
@@ -192,7 +194,16 @@ mod tests {
 
         let usage = KVerusContext.command_usage().unwrap();
         assert!(usage.contains("prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"));
+        assert!(usage.contains("finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
+
+        let finalizer = commands
+            .iter()
+            .find(|command| command.name == "finalize-reviewed")
+            .unwrap();
+        assert_eq!(finalizer.canonical_token, "finalize_reviewed");
+        assert_eq!(finalizer.category, "reviewed_binding");
+        assert!(!finalizer.proof_credit);
     }
 
     #[test]
@@ -212,6 +223,27 @@ mod tests {
             AutomationCommand::PrepareReviewed {
                 manifest_path: "verification/spec/Cargo.toml".to_string(),
                 output_dir: ".aegis/out".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn command_router_builds_typed_reviewed_finalization_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "finalize-reviewed".to_string(),
+                "--campaign-dir".to_string(),
+                ".aegis/campaign".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::FinalizeReviewed {
+                reviewed_dir: ".aegis/reviewed".to_string(),
+                campaign_dir: ".aegis/campaign".to_string(),
             }
         );
     }

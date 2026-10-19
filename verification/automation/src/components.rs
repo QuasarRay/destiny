@@ -2,7 +2,7 @@ use crate::{
     AutomationCommand, AutomationPlan, CommandDescriptor, ContractDiscovery, ContractPlan,
     DEFAULT_ENGINE, DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport,
     KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause, PreparationReceipt,
-    ReviewedPreparationReceipt,
+    ReviewedFinalizationReceipt, ReviewedPreparationReceipt,
 };
 use cgp::prelude::*;
 use kani_metadata::{
@@ -153,17 +153,27 @@ impl CommandRouter {
                 path: rest[0].clone(),
             }),
             "prepare" => {
-                let (manifest_path, output_dir) = parse_manifest_output_args(rest)?;
+                let (manifest_path, output_dir) =
+                    parse_required_pair(rest, "--manifest-path", "--output-dir")?;
                 Ok(AutomationCommand::Prepare {
                     manifest_path,
                     output_dir,
                 })
             }
             "prepare-reviewed" => {
-                let (manifest_path, output_dir) = parse_manifest_output_args(rest)?;
+                let (manifest_path, output_dir) =
+                    parse_required_pair(rest, "--manifest-path", "--output-dir")?;
                 Ok(AutomationCommand::PrepareReviewed {
                     manifest_path,
                     output_dir,
+                })
+            }
+            "finalize-reviewed" => {
+                let (reviewed_dir, campaign_dir) =
+                    parse_required_pair(rest, "--reviewed-dir", "--campaign-dir")?;
+                Ok(AutomationCommand::FinalizeReviewed {
+                    reviewed_dir,
+                    campaign_dir,
                 })
             }
             "explain" if rest.is_empty() => Ok(AutomationCommand::Explain),
@@ -181,9 +191,13 @@ impl CommandRouter {
     }
 }
 
-fn parse_manifest_output_args(args: &[String]) -> Result<(String, String), String> {
-    let mut manifest_path = None;
-    let mut output_dir = None;
+fn parse_required_pair(
+    args: &[String],
+    first_flag: &str,
+    second_flag: &str,
+) -> Result<(String, String), String> {
+    let mut first = None;
+    let mut second = None;
     let mut index = 0;
 
     while index < args.len() {
@@ -192,17 +206,19 @@ fn parse_manifest_output_args(args: &[String]) -> Result<(String, String), Strin
             .get(index + 1)
             .ok_or_else(|| format!("missing value for {flag}"))?
             .clone();
-        match flag {
-            "--manifest-path" if manifest_path.is_none() => manifest_path = Some(value),
-            "--output-dir" if output_dir.is_none() => output_dir = Some(value),
-            _ => return Err(format!("unexpected or duplicate argument {flag}")),
+        if flag == first_flag && first.is_none() {
+            first = Some(value);
+        } else if flag == second_flag && second.is_none() {
+            second = Some(value);
+        } else {
+            return Err(format!("unexpected or duplicate argument {flag}"));
         }
         index += 2;
     }
 
-    match (manifest_path, output_dir) {
-        (Some(manifest_path), Some(output_dir)) => Ok((manifest_path, output_dir)),
-        _ => Err("both --manifest-path and --output-dir are required".into()),
+    match (first, second) {
+        (Some(first), Some(second)) => Ok((first, second)),
+        _ => Err(format!("both {first_flag} and {second_flag} are required")),
     }
 }
 
@@ -507,6 +523,45 @@ impl PythonToolRunner {
     }
 }
 
+#[cgp_component(JsonPythonToolRunner)]
+pub trait CanRunJsonPythonTool {
+    fn run_python_json(
+        &self,
+        script: &str,
+        args: &[String],
+    ) -> Result<serde_json::Value, String>;
+}
+
+#[cgp_impl(new CapturedJsonPythonToolRunner)]
+#[uses(CanRunPythonTool)]
+impl JsonPythonToolRunner {
+    fn run_python_json(
+        &self,
+        script: &str,
+        args: &[String],
+    ) -> Result<serde_json::Value, String> {
+        let output = self
+            .run_python_tool_output(script, args)
+            .map_err(|error| format!("failed to execute {script}: {error}"))?;
+
+        if !output.status.success() {
+            return Err(format!(
+                "{script} failed with {}: stdout={} stderr={}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout).trim(),
+                String::from_utf8_lossy(&output.stderr).trim()
+            ));
+        }
+
+        serde_json::from_slice(&output.stdout).map_err(|error| {
+            format!(
+                "{script} emitted invalid JSON: {error}; stdout={}",
+                String::from_utf8_lossy(&output.stdout).trim()
+            )
+        })
+    }
+}
+
 fn python_command(
     context: &impl HasProjectRoot,
     script: &str,
@@ -564,6 +619,23 @@ impl ArtifactStore {
                 Err(error)
             }
         }
+    }
+}
+
+#[cgp_component(JsonArtifactStore)]
+pub trait CanReadJsonArtifact {
+    fn read_json_artifact(&self, path: &Path) -> Result<serde_json::Value, String>;
+}
+
+#[cgp_impl(new SerdeJsonArtifactStore)]
+#[uses(CanReadWriteArtifacts)]
+impl JsonArtifactStore {
+    fn read_json_artifact(&self, path: &Path) -> Result<serde_json::Value, String> {
+        let bytes = self
+            .read_artifact(path)
+            .map_err(|error| format!("cannot read {}: {error}", path.display()))?;
+        serde_json::from_slice(&bytes)
+            .map_err(|error| format!("cannot parse {}: {error}", path.display()))
     }
 }
 
@@ -673,7 +745,12 @@ pub trait CanPrepareReviewedBinding {
 }
 
 #[cgp_impl(new KaniReviewedBindingPreparation)]
-#[uses(CanPrepareAutomation, CanRunPythonTool, CanReadWriteArtifacts)]
+#[uses(
+    CanPrepareAutomation,
+    CanRunJsonPythonTool,
+    CanReadJsonArtifact,
+    CanReadWriteArtifacts
+)]
 impl ReviewedBindingPreparation {
     fn prepare_reviewed_binding(
         &self,
@@ -692,26 +769,16 @@ impl ReviewedBindingPreparation {
             "--output".to_string(),
             binding_path.display().to_string(),
         ];
-        let output = self
-            .run_python_tool_output("verification/tools/bind_kani_verus.py", &args)
-            .map_err(|error| format!("failed to execute reviewed Verus binder: {error}"))?;
-
-        if !output.status.success() {
-            return Err(format!(
-                "reviewed Verus binding failed with {}: {} {}",
-                output.status,
-                String::from_utf8_lossy(&output.stdout).trim(),
-                String::from_utf8_lossy(&output.stderr).trim()
-            ));
+        let stdout_binding = self.run_python_json(
+            "verification/tools/bind_kani_verus.py",
+            &args,
+        )?;
+        let file_binding = self.read_json_artifact(&binding_path)?;
+        if stdout_binding != file_binding {
+            return Err("reviewed binder stdout and persisted receipt diverged".into());
         }
-
-        let binding_bytes = self
-            .read_artifact(&binding_path)
-            .map_err(|error| format!("cannot read {}: {error}", binding_path.display()))?;
-        let binding: ReviewedBindingReceipt =
-            serde_json::from_slice(&binding_bytes).map_err(|error| {
-                format!("cannot parse {}: {error}", binding_path.display())
-            })?;
+        let binding: ReviewedBindingReceipt = serde_json::from_value(file_binding)
+            .map_err(|error| format!("invalid reviewed binder receipt: {error}"))?;
 
         if binding.schema != 1
             || binding.status != "BOUND_FOR_VERUS"
@@ -752,6 +819,103 @@ impl ReviewedBindingPreparation {
     }
 }
 
+#[derive(Deserialize)]
+struct CampaignBindingReceipt {
+    schema: u32,
+    status: String,
+    engine: String,
+    kani_proof_credit: bool,
+    verus_checked_scoped: bool,
+    receipts: Vec<serde_json::Value>,
+    contract_inventory_count: usize,
+    contract_clause_count: usize,
+    translation_correctness: String,
+}
+
+#[cgp_component(ReviewedCampaignFinalization)]
+pub trait CanFinalizeReviewedCampaign {
+    fn finalize_reviewed_campaign(
+        &self,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+    ) -> Result<ReviewedFinalizationReceipt, String>;
+}
+
+#[cgp_impl(new KaniReviewedCampaignFinalization)]
+#[uses(CanRunJsonPythonTool, CanReadJsonArtifact, CanReadWriteArtifacts)]
+impl ReviewedCampaignFinalization {
+    fn finalize_reviewed_campaign(
+        &self,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+    ) -> Result<ReviewedFinalizationReceipt, String> {
+        let reviewed_dir_path = PathBuf::from(reviewed_dir);
+        let binding_path = reviewed_dir_path.join("verus-binding.json");
+        let campaign_binding_path = reviewed_dir_path.join("verus-receipt-binding.json");
+        let finalization_path = reviewed_dir_path.join("reviewed-finalization-receipt.json");
+
+        let args = vec![
+            "check-campaign".to_string(),
+            "--binding".to_string(),
+            binding_path.display().to_string(),
+            "--campaign-dir".to_string(),
+            campaign_dir.to_string(),
+            "--output".to_string(),
+            campaign_binding_path.display().to_string(),
+        ];
+        let stdout_receipt = self.run_python_json(
+            "verification/tools/bind_kani_verus.py",
+            &args,
+        )?;
+        let file_receipt = self.read_json_artifact(&campaign_binding_path)?;
+        if stdout_receipt != file_receipt {
+            return Err("campaign binder stdout and persisted receipt diverged".into());
+        }
+
+        let campaign: CampaignBindingReceipt = serde_json::from_value(file_receipt)
+            .map_err(|error| format!("invalid campaign binding receipt: {error}"))?;
+        if campaign.schema != 1
+            || campaign.status != "KANI_SELECTED_VERUS_CHECKED_SCOPED"
+            || campaign.engine != DEFAULT_ENGINE
+            || campaign.kani_proof_credit
+            || !campaign.verus_checked_scoped
+            || campaign.receipts.is_empty()
+            || campaign.translation_correctness.is_empty()
+        {
+            return Err(format!(
+                "campaign binding receipt violated KVerus finalization invariants:                  schema={}, status={}, engine={}, kani_proof_credit={},                  verus_checked_scoped={}, receipts={}, translation_correctness_empty={}",
+                campaign.schema,
+                campaign.status,
+                campaign.engine,
+                campaign.kani_proof_credit,
+                campaign.verus_checked_scoped,
+                campaign.receipts.len(),
+                campaign.translation_correctness.is_empty()
+            ));
+        }
+
+        let receipt = ReviewedFinalizationReceipt {
+            schema: 1,
+            status: "KVERUS_REVIEWED_VERUS_FINALIZED",
+            engine: DEFAULT_ENGINE,
+            kani_proof_credit: false,
+            verus_checked_scoped: true,
+            reviewed_dir: reviewed_dir.to_string(),
+            campaign_dir: campaign_dir.to_string(),
+            binding_path: binding_path.display().to_string(),
+            campaign_binding_path: campaign_binding_path.display().to_string(),
+            campaign_binding_status: campaign.status,
+            checked_receipt_count: campaign.receipts.len(),
+            contract_inventory_count: campaign.contract_inventory_count,
+            contract_clause_count: campaign.contract_clause_count,
+            translation_correctness: campaign.translation_correctness,
+        };
+        self.write_artifact(&finalization_path, &pretty_json_bytes(&receipt)?)
+            .map_err(|error| format!("cannot write {}: {error}", finalization_path.display()))?;
+        Ok(receipt)
+    }
+}
+
 fn pretty_json_bytes(value: &impl Serialize) -> Result<Vec<u8>, String> {
     let mut bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
     bytes.push(b'\n');
@@ -780,12 +944,18 @@ delegate_and_check_components! {
             CargoManifestProjectLayout,
         PythonToolRunnerComponent:
             SystemPythonToolRunner,
+        JsonPythonToolRunnerComponent:
+            CapturedJsonPythonToolRunner,
         ArtifactStoreComponent:
             StdArtifactStore,
+        JsonArtifactStoreComponent:
+            SerdeJsonArtifactStore,
         AutomationPreparationComponent:
             KaniAutomationPreparation,
         ReviewedBindingPreparationComponent:
             KaniReviewedBindingPreparation,
+        ReviewedCampaignFinalizationComponent:
+            KaniReviewedCampaignFinalization,
     }
 }
 
