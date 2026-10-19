@@ -240,6 +240,9 @@ jobs:
       - name: Apply and validate the exported controller postimages
         run: python3 -B verification/tools/bootstrap_controller.py
 
+      - name: Apply validated Kani metadata patch for shared automation wrapper
+        run: python3 -B verification/tools/bootstrap_kani_vendor.py
+
       - name: Install verifier toolchains
         run: |
           rustup toolchain install 1.98.1-x86_64-unknown-linux-gnu
