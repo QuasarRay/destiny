@@ -1767,7 +1767,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            &format!("kverus_contract_clause:{function}:{kind}:{expression}"),
 +            Span::call_site(),
 +        );
-+        syn::parse_quote!(#[kanitool::kverus_contract_clause = #marker])
++        syn::parse_quote!(#[kanitool::checked_with = #marker])
 +    }
 +
 +    /// Generate initial contract.
@@ -1944,7 +1944,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kani_middle/attributes.rs
 --- a/kani-compiler/src/kani_middle/attributes.rs
 +++ b/kani-compiler/src/kani_middle/attributes.rs
-@@ -1,1412 +1,1434 @@
+@@ -1,1412 +1,1456 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module contains code for processing Rust attributes (like `kani::proof`).
@@ -3683,14 +3683,16 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +        self.map.contains_key(&KaniAttributeKind::CheckedWith)
 +    }
 +
-+    /// Return all repeated KVerus clause payloads preserved by Kani's proc macros.
++    /// Return all KVerus clause payloads multiplexed through Kani's existing checked_with channel.
 +    pub fn kverus_contract_clauses(&self) -> Vec<String> {
++        const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
 +        self.map
-+            .get(&KaniAttributeKind::KverusContractClause)
++            .get(&KaniAttributeKind::CheckedWith)
 +            .map_or([].as_slice(), Vec::as_slice)
 +            .iter()
 +            .filter_map(|attr| expect_key_string_value(self.tcx.sess, attr).ok())
 +            .map(|value| value.to_string())
++            .filter(|value| value.starts_with(CLAUSE_PREFIX))
 +            .collect()
 +    }
 +
@@ -3823,8 +3825,28 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +    /// Any format or expectation error is emitted already, and does not need to be handled
 +    /// upstream.
 +    fn attribute_value(&self, kind: KaniAttributeKind) -> Option<Symbol> {
-+        self.expect_maybe_one(kind)
-+            .and_then(|target| expect_key_string_value(self.tcx.sess, target).ok())
++        if kind == KaniAttributeKind::CheckedWith {
++            const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
++            let mut ordinary = self
++                .map
++                .get(&kind)?
++                .iter()
++                .filter_map(|attr| expect_key_string_value(self.tcx.sess, attr).ok())
++                .filter(|value| !value.as_str().starts_with(CLAUSE_PREFIX));
++            let first = ordinary.next();
++            if ordinary.next().is_some() {
++                self.tcx.dcx().err(format!(
++                    "Too many ordinary {} attributes on {}, expected exactly one contract check name",
++                    kind.as_ref(),
++                    self.tcx.def_path_debug_str(self.item)
++                ));
++                return None;
++            }
++            first
++        } else {
++            self.expect_maybe_one(kind)
++                .and_then(|target| expect_key_string_value(self.tcx.sess, target).ok())
++        }
 +    }
 +
 +    /// Check that any unstable API has been enabled. Otherwise, emit an error.
