@@ -57,3 +57,194 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
  /// Generate a project using `cargo`.
  /// Accept a boolean to build as many targets as possible. The number of failures in that case can
  /// be collected from the project.
+diff --git a/library/kani_macros/src/sysroot/contracts/initialize.rs b/library/kani_macros/src/sysroot/contracts/initialize.rs
+--- a/library/kani_macros/src/sysroot/contracts/initialize.rs
++++ b/library/kani_macros/src/sysroot/contracts/initialize.rs
+@@ -5,6 +5,7 @@
+ 
+ use proc_macro::{Diagnostic, TokenStream};
+ use proc_macro2::TokenStream as TokenStream2;
++use quote::ToTokens;
+ use syn::ItemFn;
+ 
+ use super::{
+@@ -69,6 +70,31 @@
+             }
+         };
+ 
++        // Preserve Kani-parsed contract clauses as compiler-visible metadata.
++        // This records the parsed token representation rather than re-parsing
++        // user source later in the Verus bridge.
++        let (clause_kind, clause_expression) = match &condition_type {
++            ContractConditionsData::Requires { attr } => {
++                ("requires", attr.to_token_stream().to_string())
++            }
++            ContractConditionsData::Ensures { attr } => {
++                ("ensures", attr.to_token_stream().to_string())
++            }
++            ContractConditionsData::Modifies { attr } => (
++                "modifies",
++                attr.iter()
++                    .map(|expr| expr.to_token_stream().to_string())
++                    .collect::<Vec<_>>()
++                    .join(", "),
++            ),
++        };
++        let contract_clause = format!("{clause_kind}:{clause_expression}");
++        let contract_clause =
++            syn::LitStr::new(&contract_clause, proc_macro2::Span::call_site());
++        annotated_fn.attrs.push(syn::parse_quote!(
++            #[kanitool::contract_clause = #contract_clause]
++        ));
++
+         let fn_name = &annotated_fn.sig.ident;
+         let generate_name = |purpose| format!("__kani_{purpose}_{fn_name}");
+         let assert_name = generate_name("assert");
+diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kani_middle/attributes.rs
+--- a/kani-compiler/src/kani_middle/attributes.rs
++++ b/kani-compiler/src/kani_middle/attributes.rs
+@@ -4,7 +4,9 @@
+ 
+ use std::collections::{BTreeMap, HashSet};
+ 
+-use kani_metadata::{CbmcSolver, HarnessAttributes, HarnessKind, Stub};
++use kani_metadata::{
++    CbmcSolver, ContractClause, ContractClauseKind, HarnessAttributes, HarnessKind, Stub,
++};
+ use quote::ToTokens;
+ use rustc_ast::{LitKind, MetaItem, MetaItemKind};
+ use rustc_data_structures::fx::FxHashMap;
+@@ -52,6 +54,8 @@
+     /// contract, e.g. the contract check is substituted for the target function
+     /// before the the verification runs.
+     ProofForContract,
++    /// Internal compiler-visible record of one parsed function-contract clause.
++    ContractClause,
+     /// Internal attribute of the contracts implementation. Identifies the
+     /// code implementing the function with its contract clauses asserted.
+     AssertedWith,
+@@ -111,6 +115,7 @@
+             | KaniAttributeKind::ModifiesWrapper
+             | KaniAttributeKind::AssertedWith
+             | KaniAttributeKind::IsContractGenerated
++            | KaniAttributeKind::ContractClause
+             | KaniAttributeKind::DisableChecks => false,
+         }
+     }
+@@ -315,6 +320,37 @@
+         self.attribute_value(KaniAttributeKind::FnMarker)
+     }
+ 
++    /// Return the Kani-parsed contract clauses preserved by the proc-macro layer.
++    pub fn contract_clauses(&self) -> Vec<ContractClause> {
++        self.map
++            .get(&KaniAttributeKind::ContractClause)
++            .into_iter()
++            .flatten()
++            .filter_map(|attr| {
++                let raw = expect_key_string_value(self.tcx.sess, attr).ok()?.to_string();
++                let Some((kind, expression)) = raw.split_once(':') else {
++                    self.tcx
++                        .dcx()
++                        .span_err(attr.span(), "malformed internal contract_clause attribute");
++                    return None;
++                };
++                let kind = match kind {
++                    "requires" => ContractClauseKind::Requires,
++                    "ensures" => ContractClauseKind::Ensures,
++                    "modifies" => ContractClauseKind::Modifies,
++                    other => {
++                        self.tcx.dcx().span_err(
++                            attr.span(),
++                            format!("unknown internal contract clause kind `{other}`"),
++                        );
++                        return None;
++                    }
++                };
++                Some(ContractClause { kind, expression: expression.to_string() })
++            })
++            .collect()
++    }
++
+     /// Check if function is annotated with any contract attribute.
+     pub fn has_contract(&self) -> bool {
+         self.map.contains_key(&KaniAttributeKind::CheckedWith)
+@@ -412,6 +448,11 @@
+                 | KaniAttributeKind::ReplacedWith => {
+                     self.attribute_value(kind);
+                 }
++                KaniAttributeKind::ContractClause => {
++                    attrs.iter().for_each(|attr| {
++                        let _ = expect_key_string_value(self.tcx.sess, attr);
++                    });
++                }
+                 KaniAttributeKind::IsContractGenerated => {
+                     // Ignored here because this is only used by the proc macros
+                     // to communicate with one another. So by the time it gets
+diff --git a/kani_metadata/src/lib.rs b/kani_metadata/src/lib.rs
+--- a/kani_metadata/src/lib.rs
++++ b/kani_metadata/src/lib.rs
+@@ -80,6 +80,20 @@
+     UserFilter,
+ }
+ #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, PartialOrd, Ord)]
++#[serde(rename_all = "snake_case")]
++pub enum ContractClauseKind {
++    Requires,
++    Ensures,
++    Modifies,
++}
++
++#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, PartialOrd, Ord)]
++pub struct ContractClause {
++    pub kind: ContractClauseKind,
++    pub expression: String,
++}
++
++#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, PartialOrd, Ord)]
+ pub struct ContractedFunction {
+     /// The fully qualified name the user gave to the function (i.e. includes the module path).
+     pub function: String,
+@@ -87,6 +101,9 @@
+     pub file: String,
+     /// The pretty names of the proof harnesses (`#[kani::proof_for_contract]`) for this function
+     pub harnesses: Vec<String>,
++    /// Contract clauses parsed by Kani's proc-macro layer.
++    #[serde(default)]
++    pub clauses: Vec<ContractClause>,
+ }
+ 
+ #[derive(Debug, Clone, Serialize, Deserialize)]
+diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
+--- a/kani-compiler/src/kani_middle/metadata.rs
++++ b/kani-compiler/src/kani_middle/metadata.rs
+@@ -69,11 +69,19 @@
+         let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
+ 
+         if attributes.has_contract() {
+-            fn_to_data
+-                .insert(item.def_id(), ContractedFunction { function, file, harnesses: vec![] });
++            fn_to_data.insert(
++                item.def_id(),
++                ContractedFunction {
++                    function,
++                    file,
++                    harnesses: vec![],
++                    clauses: attributes.contract_clauses(),
++                },
++            );
+         // This logic finds manual contract harnesses only (automatic harnesses are a Kani intrinsic, not crate items annotated with the proof_for_contract attribute).
+         } else if let Some(def) = attributes.interpret_for_contract_attribute() {
+             let target_def_id = def.def_id();
++            let clauses = KaniAttributes::for_def_id(tcx, target_def_id).contract_clauses();
+             if let Some(cf) = fn_to_data.get_mut(&target_def_id) {
+                 cf.harnesses.push(function);
+             } else {
+@@ -86,6 +94,7 @@
+                         function: strip_local_crate_prefix(item.name()),
+                         file,
+                         harnesses: vec![function],
++                        clauses,
+                     },
+                 );
+             }
