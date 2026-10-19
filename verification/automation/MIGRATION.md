@@ -116,3 +116,38 @@ Two orchestration concerns are now reusable CGP providers:
 The command catalog gains `finalize-reviewed`, so its identifier also passes through
 the existing `proc_macro2` + safe `arcane-rs/synthez` token replay boundary. No
 Rust-to-Verus translation semantics changed in this slice.
+
+## Sixth slice: reviewed evidence manifest and reusable receipt validators
+
+`ReviewedEvidenceAssembly` adds
+`manifest-reviewed --reviewed-dir <dir>`. It consumes only artifacts already produced
+by `prepare-reviewed` and `finalize-reviewed`:
+
+- `reviewed-preparation-receipt.json`;
+- `verus-binding.json`;
+- `verus-receipt-binding.json`;
+- `reviewed-finalization-receipt.json`.
+
+The assembler cross-checks engine, proof-credit markers, selected/obligation counts,
+contract inventory/clause counts, campaign receipt counts, translation-correctness
+classification, and the reviewed/finalized status chain. It emits
+`reviewed-evidence-manifest.json` with
+`proof_credit_source = existing_verus_checked_scoped_receipts_only`. The manifest
+does not itself prove anything and cannot upgrade Kani metadata into proof credit.
+
+The earlier inline binder checks are now reusable CGP providers:
+
+- `ReviewedBindingValidator` owns the public `BOUND_FOR_VERUS` invariants;
+- `CampaignBindingValidator` owns the public
+  `KANI_SELECTED_VERUS_CHECKED_SCOPED` invariants.
+
+`prepare-reviewed`, `finalize-reviewed`, and `manifest-reviewed` all reuse these
+validators rather than duplicating receipt policy.
+
+A new `TokenIdentity` CGP provider owns safe static-identifier canonicalization.
+Both CLI command identities and evidence-artifact kinds are normalized through the
+same `proc_macro2` + `synthez::ToTokens` path. This keeps the Arcane-derived macro
+surface safe and avoids introducing `arcane-rs/delegation` or unsafe code.
+
+No Rust-to-Verus lowering semantics, Kani contract semantics, reviewed mappings, or
+proof campaign acceptance rules changed in this slice.

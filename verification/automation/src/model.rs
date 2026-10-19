@@ -113,6 +113,7 @@ pub enum AutomationCommand {
     Prepare { manifest_path: String, output_dir: String },
     PrepareReviewed { manifest_path: String, output_dir: String },
     FinalizeReviewed { reviewed_dir: String, campaign_dir: String },
+    ManifestReviewed { reviewed_dir: String },
     Explain,
     Verify { args: Vec<String> },
     ReplayKaniReference { args: Vec<String> },
@@ -151,4 +152,49 @@ pub struct ReviewedFinalizationReceipt {
     pub contract_inventory_count: usize,
     pub contract_clause_count: usize,
     pub translation_correctness: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ReviewedBindingSummary {
+    pub status: String,
+    pub selected_count: usize,
+    pub controller_obligation_count: usize,
+    pub contract_inventory_count: usize,
+    pub contract_clause_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CampaignBindingSummary {
+    pub status: String,
+    pub checked_receipt_count: usize,
+    pub contract_inventory_count: usize,
+    pub contract_clause_count: usize,
+    pub translation_correctness: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct EvidenceArtifact {
+    pub kind: String,
+    pub canonical_token: String,
+    pub path: String,
+    pub status: String,
+    pub proof_credit_source: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedEvidenceManifest {
+    pub schema: u32,
+    pub status: &'static str,
+    pub engine: &'static str,
+    pub kani_proof_credit: bool,
+    pub verus_checked_scoped: bool,
+    pub reviewed_dir: String,
+    pub selected_count: usize,
+    pub controller_obligation_count: usize,
+    pub checked_receipt_count: usize,
+    pub contract_inventory_count: usize,
+    pub contract_clause_count: usize,
+    pub translation_correctness: String,
+    pub proof_credit_source: &'static str,
+    pub artifacts: Vec<EvidenceArtifact>,
 }

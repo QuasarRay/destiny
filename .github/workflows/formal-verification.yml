@@ -189,6 +189,45 @@ jobs:
           assert receipt["contract_clause_count"] == binding["contract_clause_count"], receipt
           PY
 
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            manifest-reviewed \
+            --reviewed-dir "$out" \
+            > "$out/reviewed-evidence-manifest-stdout.json"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          binding=json.loads((root/"verus-binding.json").read_text())
+          campaign_binding=json.loads((root/"verus-receipt-binding.json").read_text())
+          manifest=json.loads((root/"reviewed-evidence-manifest.json").read_text())
+          stdout_manifest=json.loads((root/"reviewed-evidence-manifest-stdout.json").read_text())
+
+          assert manifest == stdout_manifest, (manifest, stdout_manifest)
+          assert manifest["status"] == "KVERUS_REVIEWED_EVIDENCE_MANIFEST", manifest
+          assert manifest["engine"] == "verus", manifest
+          assert manifest["kani_proof_credit"] is False, manifest
+          assert manifest["verus_checked_scoped"] is True, manifest
+          assert manifest["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", manifest
+          assert manifest["selected_count"] == len(binding["selected"]), manifest
+          assert manifest["controller_obligation_count"] == len(binding["controller_obligations"]), manifest
+          assert manifest["checked_receipt_count"] == len(campaign_binding["receipts"]), manifest
+          assert manifest["contract_inventory_count"] == binding["contract_inventory_count"], manifest
+          assert manifest["contract_clause_count"] == binding["contract_clause_count"], manifest
+          kinds={row["kind"]: row for row in manifest["artifacts"]}
+          assert set(kinds) == {
+              "reviewed-preparation-receipt",
+              "verus-binding",
+              "verus-receipt-binding",
+              "reviewed-finalization-receipt",
+          }, kinds
+          assert kinds["reviewed-finalization-receipt"]["canonical_token"] == "reviewed_finalization_receipt", kinds
+          assert kinds["verus-receipt-binding"]["proof_credit_source"] == "verus_checked_scoped", kinds
+          assert kinds["verus-binding"]["proof_credit_source"] == "none", kinds
+          PY
+
       - name: Discover the generated-obligation fixture corpus through the same Kani compiler path
         run: |
           set -euo pipefail
@@ -620,6 +659,25 @@ jobs:
           assert receipt["kani_proof_credit"] is False, receipt
           assert receipt["verus_checked_scoped"] is True, receipt
           assert campaign_binding["status"] == "KANI_SELECTED_VERUS_CHECKED_SCOPED", campaign_binding
+          PY
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            manifest-reviewed \
+            --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-evidence-manifest-stdout.json"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          manifest=json.loads((root/"reviewed-evidence-manifest.json").read_text())
+          stdout_manifest=json.loads((root/"reviewed-evidence-manifest-stdout.json").read_text())
+          assert manifest == stdout_manifest, (manifest, stdout_manifest)
+          assert manifest["status"] == "KVERUS_REVIEWED_EVIDENCE_MANIFEST", manifest
+          assert manifest["engine"] == "verus", manifest
+          assert manifest["kani_proof_credit"] is False, manifest
+          assert manifest["verus_checked_scoped"] is True, manifest
+          assert manifest["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", manifest
           PY
 
       - name: Retain complete counted results, VIR inventories and scope audit

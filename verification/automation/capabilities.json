@@ -97,7 +97,10 @@
     "python_tool_execution": "CGP PythonToolRunner provider",
     "unsafe_code": false,
     "json_python_tool_execution": "CGP JsonPythonToolRunner over PythonToolRunner",
-    "json_artifact_loading": "CGP JsonArtifactStore over ArtifactStore"
+    "json_artifact_loading": "CGP JsonArtifactStore over ArtifactStore",
+    "token_identity": "CGP TokenIdentity using proc_macro2 + safe arcane-rs/synthez ToTokens replay",
+    "reviewed_binding_validation": "CGP ReviewedBindingValidator",
+    "campaign_binding_validation": "CGP CampaignBindingValidator"
   },
   "preparation": {
     "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
@@ -160,6 +163,32 @@
       "reviewed-finalization-receipt.json"
     ],
     "proof_credit_scope": "existing reviewed Verus CHECKED_SCOPED campaign receipts only",
+    "kani_proof_credit": false
+  },
+  "reviewed_evidence_manifest": {
+    "command": "manifest-reviewed --reviewed-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP ReviewedEvidenceAssembly over the existing reviewed preparation, binding, campaign binding, and finalization receipts",
+    "requires": [
+      "reviewed-preparation-receipt.json",
+      "verus-binding.json",
+      "verus-receipt-binding.json",
+      "reviewed-finalization-receipt.json"
+    ],
+    "validates": [
+      "Verus remains the engine across preparation and finalization",
+      "Kani metadata/binding retains no proof credit",
+      "reviewed binding selected/obligation counts match preparation receipt",
+      "contract inventory and clause counts remain identical across preparation, binding, campaign binding, and finalization",
+      "checked campaign receipt count matches finalization receipt",
+      "campaign status remains KANI_SELECTED_VERUS_CHECKED_SCOPED",
+      "translation correctness classification is preserved"
+    ],
+    "artifact_identity": "proc_macro2 + safe arcane-rs/synthez through CGP TokenIdentity",
+    "emits": [
+      "reviewed-evidence-manifest.json"
+    ],
+    "proof_credit_source": "existing Verus CHECKED_SCOPED campaign receipts only",
     "kani_proof_credit": false
   }
 }

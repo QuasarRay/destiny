@@ -4,17 +4,19 @@ mod components;
 mod model;
 
 pub use components::{
-    CanBuildAutomationPlan, CanCanonicalizeContractClause, CanDescribeCommands,
-    CanFinalizeReviewedCampaign, CanNormalizeMetadata, CanParseMetadataBytes,
-    CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
-    CanReadWriteArtifacts, CanRouteCommand, CanRunJsonPythonTool, CanRunPythonTool,
-    CanValidateContractClause, HasProjectRoot, KVerusContext,
+    CanAssembleReviewedEvidence, CanBuildAutomationPlan, CanCanonicalizeContractClause,
+    CanCanonicalizeStaticIdentity, CanDescribeCommands, CanFinalizeReviewedCampaign,
+    CanNormalizeMetadata, CanParseMetadataBytes, CanPrepareAutomation,
+    CanPrepareReviewedBinding, CanReadJsonArtifact, CanReadWriteArtifacts,
+    CanRouteCommand, CanRunJsonPythonTool, CanRunPythonTool, CanValidateCampaignBinding,
+    CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
-    AutomationCommand, AutomationPlan, CommandDescriptor, ContractDiscovery, ContractPlan,
-    DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport, PlanCounts,
-    PlannedContractClause, PreparationReceipt, ReviewedFinalizationReceipt,
-    ReviewedPreparationReceipt,
+    AutomationCommand, AutomationPlan, CampaignBindingSummary, CommandDescriptor,
+    ContractDiscovery, ContractPlan, DiscoveryCandidate, DiscoveryDisposition,
+    DiscoveryReport, EvidenceArtifact, PlanCounts, PlannedContractClause,
+    PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceManifest,
+    ReviewedFinalizationReceipt, ReviewedPreparationReceipt,
 };
 
 use kani_metadata::KaniMetadata;
@@ -195,6 +197,7 @@ mod tests {
         let usage = KVerusContext.command_usage().unwrap();
         assert!(usage.contains("prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"));
         assert!(usage.contains("finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>"));
+        assert!(usage.contains("manifest-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
 
         let finalizer = commands
@@ -204,6 +207,21 @@ mod tests {
         assert_eq!(finalizer.canonical_token, "finalize_reviewed");
         assert_eq!(finalizer.category, "reviewed_binding");
         assert!(!finalizer.proof_credit);
+
+        let manifest = commands
+            .iter()
+            .find(|command| command.name == "manifest-reviewed")
+            .unwrap();
+        assert_eq!(manifest.canonical_token, "manifest_reviewed");
+        assert_eq!(manifest.category, "evidence");
+        assert!(!manifest.proof_credit);
+
+        assert_eq!(
+            KVerusContext
+                .canonicalize_static_identity("reviewed-finalization-receipt")
+                .unwrap(),
+            "reviewed_finalization_receipt"
+        );
     }
 
     #[test]
@@ -244,6 +262,24 @@ mod tests {
             AutomationCommand::FinalizeReviewed {
                 reviewed_dir: ".aegis/reviewed".to_string(),
                 campaign_dir: ".aegis/campaign".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn command_router_builds_typed_reviewed_manifest_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "manifest-reviewed".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::ManifestReviewed {
+                reviewed_dir: ".aegis/reviewed".to_string(),
             }
         );
     }
