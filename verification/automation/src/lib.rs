@@ -4,10 +4,13 @@ mod components;
 mod model;
 
 pub use components::{
-    CanNormalizeMetadata, CanParseMetadataBytes, CanValidateContractClause, KVerusContext,
+    CanBuildAutomationPlan, CanCanonicalizeContractClause, CanNormalizeMetadata,
+    CanParseMetadataBytes, CanRunPythonTool, CanValidateContractClause, HasProjectRoot,
+    KVerusContext,
 };
 pub use model::{
-    ContractDiscovery, DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport,
+    AutomationPlan, ContractDiscovery, ContractPlan, DiscoveryCandidate,
+    DiscoveryDisposition, DiscoveryReport, PlanCounts, PlannedContractClause,
 };
 
 use kani_metadata::KaniMetadata;
@@ -141,6 +144,33 @@ mod tests {
         let bytes = serde_json::to_vec(&vec![metadata(), metadata()]).unwrap();
         let parsed = parse_metadata(bytes.as_slice()).unwrap();
         assert_eq!(parsed.len(), 2);
+    }
+
+    #[test]
+    fn planner_groups_discovery_without_granting_proof_credit() {
+        let report = normalize_autoharness_metadata(&[metadata()]);
+        let plan = KVerusContext.build_automation_plan(&report).unwrap();
+
+        assert_eq!(plan.schema, 1);
+        assert!(!plan.proof_credit);
+        assert_eq!(plan.counts.selected, 1);
+        assert_eq!(plan.counts.blocked, 1);
+        assert_eq!(plan.counts.unsupported, 0);
+        assert_eq!(plan.counts.excluded, 1);
+        assert_eq!(plan.counts.contracted_functions, 1);
+        assert_eq!(plan.counts.contract_clauses, 2);
+        assert_eq!(plan.selected[0].function, "crate::good");
+        assert_eq!(plan.blocked[0].function, "crate::slice");
+        assert_eq!(plan.excluded[0].function, "crate::filtered");
+
+        let contract = &plan.contracted_functions[0];
+        assert_eq!(contract.function, "crate::good");
+        assert_eq!(contract.planner_status, "downstream_subset_check_required");
+        assert_eq!(contract.clauses[0].kind, "requires");
+        assert_eq!(contract.clauses[0].expression, "x");
+        assert!(!contract.clauses[0].canonical_tokens.is_empty());
+        assert_eq!(contract.clauses[1].kind, "ensures");
+        assert!(!contract.clauses[1].canonical_tokens.is_empty());
     }
 
     #[test]

@@ -78,5 +78,23 @@
       "Verus binary"
     ],
     "proof_failure_is_source_bug": false
+  },
+  "planning": {
+    "command": "plan <kani-metadata.json>",
+    "status": "supported",
+    "architecture": "CGP AutomationPlanner over the normalized Kani compiler discovery report",
+    "candidate_groups": [
+      "selected",
+      "blocked",
+      "unsupported",
+      "excluded"
+    ],
+    "contract_tokens": "original Kani compiler expression is authoritative; canonical_tokens is diagnostic-only proc_macro2 + arcane-rs/synthez rendering",
+    "proof_credit": false
+  },
+  "execution_orchestration": {
+    "project_layout": "CGP ProjectLayout provider",
+    "python_tool_execution": "CGP PythonToolRunner provider",
+    "unsafe_code": false
   }
 }

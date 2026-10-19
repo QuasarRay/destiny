@@ -1,45 +1,31 @@
 #![forbid(unsafe_code)]
 
 use destiny_verification_automation::{
-    DEFAULT_ENGINE, KANI_SOURCE_COMMIT, normalize_autoharness_metadata, parse_metadata,
+    CanBuildAutomationPlan, CanRunPythonTool, DEFAULT_ENGINE, DiscoveryReport,
+    KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata, parse_metadata,
 };
 use std::{
     env,
-    ffi::OsString,
     fs::File,
-    path::{Path, PathBuf},
-    process::{Command, ExitCode, ExitStatus},
+    process::{ExitCode, ExitStatus},
 };
 
 fn usage() -> ! {
     eprintln!(
         "usage: destiny-verification-automation \
          doctor | setup | discover <kani-metadata.json> | list <kani-metadata.json> | \
-         explain | verify <verus-subset args...> | replay-kani-reference <replay args...>"
+         plan <kani-metadata.json> | explain | verify <verus-subset args...> | \
+         replay-kani-reference <replay args...>"
     );
     std::process::exit(2);
 }
 
-fn project_root() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
-}
-
-fn python() -> OsString {
-    env::var_os("DESTINY_PYTHON").unwrap_or_else(|| {
-        if cfg!(windows) {
-            OsString::from("python")
-        } else {
-            OsString::from("python3")
-        }
-    })
-}
-
-fn run_python(script: &str, args: impl IntoIterator<Item = String>) -> Result<ExitStatus, std::io::Error> {
-    Command::new(python())
-        .arg("-B")
-        .arg(project_root().join(script))
-        .args(args)
-        .status()
+fn run_python(
+    script: &str,
+    args: impl IntoIterator<Item = String>,
+) -> Result<ExitStatus, std::io::Error> {
+    let args = args.into_iter().collect::<Vec<_>>();
+    KVerusContext.run_python_tool(script, &args)
 }
 
 fn exit_status(status: ExitStatus) -> ExitCode {
@@ -77,17 +63,41 @@ fn setup() -> ExitCode {
     ExitCode::SUCCESS
 }
 
-fn discovery(path: String) -> ExitCode {
-    let result = File::open(path)
-        .map_err(|e| e.to_string())
-        .and_then(|file| parse_metadata(file).map_err(|e| e.to_string()))
+fn load_discovery(path: &str) -> Result<DiscoveryReport, String> {
+    File::open(path)
+        .map_err(|error| error.to_string())
+        .and_then(|file| parse_metadata(file).map_err(|error| error.to_string()))
         .map(|metadata| normalize_autoharness_metadata(&metadata))
-        .and_then(|report| serde_json::to_string_pretty(&report).map_err(|e| e.to_string()));
-    match result {
+}
+
+fn emit_json<T: serde::Serialize>(value: &T) -> ExitCode {
+    match serde_json::to_string_pretty(value) {
         Ok(json) => {
             println!("{json}");
             ExitCode::SUCCESS
         }
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn discovery(path: &str) -> ExitCode {
+    match load_discovery(path) {
+        Ok(report) => emit_json(&report),
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn plan(path: &str) -> ExitCode {
+    let result = load_discovery(path)
+        .and_then(|report| KVerusContext.build_automation_plan(&report));
+    match result {
+        Ok(plan) => emit_json(&plan),
         Err(error) => {
             eprintln!("{error}");
             ExitCode::FAILURE
@@ -110,7 +120,14 @@ fn main() -> ExitCode {
             if args.next().is_some() {
                 usage()
             }
-            discovery(path)
+            discovery(&path)
+        }
+        Some("plan") => {
+            let Some(path) = args.next() else { usage() };
+            if args.next().is_some() {
+                usage()
+            }
+            plan(&path)
         }
         Some("explain") if args.next().is_none() => {
             print!("{}", include_str!("../capabilities.json"));

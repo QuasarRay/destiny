@@ -1,6 +1,7 @@
 use crate::{
-    DEFAULT_ENGINE, KANI_SOURCE_COMMIT, ContractDiscovery, DiscoveryCandidate,
-    DiscoveryDisposition, DiscoveryReport,
+    AutomationPlan, ContractDiscovery, ContractPlan, DEFAULT_ENGINE, DiscoveryCandidate,
+    DiscoveryDisposition, DiscoveryReport, KANI_SOURCE_COMMIT, PlanCounts,
+    PlannedContractClause,
 };
 use cgp::prelude::*;
 use kani_metadata::{
@@ -8,9 +9,16 @@ use kani_metadata::{
 };
 use proc_macro2::TokenStream;
 use serde::Deserialize;
-use std::str::FromStr;
-use synthez::{ToTokens, quote::quote, syn};
+use std::{
+    env,
+    ffi::OsString,
+    io,
+    path::{Path, PathBuf},
+    process::{Command, ExitStatus},
+    str::FromStr,
+};
 use synthez::syn::parse::Parser as _;
+use synthez::{quote::quote, syn, ToTokens};
 
 #[derive(Deserialize)]
 #[serde(untagged)]
@@ -28,8 +36,8 @@ impl MetadataEnvelope {
     }
 }
 
-/// Tiny codegen wrapper used to exercise arcane-rs/synthez's safe `ToTokens`
-/// derive at the validated syntax boundary.
+/// Safe Arcane-rs codegen wrapper. `synthez::ToTokens` expands without
+/// requiring KVerus to permit unsafe code.
 #[derive(ToTokens)]
 #[to_tokens(append(render))]
 struct ValidatedClauseTokens {
@@ -61,14 +69,20 @@ impl MetadataParser {
     }
 }
 
-#[cgp_component(ContractClauseValidator)]
-pub trait CanValidateContractClause {
-    fn validate_contract_clause(&self, clause: &ContractClause) -> Result<(), String>;
+#[cgp_component(ContractClauseSyntax)]
+pub trait CanCanonicalizeContractClause {
+    fn canonicalize_contract_clause(
+        &self,
+        clause: &ContractClause,
+    ) -> Result<String, String>;
 }
 
-#[cgp_impl(new ProcMacro2ContractClauseValidator)]
-impl ContractClauseValidator {
-    fn validate_contract_clause(&self, clause: &ContractClause) -> Result<(), String> {
+#[cgp_impl(new ProcMacro2ContractClauseSyntax)]
+impl ContractClauseSyntax {
+    fn canonicalize_contract_clause(
+        &self,
+        clause: &ContractClause,
+    ) -> Result<String, String> {
         let tokens = TokenStream::from_str(&clause.expression).map_err(|error| {
             format!(
                 "proc_macro2 rejected {:?} clause token stream {:?}: {error}",
@@ -97,15 +111,27 @@ impl ContractClauseValidator {
             }
         }
 
-        // Render through synthez's proc-macro derive after Syn has accepted the
-        // grammar. This is a syntax/codegen sanity check only: KVerus preserves
-        // Kani's original clause string in its serialized evidence.
-        let validated = ValidatedClauseTokens { tokens: tokens.clone() };
+        let validated = ValidatedClauseTokens {
+            tokens: tokens.clone(),
+        };
         let replay = quote!(#validated);
         if replay.is_empty() != tokens.is_empty() {
             return Err("synthez token replay changed clause emptiness".into());
         }
-        Ok(())
+        Ok(replay.to_string())
+    }
+}
+
+#[cgp_component(ContractClauseValidator)]
+pub trait CanValidateContractClause {
+    fn validate_contract_clause(&self, clause: &ContractClause) -> Result<(), String>;
+}
+
+#[cgp_impl(new CanonicalContractClauseValidator)]
+#[uses(CanCanonicalizeContractClause)]
+impl ContractClauseValidator {
+    fn validate_contract_clause(&self, clause: &ContractClause) -> Result<(), String> {
+        self.canonicalize_contract_clause(clause).map(|_| ())
     }
 }
 
@@ -195,17 +221,163 @@ impl MetadataNormalizer {
     }
 }
 
+#[cgp_component(AutomationPlanner)]
+pub trait CanBuildAutomationPlan {
+    fn build_automation_plan(
+        &self,
+        report: &DiscoveryReport,
+    ) -> Result<AutomationPlan, String>;
+}
+
+#[cgp_impl(new KaniAutomationPlanner)]
+#[uses(CanCanonicalizeContractClause)]
+impl AutomationPlanner {
+    fn build_automation_plan(
+        &self,
+        report: &DiscoveryReport,
+    ) -> Result<AutomationPlan, String> {
+        let mut selected = Vec::new();
+        let mut blocked = Vec::new();
+        let mut unsupported = Vec::new();
+        let mut excluded = Vec::new();
+
+        for candidate in &report.candidates {
+            match candidate.disposition {
+                DiscoveryDisposition::KaniEligible => selected.push(candidate.clone()),
+                DiscoveryDisposition::Blocked => blocked.push(candidate.clone()),
+                DiscoveryDisposition::Unsupported => unsupported.push(candidate.clone()),
+                DiscoveryDisposition::Excluded => excluded.push(candidate.clone()),
+            }
+        }
+
+        let mut contracted_functions = Vec::new();
+        let mut contract_clause_count = 0;
+
+        for contract in &report.contracted_functions {
+            let mut has_modifies = false;
+            let mut clauses = Vec::new();
+
+            for clause in &contract.clauses {
+                let kind = contract_clause_kind_name(&clause.kind);
+                has_modifies |= matches!(clause.kind, ContractClauseKind::Modifies);
+                clauses.push(PlannedContractClause {
+                    kind,
+                    expression: clause.expression.clone(),
+                    canonical_tokens: self.canonicalize_contract_clause(clause)?,
+                });
+            }
+
+            contract_clause_count += clauses.len();
+            contracted_functions.push(ContractPlan {
+                crate_name: contract.crate_name.clone(),
+                function: contract.function.clone(),
+                file: contract.file.clone(),
+                harnesses: contract.harnesses.clone(),
+                clauses,
+                planner_status: if has_modifies {
+                    "blocked_by_modifies_semantics"
+                } else {
+                    "downstream_subset_check_required"
+                },
+            });
+        }
+
+        Ok(AutomationPlan {
+            schema: 1,
+            default_engine: report.default_engine,
+            kani_source_commit: report.kani_source_commit,
+            proof_credit: false,
+            counts: PlanCounts {
+                selected: selected.len(),
+                blocked: blocked.len(),
+                unsupported: unsupported.len(),
+                excluded: excluded.len(),
+                contracted_functions: contracted_functions.len(),
+                contract_clauses: contract_clause_count,
+            },
+            selected,
+            blocked,
+            unsupported,
+            excluded,
+            contracted_functions,
+        })
+    }
+}
+
+#[cgp_component(ProjectLayout)]
+pub trait HasProjectRoot {
+    fn project_root(&self) -> PathBuf;
+}
+
+#[cgp_impl(new CargoManifestProjectLayout)]
+impl ProjectLayout {
+    fn project_root(&self) -> PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
+    }
+}
+
+#[cgp_component(PythonToolRunner)]
+pub trait CanRunPythonTool {
+    fn run_python_tool(
+        &self,
+        script: &str,
+        args: &[String],
+    ) -> Result<ExitStatus, io::Error>;
+}
+
+#[cgp_impl(new SystemPythonToolRunner)]
+#[uses(HasProjectRoot)]
+impl PythonToolRunner {
+    fn run_python_tool(
+        &self,
+        script: &str,
+        args: &[String],
+    ) -> Result<ExitStatus, io::Error> {
+        Command::new(python_executable())
+            .arg("-B")
+            .arg(self.project_root().join(script))
+            .args(args)
+            .status()
+    }
+}
+
 pub struct KVerusContext;
 
 delegate_and_check_components! {
     KVerusContext {
         MetadataParserComponent:
             JsonMetadataParser,
+        ContractClauseSyntaxComponent:
+            ProcMacro2ContractClauseSyntax,
         ContractClauseValidatorComponent:
-            ProcMacro2ContractClauseValidator,
+            CanonicalContractClauseValidator,
         MetadataNormalizerComponent:
             KaniMetadataNormalizer,
+        AutomationPlannerComponent:
+            KaniAutomationPlanner,
+        ProjectLayoutComponent:
+            CargoManifestProjectLayout,
+        PythonToolRunnerComponent:
+            SystemPythonToolRunner,
     }
+}
+
+fn contract_clause_kind_name(kind: &ContractClauseKind) -> &'static str {
+    match kind {
+        ContractClauseKind::Requires => "requires",
+        ContractClauseKind::Ensures => "ensures",
+        ContractClauseKind::Modifies => "modifies",
+    }
+}
+
+fn python_executable() -> OsString {
+    env::var_os("DESTINY_PYTHON").unwrap_or_else(|| {
+        if cfg!(windows) {
+            OsString::from("python")
+        } else {
+            OsString::from("python3")
+        }
+    })
 }
 
 fn classify_skip(reason: &AutoHarnessSkipReason) -> (DiscoveryDisposition, String) {

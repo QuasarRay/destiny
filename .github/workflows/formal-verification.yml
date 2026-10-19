@@ -145,6 +145,10 @@ jobs:
               --manifest-path verification/automation/Cargo.toml --locked -- \
               discover "$out/kani-metadata.json" \
               > "$out/normalized-discovery.json"
+            cargo +nightly-2026-08-21 run --quiet \
+              --manifest-path verification/automation/Cargo.toml --locked -- \
+              plan "$out/kani-metadata.json" \
+              > "$out/automation-plan.json"
           done
           python3 - <<'PY'
           import json
@@ -192,6 +196,33 @@ jobs:
           }
           assert all(len(rows) == 1 for rows in selected.values()), selected
           assert all(rows[0]["disposition"] == "kani_eligible" for rows in selected.values()), selected
+
+          plan=json.loads(Path(
+              ".aegis/destiny/kani-autoharness-fixtures/contracts/automation-plan.json"
+          ).read_text())
+          assert plan["schema"] == 1, plan
+          assert plan["default_engine"] == "verus", plan
+          assert plan["proof_credit"] is False, plan
+          assert plan["counts"]["selected"] >= len(expected), plan
+          assert plan["counts"]["contracted_functions"] == len(expected), plan
+          assert plan["counts"]["contract_clauses"] >= len(expected), plan
+          planned={
+              next(name for name in expected if row["function"].endswith(name)): row
+              for row in plan["contracted_functions"]
+          }
+          assert set(planned) == expected, planned
+          assert all(row["planner_status"] == "downstream_subset_check_required"
+                     for row in planned.values()), planned
+          assert all(
+              clause["canonical_tokens"].strip()
+              for row in planned.values()
+              for clause in row["clauses"]
+          ), planned
+          assert all(
+              clause["expression"].strip()
+              for row in planned.values()
+              for clause in row["clauses"]
+          ), planned
           PY
           python3 -B verification/tools/test_verus_subset.py
 
