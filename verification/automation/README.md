@@ -46,7 +46,7 @@ The generated slice currently supports:
 - selected primitive monomorphic generic instances reported by Kani;
 - `+`, `-`, and `*` only inside executable branch conditions, where Verus must prove fixed-width overflow/underflow safety;
 - Kani-parsed non-arithmetic `requires` predicates over the supported scalar parameters;
-- Kani-parsed unit-return `ensures` closures of the form `|_| predicate`, lowered to Verus `ensures`;
+- Kani-parsed unit-return `ensures` closures of the form `|_| predicate`, plus supported scalar-return result-reference closures such as `|result: &u8| *result == x`, lowered to a named Verus result value;
 - a separate Verus existential satisfiability obligation for every accepted `requires` set, preventing contradictory preconditions from making a contract proof vacuous.
 
 It deliberately rejects ghost arithmetic in assertions or assumptions, target-width integers, floating point, pointers/references, allocation, unsafe code, dynamic loops/recursion, and general concurrent Rust source translation. The reviewed registry/binder may select an existing Verus concurrency proof for a Kani-discovered specification function, but that is distinct from translating arbitrary concurrent Rust into Verus.
@@ -67,7 +67,7 @@ The normalized contract rows contain:
 - Kani-parsed clause kind and expression records;
 - explicit upstream provenance.
 
-The Kani-to-Verus binder validates those rows and carries them with `proof_credit: false` and `contract_semantics_status: compiler_parsed_clauses_available`. `verification/tools/verus_subset.py` then implements the first semantic slice: non-arithmetic Boolean/comparison `requires`, plus unit-return `ensures` closures whose result binder is `_`. Contract preconditions must also pass a separately generated Verus existential satisfiability proof. `modifies`, `old`/history, references, calls, contract arithmetic, non-unit returns, and richer result binders remain explicitly unsupported. A successful result credits the generated Verus obligation, never the metadata itself.
+The Kani-to-Verus binder validates those rows and carries them with `proof_credit: false` and `contract_semantics_status: compiler_parsed_clauses_available`. `verification/tools/verus_subset.py` then implements the restricted semantic slice: non-arithmetic Boolean/comparison `requires`, unit-return `ensures` closures whose result binder is `_`, and supported scalar-return `ensures` closures where Kani's result reference is dereferenced and mapped to a same-typed named Verus return value. Contract preconditions must also pass a separately generated Verus existential satisfiability proof. `modifies`, `old`/history, general references, calls, contract arithmetic, non-scalar returns, and richer result structures remain explicitly unsupported. A successful result credits the generated Verus obligation, never the metadata itself.
 
 
 ## Explicit concrete replay reference lane
