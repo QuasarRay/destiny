@@ -1743,12 +1743,12 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +use super::{ContractConditionsHandler, INTERNAL_RESULT_IDENT, helpers::*};
 +
 +impl<'a> ContractConditionsHandler<'a> {
-+    /// Preserve one Kani-parsed contract clause on the contracted function itself.
++    /// Preserve one Kani-parsed contract clause using Kani's existing fn_marker channel.
 +    ///
-+    /// Repeated internal tool attributes survive proc-macro expansion and are read
-+    /// later by KaniAttributes, avoiding source re-parsing and unreliable recovery
-+    /// of function-local marker items from rustc_public::all_local_items().
-+    fn contract_clause_attribute(&self) -> syn::Attribute {
++    /// These markers are attached to the contracted function itself. The compiler-side
++    /// KaniAttributes adapter filters the KVerus-prefixed values out of ordinary
++    /// instrumentation marker semantics while retaining them for contract metadata.
++    fn contract_clause_marker(&self) -> syn::Attribute {
 +        let (kind, expression) = match &self.condition_type {
 +            super::ContractConditionsData::Requires { attr } => {
 +                ("requires", attr.to_token_stream().to_string())
@@ -1768,7 +1768,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            &format!("kverus_contract_clause:{kind}:{expression}"),
 +            Span::call_site(),
 +        );
-+        syn::parse_quote!(#[kanitool::contract_clause = #marker])
++        syn::parse_quote!(#[kanitool::fn_marker = #marker])
 +    }
 +
 +    /// Generate initial contract.
@@ -1781,7 +1781,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +        let recursion_name = &self.recursion_name;
 +        let check_name = &self.check_name;
 +        let assert_name = &self.assert_name;
-+        let contract_clause_attribute = self.contract_clause_attribute();
++        let contract_clause_marker = self.contract_clause_marker();
 +
 +        let replace_closure = self.replace_closure();
 +        let check_closure = self.check_closure();
@@ -1802,7 +1802,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +        let ItemFn { attrs, vis, sig, block } = &self.annotated_fn;
 +        self.output.extend(quote!(
 +            #(#attrs)*
-+            #contract_clause_attribute
++            #contract_clause_marker
 +            #[kanitool::recursion_check = #recursion_name]
 +            #[kanitool::checked_with = #check_name]
 +            #[kanitool::replaced_with = #replace_name]
@@ -1868,7 +1868,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +    /// to the attribute being handled.
 +    pub fn handle_expanded(&mut self) {
 +        let mut annotated_fn = self.annotated_fn.clone();
-+        annotated_fn.attrs.push(self.contract_clause_attribute());
++        annotated_fn.attrs.push(self.contract_clause_marker());
 +        let ItemFn { block, .. } = &mut annotated_fn;
 +        let recursion_closure = expect_closure_in_match(&mut block.stmts, "recursion_check");
 +        self.expand_recursion(recursion_closure);
@@ -1944,7 +1944,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kani_middle/attributes.rs
 --- a/kani-compiler/src/kani_middle/attributes.rs
 +++ b/kani-compiler/src/kani_middle/attributes.rs
-@@ -1,1412 +1,1432 @@
+@@ -1,1412 +1,1452 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module contains code for processing Rust attributes (like `kani::proof`).
@@ -3411,8 +3411,6 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +    /// contract, e.g. the contract check is substituted for the target function
 +    /// before the the verification runs.
 +    ProofForContract,
-+    /// Internal metadata marker preserving one Kani-parsed contract clause.
-+    ContractClause,
 +    /// Internal attribute of the contracts implementation. Identifies the
 +    /// code implementing the function with its contract clauses asserted.
 +    AssertedWith,
@@ -3464,7 +3462,6 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +            KaniAttributeKind::Unstable
 +            | KaniAttributeKind::StubSet
 +            | KaniAttributeKind::FnMarker
-+            | KaniAttributeKind::ContractClause
 +            | KaniAttributeKind::Recursion
 +            | KaniAttributeKind::RecursionTracker
 +            | KaniAttributeKind::ReplacedWith
@@ -3672,19 +3669,35 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +        self.map.contains_key(&KaniAttributeKind::IsContractGenerated)
 +    }
 +
-+    /// Return a function marker if any.
++    /// Return the ordinary Kani instrumentation marker, ignoring KVerus clause markers.
 +    pub fn fn_marker(&self) -> Option<Symbol> {
-+        self.attribute_value(KaniAttributeKind::FnMarker)
++        const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
++        let mut markers = self
++            .map
++            .get(&KaniAttributeKind::FnMarker)?
++            .iter()
++            .filter_map(|attr| expect_key_string_value(self.tcx.sess, attr).ok())
++            .filter(|marker| !marker.as_str().starts_with(CLAUSE_PREFIX));
++        let first = markers.next();
++        if markers.next().is_some() {
++            self.tcx.sess.dcx().err(format!(
++                "multiple ordinary Kani fn_marker attributes on function `{}`",
++                self.tcx.def_path_str(self.item)
++            ));
++        }
++        first
 +    }
 +
-+    /// Return all KVerus contract clause markers emitted by Kani's proc macros.
++    /// Return KVerus contract clauses transported through Kani's existing fn_marker channel.
 +    pub fn contract_clause_markers(&self) -> Vec<String> {
++        const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
 +        self.map
-+            .get(&KaniAttributeKind::ContractClause)
++            .get(&KaniAttributeKind::FnMarker)
 +            .into_iter()
 +            .flatten()
 +            .filter_map(|attr| expect_key_string_value(self.tcx.sess, attr).ok())
 +            .map(|symbol| symbol.to_string())
++            .filter(|marker| marker.starts_with(CLAUSE_PREFIX))
 +            .collect()
 +    }
 +
@@ -3777,18 +3790,26 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +                        }
 +                    });
 +                }
-+                KaniAttributeKind::FnMarker
-+                | KaniAttributeKind::CheckedWith
++                KaniAttributeKind::CheckedWith
 +                | KaniAttributeKind::ModifiesWrapper
 +                | KaniAttributeKind::RecursionCheck
 +                | KaniAttributeKind::AssertedWith
 +                | KaniAttributeKind::ReplacedWith => {
 +                    self.attribute_value(kind);
 +                }
-+                KaniAttributeKind::ContractClause => {
-+                    attrs.iter().for_each(|attr| {
-+                        let _ = expect_key_string_value(self.tcx.sess, attr);
-+                    });
++                KaniAttributeKind::FnMarker => {
++                    const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
++                    let ordinary = attrs
++                        .iter()
++                        .filter_map(|attr| expect_key_string_value(self.tcx.sess, attr).ok())
++                        .filter(|marker| !marker.as_str().starts_with(CLAUSE_PREFIX))
++                        .count();
++                    if ordinary > 1 {
++                        self.tcx.sess.dcx().err(format!(
++                            "multiple ordinary Kani fn_marker attributes on function `{}`",
++                            self.tcx.def_path_str(self.item)
++                        ));
++                    }
 +                }
 +                KaniAttributeKind::IsContractGenerated => {
 +                    // Ignored here because this is only used by the proc macros
@@ -3969,7 +3990,6 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +                    unreachable!()
 +                }
 +                KaniAttributeKind::CheckedWith
-+                | KaniAttributeKind::ContractClause
 +                | KaniAttributeKind::IsContractGenerated
 +                | KaniAttributeKind::ModifiesWrapper
 +                | KaniAttributeKind::RecursionCheck
