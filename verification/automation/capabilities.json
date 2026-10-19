@@ -4,7 +4,8 @@
   "source_discovery": {
     "engine": "pinned Kani compiler autoharness metadata",
     "path": "verification/tools/run_kani_autoharness_discovery.py",
-    "cbmc_or_goto_execution_on_default_path": false
+    "cbmc_or_goto_execution_on_default_path": false,
+    "function_contract_metadata": "supported via kani_metadata::KaniMetadata::contracted_functions; source file and proof-for-contract harness identities are preserved as planning provenance with proof_credit=false"
   },
   "semantic_bridge": {
     "status": "restricted",
@@ -44,20 +45,21 @@
       "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem",
       "assumptions": "preserved at their source program point; for each user assumption, Verus proves that every otherwise feasible non-arithmetic path prefix retains at least one fixed-width input after the assumption",
       "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected, and arithmetic-dependent assumption reachability is rejected rather than widened.",
-      "generics": "source functions with unbounded type parameters only when Kani autoharness selected an explicit monomorphic instance and every selected type is in the supported fixed-width integer/Boolean set; the result is scoped to that concrete instantiation"
+      "generics": "source functions with unbounded type parameters only when Kani autoharness selected an explicit monomorphic instance and every selected type is in the supported fixed-width integer/Boolean set; the result is scoped to that concrete instantiation",
+      "function_contract_discovery": "Kani compiler metadata for contracted functions is preserved and validated end-to-end so the Verus planner can see exact function/file/harness provenance without reimplementing Kani discovery"
     },
     "rejected": [
-      "requires/ensures syntax and contract macros",
+      "requires/ensures/modifies expression translation and contract proof semantics; contract metadata discovery alone is not a Verus contract proof",
       "arithmetic in assert!/kani::assume, division/remainder, casts, arithmetic outside executable if conditions, and assumption non-vacuity paths that depend on machine arithmetic",
       "usize/isize and target-width dependent values",
       "function calls",
       "references, raw pointers, slices, allocation and user ADTs",
       "floating point",
       "unsafe code",
-      "concurrency",
+      "concurrency in the generated-source translator; reviewed Kani-selected functions may still bind to the separate existing Verus concurrency campaign through registry.json",
       "generic trait-bound syntax, const generics, lifetimes, target-width generic arguments, dynamic loops, named loop variables and recursion"
     ],
-    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Scoped assumptions are guarded by Verus-checked path-preservation non-vacuity obligations; syntactically unreachable assertion branches are recorded but are not required to have witnesses. No general Rust-to-Verus translation soundness is claimed."
+    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Scoped assumptions are guarded by Verus-checked path-preservation non-vacuity obligations; syntactically unreachable assertion branches are recorded but are not required to have witnesses. Kani function-contract metadata is preserved as provenance only until contract expressions receive an explicit semantic bridge. No general Rust-to-Verus translation soundness is claimed."
   },
   "evidence": {
     "strict_verus_result_parser": "existing Aegis agentinfra.destiny_reuse.checked_output",
@@ -65,6 +67,7 @@
       "source",
       "manifest",
       "normalized Kani discovery",
+      "Kani contracted-function inventory",
       "translator",
       "capability registry",
       "generated Verus source",
