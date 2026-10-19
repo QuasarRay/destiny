@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "default_engine": "verus",
+  "source_discovery": {
+    "engine": "pinned Kani compiler autoharness metadata",
+    "path": "verification/tools/run_kani_autoharness_discovery.py",
+    "cbmc_or_goto_execution_on_default_path": false,
+    "function_contract_metadata": "supported via a pinned Kani extension: Kani's proc-macro layer parses requires/ensures/modifies, the compiler preserves those parsed clauses in kani_metadata::ContractedFunction, and discovery carries them with proof_credit=false"
+  },
+  "semantic_bridge": {
+    "status": "restricted",
+    "accepted": {
+      "functions": "free functions with unit or supported scalar return types; selected primitive monomorphic generic instances remain allowed under the existing Kani-selection rule",
+      "parameters": [
+        "bool",
+        "u8",
+        "u16",
+        "u32",
+        "u64",
+        "i8",
+        "i16",
+        "i32",
+        "i64"
+      ],
+      "statements": [
+        "kani::assume(expr) with source-scoped path semantics",
+        "assert!(expr)",
+        "if/else",
+        "for _ in LITERAL..LITERAL with at most 32 iterations"
+      ],
+      "expressions": [
+        "boolean literals/parameters",
+        "fixed-width integer parameters/nonnegative literals",
+        "!",
+        "&&",
+        "||",
+        "==",
+        "!=",
+        "<",
+        "<=",
+        ">",
+        ">=",
+        "+, -, * only inside executable if conditions; Verus must discharge fixed-width overflow/underflow"
+      ],
+      "loops": "literal ranges are exhaustively unrolled; this is not a general loop invariant or recursion theorem",
+      "assumptions": "preserved at their source program point; for each user assumption, Verus proves that every otherwise feasible non-arithmetic path prefix retains at least one fixed-width input after the assumption",
+      "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected, and arithmetic-dependent assumption reachability is rejected rather than widened.",
+      "generics": "source functions with unbounded type parameters only when Kani autoharness selected an explicit monomorphic instance and every selected type is in the supported fixed-width integer/Boolean set; the result is scoped to that concrete instantiation",
+      "function_contract_discovery": "Kani compiler metadata preserves exact contracted-function identity/file/harness provenance plus Kani-parsed clause kind/expression records; the Verus bridge does not re-parse contract source attributes",
+      "function_contracts": "restricted semantic lowering supports non-arithmetic requires predicates over supported scalar parameters; unit/scalar-return ensures may additionally contain exactly one u8/u16/u32/u64 +,-,* operation with one nonnegative integer literal on one side of a comparison. KVerus emits the exact fixed-width definedness guard into the Verus postcondition and records it as evidence. Scalar Kani result references are dereferenced into a named Verus result value; every accepted requires set is separately checked for existential satisfiability."
+    },
+    "rejected": [
+      "machine arithmetic in requires; signed arithmetic in contracts; nested contract arithmetic; variable-variable arithmetic; more than one arithmetic subexpression; arithmetic outside one top-level comparison; function calls, casts, old/history expressions, and syntax outside the declared Boolean/comparison grammar",
+      "modifies clauses and memory-footprint semantics",
+      "non-scalar return contracts, result-reference types that do not match the function return type, bare/reference-valued result usage instead of scalar dereference, and arithmetic result expressions outside the guarded unsigned-literal subset",
+      "arithmetic in assert!/kani::assume, division/remainder, casts, arithmetic outside executable if conditions, and assumption non-vacuity paths that depend on machine arithmetic",
+      "usize/isize and target-width dependent values",
+      "function calls in the generated-source subset",
+      "references, raw pointers, slices, allocation and user ADTs",
+      "floating point",
+      "unsafe code",
+      "concurrency in the generated-source translator; reviewed Kani-selected functions may still bind to the separate existing Verus concurrency campaign through registry.json",
+      "generic trait-bound syntax, const generics, lifetimes, target-width generic arguments, dynamic loops, named loop variables and recursion"
+    ],
+    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Function-contract semantics come from clauses parsed by Kani's own proc-macro layer and exported through the pinned discovery evidence/metadata path; source attributes are stripped only to expose the decorated function body to the restricted parser. Requires arithmetic remains rejected because Kani evaluates a requires expression before kani::assume, so inserting a guard would change overflow behavior. In ensures, one unsigned fixed-width scalar/literal +,-,* operation may be represented in Verus only together with its computed Rust-definedness guard; the guard is part of the postcondition and evidence, while the body remains executable fixed-width Rust semantics. Every accepted requires set gets a separate Verus existential satisfiability proof before the contract-bearing function can receive proof credit. Scoped assumptions retain their existing Verus-checked path non-vacuity obligations. No general Rust-to-Verus or Kani-contract-to-Verus translation soundness theorem is claimed."
+  },
+  "evidence": {
+    "strict_verus_result_parser": "existing Aegis agentinfra.destiny_reuse.checked_output",
+    "tracked": [
+      "source",
+      "manifest",
+      "normalized Kani discovery",
+      "Kani contracted-function inventory",
+      "Kani parsed contract clauses",
+      "translator",
+      "capability registry",
+      "generated Verus source",
+      "Verus binary"
+    ],
+    "proof_failure_is_source_bug": false
+  }
+}

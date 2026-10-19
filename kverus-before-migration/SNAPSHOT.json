@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "snapshot_name": "kverus-before-migration",
+  "source_repository": "QuasarRay/destiny",
+  "source_branch": "KVerus-dev",
+  "source_commit": "f62f1d79304596098be917d2524702d926b69be5",
+  "source_tree": "b9bd9ef55f095c7e291a6ecd94ab9e6ff5b55937",
+  "purpose": "Byte-identical archival snapshot of the KVerus reusable automation boundary immediately before the CGP/proc-macro2/arcane-rs refactor.",
+  "boundary": {
+    "included": [
+      "verification/automation/**",
+      "verification/vendor/**",
+      "KVerus Kani/Verus bridge, discovery, replay, subset and regression tools",
+      "verification/plans/verus-concurrency.json because the current binder consumes it"
+    ],
+    "excluded": [
+      "Destiny runtime implementation",
+      "Destiny domain-specific Verus proof corpus",
+      "unrelated Destiny migration/harness generators",
+      "the mixed parent .github/workflows/formal-verification.yml"
+    ]
+  },
+  "file_count": 30,
+  "files": [
+    {
+      "path": "verification/automation/capabilities.json",
+      "blob": "ade20516f5dbce3436c558e78a50b5b99cf1dc22",
+      "size": 6187
+    },
+    {
+      "path": "verification/automation/Cargo.lock",
+      "blob": "b5eb7e044e618883d7f3ae73344f73e83c0b8677",
+      "size": 12176
+    },
+    {
+      "path": "verification/automation/Cargo.toml",
+      "blob": "3dcc1f7b639c1ce8fdae2aac7a25928034a84ed6",
+      "size": 317
+    },
+    {
+      "path": "verification/automation/fixtures/contracts/Cargo.toml",
+      "blob": "0a45011483ded5b31ef5d405232693461ae28574",
+      "size": 125
+    },
+    {
+      "path": "verification/automation/fixtures/contracts/src/lib.rs",
+      "blob": "3490ca623f09211bad639700c9cb8c74d63ac75a",
+      "size": 968
+    },
+    {
+      "path": "verification/automation/fixtures/invalid/Cargo.toml",
+      "blob": "83a759f79c5d3488f65bbef52233338c1466550c",
+      "size": 124
+    },
+    {
+      "path": "verification/automation/fixtures/invalid/src/lib.rs",
+      "blob": "1d555c5c306fb80f70800fac81d8976a4816190d",
+      "size": 405
+    },
+    {
+      "path": "verification/automation/fixtures/unsupported/Cargo.toml",
+      "blob": "b279ffbf56424f3ac9585bb660faa94cb3c8a59a",
+      "size": 128
+    },
+    {
+      "path": "verification/automation/fixtures/unsupported/src/lib.rs",
+      "blob": "d27bf9e602adb836f9ab485dbf997685af0716a5",
+      "size": 58
+    },
+    {
+      "path": "verification/automation/fixtures/valid/Cargo.toml",
+      "blob": "335987529bdd1ee39dd40b902de3e2648fd078a6",
+      "size": 122
+    },
+    {
+      "path": "verification/automation/fixtures/valid/src/lib.rs",
+      "blob": "aab0f8622f8ddd61d65fcda37cc084cd2fb2c856",
+      "size": 1023
+    },
+    {
+      "path": "verification/automation/README.md",
+      "blob": "3a9a110dbf6113b0c73d0e9563032025df57f938",
+      "size": 8771
+    },
+    {
+      "path": "verification/automation/registry.json",
+      "blob": "e9518901752dde5a06648cd0b9e9d90f43ee9c1f",
+      "size": 7306
+    },
+    {
+      "path": "verification/automation/src/lib.rs",
+      "blob": "ee3cce25891fc540381d696b0c4d819f0e009b10",
+      "size": 10199
+    },
+    {
+      "path": "verification/automation/src/main.rs",
+      "blob": "bc92e26f674847a4c669adb1913d854a0bb76902",
+      "size": 3890
+    },
+    {
+      "path": "verification/plans/verus-concurrency.json",
+      "blob": "45aed7cdc3ba002b03160646a673cf9e9cec4ae0",
+      "size": 20128
+    },
+    {
+      "path": "verification/tools/bind_kani_verus.py",
+      "blob": "9e8f649f508b2b50e9b2b36d98dc2191f8af69bb",
+      "size": 17314
+    },
+    {
+      "path": "verification/tools/bootstrap_kani_vendor.py",
+      "blob": "65a0237345a8a532a3f1864d9422ce3a6f239110",
+      "size": 2890
+    },
+    {
+      "path": "verification/tools/check_vendor_integrity.py",
+      "blob": "13f01976aff175de4e0ca5d1b408e77479ef018b",
+      "size": 2256
+    },
+    {
+      "path": "verification/tools/replay_kani_fixture.py",
+      "blob": "2ac6d087188ae517d965eede8b894090f81a701e",
+      "size": 10184
+    },
+    {
+      "path": "verification/tools/run_kani_autoharness_discovery.py",
+      "blob": "105649e4cb6a522f8cec3bdaac1f383486cfba4e",
+      "size": 12423
+    },
+    {
+      "path": "verification/tools/test_bind_kani_verus.py",
+      "blob": "7065189eee180bc33a1eb65039718f66ed2c8e7d",
+      "size": 7938
+    },
+    {
+      "path": "verification/tools/test_kani_discovery.py",
+      "blob": "da665d24ff46e18a58d68f5608bd162aa8341e5f",
+      "size": 2734
+    },
+    {
+      "path": "verification/tools/test_replay_kani_fixture.py",
+      "blob": "8cf8707e79c4d75800598d1daa882c9289962104",
+      "size": 1787
+    },
+    {
+      "path": "verification/tools/test_verus_subset.py",
+      "blob": "7fea91f0dbbdaec6d10b2980ca1e0cbf14a3cd8c",
+      "size": 18374
+    },
+    {
+      "path": "verification/tools/verus_subset.py",
+      "blob": "ccd06cbad0d908a739fe7e2487ce0a596986ba25",
+      "size": 59128
+    },
+    {
+      "path": "verification/vendor/BASELINE.md",
+      "blob": "09173e0330e1ceb4e4215f999f2bff109c08f40d",
+      "size": 2442
+    },
+    {
+      "path": "verification/vendor/patches/kani/0001-autoharness-metadata-only.patch",
+      "blob": "d3069e57bf1ea47dcf6880cbbbb9428a590a14c2",
+      "size": 238622
+    },
+    {
+      "path": "verification/vendor/REUSE_MATRIX.md",
+      "blob": "a1f275403e63cbd5c203e506d4a48669658de27a",
+      "size": 8400
+    },
+    {
+      "path": "verification/vendor/upstreams.json",
+      "blob": "1a5ca60d64b3f63c354e7cfc38d7833afceb5174",
+      "size": 4257
+    }
+  ]
+}

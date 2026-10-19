@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "default_engine": "verus",
+  "manifest": "verification/spec/Cargo.toml",
+  "kani": {
+    "version": "0.68.0",
+    "vendor_commit": "0d2328a93f0e0ff66132d6bfa1a7d884877cf862",
+    "reuse": [
+      {
+        "file": "kani-driver/src/autoharness/mod.rs",
+        "symbol": "postprocess_project",
+        "role": "autoharness codegen/list control flow"
+      },
+      {
+        "file": "kani_metadata/src/lib.rs",
+        "symbol": "AutoHarnessMetadata",
+        "role": "chosen/skipped candidate schema"
+      },
+      {
+        "file": "kani_metadata/src/lib.rs",
+        "symbol": "ContractedFunction",
+        "role": "function-contract discovery schema; exact function, source file, and proof-for-contract harness identities are retained without Kani proof credit"
+      },
+      {
+        "file": "library/kani_macros/src/sysroot/contracts/initialize.rs",
+        "symbol": "ContractConditionsHandler::new",
+        "role": "Kani-owned parsed-clause boundary reused by the pinned metadata extension; requires/ensures/modifies expressions are exported after Kani parses them"
+      },
+      {
+        "file": "kani_metadata/src/lib.rs",
+        "symbol": "ContractClause",
+        "role": "typed parsed clause kind/expression schema consumed by the restricted KVerus translator without source-attribute semantic re-parsing"
+      }
+    ]
+  },
+  "verus": {
+    "release": "0.2026.09.20.aef82ed",
+    "vendor_commit": "aef82eda71838deef4a8cd0260fda6c9504be9b9",
+    "plan": "verification/plans/verus-concurrency.json"
+  },
+  "supported_subset": {
+    "scope": "existing executable specification functions whose semantics are exactly Boolean logic, integer equality, or value selection with no arithmetic overflow/casts/pointers/allocation/concurrency/floating point",
+    "translation": "No Rust-to-Verus source translation is claimed. Kani autoharness selects the Rust function; the bridge maps it to an already reviewed Verus entry whose exact symbol inventory is checked by the existing controller.",
+    "contract_metadata": "Kani-parsed contract clauses are preserved in planner metadata. The generated-obligation lane can translate only non-arithmetic scalar requires predicates and unit-result ensures closures of the form |_| predicate, with a separate Verus precondition-satisfiability proof; modifies and richer contracts remain unsupported. The reviewed Destiny registry mappings themselves still bind to pre-existing reviewed Verus entries rather than claiming automatic translation.",
+    "trusted_boundary": "The source-to-existing-Verus correspondence remains an explicit reviewed mapping. A checked Verus entry does not by itself prove arbitrary Rust translation correctness."
+  },
+  "candidates": [
+    {
+      "function": "destiny_original_spec::model::follow_allowed",
+      "status": "supported",
+      "reason": "i64 equality plus Boolean logic; no arithmetic or representation-changing operation",
+      "controller_obligation": "proofs-reviewed-inventory",
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::follow_allowed"
+    },
+    {
+      "function": "destiny_original_spec::model::visibility_occluder",
+      "status": "supported",
+      "reason": "Boolean conjunction/negation only",
+      "controller_obligation": "proofs-reviewed-inventory",
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::visibility_occluder"
+    },
+    {
+      "function": "destiny_original_spec::model::proximity_eligible",
+      "status": "supported",
+      "reason": "Boolean logic only",
+      "controller_obligation": "proofs-reviewed-inventory",
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::proximity_eligible"
+    },
+    {
+      "function": "destiny_original_spec::model::uncloak_restores_massive",
+      "status": "supported",
+      "reason": "Boolean negation only",
+      "controller_obligation": "proofs-reviewed-inventory",
+      "verus_entry": "verification/verus/proofs.rs",
+      "kani_metadata_name": "model::uncloak_restores_massive"
+    },
+    {
+      "function": "destiny_original_spec::model::assign_flag",
+      "status": "supported",
+      "reason": "Boolean identity",
+      "controller_obligation": "state-contracts-reviewed-inventory",
+      "verus_entry": "verification/verus/state_contracts.rs",
+      "kani_metadata_name": "model::assign_flag"
+    },
+    {
+      "function": "destiny_original_spec::model::running_after_start",
+      "status": "supported",
+      "reason": "Boolean constant",
+      "controller_obligation": "state-contracts-reviewed-inventory",
+      "verus_entry": "verification/verus/state_contracts.rs",
+      "kani_metadata_name": "model::running_after_start"
+    },
+    {
+      "function": "destiny_original_spec::model::running_after_pause",
+      "status": "supported",
+      "reason": "Boolean constant",
+      "controller_obligation": "state-contracts-reviewed-inventory",
+      "verus_entry": "verification/verus/state_contracts.rs",
+      "kani_metadata_name": "model::running_after_pause"
+    },
+    {
+      "function": "destiny_original_spec::visibility::visibility_candidate_blocks",
+      "status": "supported",
+      "reason": "Boolean conjunction/negation only",
+      "controller_obligation": "visibility-contracts-reviewed-inventory",
+      "verus_entry": "verification/verus/visibility_contracts.rs",
+      "kani_metadata_name": "visibility::visibility_candidate_blocks"
+    },
+    {
+      "function": "destiny_original_spec::visibility::visibility_result",
+      "status": "supported",
+      "reason": "i64 value selection with constant zero; no arithmetic",
+      "controller_obligation": "visibility-contracts-reviewed-inventory",
+      "verus_entry": "verification/verus/visibility_contracts.rs",
+      "kani_metadata_name": "visibility::visibility_result"
+    },
+    {
+      "function": "destiny_original_spec::model::adjust_time",
+      "status": "unsupported",
+      "reason": "Rust checked_add has machine-overflow/Option semantics while the current Verus entry uses mathematical integer addition"
+    },
+    {
+      "function": "destiny_original_spec::model::membership_count_after_add",
+      "status": "unsupported",
+      "reason": "Rust checked_add can return None at usize::MAX while the current Verus entry is unbounded mathematical addition"
+    },
+    {
+      "function": "destiny_original_spec::model::membership_count_after_remove",
+      "status": "unsupported",
+      "reason": "the current Verus contract excludes one guarded Rust case (current == 0 && was_present)"
+    },
+    {
+      "function": "destiny_original_spec::visibility::scan_cone_pi_over_2_x",
+      "status": "unsupported",
+      "reason": "the Rust implementation performs bounded i128 arithmetic whose overflow behavior is not represented by the mathematical-int theorem"
+    },
+    {
+      "function": "destiny_original_spec::model::apply_non_negative_setter",
+      "status": "unsupported",
+      "reason": "f64/IEEE-754 correspondence intentionally remains a concrete Kani obligation"
+    },
+    {
+      "function": "destiny_original_spec::model::clamp_speed_fraction",
+      "status": "unsupported",
+      "reason": "f64/IEEE-754 correspondence intentionally remains a concrete Kani obligation"
+    }
+  ]
+}

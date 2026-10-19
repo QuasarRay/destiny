@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "generated_from_branch_head": "f5bb8edafb27d35165ceafeb39be8b0498e553e9",
+  "upstreams": {
+    "verus": {
+      "repository": "https://github.com/verus-lang/verus.git",
+      "path": "third_party/verus",
+      "commit": "aef82eda71838deef4a8cd0260fda6c9504be9b9",
+      "tree": "04ee402221823dccc6e98da618831d4176da68f9",
+      "release": "0.2026.09.20.aef82ed",
+      "toolchain": "1.98.1",
+      "license_paths": [
+        "LICENSE"
+      ],
+      "nested_submodules": []
+    },
+    "kani": {
+      "repository": "https://github.com/model-checking/kani.git",
+      "path": "third_party/kani",
+      "commit": "0d2328a93f0e0ff66132d6bfa1a7d884877cf862",
+      "tree": "9b59a9dfa917ba5b9f1af1f27a1ed2b5c02bc752",
+      "release": "0.68.0",
+      "toolchain": "nightly-2026-08-21",
+      "license_paths": [
+        "LICENSE-APACHE",
+        "LICENSE-MIT"
+      ],
+      "nested_submodules": [
+        {
+          "path": "charon",
+          "commit": "b250680abd40ff1aaa07081d0497dc2755ed112e",
+          "required_for_current_boundary": true
+        },
+        {
+          "path": "firecracker",
+          "commit": "cd36c699f3cb3d531289aadee26c45c1306edcfc",
+          "required_for_current_boundary": false
+        }
+      ],
+      "patches": [
+        {
+          "id": "0001-autoharness-metadata-only",
+          "path": "verification/vendor/patches/kani/0001-autoharness-metadata-only.patch",
+          "upstream_files": [
+            "kani-driver/src/autoharness/mod.rs",
+            "kani-driver/src/project.rs",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs",
+            "kani-compiler/src/kani_middle/attributes.rs",
+            "kani-compiler/src/kani_middle/metadata.rs",
+            "kani_metadata/src/lib.rs"
+          ],
+          "postimage_git_blobs": {
+            "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
+            "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "61867bfcafd2df941a872d6d676bbbf4a573520f",
+            "kani-compiler/src/kani_middle/metadata.rs": "0c1187f429f7684b5807478946d011e11ef0d9ce",
+            "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a",
+            "kani-compiler/src/kani_middle/attributes.rs": "ebb1728c731d541e8637fdd252ce5d577c9f2eda"
+          },
+          "purpose": "Make autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses as parser-side evidence. The proc macro writes already-syn-parsed clauses to an explicit discovery directory when inherited, otherwise to a deterministic OS temporary fallback. Discovery clears and reads both channels, binds records back to Kani ContractedFunction identities exactly once, and grants no proof credit. Compiler-side checked_with decoding remains as an independently validated transport invariant without the temporary diagnostic panic.",
+          "git_blob": "d3069e57bf1ea47dcf6880cbbbb9428a590a14c2"
+        }
+      ]
+    }
+  },
+  "current_boundary": {
+    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Contract clauses are captured immediately after Kani's own syn parsing. The parser evidence channel is independent of proc-macro cwd semantics: it prefers the explicit discovery directory and otherwise uses a deterministic OS-temp fallback that the adapter owns and clears per run.",
+    "default_engine": "verus"
+  },
+  "repository_gitlinks": [
+    {
+      "path": ".agents",
+      "repository": "https://github.com/QuasarRay/Aegis.git",
+      "commit": "46f90f7dbc4f3db8a1a74ef9d8aa91fb4b679460",
+      "role": "maintained verification controller"
+    },
+    {
+      "path": "vendor/github.com/carbonengine/vcpkg-registry",
+      "repository": "https://github.com/carbonengine/vcpkg-registry",
+      "commit": "ec7d8d86e07879d1c73ba2016ac34dd6610fef6a",
+      "role": "existing project dependency"
+    },
+    {
+      "path": "vendor/github.com/microsoft/vcpkg",
+      "repository": "https://github.com/microsoft/vcpkg",
+      "commit": "6d9d7df564a1ccdaa994e4ad39ccd4a32360867b",
+      "role": "existing project dependency"
+    }
+  ]
+}

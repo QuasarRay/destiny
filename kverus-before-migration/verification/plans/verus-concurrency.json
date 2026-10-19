@@ -1,0 +1,345 @@
+{
+  "schema": 1,
+  "objective": "Execute each preserved/new Verus entry once against its exact reviewed symbol inventory and production/logical scope; retain all qualified-case and boundary conjuncts separately.",
+  "authority_sha256": "e5f0221696f05823a88ee83123d6be3d774da21e7eb284306090c42d405a1376",
+  "reference_review": "Behavioral authority ef738406b61ad06bae2f402857e464735ab106a2; separately recorded formation CI pin 114e89fa584f0e1a81eb0a679aabf41af8870072. verification/cases/reference_review.json records reviewed definitions and hashes. Reviewed Ballpark.cpp and Thunkers.cpp differ only in stdafx.h/StdAfx.h include spelling; Ball.cpp, callback case and helper definitions match. No authority switch; external/native numerical and Blue/interpreter correspondence remain pending.",
+  "reuse": {
+    "strategy": "generate",
+    "sources": [
+      "Existing six Verus entries preserved at Destiny HEAD 6e0725313d58ace04bdf13ed096925638c3336d8",
+      "Actual production ffi_lifecycle/evolution_phase shared bodies and reviewed pinned Verus token-machine APIs"
+    ],
+    "license": "Destiny MIT; retained CCP notices in source-derived numeric specifications. Verus tool/framework licenses remain separately identified; no license is invented for the supplied Aegis base.",
+    "reason": "Deduplicate exact entry runs and bind actual macro-generated symbol inventories without changing Kani classification or promoting a partial kernel to a completed original case.",
+    "generator": [
+      "python3",
+      "-B",
+      "verification/tools/generate_verus_inventory.py"
+    ]
+  },
+  "obligations": [
+    {
+      "id": "proofs-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/proofs.rs",
+      "expected_checks": 20,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/proofs.rs. Scope: legacy_mathematical_sequential_model_only.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/proofs.rs"
+      ],
+      "implementation": [
+        "verification/verus/proofs.rs"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/proofs.rs",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+    },
+    {
+      "id": "state-contracts-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/state_contracts.rs",
+      "expected_checks": 22,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/state_contracts.rs. Scope: legacy_mathematical_sequential_model_only.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/state_contracts.rs"
+      ],
+      "implementation": [
+        "verification/verus/state_contracts.rs"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/state_contracts.rs",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+    },
+    {
+      "id": "lifecycle-contracts-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/lifecycle_contracts.rs",
+      "expected_checks": 4,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/lifecycle_contracts.rs. Scope: legacy_mathematical_sequential_model_only.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/lifecycle_contracts.rs"
+      ],
+      "implementation": [
+        "verification/verus/lifecycle_contracts.rs"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/lifecycle_contracts.rs",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+    },
+    {
+      "id": "ball-contracts-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/ball_contracts.rs",
+      "expected_checks": 12,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/ball_contracts.rs. Scope: legacy_mathematical_sequential_model_only.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/ball_contracts.rs"
+      ],
+      "implementation": [
+        "verification/verus/ball_contracts.rs"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/ball_contracts.rs",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+    },
+    {
+      "id": "visibility-contracts-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/visibility_contracts.rs",
+      "expected_checks": 10,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/visibility_contracts.rs. Scope: legacy_mathematical_sequential_model_only.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/visibility_contracts.rs"
+      ],
+      "implementation": [
+        "verification/verus/visibility_contracts.rs"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json",
+        "verification/verus/visibility_contracts.rs"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+    },
+    {
+      "id": "geometry-contracts-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/geometry_contracts.rs",
+      "expected_checks": 36,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/geometry_contracts.rs. Scope: legacy_mathematical_sequential_model_only.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/geometry_contracts.rs"
+      ],
+      "implementation": [
+        "verification/verus/geometry_contracts.rs"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/geometry_contracts.rs",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "Existing int/bool mathematical and identity theorems are preserved. This entry does not establish production linkage, floating-point equivalence, complete qualified-case assertions, concurrency or interpreter/native/engine correspondence."
+    },
+    {
+      "id": "ffi-lifecycle-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/ffi_lifecycle.rs",
+      "expected_checks": 25,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/ffi_lifecycle.rs. Scope: production_counter_and_atomic_attempt_kernels_plus_logical_token_relation.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/ffi_lifecycle.rs"
+      ],
+      "implementation": [
+        "src/ffi_lifecycle.rs",
+        "src/ball_lifecycle.rs",
+        "src/missile.rs",
+        "src/harmonic.rs",
+        "src/collision_identity.rs",
+        "src/runtime.rs",
+        "src/ffi.rs",
+        "src/operation_gate.rs",
+        "python/destiny/_backend.py",
+        "python/destiny/_facade.py",
+        "include/destiny_bevy_compat.h"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "src/ball_lifecycle.rs",
+        "src/collision_identity.rs",
+        "src/ffi_lifecycle.rs",
+        "src/harmonic.rs",
+        "src/missile.rs",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/ball_lifecycle.rs",
+        "verification/verus/ffi_lifecycle.rs",
+        "verification/verus/reference_protocol.rs",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "No complete raw-pointer/Box allocation identity, global atomic invariant across the retry driver, reference-transfer caller, operation gate/Mutex, poison, ECS, OS or foreign-callback refinement. No lock-free, fairness or termination claim."
+    },
+    {
+      "id": "evolution-callbacks-reviewed-inventory",
+      "method": "verus",
+      "entry": "verification/verus/evolution_callbacks.rs",
+      "expected_checks": 13,
+      "invariant": "Conjoin the exact reviewed theorem and executable contracts in verification/verus/symbol_inventory.json for verification/verus/evolution_callbacks.rs. Scope: production_phase_kernels_and_feasible_callback_trace.",
+      "specification": [
+        "verification/cases/reference_review.json",
+        "verification/cases/concurrency_mappings.json",
+        "verification/verus/evolution_callbacks.rs"
+      ],
+      "implementation": [
+        "src/evolution_phase.rs",
+        "src/proximity.rs",
+        "src/notification_batch.rs",
+        "src/operation_gate.rs",
+        "src/ffi.rs",
+        "src/runtime.rs",
+        "python/destiny/_backend.py",
+        "python/destiny/_facade.py"
+      ],
+      "proof_inputs": [
+        "Cargo.lock",
+        "Cargo.toml",
+        "rust-toolchain.toml",
+        "src/evolution_phase.rs",
+        "src/notification_batch.rs",
+        "src/proximity.rs",
+        "verification/cases/concurrency_mappings.json",
+        "verification/cases/inventory.json",
+        "verification/cases/reference_review.json",
+        "verification/controller/base.json",
+        "verification/controller/destiny-controller.patch",
+        "verification/spec/Cargo.lock",
+        "verification/spec/Cargo.toml",
+        "verification/spec/src/original_motion.rs",
+        "verification/spec/src/original_warp.rs",
+        "verification/tools/check_concurrency_acceptance.py",
+        "verification/tools/generate_concurrency_map.py",
+        "verification/tools/generate_verus_inventory.py",
+        "verification/verus/evolution_callbacks.rs",
+        "verification/verus/symbol_inventory.json",
+        "verification/verus/trust_register.json"
+      ],
+      "assumptions": "No new assume/admit/unchecked behavior contracts. Pin Verus 0.2026.09.20.aef82ed, compatible vstd/macros and Z3 as identified by runner receipts; review unavoidable primitives and token-sharding trust in verification/verus/trust_register.json. Machine usize/u8 contracts retain their whole domains; mathematical legacy lemmas retain their original declared preconditions.",
+      "limits": "Phase kernels alone do not establish callback invocation, ECS membership/repair frame conditions, every command ordering, foreign exception handling, Warp IEEE-754/libm reachability, all worker/engine configurations, snapshots, allocation/Mutex permissions or progress."
+    }
+  ]
+}
