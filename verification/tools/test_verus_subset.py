@@ -191,6 +191,102 @@ class TranslatorTests(unittest.TestCase):
         self.assertIn("    requires\n        x,", lowered)
         self.assertIn("    ensures\n        x,", lowered)
 
+    def test_scalar_return_tail_is_preserved_as_executable_verus_return(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "lib.rs"
+            source.write_text("pub fn identity(x: u8) -> u8 { x }\n")
+            function = vk.parse_source(source)[0]
+            lowered = vk.lower_function(function, source, root)
+        self.assertEqual(function.return_type, "u8")
+        self.assertEqual(function.body[-1], vk.ReturnStmt(vk.Expr("x"), 1))
+        self.assertIn("fn identity(x: u8) -> u8 {", lowered)
+        self.assertIn("return x;", lowered)
+
+    def test_scalar_result_contract_uses_named_verus_result(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "lib.rs"
+            source.write_text(
+                "#[kani::requires(true)]\n"
+                "#[kani::ensures(|result: &u8| *result == x)]\n"
+                "pub fn identity(x: u8) -> u8 { x }\n"
+            )
+            function = vk.parse_source(source)[0]
+            discovery = root / "discovery.json"
+            discovery.write_text(json.dumps({
+                "contracted_functions": [{
+                    "function": "identity",
+                    "file": "src/lib.rs",
+                    "harnesses": ["identity"],
+                    "clauses": [
+                        {"kind": "requires", "expression": "true"},
+                        {
+                            "kind": "ensures",
+                            "expression": "| result : & u8 | * result == x",
+                        },
+                    ],
+                }],
+            }))
+            contract = vk.contract_for_function(discovery, "identity", function)
+            lowered = vk.lower_function(function, source, root, contract)
+        self.assertEqual(function.return_type, "u8")
+        self.assertEqual(
+            [expr.text for expr in contract.ensures],
+            ["(__destiny_result == x)"],
+        )
+        self.assertIn(
+            "fn identity(x: u8) -> (__destiny_result: u8)",
+            lowered,
+        )
+        self.assertIn("        (__destiny_result == x),", lowered)
+        self.assertIn("return x;", lowered)
+
+    def test_scalar_result_contract_rejects_wrong_result_reference_type(self):
+        function = self.parse("pub fn identity(x: u8) -> u8 { x }\n")[0]
+        with tempfile.TemporaryDirectory() as directory:
+            discovery = Path(directory) / "discovery.json"
+            discovery.write_text(json.dumps({
+                "contracted_functions": [{
+                    "function": "identity",
+                    "file": "src/lib.rs",
+                    "harnesses": [],
+                    "clauses": [{
+                        "kind": "ensures",
+                        "expression": "|result: &u16| *result == 0",
+                    }],
+                }],
+            }))
+            with self.assertRaises(vk.Unsupported):
+                vk.contract_for_function(discovery, "identity", function)
+
+    def test_scalar_result_contract_arithmetic_remains_rejected(self):
+        function = self.parse("pub fn identity(x: u8) -> u8 { x }\n")[0]
+        with tempfile.TemporaryDirectory() as directory:
+            discovery = Path(directory) / "discovery.json"
+            discovery.write_text(json.dumps({
+                "contracted_functions": [{
+                    "function": "identity",
+                    "file": "src/lib.rs",
+                    "harnesses": [],
+                    "clauses": [{
+                        "kind": "ensures",
+                        "expression": "|result: &u8| *result + 1 > x",
+                    }],
+                }],
+            }))
+            with self.assertRaises(vk.Unsupported):
+                vk.contract_for_function(discovery, "identity", function)
+
+    def test_selected_generic_return_type_is_substituted(self):
+        function = self.parse("pub fn generic_return<T>(x: T) -> T { x }\n")[0]
+        selected = vk.instantiate_selected_function(
+            function,
+            "crate::generic_return::<i32>",
+        )
+        self.assertEqual(selected.params, (("x", "i32"),))
+        self.assertEqual(selected.return_type, "i32")
+
     def test_contract_requires_receive_explicit_nonvacuity_proof(self):
         function = self.parse("pub fn contracted(x: bool) { assert!(true); }\n")[0]
         contract = vk.ContractSpec(
