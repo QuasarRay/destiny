@@ -1324,7 +1324,7 @@ def verify(
             for path in assertion_paths
         ],
         "bounds": collect_loop_bounds(function.body),
-        "target_scope": "bool_and_fixed_width_integer parameters/returns; +,-,* only in executable conditions/return expressions; usize/isize rejected",
+        "target_scope": "bool_and_fixed_width_integer parameters/returns; +,-,* in executable conditions/return expressions plus one guarded unsigned scalar/literal ensures comparison; usize/isize rejected",
         "trusted_boundaries": [
             "Kani compiler autoharness eligibility metadata selects the source function; Kani/CBMC proof results are not used.",
             "The structural Rust-to-Verus lowering is trusted only for the declared grammar and is separately regression-tested.",
