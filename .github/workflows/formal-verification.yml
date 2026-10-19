@@ -115,7 +115,7 @@ jobs:
       - name: Discover the generated-obligation fixture corpus through the same Kani compiler path
         run: |
           set -euo pipefail
-          for fixture in valid invalid unsupported; do
+          for fixture in valid invalid unsupported contracts; do
             out=".aegis/destiny/kani-autoharness-fixtures/$fixture"
             python3 -B verification/tools/run_kani_autoharness_discovery.py \
               --manifest-path "verification/automation/fixtures/$fixture/Cargo.toml" \
@@ -125,6 +125,26 @@ jobs:
               discover "$out/kani-metadata.json" \
               > "$out/normalized-discovery.json"
           done
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          contract=json.loads(Path(
+              ".aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json"
+          ).read_text())
+          assert contract["proof_credit"] is False, contract
+          rows=contract["contracted_functions"]
+          assert len(rows) == 1, rows
+          row=rows[0]
+          assert row["function"].endswith("contracted_valid"), row
+          assert row["file"].endswith("src/lib.rs"), row
+          assert row["provenance"] == "kani_metadata::KaniMetadata::contracted_functions", row
+          selected=[
+              candidate for candidate in contract["candidates"]
+              if candidate["function"].endswith("contracted_valid")
+          ]
+          assert len(selected) == 1, selected
+          assert selected[0]["disposition"] == "kani_eligible", selected
+          PY
           python3 -B verification/tools/test_verus_subset.py
 
       - name: Retain Kani-to-Verus discovery evidence
