@@ -124,6 +124,18 @@ class TranslatorTests(unittest.TestCase):
             lowered,
         )
 
+    def test_assumption_nonvacuity_is_scoped_to_contract_precondition(self):
+        function = self.parse(
+            "pub fn contracted(x: bool, y: bool) { kani::assume(y); assert!(y); }\n"
+        )[0]
+        witnesses = vk.collect_assumption_witnesses(function.body)
+        lowered = vk.lower_nonvacuity(function, witnesses, (vk.Expr("x"),))
+        self.assertIn(
+            "(exists|x: bool, y: bool| (x)) ==> "
+            "(exists|x: bool, y: bool| (x) && (y))",
+            lowered,
+        )
+
     def test_unreachable_assertion_branch_is_not_a_hard_nonvacuity_requirement(self):
         function = self.parse(
             "pub fn guarded(x: u8) { "
