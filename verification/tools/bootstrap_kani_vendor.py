@@ -34,7 +34,10 @@ def main() -> int:
 
     if git(checkout, "rev-parse", "HEAD") != spec["commit"]:
         raise ValueError("Kani checkout is not at the recorded commit")
-    if sha256(patch) != patch_spec["sha256"]:
+    if "git_blob" in patch_spec:
+        if git(checkout, "hash-object", str(patch)) != patch_spec["git_blob"]:
+            raise ValueError("Kani patch blob differs from the recorded digest")
+    elif sha256(patch) != patch_spec["sha256"]:
         raise ValueError("Kani patch digest differs from the recorded digest")
 
     expected = patch_spec["postimage_git_blobs"]
