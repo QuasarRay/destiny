@@ -5,12 +5,13 @@ mod model;
 
 pub use components::{
     CanBuildAutomationPlan, CanCanonicalizeContractClause, CanNormalizeMetadata,
-    CanParseMetadataBytes, CanRunPythonTool, CanValidateContractClause, HasProjectRoot,
-    KVerusContext,
+    CanParseMetadataBytes, CanPrepareAutomation, CanReadWriteArtifacts, CanRunPythonTool,
+    CanValidateContractClause, HasProjectRoot, KVerusContext,
 };
 pub use model::{
     AutomationPlan, ContractDiscovery, ContractPlan, DiscoveryCandidate,
     DiscoveryDisposition, DiscoveryReport, PlanCounts, PlannedContractClause,
+    PreparationReceipt,
 };
 
 use kani_metadata::KaniMetadata;

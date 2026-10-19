@@ -79,3 +79,18 @@ pub struct AutomationPlan {
     pub excluded: Vec<DiscoveryCandidate>,
     pub contracted_functions: Vec<ContractPlan>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct PreparationReceipt {
+    pub schema: u32,
+    pub status: &'static str,
+    pub default_engine: &'static str,
+    pub kani_source_commit: &'static str,
+    pub proof_credit: bool,
+    pub manifest_path: String,
+    pub output_dir: String,
+    pub metadata_path: String,
+    pub discovery_path: String,
+    pub plan_path: String,
+    pub counts: PlanCounts,
+}

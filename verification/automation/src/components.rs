@@ -1,20 +1,21 @@
 use crate::{
     AutomationPlan, ContractDiscovery, ContractPlan, DEFAULT_ENGINE, DiscoveryCandidate,
     DiscoveryDisposition, DiscoveryReport, KANI_SOURCE_COMMIT, PlanCounts,
-    PlannedContractClause,
+    PlannedContractClause, PreparationReceipt,
 };
 use cgp::prelude::*;
 use kani_metadata::{
     AutoHarnessSkipReason, ContractClause, ContractClauseKind, KaniMetadata,
 };
 use proc_macro2::TokenStream;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::{
     env,
     ffi::OsString,
-    io,
+    fs::{self, OpenOptions},
+    io::{self, Write},
     path::{Path, PathBuf},
-    process::{Command, ExitStatus},
+    process::{self, Command, ExitStatus, Output},
     str::FromStr,
 };
 use synthez::syn::parse::Parser as _;
@@ -323,6 +324,12 @@ pub trait CanRunPythonTool {
         script: &str,
         args: &[String],
     ) -> Result<ExitStatus, io::Error>;
+
+    fn run_python_tool_output(
+        &self,
+        script: &str,
+        args: &[String],
+    ) -> Result<Output, io::Error>;
 }
 
 #[cgp_impl(new SystemPythonToolRunner)]
@@ -333,12 +340,165 @@ impl PythonToolRunner {
         script: &str,
         args: &[String],
     ) -> Result<ExitStatus, io::Error> {
-        Command::new(python_executable())
-            .arg("-B")
-            .arg(self.project_root().join(script))
-            .args(args)
-            .status()
+        python_command(self, script, args).status()
     }
+
+    fn run_python_tool_output(
+        &self,
+        script: &str,
+        args: &[String],
+    ) -> Result<Output, io::Error> {
+        python_command(self, script, args).output()
+    }
+}
+
+fn python_command(
+    context: &impl HasProjectRoot,
+    script: &str,
+    args: &[String],
+) -> Command {
+    let mut command = Command::new(python_executable());
+    command
+        .arg("-B")
+        .arg(context.project_root().join(script))
+        .args(args);
+    command
+}
+
+#[cgp_component(ArtifactStore)]
+pub trait CanReadWriteArtifacts {
+    fn read_artifact(&self, path: &Path) -> Result<Vec<u8>, io::Error>;
+    fn write_artifact(&self, path: &Path, bytes: &[u8]) -> Result<(), io::Error>;
+}
+
+#[cgp_impl(new StdArtifactStore)]
+impl ArtifactStore {
+    fn read_artifact(&self, path: &Path) -> Result<Vec<u8>, io::Error> {
+        fs::read(path)
+    }
+
+    fn write_artifact(&self, path: &Path, bytes: &[u8]) -> Result<(), io::Error> {
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let file_name = path
+            .file_name()
+            .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, "artifact path has no file name"))?
+            .to_string_lossy();
+        let temporary = path.with_file_name(format!(
+            ".{file_name}.{}.kverus-tmp",
+            process::id()
+        ));
+        let mut file = OpenOptions::new()
+            .create(true)
+            .truncate(true)
+            .write(true)
+            .open(&temporary)?;
+        file.write_all(bytes)?;
+        file.sync_all()?;
+        drop(file);
+
+        match fs::rename(&temporary, path) {
+            Ok(()) => Ok(()),
+            Err(_) if path.exists() => {
+                fs::remove_file(path)?;
+                fs::rename(&temporary, path)
+            }
+            Err(error) => {
+                let _ = fs::remove_file(&temporary);
+                Err(error)
+            }
+        }
+    }
+}
+
+#[cgp_component(AutomationPreparation)]
+pub trait CanPrepareAutomation {
+    fn prepare_automation(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+    ) -> Result<PreparationReceipt, String>;
+}
+
+#[cgp_impl(new KaniAutomationPreparation)]
+#[uses(
+    CanRunPythonTool,
+    CanReadWriteArtifacts,
+    CanParseMetadataBytes,
+    CanNormalizeMetadata,
+    CanBuildAutomationPlan
+)]
+impl AutomationPreparation {
+    fn prepare_automation(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+    ) -> Result<PreparationReceipt, String> {
+        let args = vec![
+            "--manifest-path".to_string(),
+            manifest_path.to_string(),
+            "--output-dir".to_string(),
+            output_dir.to_string(),
+        ];
+        let output = self
+            .run_python_tool_output(
+                "verification/tools/run_kani_autoharness_discovery.py",
+                &args,
+            )
+            .map_err(|error| format!("failed to execute Kani discovery: {error}"))?;
+
+        if !output.status.success() {
+            return Err(format!(
+                "Kani discovery failed with {}: {}",
+                output.status,
+                String::from_utf8_lossy(&output.stderr).trim()
+            ));
+        }
+
+        let output_dir_path = PathBuf::from(output_dir);
+        let metadata_path = output_dir_path.join("kani-metadata.json");
+        let discovery_path = output_dir_path.join("normalized-discovery.json");
+        let plan_path = output_dir_path.join("automation-plan.json");
+        let receipt_path = output_dir_path.join("preparation-receipt.json");
+
+        let metadata_bytes = self
+            .read_artifact(&metadata_path)
+            .map_err(|error| format!("cannot read {}: {error}", metadata_path.display()))?;
+        let metadata = self
+            .parse_metadata_bytes(&metadata_bytes)
+            .map_err(|error| format!("cannot parse {}: {error}", metadata_path.display()))?;
+        let discovery = self.normalize_metadata(&metadata);
+        let plan = self.build_automation_plan(&discovery)?;
+
+        self.write_artifact(&discovery_path, &pretty_json_bytes(&discovery)?)
+            .map_err(|error| format!("cannot write {}: {error}", discovery_path.display()))?;
+        self.write_artifact(&plan_path, &pretty_json_bytes(&plan)?)
+            .map_err(|error| format!("cannot write {}: {error}", plan_path.display()))?;
+
+        let receipt = PreparationReceipt {
+            schema: 1,
+            status: "KVERUS_PREPARED",
+            default_engine: discovery.default_engine,
+            kani_source_commit: discovery.kani_source_commit,
+            proof_credit: false,
+            manifest_path: manifest_path.to_string(),
+            output_dir: output_dir.to_string(),
+            metadata_path: metadata_path.display().to_string(),
+            discovery_path: discovery_path.display().to_string(),
+            plan_path: plan_path.display().to_string(),
+            counts: plan.counts.clone(),
+        };
+        self.write_artifact(&receipt_path, &pretty_json_bytes(&receipt)?)
+            .map_err(|error| format!("cannot write {}: {error}", receipt_path.display()))?;
+        Ok(receipt)
+    }
+}
+
+fn pretty_json_bytes(value: &impl Serialize) -> Result<Vec<u8>, String> {
+    let mut bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
+    bytes.push(b'\n');
+    Ok(bytes)
 }
 
 pub struct KVerusContext;
@@ -359,6 +519,10 @@ delegate_and_check_components! {
             CargoManifestProjectLayout,
         PythonToolRunnerComponent:
             SystemPythonToolRunner,
+        ArtifactStoreComponent:
+            StdArtifactStore,
+        AutomationPreparationComponent:
+            KaniAutomationPreparation,
     }
 }
 

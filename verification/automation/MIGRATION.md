@@ -42,3 +42,22 @@ only. `main.rs` no longer owns project layout or Python process construction.
 
 This slice intentionally does not change `verification/tools/verus_subset.py` or any
 proof translation semantics.
+
+## Third slice: end-to-end preparation
+
+`AutomationPreparation` composes the already-validated providers instead of duplicating
+their logic. The new `prepare --manifest-path <Cargo.toml> --output-dir <dir>` command:
+
+1. invokes the existing metadata-only Kani discovery through `PythonToolRunner`;
+2. reads Kani's combined metadata through the `ArtifactStore` provider;
+3. reuses `MetadataParser`, `MetadataNormalizer`, and `AutomationPlanner`;
+4. writes normalized discovery, the automation plan, and a preparation receipt;
+5. keeps every generated planning/discovery artifact at `proof_credit = false`.
+
+`ArtifactStore` publishes through a temporary sibling file plus rename, with a
+conservative replacement fallback on platforms that reject rename-over-existing.
+The Kani subprocess is captured so `prepare` itself has a single machine-readable JSON
+stdout surface.
+
+CI exercises `prepare` against all real valid, invalid, unsupported, and contract fixture
+crates. The restricted Rust-to-Verus translator remains untouched.

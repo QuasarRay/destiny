@@ -138,17 +138,13 @@ jobs:
           set -euo pipefail
           for fixture in valid invalid unsupported contracts; do
             out=".aegis/destiny/kani-autoharness-fixtures/$fixture"
-            python3 -B verification/tools/run_kani_autoharness_discovery.py \
+            mkdir -p "$out"
+            cargo +nightly-2026-08-21 run --quiet \
+              --manifest-path verification/automation/Cargo.toml --locked -- \
+              prepare \
               --manifest-path "verification/automation/fixtures/$fixture/Cargo.toml" \
-              --output-dir "$out"
-            cargo +nightly-2026-08-21 run --quiet \
-              --manifest-path verification/automation/Cargo.toml --locked -- \
-              discover "$out/kani-metadata.json" \
-              > "$out/normalized-discovery.json"
-            cargo +nightly-2026-08-21 run --quiet \
-              --manifest-path verification/automation/Cargo.toml --locked -- \
-              plan "$out/kani-metadata.json" \
-              > "$out/automation-plan.json"
+              --output-dir "$out" \
+              > "$out/prepare-stdout.json"
           done
           python3 - <<'PY'
           import json
@@ -223,6 +219,18 @@ jobs:
               for row in planned.values()
               for clause in row["clauses"]
           ), planned
+
+          receipt=json.loads(Path(
+              ".aegis/destiny/kani-autoharness-fixtures/contracts/preparation-receipt.json"
+          ).read_text())
+          stdout_receipt=json.loads(Path(
+              ".aegis/destiny/kani-autoharness-fixtures/contracts/prepare-stdout.json"
+          ).read_text())
+          assert receipt == stdout_receipt, (receipt, stdout_receipt)
+          assert receipt["status"] == "KVERUS_PREPARED", receipt
+          assert receipt["default_engine"] == "verus", receipt
+          assert receipt["proof_credit"] is False, receipt
+          assert receipt["counts"] == plan["counts"], (receipt, plan)
           PY
           python3 -B verification/tools/test_verus_subset.py
 

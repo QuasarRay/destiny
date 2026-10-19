@@ -1,8 +1,9 @@
 #![forbid(unsafe_code)]
 
 use destiny_verification_automation::{
-    CanBuildAutomationPlan, CanRunPythonTool, DEFAULT_ENGINE, DiscoveryReport,
-    KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata, parse_metadata,
+    CanBuildAutomationPlan, CanPrepareAutomation, CanRunPythonTool, DEFAULT_ENGINE,
+    DiscoveryReport, KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata,
+    parse_metadata,
 };
 use std::{
     env,
@@ -14,7 +15,8 @@ fn usage() -> ! {
     eprintln!(
         "usage: destiny-verification-automation \
          doctor | setup | discover <kani-metadata.json> | list <kani-metadata.json> | \
-         plan <kani-metadata.json> | explain | verify <verus-subset args...> | \
+         plan <kani-metadata.json> | prepare --manifest-path <Cargo.toml> \
+         --output-dir <dir> | explain | verify <verus-subset args...> | \
          replay-kani-reference <replay args...>"
     );
     std::process::exit(2);
@@ -105,6 +107,28 @@ fn plan(path: &str) -> ExitCode {
     }
 }
 
+fn prepare(mut args: impl Iterator<Item = String>) -> ExitCode {
+    let mut manifest_path = None;
+    let mut output_dir = None;
+    while let Some(argument) = args.next() {
+        match argument.as_str() {
+            "--manifest-path" if manifest_path.is_none() => manifest_path = args.next(),
+            "--output-dir" if output_dir.is_none() => output_dir = args.next(),
+            _ => usage(),
+        }
+    }
+    let (Some(manifest_path), Some(output_dir)) = (manifest_path, output_dir) else {
+        usage()
+    };
+    match KVerusContext.prepare_automation(&manifest_path, &output_dir) {
+        Ok(receipt) => emit_json(&receipt),
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let mut args = env::args().skip(1);
     match args.next().as_deref() {
@@ -129,6 +153,7 @@ fn main() -> ExitCode {
             }
             plan(&path)
         }
+        Some("prepare") => prepare(args),
         Some("explain") if args.next().is_none() => {
             print!("{}", include_str!("../capabilities.json"));
             ExitCode::SUCCESS

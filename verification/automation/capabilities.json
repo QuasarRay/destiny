@@ -96,5 +96,18 @@
     "project_layout": "CGP ProjectLayout provider",
     "python_tool_execution": "CGP PythonToolRunner provider",
     "unsafe_code": false
+  },
+  "preparation": {
+    "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP AutomationPreparation composed from PythonToolRunner, ArtifactStore, MetadataParser, MetadataNormalizer, and AutomationPlanner",
+    "emits": [
+      "kani-metadata.json",
+      "normalized-discovery.json",
+      "automation-plan.json",
+      "preparation-receipt.json"
+    ],
+    "kani_backend_execution": "CBMC/GOTO remain forbidden by the reused metadata-only discovery tool",
+    "proof_credit": false
   }
 }
