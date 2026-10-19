@@ -115,6 +115,13 @@ class Function:
     source: str
 
 
+@dataclasses.dataclass(frozen=True)
+class ContractSpec:
+    clauses: tuple[tuple[str, str], ...]
+    requires: tuple[Expr, ...]
+    ensures: tuple[Expr, ...]
+
+
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -399,8 +406,143 @@ def expression_has_machine_arithmetic(expr: Expr) -> bool:
     return any(f" {operator} " in expr.text for operator in ("+", "-", "*"))
 
 
+CONTRACT_ATTRIBUTE = re.compile(
+    r"#\s*\[\s*kani\s*::\s*(?:requires|ensures|modifies)\b"
+)
+
+
+def strip_kani_contract_attributes(text: str) -> str:
+    """Remove only Kani contract attributes while preserving source line numbers.
+
+    Contract semantics come from compiler metadata, never from this source text.
+    This preprocessing only lets the existing restricted Rust body parser reach
+    the decorated function declaration.
+    """
+    chars = list(text)
+    search_from = 0
+    while True:
+        match = CONTRACT_ATTRIBUTE.search(text, search_from)
+        if match is None:
+            break
+        bracket = text.find("[", match.start(), match.end())
+        if bracket < 0:
+            raise Unsupported("malformed Kani contract attribute")
+        depth = 0
+        in_string = False
+        escaped = False
+        end = None
+        for index in range(bracket, len(text)):
+            ch = text[index]
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif ch == "\\":
+                    escaped = True
+                elif ch == '"':
+                    in_string = False
+                continue
+            if ch == '"':
+                in_string = True
+            elif ch == "[":
+                depth += 1
+            elif ch == "]":
+                depth -= 1
+                if depth == 0:
+                    end = index
+                    break
+        if end is None:
+            raise Unsupported("unterminated Kani contract attribute")
+        for index in range(match.start(), end + 1):
+            if chars[index] != "\n":
+                chars[index] = " "
+        search_from = end + 1
+    return "".join(chars)
+
+
 def parse_source(path: Path) -> list[Function]:
-    return Parser(tokenize(path.read_text(encoding="utf-8")), str(path)).parse_file()
+    source = path.read_text(encoding="utf-8")
+    return Parser(tokenize(strip_kani_contract_attributes(source)), str(path)).parse_file()
+
+
+def parse_contract_expression(text: str, names: set[str], source: str) -> Expr:
+    parser = Parser(tokenize(text), source)
+    parser.allowed_names = set(names)
+    expr = parser.parse_expression()
+    if parser.current().kind != "eof":
+        parser.fail("unexpected tokens after contract expression")
+    if expression_has_machine_arithmetic(expr):
+        raise Unsupported(
+            "machine arithmetic in Kani function contracts is not in the initial "
+            "KVerus contract subset"
+        )
+    return expr
+
+
+def contract_for_function(
+    discovery_path: Path,
+    requested: str,
+    function: Function,
+) -> ContractSpec:
+    discovery = strict_json(discovery_path)
+    requested_base, _ = split_selected_instance(requested)
+    rows = [
+        row
+        for row in discovery.get("contracted_functions", [])
+        if row.get("function") == requested_base
+        or str(row.get("function", "")).endswith("::" + requested_base)
+    ]
+    if not rows:
+        return ContractSpec((), (), ())
+    if len(rows) != 1:
+        raise VerificationError(
+            f"expected at most one Kani contract identity for {requested!r}, found {len(rows)}"
+        )
+    clauses = rows[0].get("clauses")
+    if not isinstance(clauses, list) or not clauses:
+        raise VerificationError(
+            f"Kani reports {requested!r} as contracted but exported no parsed clauses"
+        )
+
+    names = {name for name, _ in function.params}
+    normalized = []
+    requires = []
+    ensures = []
+    for clause in clauses:
+        if not isinstance(clause, dict):
+            raise VerificationError("malformed Kani contract clause metadata")
+        kind = clause.get("kind")
+        expression = clause.get("expression")
+        if not isinstance(expression, str) or not expression.strip():
+            raise VerificationError("empty Kani contract clause expression")
+        normalized.append((kind, expression))
+        if kind == "requires":
+            requires.append(
+                parse_contract_expression(
+                    expression,
+                    names,
+                    f"Kani requires for {requested}",
+                )
+            )
+        elif kind == "ensures":
+            match = re.fullmatch(r"\|\s*_\s*\|\s*(.+)", expression, re.S)
+            if match is None:
+                raise Unsupported(
+                    "initial KVerus ensures support requires a unit-return closure "
+                    "with wildcard result binder, e.g. |_| predicate"
+                )
+            ensures.append(
+                parse_contract_expression(
+                    match.group(1),
+                    names,
+                    f"Kani ensures for {requested}",
+                )
+            )
+        elif kind == "modifies":
+            raise Unsupported("Kani modifies clauses are not in the initial KVerus contract subset")
+        else:
+            raise VerificationError(f"unknown Kani contract clause kind {kind!r}")
+
+    return ContractSpec(tuple(normalized), tuple(requires), tuple(ensures))
 
 
 def emit_statement(statement: Stmt, indent: str, source: str, output: list[str]) -> None:
@@ -435,13 +577,29 @@ def emit_statement(statement: Stmt, indent: str, source: str, output: list[str])
     raise TypeError(statement)
 
 
-def lower_function(function: Function, source_path: Path, project_root: Path) -> str:
+def lower_function(
+    function: Function,
+    source_path: Path,
+    project_root: Path,
+    contract: ContractSpec | None = None,
+) -> str:
     try:
         relative = source_path.resolve().relative_to(project_root.resolve()).as_posix()
     except ValueError:
         relative = source_path.resolve().as_posix()
     params = ", ".join(f"{name}: {typ}" for name, typ in function.params)
-    output = ["use vstd::prelude::*;", "", "verus! {", f"fn {function.name}({params}) {{"]
+    output = ["use vstd::prelude::*;", "", "verus! {"]
+    if contract is not None and (contract.requires or contract.ensures):
+        output.append(f"fn {function.name}({params})")
+        if contract.requires:
+            output.append("    requires")
+            output.extend(f"        {expr.text}," for expr in contract.requires)
+        if contract.ensures:
+            output.append("    ensures")
+            output.extend(f"        {expr.text}," for expr in contract.ensures)
+        output.append("{")
+    else:
+        output.append(f"fn {function.name}({params}) {{")
     for statement in function.body:
         emit_statement(statement, "    ", relative, output)
     output.extend(["}", "}", ""])
@@ -610,11 +768,24 @@ def _conjunction(conditions: Sequence[str]) -> str:
     return " && ".join(f"({term})" for term in conditions) or "true"
 
 
-def lower_nonvacuity(function: Function, witnesses: Sequence[AssumptionWitness]) -> str:
-    if not witnesses:
-        raise Unsupported("selected function contains no user-assumption non-vacuity obligations")
+def lower_nonvacuity(
+    function: Function,
+    witnesses: Sequence[AssumptionWitness],
+    contract_requires: Sequence[Expr] = (),
+) -> str:
+    if not witnesses and not contract_requires:
+        raise Unsupported("selected function contains no non-vacuity obligations")
     output = ["use vstd::prelude::*;", "", "verus! {"]
     binders = ", ".join(f"{name}: {typ}" for name, typ in function.params)
+    if contract_requires:
+        output.append("proof fn __destiny_contract_precondition_nonvacuity() {")
+        predicate = _conjunction([expr.text for expr in contract_requires])
+        if binders:
+            output.append(f"    assert(exists|{binders}| {predicate});")
+        else:
+            output.append(f"    assert({predicate});")
+        output.append("}")
+        output.append("")
     for index, witness in enumerate(witnesses):
         output.append(f"proof fn __destiny_nonvacuity_{index}() {{")
         prefix = _conjunction(witness.prefix_conditions)
