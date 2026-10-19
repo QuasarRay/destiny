@@ -27,7 +27,7 @@ checksum = "940b3a0ca603d1eade50a4846a2afffd5ef57a9feac2c0e2ec2e14f9ead76000"
 name = "anstyle-parse"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52ce7f38b242319f7cabaa6813055467063ecdc9d355bbb4ce0c68908cd8130e"
+checksum = "52ce7c95d9f6cbf04d365308285d67b3f3b736ae353db07fb17cae89d0f1336b"
 dependencies = [
  "utf8parse",
 ]
@@ -57,6 +57,238 @@ name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
+
+[[package]]
+name = "cgp"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+ "cgp-extra",
+]
+
+[[package]]
+name = "cgp-async-macro"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "cgp-base"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-base-types",
+ "cgp-component",
+ "cgp-macro",
+]
+
+[[package]]
+name = "cgp-base-extra"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-base",
+ "cgp-type",
+]
+
+[[package]]
+name = "cgp-base-types"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+
+[[package]]
+name = "cgp-component"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+
+[[package]]
+name = "cgp-core"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-async-macro",
+ "cgp-base",
+ "cgp-component",
+ "cgp-error",
+ "cgp-field",
+ "cgp-macro",
+ "cgp-type",
+]
+
+[[package]]
+name = "cgp-dispatch"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+ "cgp-handler",
+ "cgp-monad",
+]
+
+[[package]]
+name = "cgp-error"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-base-extra",
+ "cgp-field",
+ "cgp-macro",
+ "cgp-type",
+]
+
+[[package]]
+name = "cgp-error-extra"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+]
+
+[[package]]
+name = "cgp-extra"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+ "cgp-dispatch",
+ "cgp-error-extra",
+ "cgp-field-extra",
+ "cgp-handler",
+ "cgp-macro-extra",
+ "cgp-monad",
+ "cgp-run",
+ "cgp-runtime",
+]
+
+[[package]]
+name = "cgp-field"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-base-types",
+ "cgp-component",
+ "cgp-type",
+]
+
+[[package]]
+name = "cgp-field-extra"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-field",
+]
+
+[[package]]
+name = "cgp-handler"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+]
+
+[[package]]
+name = "cgp-macro"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-macro-lib",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "cgp-macro-core"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "itertools",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "cgp-macro-extra"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-macro-extra-lib",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "cgp-macro-extra-core"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-macro-core",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "cgp-macro-extra-lib"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-macro-core",
+ "cgp-macro-extra-core",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "cgp-macro-lib"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-macro-core",
+ "itertools",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "cgp-monad"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+ "cgp-handler",
+]
+
+[[package]]
+name = "cgp-run"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+]
+
+[[package]]
+name = "cgp-runtime"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-core",
+]
+
+[[package]]
+name = "cgp-type"
+version = "0.8.0-alpha"
+source = "git+https://github.com/contextgeneric/cgp.git?rev=eca0c5fda60d87cf048460f5abdd3b6e82da5e0f#eca0c5fda60d87cf048460f5abdd3b6e82da5e0f"
+dependencies = [
+ "cgp-base",
+ "cgp-component",
+ "cgp-macro",
+]
 
 [[package]]
 name = "clap"
@@ -122,16 +354,25 @@ dependencies = [
 name = "destiny-verification-automation"
 version = "0.1.0"
 dependencies = [
+ "cgp",
  "kani_metadata",
+ "proc-macro2",
  "serde",
  "serde_json",
+ "synthez",
 ]
+
+[[package]]
+name = "either"
+version = "1.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e9c71c2167ca323c882b99918929403426e2373ea17242ff5653e0d5e1058be"
 
 [[package]]
 name = "foldhash"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
+checksum = "77ce24b58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
 name = "hashbrown"
@@ -155,10 +396,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
 
 [[package]]
+name = "itertools"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
+checksum = "8f42a60df4d89a27cc9623757dcc65eb5e2daf00b03380605370d0e139ae570"
 
 [[package]]
 name = "kani_metadata"
@@ -192,7 +442,7 @@ dependencies = [
 name = "memchr"
 version = "2.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
+checksum = "cf8baf1c55e62ffcace7a9fec1b15cb490cc62588f2e1c5fc7c4acf617bf3f1b"
 
 [[package]]
 name = "num"
@@ -240,9 +490,8 @@ dependencies = [
 name = "num-iter"
 version = "0.1.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c92800bd69a1eac91786bcfe9da64a897eb72911b8dc3095decbd07429e8048b"
+checksum = "c92800bd69a1eac91786bcfe9da64a897eb72911b8e16d1f701c9c5ea257c58e057f3ba8cf69e8da"
 dependencies = [
- "num-integer",
  "num-traits",
 ]
 
@@ -307,6 +556,17 @@ name = "rustc-hash"
 version = "2.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
+
+[[package]]
+name = "sealed"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b68e2ea526d9fb32f23ca8894fb5da9e743f34c2f41701f0501dc8a25c4b343"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 3.0.9",
+]
 
 [[package]]
 name = "serde"
@@ -417,6 +677,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "synthez"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d530ab07d3567d3ced41aa9d5791f144888ce504feb6b528738f3be5e877de9"
+dependencies = [
+ "syn 3.0.9",
+ "synthez-codegen",
+ "synthez-core",
+]
+
+[[package]]
+name = "synthez-codegen"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50e304d517e964ef1116fe785d6280f0d76ed6a0a9fbe3141894a7ab284c2e2a"
+dependencies = [
+ "syn 3.0.9",
+ "synthez-core",
+]
+
+[[package]]
+name = "synthez-core"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32c1b613285013808d3b8de7b56f8005ad10bab34bcab88a5f2d481b4593389c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "sealed",
+ "syn 3.0.9",
+]
+
+[[package]]
 name = "tracing"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -451,7 +744,7 @@ dependencies = [
 name = "unicode-ident"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
+checksum = "a2c754d6c33795f9890bdbcba760d3e246563"
 
 [[package]]
 name = "utf8parse"
@@ -463,7 +756,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 name = "windows-link"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5"
+checksum = "f0805222e57f7521d6a62e09ed5fbed04b3f0c13fc95026d55e55e7cb1c89015"
 
 [[package]]
 name = "windows-sys"
