@@ -58,66 +58,74 @@ pub trait CanDescribeCommands {
     fn command_usage(&self) -> Result<String, String>;
 }
 
+const COMMANDS: &[(&str, &str, &str)] = &[
+    ("doctor", "doctor", "diagnostics"),
+    ("setup", "setup", "bootstrap"),
+    ("discover", "discover <kani-metadata.json>", "discovery"),
+    ("list", "list <kani-metadata.json>", "discovery"),
+    ("plan", "plan <kani-metadata.json>", "planning"),
+    (
+        "prepare",
+        "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
+        "planning",
+    ),
+    (
+        "prepare-reviewed",
+        "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>",
+        "reviewed_binding",
+    ),
+    ("explain", "explain", "diagnostics"),
+    ("verify", "verify <verus-subset args...>", "verification"),
+    (
+        "replay-kani-reference",
+        "replay-kani-reference <replay args...>",
+        "reference",
+    ),
+];
+
+fn static_command_descriptors() -> Result<Vec<CommandDescriptor>, String> {
+    COMMANDS
+        .iter()
+        .map(|(name, synopsis, category)| {
+            let rust_name = name.replace('-', "_");
+            let ident = syn::parse_str::<syn::Ident>(&rust_name).map_err(|error| {
+                format!("invalid static KVerus command identifier {name:?}: {error}")
+            })?;
+            let tokens = quote!(#ident);
+            let replay = SafeTokenReplay { tokens };
+            let canonical_token = quote!(#replay).to_string();
+
+            Ok(CommandDescriptor {
+                name: (*name).to_string(),
+                synopsis: (*synopsis).to_string(),
+                category: (*category).to_string(),
+                canonical_token,
+                proof_credit: false,
+            })
+        })
+        .collect()
+}
+
+fn static_command_usage() -> Result<String, String> {
+    let commands = static_command_descriptors()?;
+    Ok(format!(
+        "usage: destiny-verification-automation {}",
+        commands
+            .iter()
+            .map(|command| command.synopsis.as_str())
+            .collect::<Vec<_>>()
+            .join(" | ")
+    ))
+}
+
 #[cgp_impl(new StaticCommandCatalog)]
 impl CommandCatalog {
     fn command_descriptors(&self) -> Result<Vec<CommandDescriptor>, String> {
-        const COMMANDS: &[(&str, &str, &str)] = &[
-            ("doctor", "doctor", "diagnostics"),
-            ("setup", "setup", "bootstrap"),
-            ("discover", "discover <kani-metadata.json>", "discovery"),
-            ("list", "list <kani-metadata.json>", "discovery"),
-            ("plan", "plan <kani-metadata.json>", "planning"),
-            (
-                "prepare",
-                "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
-                "planning",
-            ),
-            (
-                "prepare-reviewed",
-                "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>",
-                "reviewed_binding",
-            ),
-            ("explain", "explain", "diagnostics"),
-            ("verify", "verify <verus-subset args...>", "verification"),
-            (
-                "replay-kani-reference",
-                "replay-kani-reference <replay args...>",
-                "reference",
-            ),
-        ];
-
-        COMMANDS
-            .iter()
-            .map(|(name, synopsis, category)| {
-                let rust_name = name.replace('-', "_");
-                let ident = syn::parse_str::<syn::Ident>(&rust_name).map_err(|error| {
-                    format!("invalid static KVerus command identifier {name:?}: {error}")
-                })?;
-                let tokens = quote!(#ident);
-                let replay = SafeTokenReplay { tokens };
-                let canonical_token = quote!(#replay).to_string();
-
-                Ok(CommandDescriptor {
-                    name: (*name).to_string(),
-                    synopsis: (*synopsis).to_string(),
-                    category: (*category).to_string(),
-                    canonical_token,
-                    proof_credit: false,
-                })
-            })
-            .collect()
+        static_command_descriptors()
     }
 
     fn command_usage(&self) -> Result<String, String> {
-        let commands = self.command_descriptors()?;
-        Ok(format!(
-            "usage: destiny-verification-automation {}",
-            commands
-                .iter()
-                .map(|command| command.synopsis.as_str())
-                .collect::<Vec<_>>()
-                .join(" | ")
-        ))
+        static_command_usage()
     }
 }
 
