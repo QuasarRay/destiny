@@ -53,12 +53,12 @@
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
             "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "61867bfcafd2df941a872d6d676bbbf4a573520f",
-            "kani-compiler/src/kani_middle/metadata.rs": "156ff5af73d7691cd2a20bb01c407460ecc35b8a",
+            "kani-compiler/src/kani_middle/metadata.rs": "0c1187f429f7684b5807478946d011e11ef0d9ce",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a",
             "kani-compiler/src/kani_middle/attributes.rs": "ebb1728c731d541e8637fdd252ce5d577c9f2eda"
           },
-          "purpose": "Make autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses as parser-side evidence. The proc macro writes already-syn-parsed clauses to an explicit discovery directory when inherited, otherwise to a deterministic OS temporary fallback. Discovery clears and reads both channels, binds records back to Kani ContractedFunction identities exactly once, and grants no proof credit.",
-          "git_blob": "c68a1120c23548edaa7d9c19c9bf49662c6fe1d9"
+          "purpose": "Make autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses as parser-side evidence. The proc macro writes already-syn-parsed clauses to an explicit discovery directory when inherited, otherwise to a deterministic OS temporary fallback. Discovery clears and reads both channels, binds records back to Kani ContractedFunction identities exactly once, and grants no proof credit. Compiler-side checked_with decoding remains as an independently validated transport invariant without the temporary diagnostic panic.",
+          "git_blob": "d3069e57bf1ea47dcf6880cbbbb9428a590a14c2"
         }
       ]
     }
