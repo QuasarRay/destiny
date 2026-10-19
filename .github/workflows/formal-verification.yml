@@ -74,7 +74,9 @@ jobs:
           rustup component add --toolchain nightly-2026-08-21 rustc-dev rust-src llvm-tools rustfmt
 
       - name: Test shared autoharness metadata adapter
-        run: cargo +nightly-2026-08-21 test --manifest-path verification/automation/Cargo.toml --locked
+        run: |
+          cargo +nightly-2026-08-21 test --manifest-path verification/automation/Cargo.toml --locked
+          python3 -B verification/tools/test_kani_discovery.py
 
       - name: Build patched pinned Kani from source
         working-directory: third_party/kani
