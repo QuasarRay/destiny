@@ -1549,7 +1549,7 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
 diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 --- a/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 +++ b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
-@@ -1,180 +1,226 @@
+@@ -1,180 +1,229 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -
@@ -1751,7 +1751,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +    /// Kani already preserves local helper functions carrying `fn_marker` through the
 +    /// compiler pipeline (for example `kani_contract_mode`). Reusing that exercised channel
 +    /// avoids relying on module-level sibling items surviving stacked attribute expansion.
-+    fn contract_clause_marker(&self) -> Stmt {
++    fn contract_clause_marker(&self) -> [Stmt; 2] {
 +        let (kind, expression) = match &self.condition_type {
 +            super::ContractConditionsData::Requires { attr } => {
 +                ("requires", attr.to_token_stream().to_string())
@@ -1777,12 +1777,15 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            &format!("__kani_kverus_contract_clause_{marker_id}"),
 +            Span::call_site(),
 +        );
-+        syn::parse_quote!(
-+            #[inline(never)]
-+            #[allow(dead_code)]
-+            #[kanitool::fn_marker = #marker]
-+            const fn #marker_ident() {}
-+        )
++        [
++            syn::parse_quote!(
++                #[inline(never)]
++                #[allow(dead_code)]
++                #[kanitool::fn_marker = #marker]
++                const fn #marker_ident() {}
++            ),
++            syn::parse_quote!(#marker_ident();),
++        ]
 +    }
 +
 +    /// Generate initial contract.
@@ -1822,7 +1825,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            #[kanitool::asserted_with = #assert_name]
 +            #[kanitool::modifies_wrapper = #modifies_name]
 +            #vis #sig {
-+                #contract_clause_marker
++                #(#contract_clause_marker)*
 +                // Dummy functions used to force the compiler to annotate Kani's
 +                // closures as `FnOnce`. Without this, Rust infers the generated closures as `FnMut`,
 +                // preventing us from writing contracts for functions returning mutable references.
@@ -1884,7 +1887,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +        let contract_clause_marker = self.contract_clause_marker();
 +        let mut annotated_fn = self.annotated_fn.clone();
 +        let ItemFn { block, .. } = &mut annotated_fn;
-+        block.stmts.insert(0, contract_clause_marker);
++        block.stmts.splice(0..0, contract_clause_marker);
 +        let recursion_closure = expect_closure_in_match(&mut block.stmts, "recursion_check");
 +        self.expand_recursion(recursion_closure);
 +
