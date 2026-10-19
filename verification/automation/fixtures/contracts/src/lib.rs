@@ -22,3 +22,15 @@ pub fn contracted_vacuous(x: bool) {
 pub fn contracted_arithmetic(x: u8) {
     assert!(true);
 }
+
+#[kani::requires(true)]
+#[kani::ensures(|result: &u8| *result == x)]
+pub fn contracted_result_valid(x: u8) -> u8 {
+    x
+}
+
+#[kani::requires(true)]
+#[kani::ensures(|result: &u8| *result != x)]
+pub fn contracted_result_invalid(x: u8) -> u8 {
+    x
+}
