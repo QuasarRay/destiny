@@ -190,6 +190,7 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
                  | KaniAttributeKind::RecursionCheck
                  | KaniAttributeKind::RecursionTracker
                  | KaniAttributeKind::AssertedWith
+                 | KaniAttributeKind::ReplacedWith => {
 diff --git a/kani_metadata/src/lib.rs b/kani_metadata/src/lib.rs
 --- a/kani_metadata/src/lib.rs
 +++ b/kani_metadata/src/lib.rs
