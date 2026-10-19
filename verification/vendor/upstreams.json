@@ -41,30 +41,28 @@
         {
           "id": "0001-autoharness-metadata-only",
           "path": "verification/vendor/patches/kani/0001-autoharness-metadata-only.patch",
-          "sha256": "1adc5318ae5b6bb01c475603510249fe35a55089833a27049bdcc0e995f7219d",
+          "sha256": "ec38cf4d75b36068076732655f93f51523e3ea16e4e31c32a53ace47c3b56fa7",
           "upstream_files": [
             "kani-driver/src/autoharness/mod.rs",
             "kani-driver/src/project.rs",
-            "library/kani_macros/src/sysroot/contracts/initialize.rs",
-            "kani-compiler/src/kani_middle/attributes.rs",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs",
             "kani_metadata/src/lib.rs",
             "kani-compiler/src/kani_middle/metadata.rs"
           ],
           "postimage_git_blobs": {
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
-            "library/kani_macros/src/sysroot/contracts/initialize.rs": "8e4047b6268d97307d62f95a4ba34e7317e766b8",
-            "kani-compiler/src/kani_middle/attributes.rs": "dd7cca95092abbbc8eeadf2a911f142c13390349",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "bb576135edd8d510f16eb3665d30d39da552e190",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a",
-            "kani-compiler/src/kani_middle/metadata.rs": "ae4d6da962005cc08695fa4c428f2745976e5e9d"
+            "kani-compiler/src/kani_middle/metadata.rs": "8465520cf6b1198850585b93fa2c73f21f178fa5"
           },
-          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses in ContractedFunction metadata for the restricted Verus bridge."
+          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses through Kani's existing fn_marker channel on inert local items, associating them with the direct parent contracted function."
         }
       ]
     }
   },
   "current_boundary": {
-    "description": "Kani autoharness discovery is sourced from the pinned compiler through a validated metadata-only patch. The path stops before GOTO linking, CI hard-fails CBMC/GOTO executable invocation, and Kani-parsed function-contract clauses are preserved in compiler metadata for restricted Verus lowering. Results remain discovery-only until Verus checks the generated obligations.",
+    "description": "Kani autoharness discovery is sourced from the pinned compiler through a validated metadata-only patch. The path stops before GOTO linking, CI hard-fails CBMC/GOTO executable invocation, and Kani-parsed function-contract clauses are carried through Kani's existing fn_marker mechanism into ContractedFunction metadata for restricted Verus lowering. Results remain discovery-only until Verus checks the generated obligations.",
     "default_engine": "verus"
   },
   "repository_gitlinks": [
