@@ -52,19 +52,19 @@
           "postimage_git_blobs": {
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
-            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "5255e7441e6ca88d6ab04bf261c6f3c07fe3c0af",
-            "kani-compiler/src/kani_middle/attributes.rs": "477b67cde3d6a2350f703d4d77150ce8cf4dc69b",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "6ce7caf0295298f7b77702b96a9235186960cad0",
+            "kani-compiler/src/kani_middle/attributes.rs": "55c80e7771267ad040377f453a90b13048006546",
             "kani-compiler/src/kani_middle/metadata.rs": "b00b58d89bd50371fcd6991bfc234183d43b793b",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a"
           },
-          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses as repeated internal tool attributes on the contracted function, consumed directly by KaniAttributes and ContractedFunction metadata.",
-          "git_blob": "ed4614d0b23d155533f51607a412bde157991036"
+          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses through repeated values in Kani's existing fn_marker channel on the contracted function. KaniAttributes filters KVerus clause markers out of ordinary instrumentation-marker semantics and exports them into ContractedFunction metadata.",
+          "git_blob": "b1c995f7ba0e10c97f74734c2b9e4a9084a53e7d"
         }
       ]
     }
   },
   "current_boundary": {
-    "description": "Kani autoharness discovery is sourced from the pinned compiler through a validated metadata-only patch. The path stops before GOTO linking, CI hard-fails CBMC/GOTO executable invocation, and Kani-parsed function-contract clauses are preserved as repeated internal attributes on the contracted function and exported into ContractedFunction metadata for restricted Verus lowering. Results remain discovery-only until Verus checks the generated obligations.",
+    "description": "Kani autoharness discovery is sourced from the pinned compiler through a validated metadata-only patch. The path stops before GOTO linking, CI hard-fails CBMC/GOTO executable invocation, and Kani-parsed function-contract clauses are transported through Kani's existing compiler-preserved fn_marker channel on each contracted function. KaniAttributes separates those clause markers from ordinary instrumentation markers and exports them into ContractedFunction metadata for restricted Verus lowering. Results remain discovery-only until Verus checks the generated obligations.",
     "default_engine": "verus"
   },
   "repository_gitlinks": [
