@@ -141,6 +141,85 @@ class TranslatorTests(unittest.TestCase):
         with self.assertRaises(vk.Unsupported):
             vk.collect_assumption_witnesses(function.body)
 
+    def test_contract_attributes_are_ignored_by_source_parser_not_used_as_semantics(self):
+        function = self.parse(
+            "#[kani::requires(x)]\n"
+            "#[kani::ensures(|_| x)]\n"
+            "pub fn contracted(x: bool) { assert!(x); }\n"
+        )[0]
+        self.assertEqual(function.name, "contracted")
+        self.assertEqual(function.params, (("x", "bool"),))
+
+    def test_compiler_contract_metadata_lowers_to_verus_requires_and_ensures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "lib.rs"
+            source.write_text(
+                "#[kani::requires(x)]\n"
+                "#[kani::ensures(|_| x)]\n"
+                "pub fn contracted(x: bool) { assert!(x); }\n"
+            )
+            function = vk.parse_source(source)[0]
+            discovery = root / "discovery.json"
+            discovery.write_text(json.dumps({
+                "contracted_functions": [{
+                    "function": "contracted",
+                    "file": "src/lib.rs",
+                    "harnesses": ["contracted"],
+                    "clauses": [
+                        {"kind": "requires", "expression": "x"},
+                        {"kind": "ensures", "expression": "| _ | x"},
+                    ],
+                }],
+            }))
+            contract = vk.contract_for_function(discovery, "contracted", function)
+            lowered = vk.lower_function(function, source, root, contract)
+        self.assertEqual([expr.text for expr in contract.requires], ["x"])
+        self.assertEqual([expr.text for expr in contract.ensures], ["x"])
+        self.assertIn("    requires\n        x,", lowered)
+        self.assertIn("    ensures\n        x,", lowered)
+
+    def test_contract_requires_receive_explicit_nonvacuity_proof(self):
+        function = self.parse("pub fn contracted(x: bool) { assert!(true); }\n")[0]
+        contract = vk.ContractSpec(
+            (("requires", "x"), ("requires", "! x")),
+            (vk.Expr("x"), vk.Expr("!(x)")),
+            (),
+        )
+        lowered = vk.lower_nonvacuity(function, (), contract.requires)
+        self.assertIn(
+            "assert(exists|x: bool| (x) && (!(x)));",
+            lowered,
+        )
+
+    def test_contract_arithmetic_and_modifies_are_rejected(self):
+        function = self.parse("pub fn contracted(x: u8) { assert!(true); }\n")[0]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            arithmetic = root / "arithmetic.json"
+            arithmetic.write_text(json.dumps({
+                "contracted_functions": [{
+                    "function": "contracted",
+                    "file": "src/lib.rs",
+                    "harnesses": [],
+                    "clauses": [{"kind": "requires", "expression": "x + 1 > x"}],
+                }],
+            }))
+            with self.assertRaises(vk.Unsupported):
+                vk.contract_for_function(arithmetic, "contracted", function)
+
+            modifies = root / "modifies.json"
+            modifies.write_text(json.dumps({
+                "contracted_functions": [{
+                    "function": "contracted",
+                    "file": "src/lib.rs",
+                    "harnesses": [],
+                    "clauses": [{"kind": "modifies", "expression": "x"}],
+                }],
+            }))
+            with self.assertRaises(vk.Unsupported):
+                vk.contract_for_function(modifies, "contracted", function)
+
     def test_discovery_requires_exact_pinned_kani_identity_and_no_proof_credit(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
