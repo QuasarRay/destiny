@@ -455,6 +455,10 @@ jobs:
             fixture-add-overflow.json
             fixture-sub-underflow.json
             fixture-unsupported.json
+            fixture-contract-valid.json
+            fixture-contract-invalid.json
+            fixture-contract-vacuous.json
+            fixture-contract-arithmetic.json
             fixture-capabilities.json
 
   kani-reference-replay:
