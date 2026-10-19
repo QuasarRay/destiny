@@ -249,6 +249,12 @@ jobs:
           name: kani-verus-fixture-discovery
           path: .aegis/destiny/kani-autoharness-fixtures
 
+      - name: Reuse resolved KVerus automation lockfile
+        uses: actions/download-artifact@v4
+        with:
+          name: kverus-automation-lockfile
+          path: verification/automation
+
       - name: Check out the pinned maintained controller
         uses: actions/checkout@v4
         with:
