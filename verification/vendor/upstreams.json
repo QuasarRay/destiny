@@ -52,19 +52,19 @@
           "postimage_git_blobs": {
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
-            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "c52e2294ede4b7e6afeaefc7b6316c9acca8bcb6",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "81fd23302c8c8fe0133158abcb04bbf09277eecd",
             "kani-compiler/src/kani_middle/metadata.rs": "fec588fa5e3ef52c18e767bd0558e0d1998aee12",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a",
-            "kani-compiler/src/kani_middle/attributes.rs": "47b6edf2bdadc95e1ef0064d66c30b5ae7734514"
+            "kani-compiler/src/kani_middle/attributes.rs": "f99c5f709017b2f8a049c73fb01d50d8f1b4e499"
           },
-          "purpose": "Make autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses by multiplexing reserved kverus_contract_clause:* payloads through Kani's existing kanitool::checked_with name-value attribute channel. KaniAttributes filters those payloads away from the single real check-closure name and exports them through ContractedFunction metadata; no second Rust contract parser is introduced.",
-          "git_blob": "028c80a5a78acacfe4f29271e3774b9ed0acb98e"
+          "purpose": "Make autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses inside the single existing kanitool::checked_with string value. The first segment remains Kani's generated check-closure identity; separator-delimited kverus_contract_clause payloads are decoded only for ContractedFunction metadata, avoiding a second Rust parser and avoiding reliance on extra attributes or local items surviving expansion.",
+          "git_blob": "f0345dc8b7239dec772831fd25736c79b3ad0d2d"
         }
       ]
     }
   },
   "current_boundary": {
-    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani's proc-macro parser emits each parsed contract clause through the existing checked_with attribute channel using a reserved payload prefix. The compiler separates the real check-closure identity from clause payloads and exports the latter in ContractedFunction metadata with no proof credit.",
+    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Parsed contract clauses are packed into the existing checked_with string that Kani already preserves across contract expansion; the compiler splits the real check-closure name from clause payloads and exports those payloads with no proof credit.",
     "default_engine": "verus"
   },
   "repository_gitlinks": [
