@@ -3,39 +3,43 @@ use crate::{
     DiscoveryDisposition, DiscoveryReport,
 };
 use cgp::prelude::*;
-use delegation::delegate;
 use kani_metadata::{
     AutoHarnessSkipReason, ContractClause, ContractClauseKind, KaniMetadata,
 };
 use proc_macro2::TokenStream;
 use serde::Deserialize;
 use std::str::FromStr;
-use synthez::syn;
+use synthez::{ToTokens, quote::quote, syn};
 use synthez::syn::parse::Parser as _;
-
-#[delegate]
-trait IntoMetadataVec {
-    fn into_metadata_vec(self) -> Vec<KaniMetadata>;
-}
-
-impl IntoMetadataVec for KaniMetadata {
-    fn into_metadata_vec(self) -> Vec<KaniMetadata> {
-        vec![self]
-    }
-}
-
-impl IntoMetadataVec for Vec<KaniMetadata> {
-    fn into_metadata_vec(self) -> Vec<KaniMetadata> {
-        self
-    }
-}
 
 #[derive(Deserialize)]
 #[serde(untagged)]
-#[delegate(derive(IntoMetadataVec))]
 enum MetadataEnvelope {
     One(KaniMetadata),
     Many(Vec<KaniMetadata>),
+}
+
+impl MetadataEnvelope {
+    fn into_metadata_vec(self) -> Vec<KaniMetadata> {
+        match self {
+            Self::One(metadata) => vec![metadata],
+            Self::Many(metadata) => metadata,
+        }
+    }
+}
+
+/// Tiny codegen wrapper used to exercise arcane-rs/synthez's safe `ToTokens`
+/// derive at the validated syntax boundary.
+#[derive(ToTokens)]
+#[to_tokens(append(render))]
+struct ValidatedClauseTokens {
+    tokens: TokenStream,
+}
+
+impl ValidatedClauseTokens {
+    fn render(&self) -> TokenStream {
+        self.tokens.clone()
+    }
 }
 
 #[cgp_component(MetadataParser)]
@@ -74,26 +78,34 @@ impl ContractClauseValidator {
 
         match &clause.kind {
             ContractClauseKind::Requires | ContractClauseKind::Ensures => {
-                syn::parse2::<syn::Expr>(tokens)
-                    .map(|_| ())
-                    .map_err(|error| {
-                        format!(
-                            "synthez/syn rejected {:?} clause expression {:?}: {error}",
-                            clause.kind, clause.expression
-                        )
-                    })
+                syn::parse2::<syn::Expr>(tokens.clone()).map_err(|error| {
+                    format!(
+                        "synthez/syn rejected {:?} clause expression {:?}: {error}",
+                        clause.kind, clause.expression
+                    )
+                })?;
             }
             ContractClauseKind::Modifies => {
                 let parser =
                     syn::punctuated::Punctuated::<syn::Expr, syn::Token![,]>::parse_terminated;
-                parser.parse2(tokens).map(|_| ()).map_err(|error| {
+                parser.parse2(tokens.clone()).map_err(|error| {
                     format!(
                         "synthez/syn rejected modifies clause expression list {:?}: {error}",
                         clause.expression
                     )
-                })
+                })?;
             }
         }
+
+        // Render through synthez's proc-macro derive after Syn has accepted the
+        // grammar. This is a syntax/codegen sanity check only: KVerus preserves
+        // Kani's original clause string in its serialized evidence.
+        let validated = ValidatedClauseTokens { tokens: tokens.clone() };
+        let replay = quote!(#validated);
+        if replay.is_empty() != tokens.is_empty() {
+            return Err("synthez token replay changed clause emptiness".into());
+        }
+        Ok(())
     }
 }
 
@@ -151,8 +163,6 @@ impl MetadataNormalizer {
                     function: contract.function.clone(),
                     file: contract.file.clone(),
                     harnesses: contract.harnesses.clone(),
-                    // Preserve Kani's exact rendered clause text. proc_macro2/synthez
-                    // validates the syntax boundary but deliberately does not rewrite it.
                     clauses: contract.clauses.clone(),
                     provenance: "kani_metadata::KaniMetadata::contracted_functions",
                 });

@@ -10,7 +10,6 @@ pub use model::{
     ContractDiscovery, DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport,
 };
 
-use cgp::prelude::*;
 use kani_metadata::KaniMetadata;
 use std::io::Read;
 

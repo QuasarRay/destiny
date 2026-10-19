@@ -7,7 +7,6 @@ license = "MIT"
 
 [dependencies]
 cgp = { git = "https://github.com/contextgeneric/cgp.git", rev = "eca0c5fda60d87cf048460f5abdd3b6e82da5e0f" }
-delegation = "=0.5.0"
 kani_metadata = { path = "../../third_party/kani/kani_metadata" }
 proc-macro2 = "=1.0.107"
 serde = { version = "=1.0.229", features = ["derive"] }
