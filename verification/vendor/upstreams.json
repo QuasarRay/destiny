@@ -51,18 +51,18 @@
           "postimage_git_blobs": {
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
-            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "f45898ac67f18c696ef59f4c90057d818d570285",
-            "kani-compiler/src/kani_middle/metadata.rs": "a20078c85c7b43a410f781cce9fa32543d1914f3",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "679304c6d04297dd2ecfab3e51d933e75ec79a80",
+            "kani-compiler/src/kani_middle/metadata.rs": "ca44f90ce896017a3215b7c7ab425ecfd6974346",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a"
           },
-          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses as uniquely named module-level sibling const items emitted by Kani's proc macros. Named items are enumerated by rustc_public::all_local_items; the compiler joins each marker to a contracted function by same-module plus target leaf identity.",
-          "git_blob": "f978ca9133ab77f861c1e7721323791d40eaccc3"
+          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses in uniquely named module-level static &str items. The metadata pass identifies those items by generated name and reads their initializer through rustc constant evaluation, avoiding reliance on transient macro/tool attributes.",
+          "git_blob": "6bb8076eca32faf0a10d71c65fd4b28ba786356c"
         }
       ]
     }
   },
   "current_boundary": {
-    "description": "Kani autoharness discovery is sourced from the pinned compiler through a validated metadata-only patch. The path stops before GOTO linking and CI hard-fails CBMC/GOTO executable invocation. Parsed contract clauses are emitted as uniquely named module-level sibling const items, guaranteeing visibility in rustc_public::all_local_items; the generated identifier is transport-only and does not contribute proof semantics.",
+    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani-parsed contract clauses are transported as compiler-visible static string constants emitted by the proc macro. Clause payload recovery uses rustc constant evaluation and same-module target association; generated marker identifiers are transport-only and carry no proof semantics.",
     "default_engine": "verus"
   },
   "repository_gitlinks": [
