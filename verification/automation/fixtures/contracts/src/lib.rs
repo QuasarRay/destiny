@@ -34,3 +34,15 @@ pub fn contracted_result_valid(x: u8) -> u8 {
 pub fn contracted_result_invalid(x: u8) -> u8 {
     x
 }
+
+#[kani::requires(x < 255)]
+#[kani::ensures(|result: &u8| *result == x + 1)]
+pub fn contracted_result_add_valid(x: u8) -> u8 {
+    x + 1
+}
+
+#[kani::requires(true)]
+#[kani::ensures(|result: &u8| *result == x + 1)]
+pub fn contracted_result_add_invalid(x: u8) -> u8 {
+    x
+}
