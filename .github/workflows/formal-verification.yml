@@ -305,6 +305,11 @@ jobs:
             --discovery .aegis/destiny/kani-autoharness-fixtures/valid/normalized-discovery.json \
             --function "$generic_fn" --verus "$VERUS_BIN" > fixture-generic.json
 
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/contracts/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
+            --function contracted_valid --verus "$VERUS_BIN" > fixture-contract-valid.json
+
           set +e
           cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
             --manifest-path verification/automation/fixtures/invalid/Cargo.toml \
@@ -331,12 +336,30 @@ jobs:
             --discovery .aegis/destiny/kani-autoharness-fixtures/unsupported/normalized-discovery.json \
             --function float_unsupported --verus "$VERUS_BIN" > fixture-unsupported.json
           unsupported_rc=$?
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/contracts/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
+            --function contracted_invalid --verus "$VERUS_BIN" > fixture-contract-invalid.json
+          contract_invalid_rc=$?
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/contracts/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
+            --function contracted_vacuous --verus "$VERUS_BIN" > fixture-contract-vacuous.json
+          contract_vacuous_rc=$?
+          cargo +nightly-2026-08-21 run --quiet --manifest-path verification/automation/Cargo.toml --locked -- verify \
+            --manifest-path verification/automation/fixtures/contracts/Cargo.toml \
+            --discovery .aegis/destiny/kani-autoharness-fixtures/contracts/normalized-discovery.json \
+            --function contracted_arithmetic --verus "$VERUS_BIN" > fixture-contract-arithmetic.json
+          contract_arithmetic_rc=$?
           set -e
           test "$invalid_rc" -eq 1
           test "$contradictory_rc" -eq 1
           test "$add_overflow_rc" -eq 1
           test "$sub_underflow_rc" -eq 1
           test "$unsupported_rc" -eq 1
+          test "$contract_invalid_rc" -eq 1
+          test "$contract_vacuous_rc" -eq 1
+          test "$contract_arithmetic_rc" -eq 1
 
           python3 - <<'PY'
           import json
@@ -353,6 +376,10 @@ jobs:
           add_overflow=json.loads(Path("fixture-add-overflow.json").read_text())
           sub_underflow=json.loads(Path("fixture-sub-underflow.json").read_text())
           unsupported=json.loads(Path("fixture-unsupported.json").read_text())
+          contract_valid=json.loads(Path("fixture-contract-valid.json").read_text())
+          contract_invalid=json.loads(Path("fixture-contract-invalid.json").read_text())
+          contract_vacuous=json.loads(Path("fixture-contract-vacuous.json").read_text())
+          contract_arithmetic=json.loads(Path("fixture-contract-arithmetic.json").read_text())
           assert branch["status"] == "checked_valid", branch
           assert loop["status"] == "checked_valid", loop
           assert independent["status"] == "checked_valid", independent
@@ -373,6 +400,14 @@ jobs:
           assert all(row["independent"] for row in independent["parameter_domains"]), independent
           assert invalid["status"] == "proof_failure", invalid
           assert unsupported["status"] == "unsupported", unsupported
+          assert contract_valid["status"] == "checked_valid", contract_valid
+          assert contract_valid["contract_requires"] == ["x"], contract_valid
+          assert contract_valid["contract_ensures"] == ["x"], contract_valid
+          assert contract_valid["contract_precondition_nonvacuity"] is True, contract_valid
+          assert contract_invalid["status"] == "proof_failure", contract_invalid
+          assert contract_vacuous["status"] == "proof_failure", contract_vacuous
+          assert contract_vacuous["failure_stage"] == "non_vacuity", contract_vacuous
+          assert contract_arithmetic["status"] == "unsupported", contract_arithmetic
           assert loop["bounds"] == [{
               "kind":"literal_for_exhaustive_unroll",
               "start":0,
