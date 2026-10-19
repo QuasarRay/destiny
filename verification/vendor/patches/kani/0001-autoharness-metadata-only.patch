@@ -4845,7 +4845,7 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
 --- a/kani-compiler/src/kani_middle/metadata.rs
 +++ b/kani-compiler/src/kani_middle/metadata.rs
-@@ -1,173 +1,216 @@
+@@ -1,173 +1,223 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module handles Kani metadata generation. For example, generating HarnessMetadata for a
@@ -5206,6 +5206,13 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +    let model_file = base_name.with_file_name(file_stem).with_extension(ArtifactType::SymTabGoto);
 +
 +    let kani_attributes = KaniAttributes::for_instance(tcx, *fn_to_verify);
++    if pretty_name.contains("contracted_") {
++        panic!(
++            "KVERUS_AUTOMATIC_CONTRACT_PROBE function={pretty_name} checked_with={:?} clauses={:?}",
++            kani_attributes.kverus_checked_with_raw(),
++            kani_attributes.kverus_contract_clauses(),
++        );
++    }
 +    let harness_kind = if kani_attributes.has_contract() {
 +        // Use the definition's name rather than the instance's (`pretty_name`), since the two
 +        // differ for generic functions under contract (e.g. `foo::<i32>` vs. `foo`), and
