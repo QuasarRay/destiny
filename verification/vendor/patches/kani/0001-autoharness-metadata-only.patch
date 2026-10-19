@@ -1746,12 +1746,12 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +static KVERUS_CONTRACT_CLAUSE_MARKER_ID: AtomicUsize = AtomicUsize::new(0);
 +
 +impl<'a> ContractConditionsHandler<'a> {
-+    /// Materialize one Kani-parsed contract clause as a named module-level static string.
++    /// Materialize one Kani-parsed contract clause as a generated local marker function.
 +    ///
-+    /// The payload is compiler-visible constant data, not an attribute. Kani's metadata
-+    /// pass recognizes the generated item name and reads the initializer through rustc
-+    /// constant evaluation.
-+    fn contract_clause_marker(&self) -> TokenStream {
++    /// Kani already preserves local helper functions carrying `fn_marker` through the
++    /// compiler pipeline (for example `kani_contract_mode`). Reusing that exercised channel
++    /// avoids relying on module-level sibling items surviving stacked attribute expansion.
++    fn contract_clause_marker(&self) -> Stmt {
 +        let (kind, expression) = match &self.condition_type {
 +            super::ContractConditionsData::Requires { attr } => {
 +                ("requires", attr.to_token_stream().to_string())
@@ -1777,9 +1777,11 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            &format!("__kani_kverus_contract_clause_{marker_id}"),
 +            Span::call_site(),
 +        );
-+        quote!(
-+            #[allow(dead_code, non_upper_case_globals)]
-+            static #marker_ident: &str = #marker;
++        syn::parse_quote!(
++            #[inline(never)]
++            #[allow(dead_code)]
++            #[kanitool::fn_marker = #marker]
++            const fn #marker_ident() {}
 +        )
 +    }
 +
@@ -1820,6 +1822,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +            #[kanitool::asserted_with = #assert_name]
 +            #[kanitool::modifies_wrapper = #modifies_name]
 +            #vis #sig {
++                #contract_clause_marker
 +                // Dummy functions used to force the compiler to annotate Kani's
 +                // closures as `FnOnce`. Without this, Rust infers the generated closures as `FnMut`,
 +                // preventing us from writing contracts for functions returning mutable references.
@@ -1870,7 +1873,6 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +                    _ => #block
 +                }
 +            }
-+            #contract_clause_marker
 +        ));
 +    }
 +
@@ -1879,8 +1881,10 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +    /// Find the closures added by the initial setup, parse them and expand their body according
 +    /// to the attribute being handled.
 +    pub fn handle_expanded(&mut self) {
++        let contract_clause_marker = self.contract_clause_marker();
 +        let mut annotated_fn = self.annotated_fn.clone();
 +        let ItemFn { block, .. } = &mut annotated_fn;
++        block.stmts.insert(0, contract_clause_marker);
 +        let recursion_closure = expect_closure_in_match(&mut block.stmts, "recursion_check");
 +        self.expand_recursion(recursion_closure);
 +
@@ -1893,11 +1897,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +        let assert_closure = expect_closure_in_match(&mut block.stmts, "assert");
 +        self.expand_assert(assert_closure);
 +
-+        let contract_clause_marker = self.contract_clause_marker();
-+        self.output.extend(quote!(
-+            #annotated_fn
-+            #contract_clause_marker
-+        ));
++        self.output.extend(quote!(#annotated_fn));
 +    }
 +
 +    /// Generate the tokens for the recursion closure.
@@ -1959,7 +1959,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
 --- a/kani-compiler/src/kani_middle/metadata.rs
 +++ b/kani-compiler/src/kani_middle/metadata.rs
-@@ -1,173 +1,231 @@
+@@ -1,173 +1,230 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module handles Kani metadata generation. For example, generating HarnessMetadata for a
@@ -2230,28 +2230,19 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +        }
 +    }
 +
-+    // Recover Kani-parsed clauses from compiler-visible static string marker items.
-+    const MARKER_ITEM_PREFIX: &str = "__kani_kverus_contract_clause_";
++    // Recover Kani-parsed clauses from generated local helper functions carrying Kani's
++    // existing fn_marker attribute. These helpers are visible in all_local_items (the same
++    // path already used by Kani for its generated contract-mode helpers).
 +    const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
 +    for item in rustc_public::all_local_items() {
-+        let item_name = strip_local_crate_prefix(item.name());
-+        if !item_name.rsplit("::").next().is_some_and(|name| name.starts_with(MARKER_ITEM_PREFIX)) {
++        let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
++        let Some(marker) = attributes.fn_marker().map(|marker| marker.to_string()) else {
 +            continue;
-+        }
++        };
++        let Some(payload) = marker.strip_prefix(CLAUSE_PREFIX) else {
++            continue;
++        };
 +
-+        let marker_def = rustc_public::rustc_internal::internal(tcx, item.def_id());
-+        let value = tcx.const_eval_poly(marker_def).unwrap_or_else(|error| {
-+            panic!("failed to evaluate KVerus contract clause marker {item_name}: {error:?}")
-+        });
-+        let bytes = value.try_get_slice_bytes_for_diagnostics(tcx).unwrap_or_else(|| {
-+            panic!("KVerus contract clause marker is not a string constant: {item_name}")
-+        });
-+        let marker = std::str::from_utf8(bytes).unwrap_or_else(|error| {
-+            panic!("KVerus contract clause marker is not UTF-8: {error}")
-+        });
-+        let payload = marker.strip_prefix(CLAUSE_PREFIX).unwrap_or_else(|| {
-+            panic!("malformed internal KVerus contract clause marker: {marker}")
-+        });
 +        let mut parts = payload.splitn(3, ':');
 +        let function_leaf = parts.next().unwrap_or_default();
 +        let kind = parts.next().unwrap_or_default();
@@ -2266,17 +2257,25 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +            _ => panic!("unknown internal KVerus contract clause kind: {kind}"),
 +        };
 +
-+        let marker_module = tcx.parent(marker_def);
-+        let (_, contracted) = fn_to_data
-+            .iter_mut()
-+            .find(|(target_def, contracted)| {
-+                let target_def = rustc_public::rustc_internal::internal(tcx, **target_def);
-+                tcx.parent(target_def) == marker_module
-+                    && contracted.function.rsplit("::").next() == Some(function_leaf)
-+            })
++        let item_name = strip_local_crate_prefix(item.name());
++        let Some((target_name, marker_leaf)) = item_name.rsplit_once("::") else {
++            panic!("KVerus contract clause helper is not nested under a function: {item_name}");
++        };
++        if !marker_leaf.starts_with("__kani_kverus_contract_clause_") {
++            panic!("KVerus contract marker has unexpected helper identity: {item_name}");
++        }
++        if target_name.rsplit("::").next() != Some(function_leaf) {
++            panic!(
++                "KVerus contract clause marker target mismatch: marker={marker}, item={item_name}"
++            );
++        }
++
++        let contracted = fn_to_data
++            .values_mut()
++            .find(|contracted| contracted.function == target_name)
 +            .unwrap_or_else(|| {
 +                panic!(
-+                    "KVerus contract clause marker has no same-module contracted target: {marker}"
++                    "KVerus contract clause helper has no contracted target: marker={marker}, item={item_name}"
 +                )
 +            });
 +        contracted.clauses.push(ContractClause { kind, expression: expression.to_string() });

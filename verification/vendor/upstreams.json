@@ -51,18 +51,18 @@
           "postimage_git_blobs": {
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
-            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "679304c6d04297dd2ecfab3e51d933e75ec79a80",
-            "kani-compiler/src/kani_middle/metadata.rs": "ca44f90ce896017a3215b7c7ab425ecfd6974346",
+            "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "75ef5a55e21b565d87c17339c9e65af72ebd666b",
+            "kani-compiler/src/kani_middle/metadata.rs": "bf82e8f53f17c7363c4a2667e564d60bafd15d7e",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a"
           },
-          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses in uniquely named module-level static &str items. The metadata pass identifies those items by generated name and reads their initializer through rustc constant evaluation, avoiding reliance on transient macro/tool attributes.",
-          "git_blob": "6bb8076eca32faf0a10d71c65fd4b28ba786356c"
+          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses in generated local const helper functions carrying Kani's existing fn_marker attribute. Kani already exposes such local helper functions through all_local_items, so the metadata pass recovers each clause from an exercised compiler-visible channel and associates it with its enclosing contracted function.",
+          "git_blob": "e0a7b3c4fff0e4d7f97e9c1a355b6d5aa2542d49"
         }
       ]
     }
   },
   "current_boundary": {
-    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani-parsed contract clauses are transported as compiler-visible static string constants emitted by the proc macro. Clause payload recovery uses rustc constant evaluation and same-module target association; generated marker identifiers are transport-only and carry no proof semantics.",
+    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani-parsed contract clauses are transported through generated local const helper functions using Kani's existing fn_marker channel, then recovered from all_local_items by enclosing function identity. Generated helper identities are transport-only and carry no proof semantics.",
     "default_engine": "verus"
   },
   "repository_gitlinks": [
