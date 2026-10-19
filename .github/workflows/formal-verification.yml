@@ -133,17 +133,40 @@ jobs:
           ).read_text())
           assert contract["proof_credit"] is False, contract
           rows=contract["contracted_functions"]
-          assert len(rows) == 1, rows
-          row=rows[0]
-          assert row["function"].endswith("contracted_valid"), row
-          assert row["file"].endswith("src/lib.rs"), row
-          assert row["provenance"] == "kani_metadata::KaniMetadata::contracted_functions", row
-          selected=[
-              candidate for candidate in contract["candidates"]
-              if candidate["function"].endswith("contracted_valid")
-          ]
-          assert len(selected) == 1, selected
-          assert selected[0]["disposition"] == "kani_eligible", selected
+          expected={
+              "contracted_valid",
+              "contracted_invalid",
+              "contracted_vacuous",
+              "contracted_arithmetic",
+          }
+          by_name={}
+          for row in rows:
+              name=next((name for name in expected if row["function"].endswith(name)), None)
+              assert name is not None, row
+              assert name not in by_name, (name, rows)
+              by_name[name]=row
+              assert row["file"].endswith("src/lib.rs"), row
+              assert row["provenance"] == "kani_metadata::KaniMetadata::contracted_functions", row
+              assert row["clauses"], row
+              assert all(clause["kind"] in {"requires","ensures","modifies"} for clause in row["clauses"]), row
+              assert all(clause["expression"].strip() for clause in row["clauses"]), row
+          assert set(by_name) == expected, by_name
+          assert [c["kind"] for c in by_name["contracted_valid"]["clauses"]].count("requires") == 1
+          assert [c["kind"] for c in by_name["contracted_valid"]["clauses"]].count("ensures") == 1
+          assert [c["kind"] for c in by_name["contracted_vacuous"]["clauses"]].count("requires") == 2
+          assert any(
+              clause["kind"] == "requires" and "+" in clause["expression"]
+              for clause in by_name["contracted_arithmetic"]["clauses"]
+          )
+          selected={
+              name: [
+                  candidate for candidate in contract["candidates"]
+                  if candidate["function"].endswith(name)
+              ]
+              for name in expected
+          }
+          assert all(len(rows) == 1 for rows in selected.values()), selected
+          assert all(rows[0]["disposition"] == "kani_eligible" for rows in selected.values()), selected
           PY
           python3 -B verification/tools/test_verus_subset.py
 
