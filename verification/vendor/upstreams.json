@@ -52,17 +52,17 @@
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
             "library/kani_macros/src/sysroot/contracts/bootstrap.rs": "d63e223782f9132935177e458f05e657437be90b",
-            "kani-compiler/src/kani_middle/metadata.rs": "421ebf421270ce6e13da33afe291eb097aa33623",
+            "kani-compiler/src/kani_middle/metadata.rs": "53591b190aba0a8bcae77ee2e74ceb58b417caef",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a"
           },
-          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses in explicitly invoked local helpers carrying Kani's existing fn_marker attribute. gen_contracts_metadata recovers those markers from call terminators in each contracted function's own stable MIR, avoiding assumptions about nested helpers appearing in all_local_items.",
-          "git_blob": "91802a6ecd2c0fe74df75da1a0ae401c7f1722b6"
+          "purpose": "Keep autoharness --list metadata-only before GOTO linking and preserve Kani-parsed requires/ensures/modifies clauses in explicitly invoked local helpers carrying Kani's existing fn_marker attribute. gen_contracts_metadata reads the definition-level FnDef body directly and recovers marker calls from its stable MIR, so generic definitions do not require invented monomorphic instances.",
+          "git_blob": "9fd5a774cf9d4d24018ca1124b5b57f73b72d4d0"
         }
       ]
     }
   },
   "current_boundary": {
-    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani-parsed contract clauses are embedded as no-op marker calls inside the expanded contracted function and recovered from that function's stable MIR using Kani's existing fn_marker mechanism. Metadata carries no proof credit.",
+    "description": "Kani autoharness discovery remains compiler-driven and stops before GOTO linking. Kani-parsed contract clauses are embedded as no-op marker calls inside the expanded contracted function and recovered from the definition-level FnDef stable MIR using Kani's existing fn_marker mechanism. Metadata carries no proof credit.",
     "default_engine": "verus"
   },
   "repository_gitlinks": [

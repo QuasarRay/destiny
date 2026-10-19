@@ -1962,7 +1962,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
 --- a/kani-compiler/src/kani_middle/metadata.rs
 +++ b/kani-compiler/src/kani_middle/metadata.rs
-@@ -1,173 +1,239 @@
+@@ -1,173 +1,236 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module handles Kani metadata generation. For example, generating HarnessMetadata for a
@@ -2194,13 +2194,10 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +fn contract_clauses_from_body(item: CrateItem, function: &str) -> Vec<ContractClause> {
 +    const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
 +
-+    let Ok(instance) = Instance::try_from(item) else {
-+        // Definition-level generic items may not have a directly resolvable instance.
-+        // Their clause identity remains discoverable, but this restricted transport does
-+        // not invent a generic instantiation merely to recover metadata.
++    let TyKind::RigidTy(RigidTy::FnDef(def, _)) = item.ty().kind() else {
 +        return vec![];
 +    };
-+    let Some(body) = instance.body() else {
++    let Some(body) = def.body() else {
 +        return vec![];
 +    };
 +    let locals = body.locals().to_vec();
