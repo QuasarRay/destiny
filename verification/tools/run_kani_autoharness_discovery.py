@@ -40,6 +40,39 @@ def read_clause_evidence(directory: Path) -> list[dict[str, str]]:
     return records
 
 
+def assert_effective_kani_sysroot(target_dir: Path, expected_sysroot: Path) -> list[dict[str, str]]:
+    observed = []
+    for path in sorted(target_dir.rglob("fingerprint/*.json")):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        rustflags = payload.get("rustflags")
+        if not isinstance(rustflags, list):
+            continue
+        values = []
+        for index, flag in enumerate(rustflags[:-1]):
+            if flag == "--sysroot":
+                values.append(rustflags[index + 1])
+        for value in values:
+            observed.append({
+                "fingerprint": str(path),
+                "sysroot": value,
+            })
+
+    if not observed:
+        raise SystemExit("Cargo fingerprints did not record an effective Kani --sysroot")
+
+    expected = str(expected_sysroot)
+    mismatched = [row for row in observed if Path(row["sysroot"]).resolve() != expected_sysroot]
+    if mismatched:
+        raise SystemExit(
+            "Kani discovery escaped the vendored dev sysroot; expected "
+            f"{expected}, observed {mismatched[:8]}"
+        )
+    return observed
+
+
 def bind_clause_evidence(metadata: list[dict], records: list[dict[str, str]]) -> None:
     targets = []
     for payload in metadata:
@@ -100,7 +133,11 @@ def main() -> int:
     parser.add_argument(
         "--kani-driver",
         type=Path,
-        default=ROOT / "third_party/kani/target/kani/bin/cargo-kani",
+        default=ROOT / "third_party/kani/scripts/cargo-kani",
+        help=(
+            "Kani cargo-mode entrypoint. The vendored default is Kani's developer script, "
+            "which execs target/kani/bin/kani-driver with argv[0]=cargo-kani."
+        ),
     )
     parser.add_argument(
         "--manifest-path",
@@ -115,14 +152,20 @@ def main() -> int:
     args = parser.parse_args()
 
     driver = args.kani_driver.resolve(strict=True)
-    compiler = driver.with_name("kani-compiler").resolve(strict=True)
+    if driver.parent.name == "scripts" and driver.name == "cargo-kani":
+        kani_repo = driver.parent.parent
+        driver_binary = (kani_repo / "target/kani/bin/kani-driver").resolve(strict=True)
+        kani_root = (kani_repo / "target/kani").resolve(strict=True)
+    else:
+        driver_binary = driver
+        kani_root = driver.parent.parent.resolve(strict=True)
+    compiler = (kani_root / "bin/kani-compiler").resolve(strict=True)
     compiler_marker = b"KVERUS_CONTRACT_TRANSPORT_EMPTY"
     if compiler_marker not in compiler.read_bytes():
         raise SystemExit(
             "Selected Kani driver is not paired with the patched KVerus kani-compiler"
         )
 
-    kani_root = driver.parent.parent
     proc_macro_candidates = sorted(
         path
         for pattern in ("libkani_macros*.so", "libkani_macros*.dylib", "kani_macros*.dll")
@@ -194,6 +237,8 @@ def main() -> int:
     if forbidden_log.exists() and forbidden_log.read_text(encoding="utf-8").strip():
         raise SystemExit("A forbidden CBMC/GOTO backend tool was invoked")
 
+    effective_sysroots = assert_effective_kani_sysroot(out / "kani-target", kani_root)
+
     metadata = sorted((out / "kani-target").rglob("*.kani-metadata.json"))
     if not metadata:
         raise SystemExit("Kani produced no .kani_metadata.json artifacts")
@@ -230,6 +275,14 @@ def main() -> int:
         "proof_credit": False,
         "manifest": str(manifest.relative_to(ROOT)),
         "driver": str(driver),
+        "driver_binary": {
+            "path": str(driver_binary),
+            "sha256": digest(driver_binary),
+        },
+        "effective_sysroot": {
+            "expected": str(kani_root),
+            "fingerprints": effective_sysroots,
+        },
         "compiler": {
             "path": str(compiler),
             "sha256": digest(compiler),
