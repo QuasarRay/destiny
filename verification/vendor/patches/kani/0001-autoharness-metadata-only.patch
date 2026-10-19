@@ -1549,7 +1549,7 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
 diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 --- a/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 +++ b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
-@@ -1,180 +1,237 @@
+@@ -1,180 +1,241 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -
@@ -1764,12 +1764,16 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +                    .join(", "),
 +            ),
 +        };
++        const SEPARATOR: &str = "::KVERUS_CONTRACT_CLAUSE::";
++        if expression.contains(SEPARATOR) {
++            panic!("KVerus contract clause expression contains reserved metadata delimiter")
++        }
 +        let function = self.annotated_fn.sig.ident.to_string();
 +        format!("kverus_contract_clause:{function}:{kind}:{expression}")
 +    }
 +
 +    fn append_contract_clause_to_checked_with(&self, annotated_fn: &mut ItemFn) {
-+        const SEPARATOR: &str = "\u{1e}";
++        const SEPARATOR: &str = "::KVERUS_CONTRACT_CLAUSE::";
 +        let payload = self.contract_clause_payload();
 +        let attribute = annotated_fn
 +            .attrs
@@ -1803,7 +1807,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +        let recursion_name = &self.recursion_name;
 +        let check_name = &self.check_name;
 +        let assert_name = &self.assert_name;
-+        const KVERUS_CLAUSE_SEPARATOR: &str = "\u{1e}";
++        const KVERUS_CLAUSE_SEPARATOR: &str = "::KVERUS_CONTRACT_CLAUSE::";
 +        let contract_clause_payload = self.contract_clause_payload();
 +        let checked_with_value = syn::LitStr::new(
 +            &format!("{check_name}{KVERUS_CLAUSE_SEPARATOR}{contract_clause_payload}"),
@@ -3710,7 +3714,7 @@ diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kan
 +    }
 +
 +    fn checked_with_parts(&self) -> Option<(Symbol, Vec<String>)> {
-+        const SEPARATOR: &str = "\u{1e}";
++        const SEPARATOR: &str = "::KVERUS_CONTRACT_CLAUSE::";
 +        let attr = self.expect_maybe_one(KaniAttributeKind::CheckedWith)?;
 +        let raw = expect_key_string_value(self.tcx.sess, attr).ok()?.to_string();
 +        let mut parts = raw.split(SEPARATOR);
