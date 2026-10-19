@@ -19,7 +19,7 @@ cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml
   replay-kani-reference --source path/to/lib.rs --function function_name --cargo-kani path/to/cargo-kani
 ```
 
-`setup` reuses the existing vendor-integrity and Kani patch bootstrap scripts; it does not install host toolchains or silently fetch external tools. `discover` and `list` are classification only and always emit `proof_credit: false`. Their normalized report now preserves Kani's compiler-produced `contracted_functions` inventory, including the function identity, source file, and any `#[kani::proof_for_contract]` harness identities. `verify` delegates to the existing restricted Verus subset implementation and keeps Verus as the default proof engine. `replay-kani-reference` is deliberately explicit: it delegates to the separate Kani/CBMC source-replay lane and cannot grant Verus proof credit. Set `DESTINY_PYTHON` only when the platform's Python executable is not the default `python3` (or `python` on Windows).
+`setup` reuses the existing vendor-integrity and Kani patch bootstrap scripts; it does not install host toolchains or silently fetch external tools. `discover` and `list` are classification only and always emit `proof_credit: false`. Their normalized report preserves Kani's compiler-produced `contracted_functions` inventory, including function identity, source file, contract harness identities, and the parsed `requires`/`ensures`/`modifies` clauses exported by the pinned Kani metadata extension. `verify` delegates to the existing restricted Verus subset implementation and keeps Verus as the default proof engine. `replay-kani-reference` is deliberately explicit: it delegates to the separate Kani/CBMC source-replay lane and cannot grant Verus proof credit. Set `DESTINY_PYTHON` only when the platform's Python executable is not the default `python3` (or `python` on Windows).
 
 
 ## Kani-selected reviewed Verus entries
@@ -28,7 +28,7 @@ cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml
 
 `verification/tools/bind_kani_verus.py bind` consumes the normalized metadata from the single Kani discovery path. Every discovered autoharness candidate is classified as selected, intentionally excluded, unsupported, or blocked. A required supported candidate that is absent or blocked makes the binding incomplete.
 
-The binder also validates and carries the normalized Kani contract inventory. Contract metadata is planning provenance only: `requires`, `ensures`, and `modifies` expressions are not yet translated by the reviewed Destiny binder, and the presence of a Kani contract or contract harness does not grant Kani or Verus proof credit. Duplicate or malformed contract identities are rejected instead of being silently merged.
+The binder also validates and carries the normalized Kani contract inventory. It still grants no proof credit. The generated-obligation lane may consume those Kani-parsed clauses only through the restricted contract subset below; the reviewed Destiny registry mappings continue to point at existing reviewed Verus entries. Duplicate or malformed contract identities/clauses are rejected rather than silently merged.
 
 The ordinary reviewed Verus concurrency campaign still runs once. Afterward, `check-campaign` binds the Kani-selected obligation IDs to those fresh `CHECKED_SCOPED` receipts. This is a reviewed correspondence boundary, not a general Rust-to-Verus translation proof and not Kani proof credit.
 
@@ -44,16 +44,19 @@ The generated slice currently supports:
 - literal bounded loops up to 32 iterations;
 - source-scoped `kani::assume` with separate Verus-checked non-vacuity obligations;
 - selected primitive monomorphic generic instances reported by Kani;
-- `+`, `-`, and `*` only inside executable branch conditions, where Verus must prove fixed-width overflow/underflow safety.
+- `+`, `-`, and `*` only inside executable branch conditions, where Verus must prove fixed-width overflow/underflow safety;
+- Kani-parsed non-arithmetic `requires` predicates over the supported scalar parameters;
+- Kani-parsed unit-return `ensures` closures of the form `|_| predicate`, lowered to Verus `ensures`;
+- a separate Verus existential satisfiability obligation for every accepted `requires` set, preventing contradictory preconditions from making a contract proof vacuous.
 
 It deliberately rejects ghost arithmetic in assertions or assumptions, target-width integers, floating point, pointers/references, allocation, unsafe code, dynamic loops/recursion, and general concurrent Rust source translation. The reviewed registry/binder may select an existing Verus concurrency proof for a Kani-discovered specification function, but that is distinct from translating arbitrary concurrent Rust into Verus.
 
 A Verus proof failure remains a proof failure. Concrete source replay is kept as a separate explicit Kani/CBMC reference lane and is not required or invoked by the default Verus fixture path.
 
 
-## Function-contract metadata boundary
+## Restricted function-contract semantic bridge
 
-Pinned Kani exposes contracted functions through `kani_metadata::KaniMetadata::contracted_functions` using the upstream `ContractedFunction` type. The automation crate preserves this exact metadata rather than adding an independent source scanner.
+Pinned Kani exposes contracted functions through `kani_metadata::KaniMetadata::contracted_functions`. The local pinned Kani patch now extends that upstream metadata path at Kani's own proc-macro parsing boundary: after Kani parses a contract attribute into `syn::Expr` / `ExprClosure`, it preserves the parsed clause kind and token representation in `ContractedFunction`. KVerus therefore does not derive contract semantics by scraping the user's source attributes.
 
 The normalized contract rows contain:
 
@@ -61,9 +64,10 @@ The normalized contract rows contain:
 - fully qualified contracted function identity as emitted by Kani;
 - source file identity;
 - Kani contract-harness identities;
+- Kani-parsed clause kind and expression records;
 - explicit upstream provenance.
 
-The Kani-to-Verus binder validates those rows and carries them into its output with `proof_credit: false` and `contract_semantics_status: metadata_only_not_translated`. This is the prerequisite inventory for later semantic lowering of a restricted `requires`/`ensures` subset; it is not such a lowering by itself.
+The Kani-to-Verus binder validates those rows and carries them with `proof_credit: false` and `contract_semantics_status: compiler_parsed_clauses_available`. `verification/tools/verus_subset.py` then implements the first semantic slice: non-arithmetic Boolean/comparison `requires`, plus unit-return `ensures` closures whose result binder is `_`. Contract preconditions must also pass a separately generated Verus existential satisfiability proof. `modifies`, `old`/history, references, calls, contract arithmetic, non-unit returns, and richer result binders remain explicitly unsupported. A successful result credits the generated Verus obligation, never the metadata itself.
 
 
 ## Explicit concrete replay reference lane
