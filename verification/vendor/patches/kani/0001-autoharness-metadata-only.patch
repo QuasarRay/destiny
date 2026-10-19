@@ -1,7 +1,7 @@
 diff --git a/kani-driver/src/autoharness/mod.rs b/kani-driver/src/autoharness/mod.rs
 --- a/kani-driver/src/autoharness/mod.rs
 +++ b/kani-driver/src/autoharness/mod.rs
-@@ -12,7 +12,7 @@ use crate::call_cbmc::VerificationStatus;
+@@ -12,7 +12,7 @@
  use crate::harness_runner::HarnessResult;
  use crate::list::collect_metadata::process_metadata;
  use crate::list::output::output_list_results;
@@ -10,7 +10,7 @@ diff --git a/kani-driver/src/autoharness/mod.rs b/kani-driver/src/autoharness/mo
  use crate::session::KaniSession;
  use crate::{InvocationType, print_kani_version, project, verify_project};
  use anyhow::Result;
-@@ -29,6 +29,19 @@ pub fn autoharness_cargo(args: CargoAutoharnessArgs) -> Result<()> {
+@@ -29,6 +29,19 @@
      if !session.args.common_args.quiet {
          print_kani_version(InvocationType::CargoKani(vec![]), session.args.common_args.verbose);
      }
@@ -33,7 +33,7 @@ diff --git a/kani-driver/src/autoharness/mod.rs b/kani-driver/src/autoharness/mo
 diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
 --- a/kani-driver/src/project.rs
 +++ b/kani-driver/src/project.rs
-@@ -210,6 +210,23 @@ impl Artifact {
+@@ -210,6 +210,23 @@
      }
  }
  
@@ -57,32 +57,34 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
  /// Generate a project using `cargo`.
  /// Accept a boolean to build as many targets as possible. The number of failures in that case can
  /// be collected from the project.
-diff --git a/library/kani_macros/src/sysroot/contracts/initialize.rs b/library/kani_macros/src/sysroot/contracts/initialize.rs
---- a/library/kani_macros/src/sysroot/contracts/initialize.rs
-+++ b/library/kani_macros/src/sysroot/contracts/initialize.rs
-@@ -5,6 +5,7 @@
+diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
+--- a/library/kani_macros/src/sysroot/contracts/bootstrap.rs
++++ b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
+@@ -5,12 +5,44 @@
+ //! function.
  
- use proc_macro::{Diagnostic, TokenStream};
- use proc_macro2::TokenStream as TokenStream2;
-+use quote::ToTokens;
- use syn::ItemFn;
+ use proc_macro2::{Ident, Span, TokenStream};
+-use quote::quote;
++use quote::{ToTokens, quote};
+ use syn::{Expr, ItemFn, Stmt};
  
- use super::{
-@@ -69,6 +70,31 @@
-             }
-         };
+ use super::{ContractConditionsHandler, INTERNAL_RESULT_IDENT, helpers::*};
  
-+        // Preserve Kani-parsed contract clauses as compiler-visible metadata.
-+        // This records the parsed token representation rather than re-parsing
-+        // user source later in the Verus bridge.
-+        let (clause_kind, clause_expression) = match &condition_type {
-+            ContractConditionsData::Requires { attr } => {
+ impl<'a> ContractConditionsHandler<'a> {
++    /// Materialize one Kani-parsed contract clause as an inert local item.
++    ///
++    /// `fn_marker` is already a compiler-preserved Kani channel. Keeping the
++    /// clause on a generated local item avoids source re-parsing and avoids
++    /// changing the attributes on the user function itself.
++    fn contract_clause_marker(&self) -> Stmt {
++        let (kind, expression) = match &self.condition_type {
++            super::ContractConditionsData::Requires { attr } => {
 +                ("requires", attr.to_token_stream().to_string())
 +            }
-+            ContractConditionsData::Ensures { attr } => {
++            super::ContractConditionsData::Ensures { attr } => {
 +                ("ensures", attr.to_token_stream().to_string())
 +            }
-+            ContractConditionsData::Modifies { attr } => (
++            super::ContractConditionsData::Modifies { attr } => (
 +                "modifies",
 +                attr.iter()
 +                    .map(|expr| expr.to_token_stream().to_string())
@@ -90,107 +92,44 @@ diff --git a/library/kani_macros/src/sysroot/contracts/initialize.rs b/library/k
 +                    .join(", "),
 +            ),
 +        };
-+        let contract_clause = format!("{clause_kind}:{clause_expression}");
-+        let contract_clause =
-+            syn::LitStr::new(&contract_clause, proc_macro2::Span::call_site());
-+        annotated_fn.attrs.push(syn::parse_quote!(
-+            #[kanitool::contract_clause = #contract_clause]
-+        ));
-+
-         let fn_name = &annotated_fn.sig.ident;
-         let generate_name = |purpose| format!("__kani_{purpose}_{fn_name}");
-         let assert_name = generate_name("assert");
-diff --git a/kani-compiler/src/kani_middle/attributes.rs b/kani-compiler/src/kani_middle/attributes.rs
---- a/kani-compiler/src/kani_middle/attributes.rs
-+++ b/kani-compiler/src/kani_middle/attributes.rs
-@@ -4,7 +4,9 @@
- 
- use std::collections::{BTreeMap, HashSet};
- 
--use kani_metadata::{CbmcSolver, HarnessAttributes, HarnessKind, Stub};
-+use kani_metadata::{
-+    CbmcSolver, ContractClause, ContractClauseKind, HarnessAttributes, HarnessKind, Stub,
-+};
- use quote::ToTokens;
- use rustc_ast::{LitKind, MetaItem, MetaItemKind};
- use rustc_data_structures::fx::FxHashMap;
-@@ -52,6 +54,8 @@
-     /// contract, e.g. the contract check is substituted for the target function
-     /// before the the verification runs.
-     ProofForContract,
-+    /// Internal compiler-visible record of one parsed function-contract clause.
-+    ContractClause,
-     /// Internal attribute of the contracts implementation. Identifies the
-     /// code implementing the function with its contract clauses asserted.
-     AssertedWith,
-@@ -111,6 +115,7 @@
-             | KaniAttributeKind::ModifiesWrapper
-             | KaniAttributeKind::AssertedWith
-             | KaniAttributeKind::IsContractGenerated
-+            | KaniAttributeKind::ContractClause
-             | KaniAttributeKind::DisableChecks => false,
-         }
-     }
-@@ -315,6 +320,37 @@
-         self.attribute_value(KaniAttributeKind::FnMarker)
-     }
- 
-+    /// Return the Kani-parsed contract clauses preserved by the proc-macro layer.
-+    pub fn contract_clauses(&self) -> Vec<ContractClause> {
-+        self.map
-+            .get(&KaniAttributeKind::ContractClause)
-+            .into_iter()
-+            .flatten()
-+            .filter_map(|attr| {
-+                let raw = expect_key_string_value(self.tcx.sess, attr).ok()?.to_string();
-+                let Some((kind, expression)) = raw.split_once(':') else {
-+                    self.tcx
-+                        .dcx()
-+                        .span_err(attr.span(), "malformed internal contract_clause attribute");
-+                    return None;
-+                };
-+                let kind = match kind {
-+                    "requires" => ContractClauseKind::Requires,
-+                    "ensures" => ContractClauseKind::Ensures,
-+                    "modifies" => ContractClauseKind::Modifies,
-+                    other => {
-+                        self.tcx.dcx().span_err(
-+                            attr.span(),
-+                            format!("unknown internal contract clause kind `{other}`"),
-+                        );
-+                        return None;
-+                    }
-+                };
-+                Some(ContractClause { kind, expression: expression.to_string() })
-+            })
-+            .collect()
++        let marker = syn::LitStr::new(
++            &format!("kverus_contract_clause:{kind}:{expression}"),
++            Span::call_site(),
++        );
++        syn::parse_quote!(
++            #[allow(dead_code)]
++            #[kanitool::fn_marker = #marker]
++            const _: () = ();
++        )
 +    }
 +
-     /// Check if function is annotated with any contract attribute.
-     pub fn has_contract(&self) -> bool {
-         self.map.contains_key(&KaniAttributeKind::CheckedWith)
-@@ -412,6 +448,11 @@
-                 | KaniAttributeKind::ReplacedWith => {
-                     self.attribute_value(kind);
-                 }
-+                KaniAttributeKind::ContractClause => {
-+                    attrs.iter().for_each(|attr| {
-+                        let _ = expect_key_string_value(self.tcx.sess, attr);
-+                    });
-+                }
-                 KaniAttributeKind::IsContractGenerated => {
-                     // Ignored here because this is only used by the proc macros
-                     // to communicate with one another. So by the time it gets
-@@ -593,8 +634,9 @@
-                 }
-                 KaniAttributeKind::CheckedWith
-                 | KaniAttributeKind::IsContractGenerated
-+                | KaniAttributeKind::ContractClause
-                 | KaniAttributeKind::ModifiesWrapper
-                 | KaniAttributeKind::RecursionCheck
-                 | KaniAttributeKind::RecursionTracker
-                 | KaniAttributeKind::AssertedWith
-                 | KaniAttributeKind::ReplacedWith => {
+     /// Generate initial contract.
+     ///
+     /// 1. Generating the body for the recursion closure used by contracts.
+@@ -21,6 +53,7 @@
+         let recursion_name = &self.recursion_name;
+         let check_name = &self.check_name;
+         let assert_name = &self.assert_name;
++        let contract_clause_marker = self.contract_clause_marker();
+ 
+         let replace_closure = self.replace_closure();
+         let check_closure = self.check_closure();
+@@ -47,6 +80,7 @@
+             #[kanitool::asserted_with = #assert_name]
+             #[kanitool::modifies_wrapper = #modifies_name]
+             #vis #sig {
++                #contract_clause_marker
+                 // Dummy functions used to force the compiler to annotate Kani's
+                 // closures as `FnOnce`. Without this, Rust infers the generated closures as `FnMut`,
+                 // preventing us from writing contracts for functions returning mutable references.
+@@ -107,6 +141,7 @@
+     pub fn handle_expanded(&mut self) {
+         let mut annotated_fn = self.annotated_fn.clone();
+         let ItemFn { block, .. } = &mut annotated_fn;
++        block.stmts.insert(0, self.contract_clause_marker());
+         let recursion_closure = expect_closure_in_match(&mut block.stmts, "recursion_check");
+         self.expand_recursion(recursion_closure);
+ 
 diff --git a/kani_metadata/src/lib.rs b/kani_metadata/src/lib.rs
 --- a/kani_metadata/src/lib.rs
 +++ b/kani_metadata/src/lib.rs
@@ -228,33 +167,92 @@ diff --git a/kani_metadata/src/lib.rs b/kani_metadata/src/lib.rs
 diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
 --- a/kani-compiler/src/kani_middle/metadata.rs
 +++ b/kani-compiler/src/kani_middle/metadata.rs
-@@ -69,11 +69,19 @@
+@@ -8,11 +8,11 @@
+ 
+ use crate::kani_middle::codegen_units::Harness;
+ use crate::kani_middle::{KaniAttributes, SourceLocation, readable_name, strip_local_crate_prefix};
+-use kani_metadata::ContractedFunction;
++use kani_metadata::{ContractClause, ContractClauseKind, ContractedFunction};
+ use kani_metadata::{ArtifactType, HarnessAttributes, HarnessKind, HarnessMetadata};
+ use rustc_middle::ty::TyCtxt;
+ use rustc_public::mir::mono::Instance;
+-use rustc_public::{CrateDef, CrateItems, DefId};
++use rustc_public::{CrateDef, CrateItems};
+ 
+ use sha1_checked::Sha1;
+ 
+@@ -58,7 +58,7 @@
+     // We work with `rustc_public::CrateItem` instead of `rustc_public::Instance` to include generic items
+     let crate_items: CrateItems = rustc_public::all_local_items();
+ 
+-    let mut fn_to_data: HashMap<DefId, ContractedFunction> = HashMap::new();
++    let mut fn_to_data = HashMap::new();
+ 
+     for item in crate_items {
+         // Use crate-relative names (rust-lang/rust#149401 made `name()` crate-qualified for
+@@ -69,11 +69,14 @@
          let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
  
          if attributes.has_contract() {
 -            fn_to_data
 -                .insert(item.def_id(), ContractedFunction { function, file, harnesses: vec![] });
++            let internal_def_id = rustc_public::rustc_internal::internal(tcx, item.def_id());
 +            fn_to_data.insert(
-+                item.def_id(),
-+                ContractedFunction {
-+                    function,
-+                    file,
-+                    harnesses: vec![],
-+                    clauses: attributes.contract_clauses(),
-+                },
++                internal_def_id,
++                ContractedFunction { function, file, harnesses: vec![], clauses: vec![] },
 +            );
          // This logic finds manual contract harnesses only (automatic harnesses are a Kani intrinsic, not crate items annotated with the proof_for_contract attribute).
          } else if let Some(def) = attributes.interpret_for_contract_attribute() {
-             let target_def_id = def.def_id();
-+            let clauses = KaniAttributes::for_def_id(tcx, target_def_id).contract_clauses();
+-            let target_def_id = def.def_id();
++            let target_def_id = rustc_public::rustc_internal::internal(tcx, def.def_id());
              if let Some(cf) = fn_to_data.get_mut(&target_def_id) {
                  cf.harnesses.push(function);
              } else {
-@@ -86,6 +94,7 @@
+@@ -86,12 +89,47 @@
                          function: strip_local_crate_prefix(item.name()),
                          file,
                          harnesses: vec![function],
-+                        clauses,
++                        clauses: vec![],
                      },
                  );
              }
+         }
+     }
+ 
++    // Recover Kani-parsed contract clauses from inert local items generated by
++    // the contract proc macros. The existing fn_marker channel survives macro
++    // expansion and is already consumed by the Kani compiler. Each marker item
++    // is a direct child of the contracted function it describes.
++    const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
++    for item in rustc_public::all_local_items() {
++        let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
++        let Some(marker) = attributes.fn_marker() else {
++            continue;
++        };
++        let marker = marker.as_str();
++        let Some(payload) = marker.strip_prefix(CLAUSE_PREFIX) else {
++            continue;
++        };
++        let Some((kind, expression)) = payload.split_once(':') else {
++            panic!("malformed internal KVerus contract clause marker: {marker}");
++        };
++        let kind = match kind {
++            "requires" => ContractClauseKind::Requires,
++            "ensures" => ContractClauseKind::Ensures,
++            "modifies" => ContractClauseKind::Modifies,
++            _ => panic!("unknown internal KVerus contract clause kind: {kind}"),
++        };
++        let internal_def_id = rustc_public::rustc_internal::internal(tcx, item.def_id());
++        let parent = tcx.parent(internal_def_id);
++        let contracted = fn_to_data
++            .get_mut(&parent)
++            .unwrap_or_else(|| panic!("KVerus contract clause marker has no contracted parent: {marker}"));
++        contracted.clauses.push(ContractClause { kind, expression: expression.to_string() });
++    }
++    for contracted in fn_to_data.values_mut() {
++        contracted.clauses.sort();
++    }
++
+     // Find automatically generated contract harnesses (if the `autoharness` subcommand is running)
+     for (harness, metadata) in harness_info {
+         if !metadata.is_automatically_generated {
