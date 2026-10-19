@@ -5,7 +5,7 @@
     "engine": "pinned Kani compiler autoharness metadata",
     "path": "verification/tools/run_kani_autoharness_discovery.py",
     "cbmc_or_goto_execution_on_default_path": false,
-    "function_contract_metadata": "supported via kani_metadata::KaniMetadata::contracted_functions; source file and proof-for-contract harness identities are preserved as planning provenance with proof_credit=false"
+    "function_contract_metadata": "supported via a pinned Kani extension: Kani's proc-macro layer parses requires/ensures/modifies, the compiler preserves those parsed clauses in kani_metadata::ContractedFunction, and discovery carries them with proof_credit=false"
   },
   "semantic_bridge": {
     "status": "restricted",
@@ -46,20 +46,23 @@
       "assumptions": "preserved at their source program point; for each user assumption, Verus proves that every otherwise feasible non-arithmetic path prefix retains at least one fixed-width input after the assumption",
       "machine_arithmetic": "Kani uses checked Rust overflow semantics at the pinned revision; translated +,-,* remain in executable Verus if conditions, where Verus requires overflow/underflow absence. Ghost arithmetic is rejected, and arithmetic-dependent assumption reachability is rejected rather than widened.",
       "generics": "source functions with unbounded type parameters only when Kani autoharness selected an explicit monomorphic instance and every selected type is in the supported fixed-width integer/Boolean set; the result is scoped to that concrete instantiation",
-      "function_contract_discovery": "Kani compiler metadata for contracted functions is preserved and validated end-to-end so the Verus planner can see exact function/file/harness provenance without reimplementing Kani discovery"
+      "function_contract_discovery": "Kani compiler metadata preserves exact contracted-function identity/file/harness provenance plus Kani-parsed clause kind/expression records; the Verus bridge does not re-parse contract source attributes",
+      "function_contracts": "restricted semantic lowering supports non-arithmetic requires predicates over supported scalar parameters and unit-return ensures closures of the form |_| predicate; accepted requires are separately checked for existential satisfiability to prevent vacuous proofs"
     },
     "rejected": [
-      "requires/ensures/modifies expression translation and contract proof semantics; contract metadata discovery alone is not a Verus contract proof",
+      "machine arithmetic, function calls, dereferences/references, casts, old/history expressions, and other syntax outside the declared Boolean/comparison grammar inside requires/ensures",
+      "modifies clauses and memory-footprint semantics",
+      "ensures result binders other than the wildcard unit-result form |_| predicate, and non-unit return contracts",
       "arithmetic in assert!/kani::assume, division/remainder, casts, arithmetic outside executable if conditions, and assumption non-vacuity paths that depend on machine arithmetic",
       "usize/isize and target-width dependent values",
-      "function calls",
+      "function calls in the generated-source subset",
       "references, raw pointers, slices, allocation and user ADTs",
       "floating point",
       "unsafe code",
       "concurrency in the generated-source translator; reviewed Kani-selected functions may still bind to the separate existing Verus concurrency campaign through registry.json",
       "generic trait-bound syntax, const generics, lifetimes, target-width generic arguments, dynamic loops, named loop variables and recursion"
     ],
-    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Scoped assumptions are guarded by Verus-checked path-preservation non-vacuity obligations; syntactically unreachable assertion branches are recorded but are not required to have witnesses. Kani function-contract metadata is preserved as provenance only until contract expressions receive an explicit semantic bridge. No general Rust-to-Verus translation soundness is claimed."
+    "translation_trust": "Structural lowering is an explicit trusted correspondence boundary and is regression-tested. Function-contract semantics come from clauses parsed by Kani's own proc-macro layer and exported through the pinned compiler metadata extension; source attributes are stripped only to expose the decorated function body to the restricted parser. Every accepted requires set gets a separate Verus existential satisfiability proof before the contract-bearing function can receive proof credit. Scoped assumptions retain their existing Verus-checked path non-vacuity obligations. No general Rust-to-Verus or Kani-contract-to-Verus translation soundness theorem is claimed."
   },
   "evidence": {
     "strict_verus_result_parser": "existing Aegis agentinfra.destiny_reuse.checked_output",
@@ -68,6 +71,7 @@
       "manifest",
       "normalized Kani discovery",
       "Kani contracted-function inventory",
+      "Kani parsed contract clauses",
       "translator",
       "capability registry",
       "generated Verus source",
