@@ -99,9 +99,16 @@ class ForStmt:
     line: int
 
 
-Stmt = AssertStmt | AssumeStmt | IfStmt | ForStmt
+@dataclasses.dataclass(frozen=True)
+class ReturnStmt:
+    expr: Expr
+    line: int
+
+
+Stmt = AssertStmt | AssumeStmt | IfStmt | ForStmt | ReturnStmt
 
 MAX_PATH_STATES = 256
+RESULT_BINDER = "__destiny_result"
 
 
 @dataclasses.dataclass(frozen=True)
@@ -110,6 +117,7 @@ class Function:
     params: tuple[tuple[str, str], ...]
     generic_params: tuple[str, ...]
     selected_generic_args: tuple[tuple[str, str], ...]
+    return_type: str | None
     body: tuple[Stmt, ...]
     line: int
     source: str
@@ -249,31 +257,42 @@ class Parser:
                 if self.current().value == ")":
                     break
         self.take(")")
+        return_type = None
         if self.accept("->"):
             if self.accept("("):
                 self.take(")")
             else:
-                self.fail("only unit return type is supported")
+                return_type = self.take(kind="ident").value
+                if return_type not in SUPPORTED_TYPES and return_type not in generic_params:
+                    self.fail(f"unsupported return type {return_type!r}")
         previous = self.allowed_names
         self.allowed_names = {name for name, _ in params}
-        body = self.parse_block()
+        body = self.parse_block(allow_tail_return=return_type is not None)
         self.allowed_names = previous
         return Function(
             name,
             tuple(params),
             tuple(generic_params),
             (),
+            return_type,
             body,
             start.line,
             self.source,
         )
 
-    def parse_block(self) -> tuple[Stmt, ...]:
+    def parse_block(self, allow_tail_return: bool = False) -> tuple[Stmt, ...]:
         self.take("{")
         statements = []
         while self.current().value != "}":
             if self.current().kind == "eof":
                 self.fail("unterminated block")
+            if allow_tail_return and self.current().value not in {"kani", "assert", "if", "for"}:
+                token = self.current()
+                expr = self.parse_expression()
+                if self.current().value != "}":
+                    self.fail("supported non-unit functions require one final tail expression")
+                statements.append(ReturnStmt(expr, token.line))
+                break
             statements.append(self.parse_statement())
         self.take("}")
         return tuple(statements)
@@ -478,6 +497,63 @@ def parse_contract_expression(text: str, names: set[str], source: str) -> Expr:
     return expr
 
 
+def parse_ensures_expression(
+    expression: str,
+    names: set[str],
+    function: Function,
+    requested: str,
+) -> Expr:
+    closure = re.fullmatch(
+        r"\|\s*([A-Za-z_][A-Za-z0-9_]*|_)\s*(?::\s*&\s*([A-Za-z_][A-Za-z0-9_]*))?\s*\|\s*(.+)",
+        expression,
+        re.S,
+    )
+    if closure is None:
+        raise Unsupported("KVerus ensures support requires a single-result closure")
+
+    binder, annotated_type, predicate = closure.groups()
+    if function.return_type is None:
+        if binder != "_" or annotated_type is not None:
+            raise Unsupported(
+                "unit-return ensures require the wildcard result binder, e.g. |_| predicate"
+            )
+        return parse_contract_expression(
+            predicate,
+            names,
+            f"Kani ensures for {requested}",
+        )
+
+    if RESULT_BINDER in names:
+        raise Unsupported(f"parameter name {RESULT_BINDER!r} is reserved by KVerus")
+    if annotated_type is not None and annotated_type != function.return_type:
+        raise Unsupported(
+            f"Kani ensures result annotation &{annotated_type} does not match "
+            f"function return type {function.return_type}"
+        )
+    if binder == "_":
+        return parse_contract_expression(
+            predicate,
+            names,
+            f"Kani ensures for {requested}",
+        )
+
+    normalized = re.sub(
+        rf"\*\s*\b{re.escape(binder)}\b",
+        RESULT_BINDER,
+        predicate,
+    )
+    if re.search(rf"\b{re.escape(binder)}\b", normalized):
+        raise Unsupported(
+            "scalar Kani ensures result binders may only be read through dereference "
+            "(e.g. |result: &u8| *result == x)"
+        )
+    return parse_contract_expression(
+        normalized,
+        names | {RESULT_BINDER},
+        f"Kani ensures for {requested}",
+    )
+
+
 def contract_for_function(
     discovery_path: Path,
     requested: str,
@@ -524,17 +600,12 @@ def contract_for_function(
                 )
             )
         elif kind == "ensures":
-            match = re.fullmatch(r"\|\s*_\s*\|\s*(.+)", expression, re.S)
-            if match is None:
-                raise Unsupported(
-                    "initial KVerus ensures support requires a unit-return closure "
-                    "with wildcard result binder, e.g. |_| predicate"
-                )
             ensures.append(
-                parse_contract_expression(
-                    match.group(1),
+                parse_ensures_expression(
+                    expression,
                     names,
-                    f"Kani ensures for {requested}",
+                    function,
+                    requested,
                 )
             )
         elif kind == "modifies":
@@ -574,6 +645,10 @@ def emit_statement(statement: Stmt, indent: str, source: str, output: list[str])
             for child in statement.body:
                 emit_statement(child, indent, source, output)
         return
+    if isinstance(statement, ReturnStmt):
+        output.append(f"{indent}// source {source}:{statement.line}; scalar return")
+        output.append(f"{indent}return {statement.expr.text};")
+        return
     raise TypeError(statement)
 
 
@@ -588,9 +663,15 @@ def lower_function(
     except ValueError:
         relative = source_path.resolve().as_posix()
     params = ", ".join(f"{name}: {typ}" for name, typ in function.params)
+    if function.return_type is None:
+        return_suffix = ""
+    elif contract is not None and contract.ensures:
+        return_suffix = f" -> ({RESULT_BINDER}: {function.return_type})"
+    else:
+        return_suffix = f" -> {function.return_type}"
     output = ["use vstd::prelude::*;", "", "verus! {"]
     if contract is not None and (contract.requires or contract.ensures):
-        output.append(f"fn {function.name}({params})")
+        output.append(f"fn {function.name}({params}){return_suffix}")
         if contract.requires:
             output.append("    requires")
             output.extend(f"        {expr.text}," for expr in contract.requires)
@@ -599,7 +680,7 @@ def lower_function(
             output.extend(f"        {expr.text}," for expr in contract.ensures)
         output.append("{")
     else:
-        output.append(f"fn {function.name}({params}) {{")
+        output.append(f"fn {function.name}({params}){return_suffix} {{")
     for statement in function.body:
         emit_statement(statement, "    ", relative, output)
     output.extend(["}", "}", ""])
@@ -694,6 +775,8 @@ def collect_assertion_paths(statements: Sequence[Stmt]) -> list[AssertionPath]:
             elif isinstance(statement, ForStmt):
                 for _ in range(statement.start, statement.end):
                     current = walk(statement.body, current)
+            elif isinstance(statement, ReturnStmt):
+                continue
             else:
                 raise TypeError(statement)
         return _bounded_states(current)
@@ -756,6 +839,8 @@ def collect_assumption_witnesses(statements: Sequence[Stmt]) -> list[AssumptionW
             elif isinstance(statement, ForStmt):
                 for _ in range(statement.start, statement.end):
                     current = walk(statement.body, current)
+            elif isinstance(statement, ReturnStmt):
+                continue
             else:
                 raise TypeError(statement)
         return _bounded_states(current)
@@ -816,13 +901,15 @@ def collect_assert_lines(statements: Sequence[Stmt]) -> list[int]:
             lines.extend(collect_assert_lines(statement.else_body))
         elif isinstance(statement, ForStmt):
             lines.extend(collect_assert_lines(statement.body))
+        elif isinstance(statement, ReturnStmt):
+            continue
     return lines
 
 
 def collect_loop_bounds(statements: Sequence[Stmt]) -> list[dict[str, int | str]]:
     bounds = []
     for statement in statements:
-        if isinstance(statement, AssumeStmt):
+        if isinstance(statement, (AssumeStmt, ReturnStmt)):
             continue
         if isinstance(statement, ForStmt):
             bounds.append({
@@ -872,13 +959,19 @@ def instantiate_selected_function(function: Function, requested: str) -> Functio
         )
     substitution = dict(zip(function.generic_params, selected, strict=True))
     params = tuple((name, substitution.get(typ, typ)) for name, typ in function.params)
+    return_type = substitution.get(function.return_type, function.return_type)
     if any(typ not in SUPPORTED_TYPES for _, typ in params):
         raise Unsupported(
             f"selected generic instance for {function.name!r} leaves unsupported parameter types"
         )
+    if return_type is not None and return_type not in SUPPORTED_TYPES:
+        raise Unsupported(
+            f"selected generic instance for {function.name!r} leaves unsupported return type"
+        )
     return dataclasses.replace(
         function,
         params=params,
+        return_type=return_type,
         selected_generic_args=tuple(zip(function.generic_params, selected, strict=True)),
     )
 
@@ -1011,6 +1104,11 @@ def verify(
             {"name": name, "rust_type": typ, "independent": True}
             for name, typ in function.params
         ],
+        "return_domain": (
+            {"rust_type": function.return_type, "verus_result": RESULT_BINDER}
+            if function.return_type is not None
+            else None
+        ),
         "selected_generic_arguments": [
             {"parameter": parameter, "concrete_type": concrete}
             for parameter, concrete in function.selected_generic_args
@@ -1040,7 +1138,7 @@ def verify(
             for path in assertion_paths
         ],
         "bounds": collect_loop_bounds(function.body),
-        "target_scope": "bool_and_fixed_width_integers; +,-,* only in executable if conditions; usize/isize rejected",
+        "target_scope": "bool_and_fixed_width_integer parameters/returns; +,-,* only in executable conditions/return expressions; usize/isize rejected",
         "trusted_boundaries": [
             "Kani compiler autoharness eligibility metadata selects the source function; Kani/CBMC proof results are not used.",
             "The structural Rust-to-Verus lowering is trusted only for the declared grammar and is separately regression-tested.",
@@ -1048,7 +1146,7 @@ def verify(
             "Machine +,-,* are accepted only in executable branch conditions, where Verus checks fixed-width overflow; ghost assertion/assumption arithmetic remains rejected to prevent widening drift.",
             "Generic source functions are accepted only when pinned Kani selected an explicit primitive monomorphic instance; that exact substitution is recorded and no generic theorem is claimed.",
             "Function-contract clauses come from Kani's compiler metadata after Kani's proc-macro parser; source attributes are stripped only so the restricted body parser can reach the decorated function.",
-            "The initial contract bridge accepts only non-arithmetic requires expressions and unit-result ensures closures of the form |_| predicate; modifies/old/references/calls remain rejected.",
+            "The contract bridge accepts non-arithmetic requires expressions plus unit-result |_| postconditions and supported scalar result-reference postconditions; modifies/old/references/calls remain rejected.",
             "Every accepted requires set gets a separate Verus existential satisfiability proof before the contract-bearing function can receive proof credit.",
             "Verus, its vstd contracts, Rust toolchain and solver remain verifier trust boundaries.",
         ],
