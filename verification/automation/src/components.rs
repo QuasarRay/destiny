@@ -74,6 +74,11 @@ const COMMANDS: &[(&str, &str, &str)] = &[
         "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>",
         "reviewed_binding",
     ),
+    (
+        "finalize-reviewed",
+        "finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>",
+        "reviewed_binding",
+    ),
     ("explain", "explain", "diagnostics"),
     ("verify", "verify <verus-subset args...>", "verification"),
     (
