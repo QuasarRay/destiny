@@ -1962,7 +1962,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_middle/metadata.rs
 --- a/kani-compiler/src/kani_middle/metadata.rs
 +++ b/kani-compiler/src/kani_middle/metadata.rs
-@@ -1,173 +1,230 @@
+@@ -1,173 +1,239 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -//! This module handles Kani metadata generation. For example, generating HarnessMetadata for a
@@ -2149,8 +2149,9 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +use kani_metadata::{ContractClause, ContractClauseKind, ContractedFunction};
 +use kani_metadata::{ArtifactType, HarnessAttributes, HarnessKind, HarnessMetadata};
 +use rustc_middle::ty::TyCtxt;
-+use rustc_public::mir::mono::Instance;
-+use rustc_public::{CrateDef, CrateItems, DefId};
++use rustc_public::mir::{TerminatorKind, mono::Instance};
++use rustc_public::ty::{RigidTy, TyKind};
++use rustc_public::{CrateDef, CrateItem, CrateItems, DefId};
 +
 +use sha1_checked::Sha1;
 +
@@ -2185,6 +2186,67 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +    }
 +}
 +
++
++/// Recover Kani-parsed contract clauses from explicit marker calls in a contracted
++/// function's own stable MIR. This is intentionally coupled to Kani's existing
++/// fn_marker mechanism, which its contract transformation already uses for
++/// kani_contract_mode and other generated helpers.
++fn contract_clauses_from_body(item: CrateItem, function: &str) -> Vec<ContractClause> {
++    const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
++
++    let Ok(instance) = Instance::try_from(item) else {
++        // Definition-level generic items may not have a directly resolvable instance.
++        // Their clause identity remains discoverable, but this restricted transport does
++        // not invent a generic instantiation merely to recover metadata.
++        return vec![];
++    };
++    let Some(body) = instance.body() else {
++        return vec![];
++    };
++    let locals = body.locals().to_vec();
++    let expected_leaf = function.rsplit("::").next().unwrap_or(function);
++    let mut clauses = vec![];
++
++    for block in &body.blocks {
++        let TerminatorKind::Call { func, .. } = &block.terminator.kind else {
++            continue;
++        };
++        let Ok(callee_ty) = func.ty(&locals) else {
++            continue;
++        };
++        let TyKind::RigidTy(RigidTy::FnDef(def, _)) = callee_ty.kind() else {
++            continue;
++        };
++        let Some(marker) = crate::kani_middle::attributes::fn_marker(def) else {
++            continue;
++        };
++        let Some(payload) = marker.strip_prefix(CLAUSE_PREFIX) else {
++            continue;
++        };
++
++        let mut parts = payload.splitn(3, ':');
++        let function_leaf = parts.next().unwrap_or_default();
++        let kind = parts.next().unwrap_or_default();
++        let expression = parts.next().unwrap_or_default();
++        if function_leaf != expected_leaf || expression.is_empty() {
++            panic!(
++                "malformed or misbound internal KVerus contract clause marker: "
++            );
++        }
++        let kind = match kind {
++            "requires" => ContractClauseKind::Requires,
++            "ensures" => ContractClauseKind::Ensures,
++            "modifies" => ContractClauseKind::Modifies,
++            _ => panic!("unknown internal KVerus contract clause kind: {kind}"),
++        };
++        clauses.push(ContractClause { kind, expression: expression.to_string() });
++    }
++
++    clauses.sort();
++    clauses.dedup();
++    clauses
++}
++
 +/// Collects contract and contract harness metadata.
 +///
 +/// For each function with contracts (or that is a target of a contract harness),
@@ -2207,9 +2269,10 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +        let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
 +
 +        if attributes.has_contract() {
++            let clauses = contract_clauses_from_body(item.clone(), &function);
 +            fn_to_data.insert(
 +                item.def_id(),
-+                ContractedFunction { function, file, harnesses: vec![], clauses: vec![] },
++                ContractedFunction { function, file, harnesses: vec![], clauses },
 +            );
 +        // This logic finds manual contract harnesses only (automatic harnesses are a Kani intrinsic, not crate items annotated with the proof_for_contract attribute).
 +        } else if let Some(def) = attributes.interpret_for_contract_attribute() {
@@ -2231,60 +2294,6 @@ diff --git a/kani-compiler/src/kani_middle/metadata.rs b/kani-compiler/src/kani_
 +                );
 +            }
 +        }
-+    }
-+
-+    // Recover Kani-parsed clauses from generated local helper functions carrying Kani's
-+    // existing fn_marker attribute. These helpers are visible in all_local_items (the same
-+    // path already used by Kani for its generated contract-mode helpers).
-+    const CLAUSE_PREFIX: &str = "kverus_contract_clause:";
-+    for item in rustc_public::all_local_items() {
-+        let attributes = KaniAttributes::for_def_id(tcx, item.def_id());
-+        let Some(marker) = attributes.fn_marker().map(|marker| marker.to_string()) else {
-+            continue;
-+        };
-+        let Some(payload) = marker.strip_prefix(CLAUSE_PREFIX) else {
-+            continue;
-+        };
-+
-+        let mut parts = payload.splitn(3, ':');
-+        let function_leaf = parts.next().unwrap_or_default();
-+        let kind = parts.next().unwrap_or_default();
-+        let expression = parts.next().unwrap_or_default();
-+        if function_leaf.is_empty() || expression.is_empty() {
-+            panic!("malformed internal KVerus contract clause marker: {marker}");
-+        }
-+        let kind = match kind {
-+            "requires" => ContractClauseKind::Requires,
-+            "ensures" => ContractClauseKind::Ensures,
-+            "modifies" => ContractClauseKind::Modifies,
-+            _ => panic!("unknown internal KVerus contract clause kind: {kind}"),
-+        };
-+
-+        let item_name = strip_local_crate_prefix(item.name());
-+        let Some((target_name, marker_leaf)) = item_name.rsplit_once("::") else {
-+            panic!("KVerus contract clause helper is not nested under a function: {item_name}");
-+        };
-+        if !marker_leaf.starts_with("__kani_kverus_contract_clause_") {
-+            panic!("KVerus contract marker has unexpected helper identity: {item_name}");
-+        }
-+        if target_name.rsplit("::").next() != Some(function_leaf) {
-+            panic!(
-+                "KVerus contract clause marker target mismatch: marker={marker}, item={item_name}"
-+            );
-+        }
-+
-+        let contracted = fn_to_data
-+            .values_mut()
-+            .find(|contracted| contracted.function == target_name)
-+            .unwrap_or_else(|| {
-+                panic!(
-+                    "KVerus contract clause helper has no contracted target: marker={marker}, item={item_name}"
-+                )
-+            });
-+        contracted.clauses.push(ContractClause { kind, expression: expression.to_string() });
-+    }
-+    for contracted in fn_to_data.values_mut() {
-+        contracted.clauses.sort();
 +    }
 +
 +    // Find automatically generated contract harnesses (if the `autoharness` subcommand is running)
