@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use kani_metadata::{AutoHarnessSkipReason, ContractClause, ContractClauseKind, KaniMetadata};
+use kani_metadata::{AutoHarnessSkipReason, ContractClause, KaniMetadata};
 use serde::{Deserialize, Serialize};
 use std::io::Read;
 
@@ -169,7 +169,7 @@ fn format_args(args: &[(String, String)]) -> String {
 mod tests {
     use super::*;
     use kani_metadata::{
-        AutoHarnessMetadata, AutoHarnessSkipReason, ContractedFunction,
+        AutoHarnessMetadata, AutoHarnessSkipReason, ContractClauseKind, ContractedFunction,
     };
     use std::collections::{BTreeMap, BTreeSet};
 
