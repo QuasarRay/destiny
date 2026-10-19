@@ -39,6 +39,13 @@ def main() -> int:
     args = parser.parse_args()
 
     driver = args.kani_driver.resolve(strict=True)
+    compiler = driver.with_name("kani-compiler").resolve(strict=True)
+    compiler_marker = b"KVERUS_CONTRACT_TRANSPORT_EMPTY"
+    if compiler_marker not in compiler.read_bytes():
+        raise SystemExit(
+            "Selected Kani driver is not paired with the patched KVerus kani-compiler"
+        )
+
     manifest = args.manifest_path.resolve(strict=True)
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -105,6 +112,11 @@ def main() -> int:
         "proof_credit": False,
         "manifest": str(manifest.relative_to(ROOT)),
         "driver": str(driver),
+        "compiler": {
+            "path": str(compiler),
+            "sha256": digest(compiler),
+            "kverus_transport_marker": compiler_marker.decode("ascii"),
+        },
         "combined_metadata": {
             "path": str(combined_path.relative_to(ROOT)),
             "sha256": digest(combined_path),
