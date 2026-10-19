@@ -1053,19 +1053,10 @@ def lower_nonvacuity(
         prefix = _conjunction(contract_domain + witness.prefix_conditions)
         post = _conjunction(contract_domain + witness.conditions)
         if binders:
-            if prefix == "true":
-                # Every supported scalar parameter type has a nonempty domain, so
-                # `exists|params| true` is tautological. Emitting it as the
-                # antecedent makes Verus demand a trigger for a quantifier whose
-                # body contains no triggerable term. Drop only that redundant
-                # antecedent; nontrivial path/contract prefixes still retain the
-                # implication below.
-                output.append(f"    assert(exists|{binders}| {post});")
-            else:
-                output.append(
-                    f"    assert((exists|{binders}| {prefix}) ==> "
-                    f"(exists|{binders}| {post}));"
-                )
+            output.append(
+                f"    assert((exists|{binders}| {prefix}) ==> "
+                f"(exists|{binders}| {post}));"
+            )
         else:
             output.append(f"    assert(({prefix}) ==> ({post}));")
         output.append("}")
