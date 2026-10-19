@@ -5,6 +5,8 @@ This tool never executes Kani or Verus. Kani discovery is produced by the single
 metadata path in run_kani_autoharness_discovery.py + verification/automation.
 The existing Verus campaign executes the proofs once; this tool only validates
 that the Kani-selected supported identities map to exact fresh campaign receipts.
+Kani function-contract metadata is preserved as planning provenance only; it
+never grants proof credit and is not treated as translated Verus contracts.
 """
 
 from __future__ import annotations
@@ -72,6 +74,51 @@ def supported(registry: dict[str, Any]) -> list[dict[str, Any]]:
     return [row for row in registry["candidates"] if row.get("status") == "supported"]
 
 
+def normalized_contract_inventory(normalized: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = normalized.get("contracted_functions", [])
+    if not isinstance(rows, list):
+        raise BindingError("normalized Kani contract inventory must be a list")
+
+    validated = []
+    seen = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            raise BindingError("normalized Kani contract entry must be an object")
+        crate_name = row.get("crate_name")
+        function = row.get("function")
+        file = row.get("file")
+        harnesses = row.get("harnesses")
+        provenance = row.get("provenance")
+        if not all(isinstance(value, str) and value for value in (crate_name, function, file, provenance)):
+            raise BindingError("normalized Kani contract entry has missing identity/provenance")
+        if not isinstance(harnesses, list) or any(
+            not isinstance(harness, str) or not harness for harness in harnesses
+        ):
+            raise BindingError(f"invalid Kani contract harness inventory for {function}")
+        key = (crate_name, function, file, tuple(harnesses))
+        if key in seen:
+            raise BindingError(f"duplicate normalized Kani contract entry: {crate_name}::{function}")
+        seen.add(key)
+        validated.append({
+            "crate_name": crate_name,
+            "function": function,
+            "file": file,
+            "harnesses": list(harnesses),
+            "provenance": provenance,
+            "proof_credit": False,
+        })
+
+    return sorted(
+        validated,
+        key=lambda row: (
+            row["crate_name"],
+            row["function"],
+            row["file"],
+            tuple(row["harnesses"]),
+        ),
+    )
+
+
 def bind_discovery(
     normalized_path: Path,
     registry_path: Path,
@@ -91,6 +138,7 @@ def bind_discovery(
     discovered = normalized.get("candidates")
     if not isinstance(discovered, list):
         raise BindingError("normalized discovery candidates are missing")
+    contracts = normalized_contract_inventory(normalized)
 
     by_name: dict[str, dict[str, Any]] = {}
     for row in discovered:
@@ -191,7 +239,7 @@ def bind_discovery(
         "schema": 1,
         "status": "BOUND_FOR_VERUS" if not unresolved else "INCOMPLETE",
         "default_engine": "verus",
-        "kani_role": "compiler_autoharness_discovery_only",
+        "kani_role": "compiler_autoharness_and_contract_metadata_discovery_only",
         "kani_proof_credit": False,
         "kani_commit": KANI_COMMIT,
         "verus_commit": VERUS_COMMIT,
@@ -204,10 +252,15 @@ def bind_discovery(
         "records": records,
         "selected": selected,
         "controller_obligations": obligations,
+        "contract_inventory": contracts,
+        "contract_inventory_count": len(contracts),
+        "contract_semantics_status": "metadata_only_not_translated",
         "unresolved": unresolved,
         "notice": (
-            "Kani determines automatic-harness eligibility. Verus remains the proof engine. "
-            "The reviewed mapping is an explicit trusted correspondence boundary."
+            "Kani determines automatic-harness eligibility and supplies function-contract "
+            "metadata. Verus remains the proof engine. Contract expressions are not yet "
+            "translated by this binder. The reviewed source-to-Verus mapping remains an "
+            "explicit trusted correspondence boundary."
         ),
     }
 
@@ -259,9 +312,14 @@ def check_campaign(binding_path: Path, campaign_dir: Path) -> dict[str, Any]:
         "campaign_binding_sha256": sha256(binding_receipt),
         "campaign_audit_sha256": sha256(audit_receipt),
         "receipts": receipts,
+        "contract_inventory_count": binding.get("contract_inventory_count", 0),
+        "contract_semantics_status": binding.get(
+            "contract_semantics_status", "metadata_only_not_translated"
+        ),
         "translation_correctness": "reviewed_mapping_boundary_not_general_translation_proof",
         "notice": (
-            "This credits only the mapped reviewed Verus entry scopes. It does not establish "
+            "This credits only the mapped reviewed Verus entry scopes. Preserved Kani "
+            "contract metadata is planning provenance, not proof credit. It does not establish "
             "general Kani compatibility, end-to-end translation soundness, or completed Destiny parity."
         ),
     }
