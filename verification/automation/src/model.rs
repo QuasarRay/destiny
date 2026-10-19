@@ -94,3 +94,42 @@ pub struct PreparationReceipt {
     pub plan_path: String,
     pub counts: PlanCounts,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct CommandDescriptor {
+    pub name: String,
+    pub synopsis: String,
+    pub category: String,
+    pub canonical_token: String,
+    pub proof_credit: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AutomationCommand {
+    Doctor,
+    Setup,
+    Discover { path: String },
+    Plan { path: String },
+    Prepare { manifest_path: String, output_dir: String },
+    PrepareReviewed { manifest_path: String, output_dir: String },
+    Explain,
+    Verify { args: Vec<String> },
+    ReplayKaniReference { args: Vec<String> },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedPreparationReceipt {
+    pub schema: u32,
+    pub status: &'static str,
+    pub default_engine: &'static str,
+    pub proof_credit: bool,
+    pub verus_campaign_checked: bool,
+    pub preparation: PreparationReceipt,
+    pub binding_path: String,
+    pub binding_status: String,
+    pub selected_count: usize,
+    pub unresolved_count: usize,
+    pub controller_obligation_count: usize,
+    pub contract_inventory_count: usize,
+    pub contract_clause_count: usize,
+}

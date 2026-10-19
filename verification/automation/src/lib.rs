@@ -4,14 +4,15 @@ mod components;
 mod model;
 
 pub use components::{
-    CanBuildAutomationPlan, CanCanonicalizeContractClause, CanNormalizeMetadata,
-    CanParseMetadataBytes, CanPrepareAutomation, CanReadWriteArtifacts, CanRunPythonTool,
+    CanBuildAutomationPlan, CanCanonicalizeContractClause, CanDescribeCommands,
+    CanNormalizeMetadata, CanParseMetadataBytes, CanPrepareAutomation,
+    CanPrepareReviewedBinding, CanReadWriteArtifacts, CanRouteCommand, CanRunPythonTool,
     CanValidateContractClause, HasProjectRoot, KVerusContext,
 };
 pub use model::{
-    AutomationPlan, ContractDiscovery, ContractPlan, DiscoveryCandidate,
-    DiscoveryDisposition, DiscoveryReport, PlanCounts, PlannedContractClause,
-    PreparationReceipt,
+    AutomationCommand, AutomationPlan, CommandDescriptor, ContractDiscovery, ContractPlan,
+    DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport, PlanCounts,
+    PlannedContractClause, PreparationReceipt, ReviewedPreparationReceipt,
 };
 
 use kani_metadata::KaniMetadata;
@@ -172,6 +173,47 @@ mod tests {
         assert!(!contract.clauses[0].canonical_tokens.is_empty());
         assert_eq!(contract.clauses[1].kind, "ensures");
         assert!(!contract.clauses[1].canonical_tokens.is_empty());
+    }
+
+    #[test]
+    fn command_catalog_is_cgp_owned_and_proc_macro_validated() {
+        let commands = KVerusContext.command_descriptors().unwrap();
+        let reviewed = commands
+            .iter()
+            .find(|command| command.name == "prepare-reviewed")
+            .unwrap();
+        assert_eq!(
+            reviewed.synopsis,
+            "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"
+        );
+        assert_eq!(reviewed.category, "reviewed_binding");
+        assert_eq!(reviewed.canonical_token, "prepare_reviewed");
+        assert!(!reviewed.proof_credit);
+
+        let usage = KVerusContext.command_usage().unwrap();
+        assert!(usage.contains("prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"));
+        assert!(usage.contains("replay-kani-reference <replay args...>"));
+    }
+
+    #[test]
+    fn command_router_builds_typed_reviewed_preparation_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "prepare-reviewed".to_string(),
+                "--output-dir".to_string(),
+                ".aegis/out".to_string(),
+                "--manifest-path".to_string(),
+                "verification/spec/Cargo.toml".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::PrepareReviewed {
+                manifest_path: "verification/spec/Cargo.toml".to_string(),
+                output_dir: ".aegis/out".to_string(),
+            }
+        );
     }
 
     #[test]

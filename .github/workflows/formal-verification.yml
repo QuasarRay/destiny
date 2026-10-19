@@ -101,37 +101,56 @@ jobs:
           cargo +nightly-2026-08-21 test -p kani_metadata
           RUSTFLAGS=--cfg=kani_sysroot cargo +nightly-2026-08-21 test -p kani_macros --features syn/extra-traits --lib
 
-      - name: Discover automatic harnesses with CBMC and GOTO execution forbidden
-        run: python3 -B verification/tools/run_kani_autoharness_discovery.py
-
-      - name: Normalize real Kani compiler metadata for the Verus-default planner
+      - name: Prepare Kani discovery and reviewed Verus binding through KVerus
         run: |
+          set -euo pipefail
+          out=".aegis/destiny/kani-autoharness-discovery"
+          mkdir -p "$out"
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
-            discover .aegis/destiny/kani-autoharness-discovery/kani-metadata.json \
-            > .aegis/destiny/kani-autoharness-discovery/normalized-discovery.json
+            prepare-reviewed \
+            --manifest-path verification/spec/Cargo.toml \
+            --output-dir "$out" \
+            > "$out/reviewed-preparation-stdout.json"
+          python3 -B verification/tools/test_bind_kani_verus.py
           python3 - <<'PY'
           import json
           from pathlib import Path
-          p=Path(".aegis/destiny/kani-autoharness-discovery/normalized-discovery.json")
-          data=json.loads(p.read_text())
-          assert data["default_engine"] == "verus"
-          assert data["proof_credit"] is False
-          assert data["crates_with_autoharness_metadata"] > 0
-          assert data["candidates"], "empty autoharness candidate inventory"
+
+          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          discovery=json.loads((root/"normalized-discovery.json").read_text())
+          binding=json.loads((root/"verus-binding.json").read_text())
+          receipt=json.loads((root/"reviewed-preparation-receipt.json").read_text())
+          stdout_receipt=json.loads((root/"reviewed-preparation-stdout.json").read_text())
+
+          assert discovery["default_engine"] == "verus", discovery
+          assert discovery["proof_credit"] is False, discovery
+          assert discovery["crates_with_autoharness_metadata"] > 0, discovery
+          assert discovery["candidates"], discovery
+
+          assert binding["status"] == "BOUND_FOR_VERUS", binding
+          assert binding["default_engine"] == "verus", binding
+          assert binding["kani_proof_credit"] is False, binding
+          assert binding["selected"], binding
+          assert not binding["unresolved"], binding
+
+          assert receipt == stdout_receipt, (receipt, stdout_receipt)
+          assert receipt["status"] == "KVERUS_REVIEWED_BINDING_PREPARED", receipt
+          assert receipt["default_engine"] == "verus", receipt
+          assert receipt["proof_credit"] is False, receipt
+          assert receipt["verus_campaign_checked"] is False, receipt
+          assert receipt["binding_status"] == "BOUND_FOR_VERUS", receipt
+          assert receipt["selected_count"] == len(binding["selected"]), receipt
+          assert receipt["unresolved_count"] == 0, receipt
+          assert receipt["controller_obligation_count"] == len(binding["controller_obligations"]), receipt
+          assert receipt["contract_inventory_count"] == binding["contract_inventory_count"], receipt
+          assert receipt["contract_clause_count"] == binding["contract_clause_count"], receipt
           print(json.dumps({
-              "default_engine": data["default_engine"],
-              "candidates": len(data["candidates"]),
-              "proof_credit": data["proof_credit"],
+              "default_engine": receipt["default_engine"],
+              "selected": receipt["selected_count"],
+              "proof_credit": receipt["proof_credit"],
           }, sort_keys=True))
           PY
-
-      - name: Bind Kani-selected Destiny functions to reviewed Verus entries
-        run: |
-          python3 -B verification/tools/bind_kani_verus.py bind \
-            --normalized .aegis/destiny/kani-autoharness-discovery/normalized-discovery.json \
-            --output .aegis/destiny/kani-autoharness-discovery/verus-binding.json
-          python3 -B verification/tools/test_bind_kani_verus.py
 
       - name: Discover the generated-obligation fixture corpus through the same Kani compiler path
         run: |

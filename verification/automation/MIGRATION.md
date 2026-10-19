@@ -61,3 +61,28 @@ stdout surface.
 
 CI exercises `prepare` against all real valid, invalid, unsupported, and contract fixture
 crates. The restricted Rust-to-Verus translator remains untouched.
+
+## Fourth slice: reviewed binding preparation and typed CLI routing
+
+`ReviewedBindingPreparation` composes `AutomationPreparation` with the existing
+`verification/tools/bind_kani_verus.py bind` implementation. KVerus does not duplicate
+the registry mapping or its proof-credit rules. The new
+`prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>` command:
+
+1. performs metadata-only Kani discovery, normalization, and planning through the
+   existing CGP preparation component;
+2. invokes the existing reviewed Kani-to-Verus binder through `PythonToolRunner`;
+3. validates the binder's public schema/status/engine/no-Kani-credit/nonempty-selected/
+   empty-unresolved invariants;
+4. writes `verus-binding.json` and `reviewed-preparation-receipt.json`;
+5. explicitly records `verus_campaign_checked = false` and `proof_credit = false`.
+
+This is preparation for the existing reviewed Verus concurrency campaign, not a new
+translation theorem and not proof completion.
+
+The CLI surface is also now modeled by the CGP `CommandCatalog` and
+`CommandRouter` components. `main.rs` receives a typed `AutomationCommand` instead
+of parsing flag strings itself. Static command names are converted to Rust-style
+identifiers and replayed through `proc_macro2` plus the safe `synthez::ToTokens`
+wrapper, giving the command catalog the same unsafe-free macro boundary as contract
+token diagnostics. `arcane-rs/delegation` remains intentionally excluded.

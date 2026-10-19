@@ -1,7 +1,8 @@
 #![forbid(unsafe_code)]
 
 use destiny_verification_automation::{
-    CanBuildAutomationPlan, CanPrepareAutomation, CanRunPythonTool, DEFAULT_ENGINE,
+    AutomationCommand, CanBuildAutomationPlan, CanDescribeCommands, CanPrepareAutomation,
+    CanPrepareReviewedBinding, CanRouteCommand, CanRunPythonTool, DEFAULT_ENGINE,
     DiscoveryReport, KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata,
     parse_metadata,
 };
@@ -11,13 +12,13 @@ use std::{
     process::{ExitCode, ExitStatus},
 };
 
-fn usage() -> ! {
+fn usage(reason: &str) -> ! {
+    eprintln!("{reason}");
     eprintln!(
-        "usage: destiny-verification-automation \
-         doctor | setup | discover <kani-metadata.json> | list <kani-metadata.json> | \
-         plan <kani-metadata.json> | prepare --manifest-path <Cargo.toml> \
-         --output-dir <dir> | explain | verify <verus-subset args...> | \
-         replay-kani-reference <replay args...>"
+        "{}",
+        KVerusContext
+            .command_usage()
+            .expect("static KVerus command catalog must remain valid")
     );
     std::process::exit(2);
 }
@@ -107,20 +108,18 @@ fn plan(path: &str) -> ExitCode {
     }
 }
 
-fn prepare(mut args: impl Iterator<Item = String>) -> ExitCode {
-    let mut manifest_path = None;
-    let mut output_dir = None;
-    while let Some(argument) = args.next() {
-        match argument.as_str() {
-            "--manifest-path" if manifest_path.is_none() => manifest_path = args.next(),
-            "--output-dir" if output_dir.is_none() => output_dir = args.next(),
-            _ => usage(),
+fn prepare(manifest_path: &str, output_dir: &str) -> ExitCode {
+    match KVerusContext.prepare_automation(manifest_path, output_dir) {
+        Ok(receipt) => emit_json(&receipt),
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
         }
     }
-    let (Some(manifest_path), Some(output_dir)) = (manifest_path, output_dir) else {
-        usage()
-    };
-    match KVerusContext.prepare_automation(&manifest_path, &output_dir) {
+}
+
+fn prepare_reviewed(manifest_path: &str, output_dir: &str) -> ExitCode {
+    match KVerusContext.prepare_reviewed_binding(manifest_path, output_dir) {
         Ok(receipt) => emit_json(&receipt),
         Err(error) => {
             eprintln!("{error}");
@@ -130,42 +129,39 @@ fn prepare(mut args: impl Iterator<Item = String>) -> ExitCode {
 }
 
 fn main() -> ExitCode {
-    let mut args = env::args().skip(1);
-    match args.next().as_deref() {
-        Some("doctor") if args.next().is_none() => {
+    let args = env::args().skip(1).collect::<Vec<_>>();
+    let command = KVerusContext
+        .route_command(&args)
+        .unwrap_or_else(|error| usage(&error));
+
+    match command {
+        AutomationCommand::Doctor => {
             println!(
                 "{{\"default_engine\":\"{DEFAULT_ENGINE}\",\"kani_source_commit\":\"{KANI_SOURCE_COMMIT}\",\"proof_credit\":false}}"
             );
             ExitCode::SUCCESS
         }
-        Some("setup") if args.next().is_none() => setup(),
-        Some("discover" | "list") => {
-            let Some(path) = args.next() else { usage() };
-            if args.next().is_some() {
-                usage()
-            }
-            discovery(&path)
-        }
-        Some("plan") => {
-            let Some(path) = args.next() else { usage() };
-            if args.next().is_some() {
-                usage()
-            }
-            plan(&path)
-        }
-        Some("prepare") => prepare(args),
-        Some("explain") if args.next().is_none() => {
+        AutomationCommand::Setup => setup(),
+        AutomationCommand::Discover { path } => discovery(&path),
+        AutomationCommand::Plan { path } => plan(&path),
+        AutomationCommand::Prepare {
+            manifest_path,
+            output_dir,
+        } => prepare(&manifest_path, &output_dir),
+        AutomationCommand::PrepareReviewed {
+            manifest_path,
+            output_dir,
+        } => prepare_reviewed(&manifest_path, &output_dir),
+        AutomationCommand::Explain => {
             print!("{}", include_str!("../capabilities.json"));
             ExitCode::SUCCESS
         }
-        Some("verify") => {
-            let mut forwarded = vec!["verify".to_string()];
-            forwarded.extend(args);
-            delegate("verification/tools/verus_subset.py", forwarded)
+        AutomationCommand::Verify { mut args } => {
+            args.insert(0, "verify".to_string());
+            delegate("verification/tools/verus_subset.py", args)
         }
-        Some("replay-kani-reference") => {
-            delegate("verification/tools/replay_kani_fixture.py", args.collect::<Vec<_>>())
+        AutomationCommand::ReplayKaniReference { args } => {
+            delegate("verification/tools/replay_kani_fixture.py", args)
         }
-        _ => usage(),
     }
 }

@@ -1,7 +1,8 @@
 use crate::{
-    AutomationPlan, ContractDiscovery, ContractPlan, DEFAULT_ENGINE, DiscoveryCandidate,
-    DiscoveryDisposition, DiscoveryReport, KANI_SOURCE_COMMIT, PlanCounts,
-    PlannedContractClause, PreparationReceipt,
+    AutomationCommand, AutomationPlan, CommandDescriptor, ContractDiscovery, ContractPlan,
+    DEFAULT_ENGINE, DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport,
+    KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause, PreparationReceipt,
+    ReviewedPreparationReceipt,
 };
 use cgp::prelude::*;
 use kani_metadata::{
@@ -41,13 +42,159 @@ impl MetadataEnvelope {
 /// requiring KVerus to permit unsafe code.
 #[derive(ToTokens)]
 #[to_tokens(append(render))]
-struct ValidatedClauseTokens {
+struct SafeTokenReplay {
     tokens: TokenStream,
 }
 
-impl ValidatedClauseTokens {
+impl SafeTokenReplay {
     fn render(&self) -> TokenStream {
         self.tokens.clone()
+    }
+}
+
+#[cgp_component(CommandCatalog)]
+pub trait CanDescribeCommands {
+    fn command_descriptors(&self) -> Result<Vec<CommandDescriptor>, String>;
+    fn command_usage(&self) -> Result<String, String>;
+}
+
+#[cgp_impl(new StaticCommandCatalog)]
+impl CommandCatalog {
+    fn command_descriptors(&self) -> Result<Vec<CommandDescriptor>, String> {
+        const COMMANDS: &[(&str, &str, &str)] = &[
+            ("doctor", "doctor", "diagnostics"),
+            ("setup", "setup", "bootstrap"),
+            ("discover", "discover <kani-metadata.json>", "discovery"),
+            ("list", "list <kani-metadata.json>", "discovery"),
+            ("plan", "plan <kani-metadata.json>", "planning"),
+            (
+                "prepare",
+                "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
+                "planning",
+            ),
+            (
+                "prepare-reviewed",
+                "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>",
+                "reviewed_binding",
+            ),
+            ("explain", "explain", "diagnostics"),
+            ("verify", "verify <verus-subset args...>", "verification"),
+            (
+                "replay-kani-reference",
+                "replay-kani-reference <replay args...>",
+                "reference",
+            ),
+        ];
+
+        COMMANDS
+            .iter()
+            .map(|(name, synopsis, category)| {
+                let rust_name = name.replace('-', "_");
+                let ident = syn::parse_str::<syn::Ident>(&rust_name).map_err(|error| {
+                    format!("invalid static KVerus command identifier {name:?}: {error}")
+                })?;
+                let tokens = quote!(#ident);
+                let replay = SafeTokenReplay { tokens };
+                let canonical_token = quote!(#replay).to_string();
+
+                Ok(CommandDescriptor {
+                    name: (*name).to_string(),
+                    synopsis: (*synopsis).to_string(),
+                    category: (*category).to_string(),
+                    canonical_token,
+                    proof_credit: false,
+                })
+            })
+            .collect()
+    }
+
+    fn command_usage(&self) -> Result<String, String> {
+        let commands = self.command_descriptors()?;
+        Ok(format!(
+            "usage: destiny-verification-automation {}",
+            commands
+                .iter()
+                .map(|command| command.synopsis.as_str())
+                .collect::<Vec<_>>()
+                .join(" | ")
+        ))
+    }
+}
+
+#[cgp_component(CommandRouter)]
+pub trait CanRouteCommand {
+    fn route_command(&self, args: &[String]) -> Result<AutomationCommand, String>;
+}
+
+#[cgp_impl(new StaticCommandRouter)]
+#[uses(CanDescribeCommands)]
+impl CommandRouter {
+    fn route_command(&self, args: &[String]) -> Result<AutomationCommand, String> {
+        let Some(command) = args.first().map(String::as_str) else {
+            return Err("missing command".into());
+        };
+        let rest = &args[1..];
+
+        match command {
+            "doctor" if rest.is_empty() => Ok(AutomationCommand::Doctor),
+            "setup" if rest.is_empty() => Ok(AutomationCommand::Setup),
+            "discover" | "list" if rest.len() == 1 => Ok(AutomationCommand::Discover {
+                path: rest[0].clone(),
+            }),
+            "plan" if rest.len() == 1 => Ok(AutomationCommand::Plan {
+                path: rest[0].clone(),
+            }),
+            "prepare" => {
+                let (manifest_path, output_dir) = parse_manifest_output_args(rest)?;
+                Ok(AutomationCommand::Prepare {
+                    manifest_path,
+                    output_dir,
+                })
+            }
+            "prepare-reviewed" => {
+                let (manifest_path, output_dir) = parse_manifest_output_args(rest)?;
+                Ok(AutomationCommand::PrepareReviewed {
+                    manifest_path,
+                    output_dir,
+                })
+            }
+            "explain" if rest.is_empty() => Ok(AutomationCommand::Explain),
+            "verify" => Ok(AutomationCommand::Verify {
+                args: rest.to_vec(),
+            }),
+            "replay-kani-reference" => Ok(AutomationCommand::ReplayKaniReference {
+                args: rest.to_vec(),
+            }),
+            _ => Err(format!(
+                "invalid KVerus command invocation; {}",
+                self.command_usage()?
+            )),
+        }
+    }
+}
+
+fn parse_manifest_output_args(args: &[String]) -> Result<(String, String), String> {
+    let mut manifest_path = None;
+    let mut output_dir = None;
+    let mut index = 0;
+
+    while index < args.len() {
+        let flag = args[index].as_str();
+        let value = args
+            .get(index + 1)
+            .ok_or_else(|| format!("missing value for {flag}"))?
+            .clone();
+        match flag {
+            "--manifest-path" if manifest_path.is_none() => manifest_path = Some(value),
+            "--output-dir" if output_dir.is_none() => output_dir = Some(value),
+            _ => return Err(format!("unexpected or duplicate argument {flag}")),
+        }
+        index += 2;
+    }
+
+    match (manifest_path, output_dir) {
+        (Some(manifest_path), Some(output_dir)) => Ok((manifest_path, output_dir)),
+        _ => Err("both --manifest-path and --output-dir are required".into()),
     }
 }
 
@@ -112,7 +259,7 @@ impl ContractClauseSyntax {
             }
         }
 
-        let validated = ValidatedClauseTokens {
+        let validated = SafeTokenReplay {
             tokens: tokens.clone(),
         };
         let replay = quote!(#validated);
@@ -495,6 +642,108 @@ impl AutomationPreparation {
     }
 }
 
+#[derive(Deserialize)]
+struct ReviewedBindingReceipt {
+    schema: u32,
+    status: String,
+    default_engine: String,
+    kani_proof_credit: bool,
+    selected: Vec<serde_json::Value>,
+    controller_obligations: Vec<String>,
+    contract_inventory_count: usize,
+    contract_clause_count: usize,
+    unresolved: Vec<serde_json::Value>,
+}
+
+#[cgp_component(ReviewedBindingPreparation)]
+pub trait CanPrepareReviewedBinding {
+    fn prepare_reviewed_binding(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+    ) -> Result<ReviewedPreparationReceipt, String>;
+}
+
+#[cgp_impl(new KaniReviewedBindingPreparation)]
+#[uses(CanPrepareAutomation, CanRunPythonTool, CanReadWriteArtifacts)]
+impl ReviewedBindingPreparation {
+    fn prepare_reviewed_binding(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+    ) -> Result<ReviewedPreparationReceipt, String> {
+        let preparation = self.prepare_automation(manifest_path, output_dir)?;
+        let output_dir_path = PathBuf::from(output_dir);
+        let binding_path = output_dir_path.join("verus-binding.json");
+        let receipt_path = output_dir_path.join("reviewed-preparation-receipt.json");
+
+        let args = vec![
+            "bind".to_string(),
+            "--normalized".to_string(),
+            preparation.discovery_path.clone(),
+            "--output".to_string(),
+            binding_path.display().to_string(),
+        ];
+        let output = self
+            .run_python_tool_output("verification/tools/bind_kani_verus.py", &args)
+            .map_err(|error| format!("failed to execute reviewed Verus binder: {error}"))?;
+
+        if !output.status.success() {
+            return Err(format!(
+                "reviewed Verus binding failed with {}: {} {}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout).trim(),
+                String::from_utf8_lossy(&output.stderr).trim()
+            ));
+        }
+
+        let binding_bytes = self
+            .read_artifact(&binding_path)
+            .map_err(|error| format!("cannot read {}: {error}", binding_path.display()))?;
+        let binding: ReviewedBindingReceipt =
+            serde_json::from_slice(&binding_bytes).map_err(|error| {
+                format!("cannot parse {}: {error}", binding_path.display())
+            })?;
+
+        if binding.schema != 1
+            || binding.status != "BOUND_FOR_VERUS"
+            || binding.default_engine != DEFAULT_ENGINE
+            || binding.kani_proof_credit
+            || binding.selected.is_empty()
+            || !binding.unresolved.is_empty()
+        {
+            return Err(format!(
+                "reviewed binder receipt violated KVerus preparation invariants:                  schema={}, status={}, engine={}, kani_proof_credit={}, selected={}, unresolved={}",
+                binding.schema,
+                binding.status,
+                binding.default_engine,
+                binding.kani_proof_credit,
+                binding.selected.len(),
+                binding.unresolved.len()
+            ));
+        }
+
+        let receipt = ReviewedPreparationReceipt {
+            schema: 1,
+            status: "KVERUS_REVIEWED_BINDING_PREPARED",
+            default_engine: DEFAULT_ENGINE,
+            proof_credit: false,
+            verus_campaign_checked: false,
+            preparation,
+            binding_path: binding_path.display().to_string(),
+            binding_status: binding.status,
+            selected_count: binding.selected.len(),
+            unresolved_count: binding.unresolved.len(),
+            controller_obligation_count: binding.controller_obligations.len(),
+            contract_inventory_count: binding.contract_inventory_count,
+            contract_clause_count: binding.contract_clause_count,
+        };
+        self.write_artifact(&receipt_path, &pretty_json_bytes(&receipt)?)
+            .map_err(|error| format!("cannot write {}: {error}", receipt_path.display()))?;
+        Ok(receipt)
+    }
+}
+
 fn pretty_json_bytes(value: &impl Serialize) -> Result<Vec<u8>, String> {
     let mut bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
     bytes.push(b'\n');
@@ -505,6 +754,10 @@ pub struct KVerusContext;
 
 delegate_and_check_components! {
     KVerusContext {
+        CommandCatalogComponent:
+            StaticCommandCatalog,
+        CommandRouterComponent:
+            StaticCommandRouter,
         MetadataParserComponent:
             JsonMetadataParser,
         ContractClauseSyntaxComponent:
@@ -523,6 +776,8 @@ delegate_and_check_components! {
             StdArtifactStore,
         AutomationPreparationComponent:
             KaniAutomationPreparation,
+        ReviewedBindingPreparationComponent:
+            KaniReviewedBindingPreparation,
     }
 }
 

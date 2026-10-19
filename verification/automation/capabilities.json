@@ -109,5 +109,30 @@
     ],
     "kani_backend_execution": "CBMC/GOTO remain forbidden by the reused metadata-only discovery tool",
     "proof_credit": false
+  },
+  "reviewed_binding_preparation": {
+    "command": "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP ReviewedBindingPreparation composes AutomationPreparation with the existing bind_kani_verus.py reviewed mapping",
+    "validates": [
+      "binder schema 1",
+      "status BOUND_FOR_VERUS",
+      "default engine remains verus",
+      "Kani proof credit remains false",
+      "selected reviewed mapping is nonempty",
+      "unresolved reviewed mapping is empty"
+    ],
+    "emits": [
+      "verus-binding.json",
+      "reviewed-preparation-receipt.json"
+    ],
+    "verus_campaign_checked": false,
+    "proof_credit": false
+  },
+  "cli": {
+    "architecture": "CGP CommandCatalog + CommandRouter",
+    "command_identity": "validated and canonically rendered through proc_macro2 + safe arcane-rs/synthez ToTokens replay",
+    "string_parsing_in_main": false,
+    "unsafe_code": false
   }
 }
