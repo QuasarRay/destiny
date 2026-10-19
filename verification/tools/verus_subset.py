@@ -977,12 +977,13 @@ def verify(
             "proof_credit": False,
         }
 
-    generated_text = lower_function(function, source_path, manifest.parent)
+    contract = contract_for_function(discovery_path, requested, function)
+    generated_text = lower_function(function, source_path, manifest.parent, contract)
     assertion_paths = collect_assertion_paths(function.body)
     assumption_witnesses = collect_assumption_witnesses(function.body)
     nonvacuity_text = (
-        lower_nonvacuity(function, assumption_witnesses)
-        if assumption_witnesses
+        lower_nonvacuity(function, assumption_witnesses, contract.requires)
+        if assumption_witnesses or contract.requires
         else None
     )
     tracked = {
@@ -1013,6 +1014,13 @@ def verify(
             {"parameter": parameter, "concrete_type": concrete}
             for parameter, concrete in function.selected_generic_args
         ],
+        "contract_clauses": [
+            {"kind": kind, "expression": expression}
+            for kind, expression in contract.clauses
+        ],
+        "contract_requires": [expr.text for expr in contract.requires],
+        "contract_ensures": [expr.text for expr in contract.ensures],
+        "contract_precondition_nonvacuity": bool(contract.requires),
         "source_assert_lines": collect_assert_lines(function.body),
         "generated_assert_count": generated_text.count("assert("),
         "generated_sha256": sha256_bytes(generated_text.encode()),
@@ -1038,6 +1046,9 @@ def verify(
             "Kani assumptions are preserved at their source program point; Verus checks that each otherwise feasible path remains satisfiable after the assumption. Arithmetic-dependent assumption reachability is rejected rather than ghost-widened.",
             "Machine +,-,* are accepted only in executable branch conditions, where Verus checks fixed-width overflow; ghost assertion/assumption arithmetic remains rejected to prevent widening drift.",
             "Generic source functions are accepted only when pinned Kani selected an explicit primitive monomorphic instance; that exact substitution is recorded and no generic theorem is claimed.",
+            "Function-contract clauses come from Kani's compiler metadata after Kani's proc-macro parser; source attributes are stripped only so the restricted body parser can reach the decorated function.",
+            "The initial contract bridge accepts only non-arithmetic requires expressions and unit-result ensures closures of the form |_| predicate; modifies/old/references/calls remain rejected.",
+            "Every accepted requires set gets a separate Verus existential satisfiability proof before the contract-bearing function can receive proof credit.",
             "Verus, its vstd contracts, Rust toolchain and solver remain verifier trust boundaries.",
         ],
     }
@@ -1118,7 +1129,7 @@ def verify(
             nonvacuity_obligation = {
                 "method": "verus",
                 "entry": str(nonvacuity),
-                "expected_checks": len(assumption_witnesses),
+                "expected_checks": len(assumption_witnesses) + (1 if contract.requires else 0),
             }
             nonvacuity_checked = checked_output(nonvacuity_obligation, nonvacuity_proxy)
         except (ImportError, RuntimeError, ValueError, VerificationError) as error:
