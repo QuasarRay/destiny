@@ -1,175 +1,44 @@
 #![forbid(unsafe_code)]
 
-use kani_metadata::{AutoHarnessSkipReason, ContractClause, KaniMetadata};
-use serde::{Deserialize, Serialize};
+mod components;
+mod model;
+
+pub use components::{
+    CanNormalizeMetadata, CanParseMetadataBytes, CanValidateContractClause, KVerusContext,
+};
+pub use model::{
+    ContractDiscovery, DiscoveryCandidate, DiscoveryDisposition, DiscoveryReport,
+};
+
+use cgp::prelude::*;
+use kani_metadata::KaniMetadata;
 use std::io::Read;
 
 pub const DEFAULT_ENGINE: &str = "verus";
 pub const KANI_SOURCE_COMMIT: &str = "0d2328a93f0e0ff66132d6bfa1a7d884877cf862";
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum DiscoveryDisposition {
-    KaniEligible,
-    Excluded,
-    Unsupported,
-    Blocked,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct DiscoveryCandidate {
-    pub crate_name: String,
-    pub function: String,
-    pub disposition: DiscoveryDisposition,
-    pub reason: String,
-    pub provenance: &'static str,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct ContractDiscovery {
-    pub crate_name: String,
-    pub function: String,
-    pub file: String,
-    pub harnesses: Vec<String>,
-    pub clauses: Vec<ContractClause>,
-    pub provenance: &'static str,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct DiscoveryReport {
-    pub default_engine: &'static str,
-    pub kani_source_commit: &'static str,
-    pub crates_with_autoharness_metadata: usize,
-    pub candidates: Vec<DiscoveryCandidate>,
-    pub contracted_functions: Vec<ContractDiscovery>,
-    pub proof_credit: bool,
-}
-
-#[derive(Deserialize)]
-#[serde(untagged)]
-enum MetadataEnvelope {
-    One(KaniMetadata),
-    Many(Vec<KaniMetadata>),
-}
-
+/// Compatibility facade retained during the incremental CGP migration.
+///
+/// The actual JSON parser is selected by `KVerusContext` through CGP.
 pub fn parse_metadata(mut reader: impl Read) -> Result<Vec<KaniMetadata>, serde_json::Error> {
     let mut bytes = Vec::new();
     reader.read_to_end(&mut bytes).map_err(serde_json::Error::io)?;
-    match serde_json::from_slice::<MetadataEnvelope>(&bytes)? {
-        MetadataEnvelope::One(md) => Ok(vec![md]),
-        MetadataEnvelope::Many(md) => Ok(md),
-    }
+    KVerusContext.parse_metadata_bytes(&bytes)
 }
 
+/// Compatibility facade retained for existing Python/CLI callers.
+///
+/// Normalization and clause-boundary validation are now CGP-owned components.
 pub fn normalize_autoharness_metadata(metadata: &[KaniMetadata]) -> DiscoveryReport {
-    let mut candidates = Vec::new();
-    let mut contracted_functions = Vec::new();
-    let mut crates_with_autoharness_metadata = 0;
-
-    for md in metadata {
-        if let Some(auto) = &md.autoharness_md {
-            crates_with_autoharness_metadata += 1;
-
-            for function in &auto.chosen {
-                candidates.push(DiscoveryCandidate {
-                    crate_name: md.crate_name.clone(),
-                    function: function.clone(),
-                    disposition: DiscoveryDisposition::KaniEligible,
-                    reason: "Kani generated an automatic harness; Verus support must still be established by the capability registry".into(),
-                    provenance: "kani_metadata::AutoHarnessMetadata::chosen",
-                });
-            }
-
-            for (function, reason) in &auto.skipped {
-                let (disposition, explanation) = classify_skip(reason);
-                candidates.push(DiscoveryCandidate {
-                    crate_name: md.crate_name.clone(),
-                    function: function.clone(),
-                    disposition,
-                    reason: explanation,
-                    provenance: "kani_metadata::AutoHarnessMetadata::skipped",
-                });
-            }
-        }
-
-        for contract in &md.contracted_functions {
-            contracted_functions.push(ContractDiscovery {
-                crate_name: md.crate_name.clone(),
-                function: contract.function.clone(),
-                file: contract.file.clone(),
-                harnesses: contract.harnesses.clone(),
-                clauses: contract.clauses.clone(),
-                provenance: "kani_metadata::KaniMetadata::contracted_functions",
-            });
-        }
-    }
-
-    candidates.sort_by(|a, b| {
-        (&a.crate_name, &a.function).cmp(&(&b.crate_name, &b.function))
-    });
-    contracted_functions.sort_by(|a, b| {
-        (&a.crate_name, &a.function, &a.file, &a.harnesses, &a.clauses)
-            .cmp(&(&b.crate_name, &b.function, &b.file, &b.harnesses, &b.clauses))
-    });
-    contracted_functions.dedup_by(|a, b| {
-        a.crate_name == b.crate_name
-            && a.function == b.function
-            && a.file == b.file
-            && a.harnesses == b.harnesses
-            && a.clauses == b.clauses
-    });
-
-    DiscoveryReport {
-        default_engine: DEFAULT_ENGINE,
-        kani_source_commit: KANI_SOURCE_COMMIT,
-        crates_with_autoharness_metadata,
-        candidates,
-        contracted_functions,
-        proof_credit: false,
-    }
-}
-
-fn classify_skip(reason: &AutoHarnessSkipReason) -> (DiscoveryDisposition, String) {
-    match reason {
-        AutoHarnessSkipReason::KaniImpl => (
-            DiscoveryDisposition::Excluded,
-            "Kani-internal implementation or existing harness".into(),
-        ),
-        AutoHarnessSkipReason::UserFilter => (
-            DiscoveryDisposition::Excluded,
-            "excluded by the user's autoharness filter".into(),
-        ),
-        AutoHarnessSkipReason::NoBody => (
-            DiscoveryDisposition::Unsupported,
-            "function has no body".into(),
-        ),
-        AutoHarnessSkipReason::GenericFn(detail) => (
-            DiscoveryDisposition::Unsupported,
-            format!("generic function is not automatically instantiable: {detail}"),
-        ),
-        AutoHarnessSkipReason::MissingArbitraryImpl(args) => (
-            DiscoveryDisposition::Unsupported,
-            format!("Kani cannot construct unbounded arbitrary arguments: {}", format_args(args)),
-        ),
-        AutoHarnessSkipReason::RequiresBoundedArguments(args) => (
-            DiscoveryDisposition::Blocked,
-            format!("requires explicit bounded-argument scope: {}", format_args(args)),
-        ),
-    }
-}
-
-fn format_args(args: &[(String, String)]) -> String {
-    args.iter()
-        .map(|(name, typ)| format!("{name}: {typ}"))
-        .collect::<Vec<_>>()
-        .join(", ")
+    KVerusContext.normalize_metadata(metadata)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use kani_metadata::{
-        AutoHarnessMetadata, AutoHarnessSkipReason, ContractClauseKind, ContractedFunction,
+        AutoHarnessMetadata, AutoHarnessSkipReason, ContractClause, ContractClauseKind,
+        ContractedFunction,
     };
     use std::collections::{BTreeMap, BTreeSet};
 
@@ -273,5 +142,20 @@ mod tests {
         let bytes = serde_json::to_vec(&vec![metadata(), metadata()]).unwrap();
         let parsed = parse_metadata(bytes.as_slice()).unwrap();
         assert_eq!(parsed.len(), 2);
+    }
+
+    #[test]
+    fn proc_macro2_and_synthez_validate_contract_clause_syntax() {
+        let valid = ContractClause {
+            kind: ContractClauseKind::Ensures,
+            expression: "|result: &u8| *result == 1".to_string(),
+        };
+        assert!(KVerusContext.validate_contract_clause(&valid).is_ok());
+
+        let invalid = ContractClause {
+            kind: ContractClauseKind::Requires,
+            expression: "x +".to_string(),
+        };
+        assert!(KVerusContext.validate_contract_clause(&invalid).is_err());
     }
 }
