@@ -1549,7 +1549,7 @@ diff --git a/kani-driver/src/project.rs b/kani-driver/src/project.rs
 diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 --- a/library/kani_macros/src/sysroot/contracts/bootstrap.rs
 +++ b/library/kani_macros/src/sysroot/contracts/bootstrap.rs
-@@ -1,180 +1,274 @@
+@@ -1,180 +1,272 @@
 -// Copyright Kani Contributors
 -// SPDX-License-Identifier: Apache-2.0 OR MIT
 -
@@ -1784,9 +1784,7 @@ diff --git a/library/kani_macros/src/sysroot/contracts/bootstrap.rs b/library/ka
 +        let directory = if let Some(directory) = std::env::var_os("KVERUS_CONTRACT_CLAUSE_DIR") {
 +            std::path::PathBuf::from(directory)
 +        } else {
-+            std::env::current_dir()
-+                .expect("failed to resolve KVerus contract-clause working directory")
-+                .join("kani-contract-clauses")
++            std::env::temp_dir().join("kverus-contract-clauses")
 +        };
 +        std::fs::create_dir_all(&directory)
 +            .expect("failed to create KVerus contract-clause evidence directory");

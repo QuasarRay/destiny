@@ -146,9 +146,11 @@ def main() -> int:
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
     clause_dir = out / "kani-contract-clauses"
-    if clause_dir.exists():
-        shutil.rmtree(clause_dir)
-    clause_dir.mkdir(parents=True)
+    fallback_clause_dir = Path(tempfile.gettempdir()) / "kverus-contract-clauses"
+    for directory in (clause_dir, fallback_clause_dir):
+        if directory.exists():
+            shutil.rmtree(directory)
+        directory.mkdir(parents=True)
     forbidden_log = out / "forbidden-backend-tools.log"
     if forbidden_log.exists():
         forbidden_log.unlink()
@@ -204,6 +206,17 @@ def main() -> int:
         combined.append(payload)
 
     clause_evidence = read_clause_evidence(clause_dir)
+    fallback_clause_evidence = read_clause_evidence(fallback_clause_dir)
+    seen_evidence = {
+        (record["crate_name"], record["function"], record["kind"], record["expression"])
+        for record in clause_evidence
+    }
+    clause_evidence.extend(
+        record
+        for record in fallback_clause_evidence
+        if (record["crate_name"], record["function"], record["kind"], record["expression"])
+        not in seen_evidence
+    )
     bind_clause_evidence(combined, clause_evidence)
 
     combined_path = out / "kani-metadata.json"
@@ -230,6 +243,7 @@ def main() -> int:
         "contract_clause_evidence": {
             "source": "patched_kani_macros_syn_parser",
             "directory": str(clause_dir.relative_to(ROOT)),
+            "fallback_directory": str(fallback_clause_dir),
             "proof_credit": False,
             "records": clause_evidence,
         },
