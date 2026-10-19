@@ -260,8 +260,42 @@ class TranslatorTests(unittest.TestCase):
             with self.assertRaises(vk.Unsupported):
                 vk.contract_for_function(discovery, "identity", function)
 
-    def test_scalar_result_contract_arithmetic_remains_rejected(self):
+    def test_scalar_result_contract_checked_unsigned_arithmetic_gets_guard(self):
         function = self.parse("pub fn identity(x: u8) -> u8 { x }\n")[0]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "lib.rs"
+            source.write_text("pub fn identity(x: u8) -> u8 { x }\n")
+            discovery = root / "discovery.json"
+            discovery.write_text(json.dumps({
+                "contracted_functions": [{
+                    "function": "identity",
+                    "file": "src/lib.rs",
+                    "harnesses": [],
+                    "clauses": [
+                        {"kind": "requires", "expression": "x < 255"},
+                        {
+                            "kind": "ensures",
+                            "expression": "|result: &u8| *result == x + 1",
+                        },
+                    ],
+                }],
+            }))
+            contract = vk.contract_for_function(discovery, "identity", function)
+            lowered = vk.lower_function(function, source, root, contract)
+        self.assertEqual([expr.text for expr in contract.requires], ["(x < 255)"])
+        self.assertEqual(len(contract.arithmetic_guards), 1)
+        guard = contract.arithmetic_guards[0]
+        self.assertEqual(guard.clause_kind, "ensures")
+        self.assertEqual(guard.guard, "(x <= 254)")
+        self.assertEqual(guard.rust_type, "u8")
+        self.assertEqual(guard.operator, "+")
+        self.assertIn("(x <= 254)", contract.ensures[0].text)
+        self.assertIn("(__destiny_result == (x + 1))", contract.ensures[0].text)
+        self.assertIn("(x <= 254)", lowered)
+
+    def test_signed_contract_arithmetic_remains_rejected(self):
+        function = self.parse("pub fn identity(x: i8) -> i8 { x }\n")[0]
         with tempfile.TemporaryDirectory() as directory:
             discovery = Path(directory) / "discovery.json"
             discovery.write_text(json.dumps({
@@ -271,12 +305,23 @@ class TranslatorTests(unittest.TestCase):
                     "harnesses": [],
                     "clauses": [{
                         "kind": "ensures",
-                        "expression": "|result: &u8| *result + 1 > x",
+                        "expression": "|result: &i8| *result == x + 1",
                     }],
                 }],
             }))
             with self.assertRaises(vk.Unsupported):
                 vk.contract_for_function(discovery, "identity", function)
+
+    def test_checked_unsigned_contract_sub_and_mul_guards(self):
+        name_types = {"x": "u8"}
+        sub = vk._checked_unsigned_contract_arithmetic_guard(
+            "x - 3 < 10", name_types, "test", "ensures"
+        )
+        mul = vk._checked_unsigned_contract_arithmetic_guard(
+            "x * 2 <= 200", name_types, "test", "ensures"
+        )
+        self.assertEqual(sub.guard, "(x >= 3)")
+        self.assertEqual(mul.guard, "(x <= 127)")
 
     def test_selected_generic_return_type_is_substituted(self):
         function = self.parse("pub fn generic_return<T>(x: T) -> T { x }\n")[0]
