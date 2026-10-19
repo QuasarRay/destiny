@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use kani_metadata::{AutoHarnessSkipReason, KaniMetadata};
+use kani_metadata::{AutoHarnessSkipReason, ContractClause, ContractClauseKind, KaniMetadata};
 use serde::{Deserialize, Serialize};
 use std::io::Read;
 
@@ -31,6 +31,7 @@ pub struct ContractDiscovery {
     pub function: String,
     pub file: String,
     pub harnesses: Vec<String>,
+    pub clauses: Vec<ContractClause>,
     pub provenance: &'static str,
 }
 
@@ -97,6 +98,7 @@ pub fn normalize_autoharness_metadata(metadata: &[KaniMetadata]) -> DiscoveryRep
                 function: contract.function.clone(),
                 file: contract.file.clone(),
                 harnesses: contract.harnesses.clone(),
+                clauses: contract.clauses.clone(),
                 provenance: "kani_metadata::KaniMetadata::contracted_functions",
             });
         }
@@ -106,14 +108,15 @@ pub fn normalize_autoharness_metadata(metadata: &[KaniMetadata]) -> DiscoveryRep
         (&a.crate_name, &a.function).cmp(&(&b.crate_name, &b.function))
     });
     contracted_functions.sort_by(|a, b| {
-        (&a.crate_name, &a.function, &a.file, &a.harnesses)
-            .cmp(&(&b.crate_name, &b.function, &b.file, &b.harnesses))
+        (&a.crate_name, &a.function, &a.file, &a.harnesses, &a.clauses)
+            .cmp(&(&b.crate_name, &b.function, &b.file, &b.harnesses, &b.clauses))
     });
     contracted_functions.dedup_by(|a, b| {
         a.crate_name == b.crate_name
             && a.function == b.function
             && a.file == b.file
             && a.harnesses == b.harnesses
+            && a.clauses == b.clauses
     });
 
     DiscoveryReport {
@@ -192,6 +195,16 @@ mod tests {
                 function: "crate::good".to_string(),
                 file: "src/lib.rs".to_string(),
                 harnesses: vec!["crate::good_contract".to_string()],
+                clauses: vec![
+                    ContractClause {
+                        kind: ContractClauseKind::Requires,
+                        expression: "x".to_string(),
+                    },
+                    ContractClause {
+                        kind: ContractClauseKind::Ensures,
+                        expression: "|_| x".to_string(),
+                    },
+                ],
             }],
             autoharness_md: Some(AutoHarnessMetadata { chosen, skipped }),
         }
@@ -218,6 +231,21 @@ mod tests {
         assert_eq!(
             report.contracted_functions[0].harnesses,
             vec!["crate::good_contract".to_string()]
+        );
+        assert_eq!(report.contracted_functions[0].clauses.len(), 2);
+        assert_eq!(
+            report.contracted_functions[0].clauses[0],
+            ContractClause {
+                kind: ContractClauseKind::Requires,
+                expression: "x".to_string(),
+            }
+        );
+        assert_eq!(
+            report.contracted_functions[0].clauses[1],
+            ContractClause {
+                kind: ContractClauseKind::Ensures,
+                expression: "|_| x".to_string(),
+            }
         );
         assert_eq!(
             report.contracted_functions[0].provenance,
