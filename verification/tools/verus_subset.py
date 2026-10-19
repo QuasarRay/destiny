@@ -28,6 +28,12 @@ CAPABILITIES = ROOT / "verification/automation/capabilities.json"
 SUPPORTED_TYPES = {
     "bool", "u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64",
 }
+UNSIGNED_MAX = {
+    "u8": (1 << 8) - 1,
+    "u16": (1 << 16) - 1,
+    "u32": (1 << 32) - 1,
+    "u64": (1 << 64) - 1,
+}
 TOKEN_RE = re.compile(
     r"""
     (?P<ws>\s+)
@@ -124,10 +130,20 @@ class Function:
 
 
 @dataclasses.dataclass(frozen=True)
+class ContractArithmeticGuard:
+    clause_kind: str
+    expression: str
+    guard: str
+    rust_type: str
+    operator: str
+
+
+@dataclasses.dataclass(frozen=True)
 class ContractSpec:
     clauses: tuple[tuple[str, str], ...]
     requires: tuple[Expr, ...]
     ensures: tuple[Expr, ...]
+    arithmetic_guards: tuple[ContractArithmeticGuard, ...] = ()
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -483,25 +499,162 @@ def parse_source(path: Path) -> list[Function]:
     return Parser(tokenize(strip_kani_contract_attributes(source)), str(path)).parse_file()
 
 
-def parse_contract_expression(text: str, names: set[str], source: str) -> Expr:
+def _strip_outer_contract_parens(tokens: list[Token]) -> list[Token]:
+    while len(tokens) >= 2 and tokens[0].value == "(" and tokens[-1].value == ")":
+        depth = 0
+        wraps_all = True
+        for index, token in enumerate(tokens):
+            if token.value == "(":
+                depth += 1
+            elif token.value == ")":
+                depth -= 1
+                if depth < 0:
+                    raise Unsupported("unbalanced parentheses in Kani contract expression")
+                if depth == 0 and index != len(tokens) - 1:
+                    wraps_all = False
+                    break
+        if depth != 0:
+            raise Unsupported("unbalanced parentheses in Kani contract expression")
+        if not wraps_all:
+            break
+        tokens = tokens[1:-1]
+    return tokens
+
+
+def _checked_unsigned_contract_arithmetic_guard(
+    text: str,
+    name_types: dict[str, str],
+    source: str,
+    clause_kind: str,
+) -> ContractArithmeticGuard:
+    tokens = _strip_outer_contract_parens(
+        [token for token in tokenize(text) if token.kind != "eof"]
+    )
+    depth = 0
+    comparisons = []
+    for index, token in enumerate(tokens):
+        if token.value == "(":
+            depth += 1
+        elif token.value == ")":
+            depth -= 1
+        elif depth == 0 and token.value in {"==", "!=", "<", "<=", ">", ">="}:
+            comparisons.append(index)
+    if depth != 0 or len(comparisons) != 1:
+        raise Unsupported(
+            "checked contract arithmetic currently requires one top-level comparison"
+        )
+
+    comparison = comparisons[0]
+
+    def parse_side(side: list[Token]):
+        side = _strip_outer_contract_parens(side)
+        if len(side) == 1 and side[0].kind in {"ident", "number"}:
+            return ("atom", side[0].value)
+        if (
+            len(side) == 3
+            and side[0].kind in {"ident", "number"}
+            and side[1].value in {"+", "-", "*"}
+            and side[2].kind in {"ident", "number"}
+        ):
+            return ("arithmetic", side[0].value, side[1].value, side[2].value)
+        raise Unsupported(
+            "checked contract arithmetic supports one unsigned scalar/literal operation "
+            "on one side of a comparison"
+        )
+
+    left = parse_side(tokens[:comparison])
+    right = parse_side(tokens[comparison + 1:])
+    arithmetic_sides = [side for side in (left, right) if side[0] == "arithmetic"]
+    if len(arithmetic_sides) != 1:
+        raise Unsupported(
+            "checked contract arithmetic requires exactly one arithmetic subexpression"
+        )
+
+    _, lhs, operator, rhs = arithmetic_sides[0]
+    identifiers = [
+        operand
+        for operand in (lhs, rhs)
+        if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", operand)
+    ]
+    literals = [operand for operand in (lhs, rhs) if operand.isdigit()]
+    if len(identifiers) != 1 or len(literals) != 1:
+        raise Unsupported(
+            "checked contract arithmetic currently requires one unsigned scalar and one "
+            "nonnegative integer literal"
+        )
+
+    name = identifiers[0]
+    rust_type = name_types.get(name)
+    if rust_type not in UNSIGNED_MAX:
+        raise Unsupported(
+            "checked contract arithmetic currently supports only u8/u16/u32/u64 scalars"
+        )
+    literal = int(literals[0])
+    maximum = UNSIGNED_MAX[rust_type]
+    if literal > maximum:
+        raise Unsupported(
+            f"contract arithmetic literal {literal} exceeds {rust_type}::MAX"
+        )
+
+    if operator == "+":
+        guard = f"({name} <= {maximum - literal})"
+    elif operator == "-":
+        guard = f"({name} >= {literal})" if lhs == name else f"({name} <= {literal})"
+    elif operator == "*":
+        guard = "true" if literal == 0 else f"({name} <= {maximum // literal})"
+    else:
+        raise AssertionError(operator)
+
+    return ContractArithmeticGuard(
+        clause_kind=clause_kind,
+        expression=text,
+        guard=guard,
+        rust_type=rust_type,
+        operator=operator,
+    )
+
+
+def parse_contract_expression(
+    text: str,
+    names: set[str],
+    source: str,
+    *,
+    name_types: dict[str, str] | None = None,
+    allow_checked_unsigned_arithmetic: bool = False,
+    clause_kind: str = "contract",
+    arithmetic_guards: list[ContractArithmeticGuard] | None = None,
+) -> Expr:
     parser = Parser(tokenize(text), source)
     parser.allowed_names = set(names)
     expr = parser.parse_expression()
     if parser.current().kind != "eof":
         parser.fail("unexpected tokens after contract expression")
-    if expression_has_machine_arithmetic(expr):
+    if not expression_has_machine_arithmetic(expr):
+        return expr
+    if not allow_checked_unsigned_arithmetic:
         raise Unsupported(
-            "machine arithmetic in Kani function contracts is not in the initial "
-            "KVerus contract subset"
+            "machine arithmetic in Kani requires is rejected because Kani evaluates the "
+            "precondition expression before kani::assume; adding a guard would change its "
+            "overflow semantics"
         )
-    return expr
-
+    if name_types is None:
+        raise Unsupported("checked contract arithmetic is missing scalar type information")
+    guard = _checked_unsigned_contract_arithmetic_guard(
+        text,
+        name_types,
+        source,
+        clause_kind,
+    )
+    if arithmetic_guards is not None:
+        arithmetic_guards.append(guard)
+    return Expr(f"(({guard.guard}) && ({expr.text}))")
 
 def parse_ensures_expression(
     expression: str,
     names: set[str],
     function: Function,
     requested: str,
+    arithmetic_guards: list[ContractArithmeticGuard],
 ) -> Expr:
     closure = re.fullmatch(
         r"\|\s*([A-Za-z_][A-Za-z0-9_]*|_)\s*(?::\s*&\s*([A-Za-z_][A-Za-z0-9_]*))?\s*\|\s*(.+)",
@@ -512,6 +665,7 @@ def parse_ensures_expression(
         raise Unsupported("KVerus ensures support requires a single-result closure")
 
     binder, annotated_type, predicate = closure.groups()
+    parameter_types = dict(function.params)
     if function.return_type is None:
         if binder != "_" or annotated_type is not None:
             raise Unsupported(
@@ -521,6 +675,10 @@ def parse_ensures_expression(
             predicate,
             names,
             f"Kani ensures for {requested}",
+            name_types=parameter_types,
+            allow_checked_unsigned_arithmetic=True,
+            clause_kind="ensures",
+            arithmetic_guards=arithmetic_guards,
         )
 
     if RESULT_BINDER in names:
@@ -535,6 +693,10 @@ def parse_ensures_expression(
             predicate,
             names,
             f"Kani ensures for {requested}",
+            name_types=parameter_types,
+            allow_checked_unsigned_arithmetic=True,
+            clause_kind="ensures",
+            arithmetic_guards=arithmetic_guards,
         )
 
     normalized = re.sub(
@@ -547,12 +709,17 @@ def parse_ensures_expression(
             "scalar Kani ensures result binders may only be read through dereference "
             "(e.g. |result: &u8| *result == x)"
         )
+    result_types = dict(parameter_types)
+    result_types[RESULT_BINDER] = function.return_type
     return parse_contract_expression(
         normalized,
         names | {RESULT_BINDER},
         f"Kani ensures for {requested}",
+        name_types=result_types,
+        allow_checked_unsigned_arithmetic=True,
+        clause_kind="ensures",
+        arithmetic_guards=arithmetic_guards,
     )
-
 
 def contract_for_function(
     discovery_path: Path,
@@ -583,6 +750,7 @@ def contract_for_function(
     normalized = []
     requires = []
     ensures = []
+    arithmetic_guards: list[ContractArithmeticGuard] = []
     for clause in clauses:
         if not isinstance(clause, dict):
             raise VerificationError("malformed Kani contract clause metadata")
@@ -597,6 +765,8 @@ def contract_for_function(
                     expression,
                     names,
                     f"Kani requires for {requested}",
+                    name_types=dict(function.params),
+                    clause_kind="requires",
                 )
             )
         elif kind == "ensures":
@@ -606,6 +776,7 @@ def contract_for_function(
                     names,
                     function,
                     requested,
+                    arithmetic_guards,
                 )
             )
         elif kind == "modifies":
@@ -613,7 +784,12 @@ def contract_for_function(
         else:
             raise VerificationError(f"unknown Kani contract clause kind {kind!r}")
 
-    return ContractSpec(tuple(normalized), tuple(requires), tuple(ensures))
+    return ContractSpec(
+        tuple(normalized),
+        tuple(requires),
+        tuple(ensures),
+        tuple(arithmetic_guards),
+    )
 
 
 def emit_statement(statement: Stmt, indent: str, source: str, output: list[str]) -> None:
@@ -1119,6 +1295,16 @@ def verify(
         ],
         "contract_requires": [expr.text for expr in contract.requires],
         "contract_ensures": [expr.text for expr in contract.ensures],
+        "contract_arithmetic_guards": [
+            {
+                "clause_kind": guard.clause_kind,
+                "expression": guard.expression,
+                "guard": guard.guard,
+                "rust_type": guard.rust_type,
+                "operator": guard.operator,
+            }
+            for guard in contract.arithmetic_guards
+        ],
         "contract_precondition_nonvacuity": bool(contract.requires),
         "source_assert_lines": collect_assert_lines(function.body),
         "generated_assert_count": generated_text.count("assert("),
@@ -1146,7 +1332,7 @@ def verify(
             "Machine +,-,* are accepted only in executable branch conditions, where Verus checks fixed-width overflow; ghost assertion/assumption arithmetic remains rejected to prevent widening drift.",
             "Generic source functions are accepted only when pinned Kani selected an explicit primitive monomorphic instance; that exact substitution is recorded and no generic theorem is claimed.",
             "Function-contract clauses come from Kani's compiler metadata after Kani's proc-macro parser; source attributes are stripped only so the restricted body parser can reach the decorated function.",
-            "The contract bridge accepts non-arithmetic requires expressions plus unit-result |_| postconditions and supported scalar result-reference postconditions; modifies/old/references/calls remain rejected.",
+            "The contract bridge keeps requires arithmetic rejected because Kani evaluates it before assumption; ensures may use one guarded unsigned fixed-width +,-,* literal operation whose Rust-definedness bound is emitted into the Verus postcondition and evidence.",
             "Every accepted requires set gets a separate Verus existential satisfiability proof before the contract-bearing function can receive proof credit.",
             "Verus, its vstd contracts, Rust toolchain and solver remain verifier trust boundaries.",
         ],
