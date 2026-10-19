@@ -64,9 +64,18 @@ class BindingTests(unittest.TestCase):
                     "provenance": "kani_metadata::AutoHarnessMetadata::chosen",
                 },
             ],
+            "contracted_functions": [
+                {
+                    "crate_name": "destiny_original_spec",
+                    "function": "model::assign_flag",
+                    "file": "verification/spec/src/model.rs",
+                    "harnesses": ["model::assign_flag_contract"],
+                    "provenance": "kani_metadata::KaniMetadata::contracted_functions",
+                }
+            ],
         }
 
-    def test_selected_and_unmapped_candidates_are_distinguished(self):
+    def test_selected_unmapped_and_contract_candidates_are_distinguished(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
             reg=self.write(root,"registry.json",self.registry())
@@ -80,6 +89,31 @@ class BindingTests(unittest.TestCase):
         self.assertEqual(classes["model::assign_flag"],"selected")
         self.assertEqual(classes["model::apply_non_negative_setter"],"intentionally_excluded")
         self.assertFalse(result["kani_proof_credit"])
+        self.assertEqual(result["contract_inventory_count"],1)
+        self.assertEqual(
+            result["contract_inventory"][0]["function"],
+            "model::assign_flag",
+        )
+        self.assertFalse(result["contract_inventory"][0]["proof_credit"])
+        self.assertEqual(
+            result["contract_semantics_status"],
+            "metadata_only_not_translated",
+        )
+
+    def test_duplicate_contract_inventory_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            reg=self.write(root,"registry.json",self.registry())
+            normalized=self.normalized()
+            normalized["contracted_functions"].append(
+                dict(normalized["contracted_functions"][0])
+            )
+            norm=self.write(root,"normalized.json",normalized)
+            plan=self.write(root,"plan.json",{
+                "obligations":[{"id":"state-contracts-reviewed-inventory"}]
+            })
+            with self.assertRaises(bridge.BindingError):
+                bridge.bind_discovery(norm,reg,plan)
 
     def test_required_supported_candidate_blocker_is_incomplete(self):
         with tempfile.TemporaryDirectory() as td:
@@ -102,6 +136,7 @@ class BindingTests(unittest.TestCase):
                 "proof_credit":False,
                 "kani_source_commit":bridge.KANI_COMMIT,
                 "candidates":[],
+                "contracted_functions":[],
             })
             plan=self.write(root,"plan.json",{
                 "obligations":[{"id":"state-contracts-reviewed-inventory"}]
@@ -116,6 +151,8 @@ class BindingTests(unittest.TestCase):
                 "status":"BOUND_FOR_VERUS",
                 "kani_proof_credit":False,
                 "controller_obligations":["state-contracts-reviewed-inventory"],
+                "contract_inventory_count":1,
+                "contract_semantics_status":"metadata_only_not_translated",
             })
             campaign=root/"campaign"
             campaign.mkdir()
@@ -126,6 +163,8 @@ class BindingTests(unittest.TestCase):
         self.assertEqual(result["status"],"KANI_SELECTED_VERUS_CHECKED_SCOPED")
         self.assertTrue(result["verus_checked_scoped"])
         self.assertFalse(result["kani_proof_credit"])
+        self.assertEqual(result["contract_inventory_count"],1)
+        self.assertEqual(result["contract_semantics_status"],"metadata_only_not_translated")
 
 
 if __name__ == "__main__":
