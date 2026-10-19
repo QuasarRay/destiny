@@ -786,10 +786,11 @@ def lower_nonvacuity(
             output.append(f"    assert({predicate});")
         output.append("}")
         output.append("")
+    contract_domain = tuple(expr.text for expr in contract_requires)
     for index, witness in enumerate(witnesses):
         output.append(f"proof fn __destiny_nonvacuity_{index}() {{")
-        prefix = _conjunction(witness.prefix_conditions)
-        post = _conjunction(witness.conditions)
+        prefix = _conjunction(contract_domain + witness.prefix_conditions)
+        post = _conjunction(contract_domain + witness.conditions)
         if binders:
             output.append(
                 f"    assert((exists|{binders}| {prefix}) ==> "
