@@ -41,7 +41,7 @@
         {
           "id": "0001-autoharness-metadata-only",
           "path": "verification/vendor/patches/kani/0001-autoharness-metadata-only.patch",
-          "sha256": "77d8612b09162cf1b8602e246329be0731ea9d21c4285c443c285819510b843a",
+          "sha256": "f6f61cccb99c9b31f21b8a977d29b26405aa1a4d1c24a5ca07f2cb1f5c702083",
           "upstream_files": [
             "kani-driver/src/autoharness/mod.rs",
             "kani-driver/src/project.rs",
@@ -54,7 +54,7 @@
             "kani-driver/src/autoharness/mod.rs": "a46c92eff5ea1bb35a1d488d505787256ee70163",
             "kani-driver/src/project.rs": "30be325a9775f1d3784f74d9be6cc5bcd8600c8b",
             "library/kani_macros/src/sysroot/contracts/initialize.rs": "8e4047b6268d97307d62f95a4ba34e7317e766b8",
-            "kani-compiler/src/kani_middle/attributes.rs": "742779f2cbe6fce6a2bdd85f348181f2a578c5b1",
+            "kani-compiler/src/kani_middle/attributes.rs": "dd7cca95092abbbc8eeadf2a911f142c13390349",
             "kani_metadata/src/lib.rs": "b977f1915963f04459f2d9e1222f02638d33518a",
             "kani-compiler/src/kani_middle/metadata.rs": "ae4d6da962005cc08695fa4c428f2745976e5e9d"
           },
