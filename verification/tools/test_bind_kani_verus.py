@@ -70,6 +70,10 @@ class BindingTests(unittest.TestCase):
                     "function": "model::assign_flag",
                     "file": "verification/spec/src/model.rs",
                     "harnesses": ["model::assign_flag_contract"],
+                    "clauses": [
+                        {"kind": "requires", "expression": "value"},
+                        {"kind": "ensures", "expression": "|_| value"},
+                    ],
                     "provenance": "kani_metadata::KaniMetadata::contracted_functions",
                 }
             ],
@@ -95,9 +99,17 @@ class BindingTests(unittest.TestCase):
             "model::assign_flag",
         )
         self.assertFalse(result["contract_inventory"][0]["proof_credit"])
+        self.assertEqual(result["contract_clause_count"],2)
+        self.assertEqual(
+            result["contract_inventory"][0]["clauses"],
+            [
+                {"kind":"requires","expression":"value"},
+                {"kind":"ensures","expression":"|_| value"},
+            ],
+        )
         self.assertEqual(
             result["contract_semantics_status"],
-            "metadata_only_not_translated",
+            "compiler_parsed_clauses_available",
         )
 
     def test_duplicate_contract_inventory_is_rejected(self):
@@ -152,7 +164,8 @@ class BindingTests(unittest.TestCase):
                 "kani_proof_credit":False,
                 "controller_obligations":["state-contracts-reviewed-inventory"],
                 "contract_inventory_count":1,
-                "contract_semantics_status":"metadata_only_not_translated",
+                "contract_clause_count":2,
+                "contract_semantics_status":"compiler_parsed_clauses_available",
             })
             campaign=root/"campaign"
             campaign.mkdir()
@@ -164,7 +177,8 @@ class BindingTests(unittest.TestCase):
         self.assertTrue(result["verus_checked_scoped"])
         self.assertFalse(result["kani_proof_credit"])
         self.assertEqual(result["contract_inventory_count"],1)
-        self.assertEqual(result["contract_semantics_status"],"metadata_only_not_translated")
+        self.assertEqual(result["contract_clause_count"],2)
+        self.assertEqual(result["contract_semantics_status"],"compiler_parsed_clauses_available")
 
 
 if __name__ == "__main__":
