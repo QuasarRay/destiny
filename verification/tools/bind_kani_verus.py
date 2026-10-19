@@ -88,6 +88,7 @@ def normalized_contract_inventory(normalized: dict[str, Any]) -> list[dict[str, 
         function = row.get("function")
         file = row.get("file")
         harnesses = row.get("harnesses")
+        clauses = row.get("clauses", [])
         provenance = row.get("provenance")
         if not all(isinstance(value, str) and value for value in (crate_name, function, file, provenance)):
             raise BindingError("normalized Kani contract entry has missing identity/provenance")
@@ -95,7 +96,26 @@ def normalized_contract_inventory(normalized: dict[str, Any]) -> list[dict[str, 
             not isinstance(harness, str) or not harness for harness in harnesses
         ):
             raise BindingError(f"invalid Kani contract harness inventory for {function}")
-        key = (crate_name, function, file, tuple(harnesses))
+        if not isinstance(clauses, list):
+            raise BindingError(f"invalid Kani contract clause inventory for {function}")
+        checked_clauses = []
+        for clause in clauses:
+            if not isinstance(clause, dict):
+                raise BindingError(f"non-object Kani contract clause for {function}")
+            kind = clause.get("kind")
+            expression = clause.get("expression")
+            if kind not in {"requires", "ensures", "modifies"}:
+                raise BindingError(f"unknown Kani contract clause kind {kind!r} for {function}")
+            if not isinstance(expression, str) or not expression.strip():
+                raise BindingError(f"empty Kani contract clause expression for {function}")
+            checked_clauses.append({"kind": kind, "expression": expression})
+        key = (
+            crate_name,
+            function,
+            file,
+            tuple(harnesses),
+            tuple((clause["kind"], clause["expression"]) for clause in checked_clauses),
+        )
         if key in seen:
             raise BindingError(f"duplicate normalized Kani contract entry: {crate_name}::{function}")
         seen.add(key)
@@ -104,6 +124,7 @@ def normalized_contract_inventory(normalized: dict[str, Any]) -> list[dict[str, 
             "function": function,
             "file": file,
             "harnesses": list(harnesses),
+            "clauses": checked_clauses,
             "provenance": provenance,
             "proof_credit": False,
         })
@@ -115,6 +136,7 @@ def normalized_contract_inventory(normalized: dict[str, Any]) -> list[dict[str, 
             row["function"],
             row["file"],
             tuple(row["harnesses"]),
+            tuple((clause["kind"], clause["expression"]) for clause in row["clauses"]),
         ),
     )
 
@@ -254,12 +276,14 @@ def bind_discovery(
         "controller_obligations": obligations,
         "contract_inventory": contracts,
         "contract_inventory_count": len(contracts),
-        "contract_semantics_status": "metadata_only_not_translated",
+        "contract_clause_count": sum(len(row["clauses"]) for row in contracts),
+        "contract_semantics_status": "compiler_parsed_clauses_available",
         "unresolved": unresolved,
         "notice": (
             "Kani determines automatic-harness eligibility and supplies function-contract "
-            "metadata. Verus remains the proof engine. Contract expressions are not yet "
-            "translated by this binder. The reviewed source-to-Verus mapping remains an "
+            "metadata. Verus remains the proof engine. Contract expressions are preserved "
+            "for the restricted Verus translator; this binder does not itself grant proof credit. "
+            "The reviewed source-to-Verus mapping remains an "
             "explicit trusted correspondence boundary."
         ),
     }
@@ -313,8 +337,9 @@ def check_campaign(binding_path: Path, campaign_dir: Path) -> dict[str, Any]:
         "campaign_audit_sha256": sha256(audit_receipt),
         "receipts": receipts,
         "contract_inventory_count": binding.get("contract_inventory_count", 0),
+        "contract_clause_count": binding.get("contract_clause_count", 0),
         "contract_semantics_status": binding.get(
-            "contract_semantics_status", "metadata_only_not_translated"
+            "contract_semantics_status", "compiler_parsed_clauses_available"
         ),
         "translation_correctness": "reviewed_mapping_boundary_not_general_translation_proof",
         "notice": (
