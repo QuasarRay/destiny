@@ -286,7 +286,8 @@
     "runner_failure_receipt": "INCOMPLETE",
     "canonical_identity": "proc_macro2 + safe arcane-rs/synthez through CGP TokenIdentity",
     "proof_credit": false,
-    "proof_credit_source": "existing_verus_checked_scoped_receipts_only"
+    "proof_credit_source": "existing_verus_checked_scoped_receipts_only",
+    "freshness": "reject pre-existing verus-campaign-runner-receipt.json, kverus-reviewed-campaign-execution.json, binding.json, or audit.json before invoking Verus"
   },
   "reviewed_integrity_validation": {
     "command": "validate-reviewed --reviewed-dir <dir>",
@@ -303,6 +304,7 @@
     ],
     "prepared_checks": [
       "reviewed preparation receipt schema/status/engine/no-credit invariants",
+      "nested KVERUS_PREPARED receipt engine, pinned Kani commit, no-credit, output/evidence paths, and contract-count correspondence",
       "binding path/status/count correspondence",
       "existing ReviewedBindingValidator invariants"
     ],
@@ -338,5 +340,36 @@
       "collection_construction": "comprende"
     },
     "proof_credit": false
+  },
+  "reviewed_verification_workflow": {
+    "command": "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path>",
+    "status": "supported",
+    "architecture": "CGP ReviewedVerification composes reviewed preparation, fresh Verus execution, finalization, evidence manifest, audit, and integrity validation",
+    "allowed_starting_stages": [
+      "reviewed-empty",
+      "reviewed-prepared"
+    ],
+    "prepared_reuse": "allowed only after validate-reviewed succeeds and the nested preparation manifest_path exactly matches the requested manifest",
+    "rejected_starting_stages": [
+      "reviewed-finalized",
+      "reviewed-manifested",
+      "reviewed-audited",
+      "reviewed-inconsistent"
+    ],
+    "campaign_freshness": "pre-existing runner/execution/binding/audit campaign receipts are rejected before proof execution",
+    "steps": [
+      "prepare-reviewed",
+      "run-reviewed",
+      "finalize-reviewed",
+      "manifest-reviewed",
+      "audit-reviewed",
+      "validate-reviewed"
+    ],
+    "step_identity": "derive-deftly enum metadata",
+    "step_inventory_construction": "comprende",
+    "final_stage": "reviewed-audited",
+    "receipt_status": "KVERUS_REVIEWED_WORKFLOW_COMPLETE",
+    "proof_credit": false,
+    "proof_credit_source": "existing_verus_checked_scoped_receipts_only"
   }
 }

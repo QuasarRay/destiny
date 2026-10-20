@@ -16,6 +16,9 @@ cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml
   --manifest-path path/to/Cargo.toml --output-dir path/to/evidence
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- prepare-reviewed \
   --manifest-path verification/spec/Cargo.toml --output-dir path/to/reviewed-evidence
+cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- verify-reviewed \
+  --manifest-path verification/spec/Cargo.toml --reviewed-dir path/to/reviewed-evidence \
+  --campaign-dir path/to/verus-final-campaign --verus path/to/verus
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- run-reviewed \
   --reviewed-dir path/to/reviewed-evidence --campaign-dir path/to/verus-final-campaign \
   --verus path/to/verus
@@ -113,3 +116,27 @@ lifecycle and integrity records together with one smallest useful recommended ne
 An invalid/inconsistent directory has no recommended transition and exposes its integrity
 violations as blockers. A valid audited directory reports `complete: true`. The command
 never grants proof credit and does not mutate evidence.
+
+
+## One-command reviewed Verus workflow
+
+`verify-reviewed` is the low-friction reviewed verification entry point. It composes the
+existing CGP preparation, Verus execution, campaign finalization, content-addressed
+manifest, audit, and integrity-validation components rather than reimplementing them.
+A fresh directory is prepared automatically. A `reviewed-prepared` directory may be
+reused only after semantic integrity validation and only when its nested preparation
+receipt is bound to the exact requested manifest. Finalized, manifested, audited, or
+inconsistent directories are rejected so the command cannot silently reuse an older
+Verus proof.
+
+The workflow also requires fresh campaign evidence. Existing runner, KVerus execution,
+binding, or audit receipts in the campaign directory cause a fail-closed error before
+Verus runs. Successful output is a compact `KVERUS_REVIEWED_WORKFLOW_COMPLETE` receipt
+with the starting stage, executed/reused steps, selected and checked counts, manifest
+digest, final audited stage, and proof-credit provenance. The orchestration receipt itself
+has `proof_credit: false`; formal credit remains solely in the exact fresh
+`CHECKED_SCOPED` Verus receipts that the finalization and audit bind.
+
+The workflow-step inventory is generated with `derive-deftly`, and `comprende` builds
+the executed/reused step lists. CGP remains responsible for behavior and component
+composition.

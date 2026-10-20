@@ -906,7 +906,7 @@ jobs:
           }], loop
           PY
 
-      - name: Verify logical refinement proofs
+      - name: Verify reviewed workflow through Verus
         run: |
           set -euo pipefail
           reviewed=".aegis/destiny/kani-autoharness-discovery"
@@ -916,16 +916,17 @@ jobs:
           python3 -B verification/tools/check_concurrency_acceptance.py --structure-only
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
-            run-reviewed \
+            verify-reviewed \
+            --manifest-path verification/spec/Cargo.toml \
             --reviewed-dir "$reviewed" \
             --campaign-dir "$campaign" \
             --verus "$VERUS_BIN" \
-            > "$campaign/kverus-reviewed-campaign-execution-stdout.json"
+            > "$campaign/kverus-reviewed-verification-stdout.json"
 
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             status-reviewed --reviewed-dir "$reviewed" \
-            > "$reviewed/reviewed-lifecycle-after-execution.json"
+            > "$reviewed/reviewed-lifecycle-after-verification.json"
 
           python3 - <<'PY'
           import json
@@ -933,23 +934,44 @@ jobs:
 
           reviewed=Path(".aegis/destiny/kani-autoharness-discovery")
           campaign=Path(".aegis/destiny/verus-final-campaign")
-          receipt=json.loads((campaign/"kverus-reviewed-campaign-execution.json").read_text())
-          stdout_receipt=json.loads(
-              (campaign/"kverus-reviewed-campaign-execution-stdout.json").read_text()
-          )
+          workflow=json.loads((campaign/"kverus-reviewed-verification-stdout.json").read_text())
+          execution=json.loads((campaign/"kverus-reviewed-campaign-execution.json").read_text())
           runner=json.loads((campaign/"verus-campaign-runner-receipt.json").read_text())
-          lifecycle=json.loads((reviewed/"reviewed-lifecycle-after-execution.json").read_text())
+          lifecycle=json.loads((reviewed/"reviewed-lifecycle-after-verification.json").read_text())
 
-          assert receipt == stdout_receipt, (receipt, stdout_receipt)
-          assert receipt["status"] == "KVERUS_REVIEWED_CAMPAIGN_EXECUTED", receipt
-          assert receipt["engine"] == "verus", receipt
-          assert receipt["canonical_execution"] == "reviewed_campaign_execution", receipt
-          assert receipt["runner_status"] == "CHECKED_SCOPED", receipt
-          assert receipt["verus_checked_scoped"] is True, receipt
-          assert receipt["checked_entry_count"] > 0, receipt
-          assert receipt["case_acceptance_exit"] == 0, receipt
-          assert receipt["proof_credit"] is False, receipt
-          assert receipt["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", receipt
+          assert workflow["status"] == "KVERUS_REVIEWED_WORKFLOW_COMPLETE", workflow
+          assert workflow["engine"] == "verus", workflow
+          assert workflow["canonical_workflow"] == "reviewed_verification", workflow
+          assert workflow["starting_stage"] == "reviewed-prepared", workflow
+          assert workflow["preparation_reused"] is True, workflow
+          assert workflow["reused_steps"] == ["prepare-reviewed"], workflow
+          assert workflow["executed_steps"] == [
+              "run-reviewed",
+              "finalize-reviewed",
+              "manifest-reviewed",
+              "audit-reviewed",
+              "validate-reviewed",
+          ], workflow
+          assert workflow["selected_count"] > 0, workflow
+          assert workflow["controller_obligation_count"] > 0, workflow
+          assert workflow["checked_entry_count"] > 0, workflow
+          assert workflow["checked_receipt_count"] > 0, workflow
+          assert workflow["verified_artifact_count"] == 4, workflow
+          assert workflow["manifest_digest_algorithm"] == "sha256", workflow
+          assert len(workflow["manifest_digest"]) == 64, workflow
+          assert workflow["final_stage"] == "reviewed-audited", workflow
+          assert workflow["integrity_valid"] is True, workflow
+          assert workflow["proof_credit"] is False, workflow
+          assert workflow["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", workflow
+
+          assert execution["status"] == "KVERUS_REVIEWED_CAMPAIGN_EXECUTED", execution
+          assert execution["engine"] == "verus", execution
+          assert execution["canonical_execution"] == "reviewed_campaign_execution", execution
+          assert execution["runner_status"] == "CHECKED_SCOPED", execution
+          assert execution["verus_checked_scoped"] is True, execution
+          assert execution["checked_entry_count"] == workflow["checked_entry_count"], (execution, workflow)
+          assert execution["case_acceptance_exit"] == 0, execution
+          assert execution["proof_credit"] is False, execution
 
           assert runner["status"] == "CHECKED_SCOPED", runner
           assert runner["engine"] == "verus", runner
@@ -958,13 +980,13 @@ jobs:
           assert runner["formal_audit"] == "CHECKED_SCOPED", runner
           assert runner["case_acceptance_exit"] == 0, runner
 
-          assert lifecycle["stage"] == "reviewed-prepared", lifecycle
-          assert lifecycle["canonical_stage"] == "reviewed_prepared", lifecycle
+          assert lifecycle["stage"] == "reviewed-audited", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_audited", lifecycle
           assert lifecycle["consistent"] is True, lifecycle
           assert lifecycle["proof_credit"] is False, lifecycle
           PY
 
-      - name: Finalize Kani-selected identities against the fresh Verus campaign
+      - name: Validate completed reviewed evidence without rerunning proofs
         run: |
           set -euo pipefail
           reviewed=".aegis/destiny/kani-autoharness-discovery"
@@ -972,91 +994,73 @@ jobs:
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             status-reviewed --reviewed-dir "$reviewed" \
-            > "$reviewed/reviewed-lifecycle-before-finalization.json"
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          root=Path(".aegis/destiny/kani-autoharness-discovery")
-          lifecycle=json.loads((root/"reviewed-lifecycle-before-finalization.json").read_text())
-          assert lifecycle["stage"] == "reviewed-prepared", lifecycle
-          assert lifecycle["canonical_stage"] == "reviewed_prepared", lifecycle
-          assert lifecycle["consistent"] is True, lifecycle
-          assert lifecycle["proof_credit"] is False, lifecycle
-          PY
-
+            > "$reviewed/reviewed-lifecycle-final.json"
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
-            finalize-reviewed \
-            --reviewed-dir "$reviewed" \
-            --campaign-dir .aegis/destiny/verus-final-campaign \
-            > "$reviewed/reviewed-finalization-stdout.json"
+            validate-reviewed --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-integrity-final.json"
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
-            status-reviewed --reviewed-dir "$reviewed" \
-            > "$reviewed/reviewed-lifecycle-finalized.json"
+            explain-reviewed --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-explanation-final.json"
 
           python3 - <<'PY'
           import json
           from pathlib import Path
-          root=Path(".aegis/destiny/kani-autoharness-discovery")
-          receipt=json.loads((root/"reviewed-finalization-receipt.json").read_text())
-          stdout_receipt=json.loads((root/"reviewed-finalization-stdout.json").read_text())
-          campaign_binding=json.loads((root/"verus-receipt-binding.json").read_text())
-          lifecycle=json.loads((root/"reviewed-lifecycle-finalized.json").read_text())
-          assert receipt == stdout_receipt, (receipt, stdout_receipt)
-          assert receipt["status"] == "KVERUS_REVIEWED_VERUS_FINALIZED", receipt
-          assert receipt["engine"] == "verus", receipt
-          assert receipt["kani_proof_credit"] is False, receipt
-          assert receipt["verus_checked_scoped"] is True, receipt
+
+          reviewed=Path(".aegis/destiny/kani-autoharness-discovery")
+          campaign=Path(".aegis/destiny/verus-final-campaign")
+          workflow=json.loads((campaign/"kverus-reviewed-verification-stdout.json").read_text())
+          finalization=json.loads((reviewed/"reviewed-finalization-receipt.json").read_text())
+          campaign_binding=json.loads((reviewed/"verus-receipt-binding.json").read_text())
+          manifest=json.loads((reviewed/"reviewed-evidence-manifest.json").read_text())
+          audit=json.loads((reviewed/"reviewed-evidence-audit.json").read_text())
+          lifecycle=json.loads((reviewed/"reviewed-lifecycle-final.json").read_text())
+          integrity=json.loads((reviewed/"reviewed-integrity-final.json").read_text())
+          explanation=json.loads((reviewed/"reviewed-explanation-final.json").read_text())
+
+          assert finalization["status"] == "KVERUS_REVIEWED_VERUS_FINALIZED", finalization
+          assert finalization["engine"] == "verus", finalization
+          assert finalization["kani_proof_credit"] is False, finalization
+          assert finalization["verus_checked_scoped"] is True, finalization
           assert campaign_binding["status"] == "KANI_SELECTED_VERUS_CHECKED_SCOPED", campaign_binding
-          assert lifecycle["stage"] == "reviewed-finalized", lifecycle
-          PY
 
-          cargo +nightly-2026-08-21 run --quiet \
-            --manifest-path verification/automation/Cargo.toml --locked -- \
-            manifest-reviewed \
-            --reviewed-dir "$reviewed" \
-            > "$reviewed/reviewed-evidence-manifest-stdout.json"
-          cargo +nightly-2026-08-21 run --quiet \
-            --manifest-path verification/automation/Cargo.toml --locked -- \
-            status-reviewed --reviewed-dir "$reviewed" \
-            > "$reviewed/reviewed-lifecycle-manifested.json"
-
-          cargo +nightly-2026-08-21 run --quiet \
-            --manifest-path verification/automation/Cargo.toml --locked -- \
-            audit-reviewed \
-            --reviewed-dir "$reviewed" \
-            > "$reviewed/reviewed-evidence-audit-stdout.json"
-          cargo +nightly-2026-08-21 run --quiet \
-            --manifest-path verification/automation/Cargo.toml --locked -- \
-            status-reviewed --reviewed-dir "$reviewed" \
-            > "$reviewed/reviewed-lifecycle-audited.json"
-
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          root=Path(".aegis/destiny/kani-autoharness-discovery")
-          manifest=json.loads((root/"reviewed-evidence-manifest.json").read_text())
-          stdout_manifest=json.loads((root/"reviewed-evidence-manifest-stdout.json").read_text())
-          audit=json.loads((root/"reviewed-evidence-audit.json").read_text())
-          stdout_audit=json.loads((root/"reviewed-evidence-audit-stdout.json").read_text())
-          manifested=json.loads((root/"reviewed-lifecycle-manifested.json").read_text())
-          audited=json.loads((root/"reviewed-lifecycle-audited.json").read_text())
-          assert manifest == stdout_manifest, (manifest, stdout_manifest)
           assert manifest["schema"] == 2, manifest
           assert manifest["status"] == "KVERUS_REVIEWED_EVIDENCE_MANIFEST", manifest
           assert manifest["engine"] == "verus", manifest
           assert manifest["kani_proof_credit"] is False, manifest
           assert manifest["verus_checked_scoped"] is True, manifest
           assert manifest["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", manifest
-          assert audit == stdout_audit, (audit, stdout_audit)
+
           assert audit["status"] == "KVERUS_REVIEWED_EVIDENCE_AUDITED", audit
           assert audit["engine"] == "verus", audit
           assert audit["kani_proof_credit"] is False, audit
           assert audit["verus_checked_scoped"] is True, audit
           assert audit["verified_artifact_count"] == len(manifest["artifacts"]), audit
-          assert manifested["stage"] == "reviewed-manifested", manifested
-          assert audited["stage"] == "reviewed-audited", audited
+          assert workflow["checked_receipt_count"] == manifest["checked_receipt_count"], (workflow, manifest)
+          assert workflow["verified_artifact_count"] == audit["verified_artifact_count"], (workflow, audit)
+          assert workflow["manifest_path"] == audit["manifest_path"], (workflow, audit)
+          assert workflow["manifest_digest"] == audit["manifest_digest"], (workflow, audit)
+
+          assert lifecycle["stage"] == "reviewed-audited", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_audited", lifecycle
+          assert lifecycle["consistent"] is True, lifecycle
+
+          assert integrity["status"] == "KVERUS_REVIEWED_INTEGRITY", integrity
+          assert integrity["lifecycle_stage"] == "reviewed-audited", integrity
+          assert integrity["valid"] is True, integrity
+          assert integrity["validated_artifact_count"] == 6, integrity
+          assert integrity["violations"] == [], integrity
+          assert integrity["proof_credit"] is False, integrity
+
+          assert explanation["status"] == "KVERUS_REVIEWED_EXPLANATION", explanation
+          assert explanation["lifecycle"]["stage"] == "reviewed-audited", explanation
+          assert explanation["integrity"]["valid"] is True, explanation
+          assert explanation["recommended_next_action"] is None, explanation
+          assert explanation["ready_for_next_action"] is False, explanation
+          assert explanation["complete"] is True, explanation
+          assert explanation["blockers"] == [], explanation
+          assert explanation["proof_credit"] is False, explanation
           PY
 
       - name: Retain complete counted results, VIR inventories and scope audit

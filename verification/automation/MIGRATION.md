@@ -334,3 +334,27 @@ smallest legal next reviewed transition only when integrity is valid, and report
 valid evidence as complete. This gives callers one machine-readable decision surface
 without weakening or bypassing `status-reviewed`, `validate-reviewed`, or any verifier
 gate.
+
+
+## Twelfth slice: one-command reviewed Verus verification
+
+The reviewed path now has `verify-reviewed`, a CGP composition that advances an empty or
+semantically valid prepared reviewed directory through real Verus campaign execution,
+campaign binding, evidence manifesting, content-addressed audit, and final integrity
+validation. It does not add a second verifier path or duplicate the existing stage
+implementations.
+
+Prepared-state reuse is deliberately narrow. The nested `KVERUS_PREPARED` receipt is now
+typed and validated for engine, pinned Kani commit, no-credit status, output/evidence
+paths, and contract-count correspondence. `verify-reviewed` additionally requires the
+requested manifest to match that nested receipt exactly. Completed reviewed stages are
+rejected so a previous proof cannot be presented as a fresh workflow execution.
+
+`run-reviewed` is also hardened to reject pre-existing campaign runner/execution,
+binding, or audit receipts. This closes the stale-receipt boundary before Verus execution.
+The successful workflow receipt records derived step identities, exact manifest digest,
+final audited stage, and the existing scoped-Verus proof-credit source while retaining
+`proof_credit = false` for orchestration itself.
+
+`derive-deftly` owns the workflow-step identity table; `comprende` constructs the
+executed/reused step inventories; CGP composes all stateful operations.
