@@ -219,7 +219,27 @@ def main():
         write_receipt(receipt_path,summary)
         print(json.dumps(summary))
         return result.returncode
-    except (CampaignTimeout,ValueError,OSError,KeyError,json.JSONDecodeError) as error:
+    except CampaignTimeout as error:
+        incomplete={
+            'schema':1,
+            'status':'TIMEOUT',
+            'engine':'verus',
+            'kani_proof_credit':False,
+            'verus_checked_scoped':False,
+            'deduplicated_entries':0,
+            'formal_audit':'INCOMPLETE',
+            'case_acceptance_exit':-1,
+            'campaign_dir':args.campaign_dir,
+            'obligations':list(args.obligation),
+            'timeout_seconds':args.timeout_seconds,
+            'memory_mib':args.memory_mib,
+            'max_concurrency':args.max_concurrency,
+            'reason':str(error),
+        }
+        write_receipt(receipt_path,incomplete)
+        print(json.dumps(incomplete))
+        return 1
+    except (ValueError,OSError,KeyError,json.JSONDecodeError) as error:
         incomplete={
             'schema':1,
             'status':'INCOMPLETE',
