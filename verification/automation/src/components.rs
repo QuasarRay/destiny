@@ -5,7 +5,7 @@ use crate::{
     DiscoveryDisposition, DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind,
     EvidenceArtifactSpec, KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause,
     PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceAuditReceipt,
-    ReviewedCampaignExecutionReceipt, ReviewedCargoTarget, ReviewedEvidenceManifest,
+    ReviewedCampaignExecutionReceipt, ReviewedEvidenceManifest,
     ReviewedFinalizationReceipt, ReviewedIntegrityArtifact, ReviewedIntegrityReport,
     ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
     ReviewedExplanationReport, ReviewedPreparationReceipt, ReviewedVerificationConfig,
