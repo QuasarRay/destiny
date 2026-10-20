@@ -183,3 +183,45 @@ byte-level drift detection independently of JSON semantic equivalence.
 This is tamper-evident/content-addressed evidence, not a digital signature: an actor
 capable of replacing both the evidence and its manifest can still create a new
 self-consistent bundle. No proof semantics or proof-credit rules change.
+
+## Eighth slice: typed reviewed lifecycle and provenance-safe handoff
+
+Reviewed evidence is now governed by an explicit CGP lifecycle rather than by the
+incidental presence of whatever files a command happens to need.
+
+`ReviewedLifecycleInspection` classifies the exact reviewed artifact inventory as one
+of:
+
+- `reviewed-empty`;
+- `reviewed-prepared`;
+- `reviewed-finalized`;
+- `reviewed-manifested`;
+- `reviewed-audited`;
+- `reviewed-inconsistent`.
+
+The stage identity is canonicalized through the existing `TokenIdentity` provider,
+therefore through the same `proc_macro2` + safe `synthez::ToTokens` boundary used
+for commands and evidence-artifact identities. The new
+`status-reviewed --reviewed-dir <dir>` command reports the stage, canonical token,
+present/missing lifecycle artifacts, legal next actions, and `proof_credit = false`.
+
+`ReviewedLifecycleTransition` now guards the mutating reviewed commands:
+
+- `prepare-reviewed`: only empty or already-prepared state;
+- `finalize-reviewed`: only prepared or already-finalized state;
+- `manifest-reviewed`: only finalized or already-manifested state;
+- `audit-reviewed`: only manifested or already-audited state.
+
+This preserves idempotent reruns at the current stage while rejecting rollback-like
+writes after downstream evidence exists. Any partial/non-prefix artifact set becomes
+`reviewed-inconsistent` and is rejected rather than guessed around.
+
+The workflow also fixes a previously latent provenance problem: synthetic
+finalization/audit regression evidence is no longer written into the same directory
+uploaded to the real Verus job. The real `kani-verus-automation-discovery` handoff
+now remains strictly `reviewed-prepared`; synthetic lifecycle regression runs in a
+separate directory/artifact. The real Verus finalization step asserts the prepared
+stage before consuming fresh campaign receipts.
+
+No verifier semantics, Kani metadata semantics, reviewed function mappings, or proof
+credit rules changed.

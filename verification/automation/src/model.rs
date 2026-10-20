@@ -115,6 +115,7 @@ pub enum AutomationCommand {
     FinalizeReviewed { reviewed_dir: String, campaign_dir: String },
     ManifestReviewed { reviewed_dir: String },
     AuditReviewed { reviewed_dir: String },
+    StatusReviewed { reviewed_dir: String },
     Explain,
     Verify { args: Vec<String> },
     ReplayKaniReference { args: Vec<String> },
@@ -231,4 +232,36 @@ pub struct ReviewedEvidenceAuditReceipt {
     pub manifest_digest: String,
     pub verified_artifact_count: usize,
     pub proof_credit_source: &'static str,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReviewedLifecycleStage {
+    Empty,
+    Prepared,
+    Finalized,
+    Manifested,
+    Audited,
+    Inconsistent,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReviewedLifecycleAction {
+    Prepare,
+    Finalize,
+    Manifest,
+    Audit,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedLifecycleReport {
+    pub schema: u32,
+    pub status: &'static str,
+    pub reviewed_dir: String,
+    pub stage: &'static str,
+    pub canonical_stage: String,
+    pub consistent: bool,
+    pub present_artifacts: Vec<String>,
+    pub missing_artifacts: Vec<String>,
+    pub legal_next_actions: Vec<&'static str>,
+    pub proof_credit: bool,
 }

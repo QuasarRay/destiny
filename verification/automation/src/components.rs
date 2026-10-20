@@ -113,6 +113,11 @@ const COMMANDS: &[(&str, &str, &str)] = &[
         "audit-reviewed --reviewed-dir <dir>",
         "evidence",
     ),
+    (
+        "status-reviewed",
+        "status-reviewed --reviewed-dir <dir>",
+        "lifecycle",
+    ),
     ("explain", "explain", "diagnostics"),
     ("verify", "verify <verus-subset args...>", "verification"),
     (
@@ -216,6 +221,9 @@ impl CommandRouter {
                 reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
             }),
             "audit-reviewed" => Ok(AutomationCommand::AuditReviewed {
+                reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
+            }),
+            "status-reviewed" => Ok(AutomationCommand::StatusReviewed {
                 reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
             }),
             "explain" if rest.is_empty() => Ok(AutomationCommand::Explain),
@@ -671,6 +679,167 @@ impl ArtifactStore {
     }
 }
 
+#[cgp_component(ArtifactPresence)]
+pub trait CanInspectArtifactPresence {
+    fn artifact_exists(&self, path: &Path) -> Result<bool, String>;
+}
+
+#[cgp_impl(new StdArtifactPresence)]
+impl ArtifactPresence {
+    fn artifact_exists(&self, path: &Path) -> Result<bool, String> {
+        match fs::metadata(path) {
+            Ok(metadata) => Ok(metadata.is_file()),
+            Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(false),
+            Err(error) => Err(format!("cannot inspect {}: {error}", path.display())),
+        }
+    }
+}
+
+const REVIEWED_LIFECYCLE_ARTIFACTS: &[&str] = &[
+    "reviewed-preparation-receipt.json",
+    "verus-binding.json",
+    "verus-receipt-binding.json",
+    "reviewed-finalization-receipt.json",
+    "reviewed-evidence-manifest.json",
+    "reviewed-evidence-audit.json",
+];
+
+#[cgp_component(ReviewedLifecycleInspection)]
+pub trait CanInspectReviewedLifecycle {
+    fn reviewed_lifecycle(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedLifecycleReport, String>;
+}
+
+#[cgp_impl(new ArtifactBackedReviewedLifecycleInspection)]
+#[uses(CanInspectArtifactPresence, CanCanonicalizeStaticIdentity)]
+impl ReviewedLifecycleInspection {
+    fn reviewed_lifecycle(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedLifecycleReport, String> {
+        let root = PathBuf::from(reviewed_dir);
+        let mut presence = [false; 6];
+        let mut present_artifacts = Vec::new();
+        let mut missing_artifacts = Vec::new();
+
+        for (index, filename) in REVIEWED_LIFECYCLE_ARTIFACTS.iter().enumerate() {
+            if self.artifact_exists(&root.join(filename))? {
+                presence[index] = true;
+                present_artifacts.push((*filename).to_string());
+            } else {
+                missing_artifacts.push((*filename).to_string());
+            }
+        }
+
+        let stage = match presence {
+            [false, false, false, false, false, false] => ReviewedLifecycleStage::Empty,
+            [true, true, false, false, false, false] => ReviewedLifecycleStage::Prepared,
+            [true, true, true, true, false, false] => ReviewedLifecycleStage::Finalized,
+            [true, true, true, true, true, false] => ReviewedLifecycleStage::Manifested,
+            [true, true, true, true, true, true] => ReviewedLifecycleStage::Audited,
+            _ => ReviewedLifecycleStage::Inconsistent,
+        };
+        let stage_name = reviewed_lifecycle_stage_name(stage);
+
+        Ok(ReviewedLifecycleReport {
+            schema: 1,
+            status: "KVERUS_REVIEWED_LIFECYCLE",
+            reviewed_dir: reviewed_dir.to_string(),
+            stage: stage_name,
+            canonical_stage: self.canonicalize_static_identity(stage_name)?,
+            consistent: stage != ReviewedLifecycleStage::Inconsistent,
+            present_artifacts,
+            missing_artifacts,
+            legal_next_actions: reviewed_lifecycle_legal_actions(stage),
+            proof_credit: false,
+        })
+    }
+}
+
+#[cgp_component(ReviewedLifecycleTransition)]
+pub trait CanRequireReviewedTransition {
+    fn require_reviewed_action(
+        &self,
+        reviewed_dir: &str,
+        action: ReviewedLifecycleAction,
+    ) -> Result<ReviewedLifecycleReport, String>;
+}
+
+#[cgp_impl(new StrictReviewedLifecycleTransition)]
+#[uses(CanInspectReviewedLifecycle)]
+impl ReviewedLifecycleTransition {
+    fn require_reviewed_action(
+        &self,
+        reviewed_dir: &str,
+        action: ReviewedLifecycleAction,
+    ) -> Result<ReviewedLifecycleReport, String> {
+        let report = self.reviewed_lifecycle(reviewed_dir)?;
+        let allowed = match action {
+            ReviewedLifecycleAction::Prepare => matches!(
+                report.stage,
+                "reviewed-empty" | "reviewed-prepared"
+            ),
+            ReviewedLifecycleAction::Finalize => matches!(
+                report.stage,
+                "reviewed-prepared" | "reviewed-finalized"
+            ),
+            ReviewedLifecycleAction::Manifest => matches!(
+                report.stage,
+                "reviewed-finalized" | "reviewed-manifested"
+            ),
+            ReviewedLifecycleAction::Audit => matches!(
+                report.stage,
+                "reviewed-manifested" | "reviewed-audited"
+            ),
+        };
+
+        if !report.consistent || !allowed {
+            return Err(format!(
+                "reviewed lifecycle rejects {} from stage {} (present: {}; missing: {})",
+                reviewed_lifecycle_action_name(action),
+                report.stage,
+                report.present_artifacts.join(", "),
+                report.missing_artifacts.join(", "),
+            ));
+        }
+
+        Ok(report)
+    }
+}
+
+fn reviewed_lifecycle_stage_name(stage: ReviewedLifecycleStage) -> &'static str {
+    match stage {
+        ReviewedLifecycleStage::Empty => "reviewed-empty",
+        ReviewedLifecycleStage::Prepared => "reviewed-prepared",
+        ReviewedLifecycleStage::Finalized => "reviewed-finalized",
+        ReviewedLifecycleStage::Manifested => "reviewed-manifested",
+        ReviewedLifecycleStage::Audited => "reviewed-audited",
+        ReviewedLifecycleStage::Inconsistent => "reviewed-inconsistent",
+    }
+}
+
+fn reviewed_lifecycle_action_name(action: ReviewedLifecycleAction) -> &'static str {
+    match action {
+        ReviewedLifecycleAction::Prepare => "prepare-reviewed",
+        ReviewedLifecycleAction::Finalize => "finalize-reviewed",
+        ReviewedLifecycleAction::Manifest => "manifest-reviewed",
+        ReviewedLifecycleAction::Audit => "audit-reviewed",
+    }
+}
+
+fn reviewed_lifecycle_legal_actions(stage: ReviewedLifecycleStage) -> Vec<&'static str> {
+    match stage {
+        ReviewedLifecycleStage::Empty => vec!["prepare-reviewed"],
+        ReviewedLifecycleStage::Prepared => vec!["prepare-reviewed", "finalize-reviewed"],
+        ReviewedLifecycleStage::Finalized => vec!["finalize-reviewed", "manifest-reviewed"],
+        ReviewedLifecycleStage::Manifested => vec!["manifest-reviewed", "audit-reviewed"],
+        ReviewedLifecycleStage::Audited => vec!["audit-reviewed"],
+        ReviewedLifecycleStage::Inconsistent => Vec::new(),
+    }
+}
+
 #[cgp_component(ArtifactDigest)]
 pub trait CanDigestArtifactBytes {
     fn digest_artifact_bytes(&self, bytes: &[u8]) -> String;
@@ -904,6 +1073,7 @@ pub trait CanPrepareReviewedBinding {
 
 #[cgp_impl(new KaniReviewedBindingPreparation)]
 #[uses(
+    CanRequireReviewedTransition,
     CanPrepareAutomation,
     CanRunJsonPythonTool,
     CanReadJsonArtifact,
@@ -916,6 +1086,7 @@ impl ReviewedBindingPreparation {
         manifest_path: &str,
         output_dir: &str,
     ) -> Result<ReviewedPreparationReceipt, String> {
+        self.require_reviewed_action(output_dir, ReviewedLifecycleAction::Prepare)?;
         let preparation = self.prepare_automation(manifest_path, output_dir)?;
         let output_dir_path = PathBuf::from(output_dir);
         let binding_path = output_dir_path.join("verus-binding.json");
@@ -1030,6 +1201,7 @@ pub trait CanFinalizeReviewedCampaign {
 
 #[cgp_impl(new KaniReviewedCampaignFinalization)]
 #[uses(
+    CanRequireReviewedTransition,
     CanRunJsonPythonTool,
     CanReadJsonArtifact,
     CanValidateCampaignBinding,
@@ -1041,6 +1213,7 @@ impl ReviewedCampaignFinalization {
         reviewed_dir: &str,
         campaign_dir: &str,
     ) -> Result<ReviewedFinalizationReceipt, String> {
+        self.require_reviewed_action(reviewed_dir, ReviewedLifecycleAction::Finalize)?;
         let reviewed_dir_path = PathBuf::from(reviewed_dir);
         let binding_path = reviewed_dir_path.join("verus-binding.json");
         let campaign_binding_path = reviewed_dir_path.join("verus-receipt-binding.json");
@@ -1255,12 +1428,17 @@ pub trait CanAssembleReviewedEvidence {
 }
 
 #[cgp_impl(new ContentAddressedReviewedEvidenceAssembly)]
-#[uses(CanBuildReviewedEvidenceManifest, CanReadWriteArtifacts)]
+#[uses(
+    CanRequireReviewedTransition,
+    CanBuildReviewedEvidenceManifest,
+    CanReadWriteArtifacts
+)]
 impl ReviewedEvidenceAssembly {
     fn assemble_reviewed_evidence(
         &self,
         reviewed_dir: &str,
     ) -> Result<ReviewedEvidenceManifest, String> {
+        self.require_reviewed_action(reviewed_dir, ReviewedLifecycleAction::Manifest)?;
         let manifest = self.build_reviewed_evidence_manifest(reviewed_dir)?;
         let manifest_path = PathBuf::from(reviewed_dir).join("reviewed-evidence-manifest.json");
         self.write_artifact(&manifest_path, &pretty_json_bytes(&manifest)?)
@@ -1279,6 +1457,7 @@ pub trait CanAuditReviewedEvidence {
 
 #[cgp_impl(new ContentAddressedReviewedEvidenceAudit)]
 #[uses(
+    CanRequireReviewedTransition,
     CanBuildReviewedEvidenceManifest,
     CanReadJsonArtifact,
     CanReadWriteArtifacts,
@@ -1289,6 +1468,7 @@ impl ReviewedEvidenceAudit {
         &self,
         reviewed_dir: &str,
     ) -> Result<ReviewedEvidenceAuditReceipt, String> {
+        self.require_reviewed_action(reviewed_dir, ReviewedLifecycleAction::Audit)?;
         let root = PathBuf::from(reviewed_dir);
         let manifest_path = root.join("reviewed-evidence-manifest.json");
         let audit_path = root.join("reviewed-evidence-audit.json");
@@ -1425,6 +1605,12 @@ delegate_and_check_components! {
             CapturedJsonPythonToolRunner,
         ArtifactStoreComponent:
             StdArtifactStore,
+        ArtifactPresenceComponent:
+            StdArtifactPresence,
+        ReviewedLifecycleInspectionComponent:
+            ArtifactBackedReviewedLifecycleInspection,
+        ReviewedLifecycleTransitionComponent:
+            StrictReviewedLifecycleTransition,
         ArtifactDigestComponent:
             Sha256ArtifactDigest,
         EvidenceArtifactPolicyComponent:

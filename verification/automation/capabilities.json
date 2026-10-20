@@ -102,7 +102,10 @@
     "reviewed_binding_validation": "CGP ReviewedBindingValidator",
     "campaign_binding_validation": "CGP CampaignBindingValidator",
     "artifact_digest": "CGP ArtifactDigest using SHA-256 over exact artifact bytes",
-    "evidence_artifact_policy": "CGP EvidenceArtifactPolicy with typed reviewed artifact kinds"
+    "evidence_artifact_policy": "CGP EvidenceArtifactPolicy with typed reviewed artifact kinds",
+    "artifact_presence": "CGP ArtifactPresence over filesystem metadata",
+    "reviewed_lifecycle_inspection": "CGP ReviewedLifecycleInspection",
+    "reviewed_lifecycle_transition": "CGP ReviewedLifecycleTransition"
   },
   "preparation": {
     "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
@@ -216,5 +219,40 @@
     "proof_credit_source": "existing Verus CHECKED_SCOPED campaign receipts only",
     "limitation": "content-addressed/tamper-evident, not cryptographically signed against an external trust anchor",
     "kani_proof_credit": false
+  },
+  "reviewed_lifecycle": {
+    "command": "status-reviewed --reviewed-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP ReviewedLifecycleInspection + ReviewedLifecycleTransition",
+    "stages": [
+      "reviewed-empty",
+      "reviewed-prepared",
+      "reviewed-finalized",
+      "reviewed-manifested",
+      "reviewed-audited",
+      "reviewed-inconsistent"
+    ],
+    "canonical_identity": "proc_macro2 + safe arcane-rs/synthez through CGP TokenIdentity",
+    "transitions": {
+      "prepare-reviewed": [
+        "reviewed-empty",
+        "reviewed-prepared"
+      ],
+      "finalize-reviewed": [
+        "reviewed-prepared",
+        "reviewed-finalized"
+      ],
+      "manifest-reviewed": [
+        "reviewed-finalized",
+        "reviewed-manifested"
+      ],
+      "audit-reviewed": [
+        "reviewed-manifested",
+        "reviewed-audited"
+      ]
+    },
+    "inconsistent_policy": "reject any partial or non-prefix reviewed artifact inventory",
+    "workflow_handoff": "real Verus handoff remains reviewed-prepared; synthetic lifecycle regression is isolated in a separate artifact",
+    "proof_credit": false
   }
 }

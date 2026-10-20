@@ -7,11 +7,12 @@ pub use components::{
     CanAssembleReviewedEvidence, CanAuditReviewedEvidence, CanBuildAutomationPlan,
     CanBuildReviewedEvidenceManifest, CanCanonicalizeContractClause,
     CanCanonicalizeStaticIdentity, CanDescribeCommands, CanDescribeEvidenceArtifacts,
-    CanDigestArtifactBytes, CanFinalizeReviewedCampaign, CanNormalizeMetadata,
-    CanParseMetadataBytes, CanPrepareAutomation, CanPrepareReviewedBinding,
-    CanReadJsonArtifact, CanReadWriteArtifacts, CanRouteCommand, CanRunJsonPythonTool,
-    CanRunPythonTool, CanValidateCampaignBinding, CanValidateContractClause,
-    CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
+    CanDigestArtifactBytes, CanFinalizeReviewedCampaign, CanInspectArtifactPresence,
+    CanInspectReviewedLifecycle, CanNormalizeMetadata, CanParseMetadataBytes,
+    CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
+    CanReadWriteArtifacts, CanRequireReviewedTransition, CanRouteCommand,
+    CanRunJsonPythonTool, CanRunPythonTool, CanValidateCampaignBinding,
+    CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
     AutomationCommand, AutomationPlan, CampaignBindingSummary, CommandDescriptor,
@@ -19,6 +20,7 @@ pub use model::{
     DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind, EvidenceArtifactSpec,
     PlanCounts, PlannedContractClause, PreparationReceipt, ReviewedBindingSummary,
     ReviewedEvidenceAuditReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
+    ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
     ReviewedPreparationReceipt,
 };
 
@@ -202,6 +204,7 @@ mod tests {
         assert!(usage.contains("finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>"));
         assert!(usage.contains("manifest-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("audit-reviewed --reviewed-dir <dir>"));
+        assert!(usage.contains("status-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
 
         let finalizer = commands
@@ -234,6 +237,14 @@ mod tests {
         assert_eq!(audit.canonical_token, "audit_reviewed");
         assert_eq!(audit.category, "evidence");
         assert!(!audit.proof_credit);
+
+        let status = commands
+            .iter()
+            .find(|command| command.name == "status-reviewed")
+            .unwrap();
+        assert_eq!(status.canonical_token, "status_reviewed");
+        assert_eq!(status.category, "lifecycle");
+        assert!(!status.proof_credit);
     }
 
     #[test]
@@ -337,6 +348,103 @@ mod tests {
             "verus-receipt-binding"
         );
         assert_eq!(specs[2].proof_credit_source, "verus_checked_scoped");
+    }
+
+    #[test]
+    fn command_router_builds_typed_reviewed_status_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "status-reviewed".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::StatusReviewed {
+                reviewed_dir: ".aegis/reviewed".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn reviewed_lifecycle_is_typed_ordered_and_proc_macro_canonicalized() {
+        use std::fs;
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "kverus-reviewed-lifecycle-{}-{suffix}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&root).unwrap();
+        let root_string = root.display().to_string();
+
+        let empty = KVerusContext.reviewed_lifecycle(&root_string).unwrap();
+        assert_eq!(empty.stage, "reviewed-empty");
+        assert_eq!(empty.canonical_stage, "reviewed_empty");
+        assert_eq!(empty.legal_next_actions, vec!["prepare-reviewed"]);
+        assert!(empty.consistent);
+        assert!(!empty.proof_credit);
+
+        for name in [
+            "reviewed-preparation-receipt.json",
+            "verus-binding.json",
+        ] {
+            fs::write(root.join(name), b"{}\n").unwrap();
+        }
+        let prepared = KVerusContext.reviewed_lifecycle(&root_string).unwrap();
+        assert_eq!(prepared.stage, "reviewed-prepared");
+        assert_eq!(prepared.canonical_stage, "reviewed_prepared");
+        assert!(prepared.legal_next_actions.contains(&"finalize-reviewed"));
+        KVerusContext
+            .require_reviewed_action(&root_string, ReviewedLifecycleAction::Finalize)
+            .unwrap();
+        assert!(
+            KVerusContext
+                .require_reviewed_action(&root_string, ReviewedLifecycleAction::Manifest)
+                .is_err()
+        );
+
+        for name in [
+            "verus-receipt-binding.json",
+            "reviewed-finalization-receipt.json",
+        ] {
+            fs::write(root.join(name), b"{}\n").unwrap();
+        }
+        let finalized = KVerusContext.reviewed_lifecycle(&root_string).unwrap();
+        assert_eq!(finalized.stage, "reviewed-finalized");
+        KVerusContext
+            .require_reviewed_action(&root_string, ReviewedLifecycleAction::Manifest)
+            .unwrap();
+
+        fs::write(root.join("reviewed-evidence-manifest.json"), b"{}\n").unwrap();
+        let manifested = KVerusContext.reviewed_lifecycle(&root_string).unwrap();
+        assert_eq!(manifested.stage, "reviewed-manifested");
+        KVerusContext
+            .require_reviewed_action(&root_string, ReviewedLifecycleAction::Audit)
+            .unwrap();
+
+        fs::write(root.join("reviewed-evidence-audit.json"), b"{}\n").unwrap();
+        let audited = KVerusContext.reviewed_lifecycle(&root_string).unwrap();
+        assert_eq!(audited.stage, "reviewed-audited");
+        assert!(
+            KVerusContext
+                .require_reviewed_action(&root_string, ReviewedLifecycleAction::Finalize)
+                .is_err()
+        );
+
+        fs::remove_file(root.join("verus-binding.json")).unwrap();
+        let inconsistent = KVerusContext.reviewed_lifecycle(&root_string).unwrap();
+        assert_eq!(inconsistent.stage, "reviewed-inconsistent");
+        assert!(!inconsistent.consistent);
+        assert!(inconsistent.legal_next_actions.is_empty());
+
+        fs::remove_dir_all(root).unwrap();
     }
 
     #[test]

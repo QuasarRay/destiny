@@ -101,17 +101,25 @@ jobs:
           cargo +nightly-2026-08-21 test -p kani_metadata
           RUSTFLAGS=--cfg=kani_sysroot cargo +nightly-2026-08-21 test -p kani_macros --features syn/extra-traits --lib
 
-      - name: Prepare and finalize reviewed KVerus orchestration boundary
+      - name: Prepare and exercise reviewed KVerus lifecycle boundary
         run: |
           set -euo pipefail
           out=".aegis/destiny/kani-autoharness-discovery"
+          regression=".aegis/destiny/kverus-reviewed-lifecycle-regression"
+          rm -rf "$out" "$regression"
           mkdir -p "$out"
+
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             prepare-reviewed \
             --manifest-path verification/spec/Cargo.toml \
             --output-dir "$out" \
             > "$out/reviewed-preparation-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$out" \
+            > "$out/reviewed-lifecycle-prepared.json"
+
           python3 -B verification/tools/test_bind_kani_verus.py
           python3 - <<'PY'
           import json
@@ -122,6 +130,7 @@ jobs:
           binding=json.loads((root/"verus-binding.json").read_text())
           receipt=json.loads((root/"reviewed-preparation-receipt.json").read_text())
           stdout_receipt=json.loads((root/"reviewed-preparation-stdout.json").read_text())
+          lifecycle=json.loads((root/"reviewed-lifecycle-prepared.json").read_text())
 
           assert discovery["default_engine"] == "verus", discovery
           assert discovery["proof_credit"] is False, discovery
@@ -146,6 +155,22 @@ jobs:
           assert receipt["contract_inventory_count"] == binding["contract_inventory_count"], receipt
           assert receipt["contract_clause_count"] == binding["contract_clause_count"], receipt
 
+          assert lifecycle["status"] == "KVERUS_REVIEWED_LIFECYCLE", lifecycle
+          assert lifecycle["stage"] == "reviewed-prepared", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_prepared", lifecycle
+          assert lifecycle["consistent"] is True, lifecycle
+          assert lifecycle["proof_credit"] is False, lifecycle
+          assert "finalize-reviewed" in lifecycle["legal_next_actions"], lifecycle
+          PY
+
+          cp -a "$out" "$regression"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path(".aegis/destiny/kverus-reviewed-lifecycle-regression")
+          binding=json.loads((root/"verus-binding.json").read_text())
           campaign=root/"synthetic-finalization-campaign"
           campaign.mkdir(parents=True, exist_ok=True)
           (campaign/"binding.json").write_text(json.dumps({"status":"BOUND"})+"\n")
@@ -159,26 +184,30 @@ jobs:
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             finalize-reviewed \
-            --reviewed-dir "$out" \
-            --campaign-dir "$out/synthetic-finalization-campaign" \
-            > "$out/reviewed-finalization-stdout.json"
+            --reviewed-dir "$regression" \
+            --campaign-dir "$regression/synthetic-finalization-campaign" \
+            > "$regression/reviewed-finalization-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$regression" \
+            > "$regression/reviewed-lifecycle-finalized.json"
 
           python3 - <<'PY'
           import json
           from pathlib import Path
 
-          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          root=Path(".aegis/destiny/kverus-reviewed-lifecycle-regression")
           binding=json.loads((root/"verus-binding.json").read_text())
           campaign_binding=json.loads((root/"verus-receipt-binding.json").read_text())
           receipt=json.loads((root/"reviewed-finalization-receipt.json").read_text())
           stdout_receipt=json.loads((root/"reviewed-finalization-stdout.json").read_text())
+          lifecycle=json.loads((root/"reviewed-lifecycle-finalized.json").read_text())
 
           assert receipt == stdout_receipt, (receipt, stdout_receipt)
           assert campaign_binding["status"] == "KANI_SELECTED_VERUS_CHECKED_SCOPED", campaign_binding
           assert campaign_binding["engine"] == "verus", campaign_binding
           assert campaign_binding["kani_proof_credit"] is False, campaign_binding
           assert campaign_binding["verus_checked_scoped"] is True, campaign_binding
-
           assert receipt["status"] == "KVERUS_REVIEWED_VERUS_FINALIZED", receipt
           assert receipt["engine"] == "verus", receipt
           assert receipt["kani_proof_credit"] is False, receipt
@@ -187,23 +216,32 @@ jobs:
           assert receipt["checked_receipt_count"] == len(binding["controller_obligations"]), receipt
           assert receipt["contract_inventory_count"] == binding["contract_inventory_count"], receipt
           assert receipt["contract_clause_count"] == binding["contract_clause_count"], receipt
+
+          assert lifecycle["stage"] == "reviewed-finalized", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_finalized", lifecycle
+          assert "manifest-reviewed" in lifecycle["legal_next_actions"], lifecycle
           PY
 
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             manifest-reviewed \
-            --reviewed-dir "$out" \
-            > "$out/reviewed-evidence-manifest-stdout.json"
+            --reviewed-dir "$regression" \
+            > "$regression/reviewed-evidence-manifest-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$regression" \
+            > "$regression/reviewed-lifecycle-manifested.json"
 
           python3 - <<'PY'
           import json
           from pathlib import Path
 
-          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          root=Path(".aegis/destiny/kverus-reviewed-lifecycle-regression")
           binding=json.loads((root/"verus-binding.json").read_text())
           campaign_binding=json.loads((root/"verus-receipt-binding.json").read_text())
           manifest=json.loads((root/"reviewed-evidence-manifest.json").read_text())
           stdout_manifest=json.loads((root/"reviewed-evidence-manifest-stdout.json").read_text())
+          lifecycle=json.loads((root/"reviewed-lifecycle-manifested.json").read_text())
 
           assert manifest == stdout_manifest, (manifest, stdout_manifest)
           assert manifest["schema"] == 2, manifest
@@ -230,32 +268,64 @@ jobs:
           assert kinds["reviewed-finalization-receipt"]["canonical_token"] == "reviewed_finalization_receipt", kinds
           assert kinds["verus-receipt-binding"]["proof_credit_source"] == "verus_checked_scoped", kinds
           assert kinds["verus-binding"]["proof_credit_source"] == "none", kinds
+
+          assert lifecycle["stage"] == "reviewed-manifested", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_manifested", lifecycle
+          assert "audit-reviewed" in lifecycle["legal_next_actions"], lifecycle
           PY
 
-          cp "$out/verus-binding.json" "$out/verus-binding.json.audit-backup"
-          printf '\n' >> "$out/verus-binding.json"
+          cp "$regression/verus-binding.json" "$regression/verus-binding.json.audit-backup"
+          printf '\n' >> "$regression/verus-binding.json"
           if cargo +nightly-2026-08-21 run --quiet \
               --manifest-path verification/automation/Cargo.toml --locked -- \
-              audit-reviewed --reviewed-dir "$out" \
-              > "$out/audit-drift-unexpected-success.json" 2> "$out/audit-drift-stderr.txt"; then
+              audit-reviewed --reviewed-dir "$regression" \
+              > "$regression/audit-drift-unexpected-success.json" \
+              2> "$regression/audit-drift-stderr.txt"; then
             echo "audit-reviewed unexpectedly accepted byte-level evidence drift" >&2
             exit 1
           fi
-          mv "$out/verus-binding.json.audit-backup" "$out/verus-binding.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$regression" \
+            > "$regression/reviewed-lifecycle-after-drift-failure.json"
+          mv "$regression/verus-binding.json.audit-backup" "$regression/verus-binding.json"
 
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             audit-reviewed \
-            --reviewed-dir "$out" \
-            > "$out/reviewed-evidence-audit-stdout.json"
+            --reviewed-dir "$regression" \
+            > "$regression/reviewed-evidence-audit-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$regression" \
+            > "$regression/reviewed-lifecycle-audited.json"
+
+          if cargo +nightly-2026-08-21 run --quiet \
+              --manifest-path verification/automation/Cargo.toml --locked -- \
+              finalize-reviewed \
+              --reviewed-dir "$regression" \
+              --campaign-dir "$regression/synthetic-finalization-campaign" \
+              > "$regression/finalize-after-audit-unexpected-success.json" \
+              2> "$regression/finalize-after-audit-stderr.txt"; then
+            echo "finalize-reviewed unexpectedly accepted audited lifecycle rollback" >&2
+            exit 1
+          fi
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$out" \
+            > "$out/reviewed-lifecycle-handoff.json"
 
           python3 - <<'PY'
           import json
           from pathlib import Path
 
-          root=Path(".aegis/destiny/kani-autoharness-discovery")
-          audit=json.loads((root/"reviewed-evidence-audit.json").read_text())
-          stdout_audit=json.loads((root/"reviewed-evidence-audit-stdout.json").read_text())
+          regression=Path(".aegis/destiny/kverus-reviewed-lifecycle-regression")
+          audit=json.loads((regression/"reviewed-evidence-audit.json").read_text())
+          stdout_audit=json.loads((regression/"reviewed-evidence-audit-stdout.json").read_text())
+          drift_lifecycle=json.loads((regression/"reviewed-lifecycle-after-drift-failure.json").read_text())
+          audited_lifecycle=json.loads((regression/"reviewed-lifecycle-audited.json").read_text())
+
           assert audit == stdout_audit, (audit, stdout_audit)
           assert audit["status"] == "KVERUS_REVIEWED_EVIDENCE_AUDITED", audit
           assert audit["engine"] == "verus", audit
@@ -265,6 +335,21 @@ jobs:
           assert len(audit["manifest_digest"]) == 64, audit
           assert audit["verified_artifact_count"] == 4, audit
           assert audit["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", audit
+
+          assert drift_lifecycle["stage"] == "reviewed-manifested", drift_lifecycle
+          assert audited_lifecycle["stage"] == "reviewed-audited", audited_lifecycle
+          assert audited_lifecycle["canonical_stage"] == "reviewed_audited", audited_lifecycle
+          assert audited_lifecycle["legal_next_actions"] == ["audit-reviewed"], audited_lifecycle
+
+          handoff=Path(".aegis/destiny/kani-autoharness-discovery")
+          handoff_lifecycle=json.loads((handoff/"reviewed-lifecycle-handoff.json").read_text())
+          assert handoff_lifecycle["stage"] == "reviewed-prepared", handoff_lifecycle
+          assert handoff_lifecycle["canonical_stage"] == "reviewed_prepared", handoff_lifecycle
+          assert handoff_lifecycle["consistent"] is True, handoff_lifecycle
+          assert not (handoff/"verus-receipt-binding.json").exists(), handoff_lifecycle
+          assert not (handoff/"reviewed-finalization-receipt.json").exists(), handoff_lifecycle
+          assert not (handoff/"reviewed-evidence-manifest.json").exists(), handoff_lifecycle
+          assert not (handoff/"reviewed-evidence-audit.json").exists(), handoff_lifecycle
           PY
 
       - name: Discover the generated-obligation fixture corpus through the same Kani compiler path
@@ -374,6 +459,13 @@ jobs:
         with:
           name: kani-verus-automation-discovery
           path: .aegis/destiny/kani-autoharness-discovery
+
+      - name: Retain reviewed lifecycle regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kverus-reviewed-lifecycle-regression
+          path: .aegis/destiny/kverus-reviewed-lifecycle-regression
 
       - name: Retain generated-obligation fixture discovery
         if: always()
@@ -679,12 +771,33 @@ jobs:
         run: |
           set -euo pipefail
           reviewed=".aegis/destiny/kani-autoharness-discovery"
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-lifecycle-before-finalization.json"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          lifecycle=json.loads((root/"reviewed-lifecycle-before-finalization.json").read_text())
+          assert lifecycle["stage"] == "reviewed-prepared", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_prepared", lifecycle
+          assert lifecycle["consistent"] is True, lifecycle
+          assert lifecycle["proof_credit"] is False, lifecycle
+          PY
+
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             finalize-reviewed \
             --reviewed-dir "$reviewed" \
             --campaign-dir .aegis/destiny/verus-final-campaign \
             > "$reviewed/reviewed-finalization-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-lifecycle-finalized.json"
+
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -692,12 +805,14 @@ jobs:
           receipt=json.loads((root/"reviewed-finalization-receipt.json").read_text())
           stdout_receipt=json.loads((root/"reviewed-finalization-stdout.json").read_text())
           campaign_binding=json.loads((root/"verus-receipt-binding.json").read_text())
+          lifecycle=json.loads((root/"reviewed-lifecycle-finalized.json").read_text())
           assert receipt == stdout_receipt, (receipt, stdout_receipt)
           assert receipt["status"] == "KVERUS_REVIEWED_VERUS_FINALIZED", receipt
           assert receipt["engine"] == "verus", receipt
           assert receipt["kani_proof_credit"] is False, receipt
           assert receipt["verus_checked_scoped"] is True, receipt
           assert campaign_binding["status"] == "KANI_SELECTED_VERUS_CHECKED_SCOPED", campaign_binding
+          assert lifecycle["stage"] == "reviewed-finalized", lifecycle
           PY
 
           cargo +nightly-2026-08-21 run --quiet \
@@ -707,9 +822,19 @@ jobs:
             > "$reviewed/reviewed-evidence-manifest-stdout.json"
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-lifecycle-manifested.json"
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
             audit-reviewed \
             --reviewed-dir "$reviewed" \
             > "$reviewed/reviewed-evidence-audit-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-lifecycle-audited.json"
+
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -718,6 +843,8 @@ jobs:
           stdout_manifest=json.loads((root/"reviewed-evidence-manifest-stdout.json").read_text())
           audit=json.loads((root/"reviewed-evidence-audit.json").read_text())
           stdout_audit=json.loads((root/"reviewed-evidence-audit-stdout.json").read_text())
+          manifested=json.loads((root/"reviewed-lifecycle-manifested.json").read_text())
+          audited=json.loads((root/"reviewed-lifecycle-audited.json").read_text())
           assert manifest == stdout_manifest, (manifest, stdout_manifest)
           assert manifest["schema"] == 2, manifest
           assert manifest["status"] == "KVERUS_REVIEWED_EVIDENCE_MANIFEST", manifest
@@ -731,6 +858,8 @@ jobs:
           assert audit["kani_proof_credit"] is False, audit
           assert audit["verus_checked_scoped"] is True, audit
           assert audit["verified_artifact_count"] == len(manifest["artifacts"]), audit
+          assert manifested["stage"] == "reviewed-manifested", manifested
+          assert audited["stage"] == "reviewed-audited", audited
           PY
 
       - name: Retain complete counted results, VIR inventories and scope audit
