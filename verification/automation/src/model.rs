@@ -87,6 +87,20 @@ define_derive_deftly! {
     }
 }
 
+define_derive_deftly! {
+    KVerusReviewedWorkflowStepMetadata:
+
+    impl $ttype {
+        pub(crate) const ALL: &'static [Self] = &[$(Self::$vname,)];
+
+        pub(crate) const fn kverus_name(self) -> &'static str {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+            }
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum DiscoveryDisposition {
@@ -198,6 +212,12 @@ pub enum AutomationCommand {
     Plan { path: String },
     Prepare { manifest_path: String, output_dir: String },
     PrepareReviewed { manifest_path: String, output_dir: String },
+    VerifyReviewed {
+        manifest_path: String,
+        reviewed_dir: String,
+        campaign_dir: String,
+        verus: String,
+    },
     RunReviewed {
         reviewed_dir: String,
         campaign_dir: String,
@@ -389,6 +409,23 @@ pub enum ReviewedLifecycleAction {
     Audit,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(KVerusReviewedWorkflowStepMetadata)]
+pub enum ReviewedVerificationStep {
+    #[deftly(kverus(name = { "prepare-reviewed" }))]
+    Prepare,
+    #[deftly(kverus(name = { "run-reviewed" }))]
+    Run,
+    #[deftly(kverus(name = { "finalize-reviewed" }))]
+    Finalize,
+    #[deftly(kverus(name = { "manifest-reviewed" }))]
+    Manifest,
+    #[deftly(kverus(name = { "audit-reviewed" }))]
+    Audit,
+    #[deftly(kverus(name = { "validate-reviewed" }))]
+    Validate,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ReviewedIntegrityArtifact {
     pub kind: String,
@@ -438,4 +475,33 @@ pub struct ReviewedExplanationReport {
     pub complete: bool,
     pub blockers: Vec<String>,
     pub proof_credit: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedVerificationReceipt {
+    pub schema: u32,
+    pub status: &'static str,
+    pub engine: &'static str,
+    pub reviewed_dir: String,
+    pub campaign_dir: String,
+    pub canonical_workflow: String,
+    pub starting_stage: String,
+    pub preparation_reused: bool,
+    pub executed_steps: Vec<&'static str>,
+    pub reused_steps: Vec<&'static str>,
+    pub selected_count: usize,
+    pub controller_obligation_count: usize,
+    pub checked_entry_count: usize,
+    pub checked_receipt_count: usize,
+    pub verified_artifact_count: usize,
+    pub contract_inventory_count: usize,
+    pub contract_clause_count: usize,
+    pub translation_correctness: String,
+    pub manifest_path: String,
+    pub manifest_digest_algorithm: &'static str,
+    pub manifest_digest: String,
+    pub final_stage: String,
+    pub integrity_valid: bool,
+    pub proof_credit: bool,
+    pub proof_credit_source: &'static str,
 }

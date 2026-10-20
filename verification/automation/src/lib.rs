@@ -14,7 +14,7 @@ pub use components::{
     CanReadWriteArtifacts, CanRequireReviewedTransition, CanRouteCommand,
     CanRunJsonPythonTool, CanRunPythonTool, CanRunReviewedCampaign,
     CanValidateCampaignBinding, CanValidateCampaignExecution,
-    CanValidateReviewedIntegrity,
+    CanValidateReviewedIntegrity, CanVerifyReviewed,
     CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
@@ -27,7 +27,7 @@ pub use model::{
     ReviewedEvidenceManifest, ReviewedExplanationReport, ReviewedFinalizationReceipt,
     ReviewedIntegrityArtifact, ReviewedIntegrityReport,
     ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
-    ReviewedPreparationReceipt,
+    ReviewedPreparationReceipt, ReviewedVerificationReceipt, ReviewedVerificationStep,
 };
 
 use kani_metadata::KaniMetadata;
@@ -208,6 +208,9 @@ mod tests {
         let usage = KVerusContext.command_usage().unwrap();
         assert!(usage.contains("prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"));
         assert!(usage.contains(
+            "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path>"
+        ));
+        assert!(usage.contains(
             "run-reviewed --reviewed-dir <dir> --campaign-dir <dir> --verus <path>"
         ));
         assert!(usage.contains("finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>"));
@@ -217,6 +220,14 @@ mod tests {
         assert!(usage.contains("validate-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("explain-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
+
+        let workflow = commands
+            .iter()
+            .find(|command| command.name == "verify-reviewed")
+            .unwrap();
+        assert_eq!(workflow.canonical_token, "verify_reviewed");
+        assert_eq!(workflow.category, "verification");
+        assert!(!workflow.proof_credit);
 
         let runner = commands
             .iter()
@@ -299,6 +310,33 @@ mod tests {
             AutomationCommand::PrepareReviewed {
                 manifest_path: "verification/spec/Cargo.toml".to_string(),
                 output_dir: ".aegis/out".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn command_router_builds_typed_reviewed_workflow_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "verify-reviewed".to_string(),
+                "--verus".to_string(),
+                "verus-dist/verus".to_string(),
+                "--campaign-dir".to_string(),
+                ".aegis/campaign".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+                "--manifest-path".to_string(),
+                "verification/spec/Cargo.toml".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::VerifyReviewed {
+                manifest_path: "verification/spec/Cargo.toml".to_string(),
+                reviewed_dir: ".aegis/reviewed".to_string(),
+                campaign_dir: ".aegis/campaign".to_string(),
+                verus: "verus-dist/verus".to_string(),
             }
         );
     }
@@ -533,6 +571,22 @@ mod tests {
             "default_engine": "verus",
             "proof_credit": false,
             "verus_campaign_checked": false,
+            "preparation": {
+                "schema": 1,
+                "status": "KVERUS_PREPARED",
+                "default_engine": "verus",
+                "kani_source_commit": KANI_SOURCE_COMMIT,
+                "proof_credit": false,
+                "manifest_path": "verification/spec/Cargo.toml",
+                "output_dir": root_string,
+                "metadata_path": root.join("kani-metadata.json").display().to_string(),
+                "discovery_path": root.join("normalized-discovery.json").display().to_string(),
+                "plan_path": root.join("automation-plan.json").display().to_string(),
+                "counts": {
+                    "contracted_functions": 1,
+                    "contract_clauses": 2
+                }
+            },
             "binding_path": binding_path.display().to_string(),
             "binding_status": "BOUND_FOR_VERUS",
             "selected_count": 1,
@@ -565,6 +619,36 @@ mod tests {
         );
         assert!(!valid.proof_credit);
 
+        let campaign = root.join("campaign");
+        let mismatch = KVerusContext
+            .verify_reviewed(
+                "verification/other/Cargo.toml",
+                &root_string,
+                &campaign.display().to_string(),
+                "missing-verus",
+            )
+            .unwrap_err();
+        assert!(mismatch.contains("manifest mismatch"), "{mismatch}");
+
+        let mut nested_corrupted = preparation.clone();
+        nested_corrupted["preparation"]["default_engine"] = serde_json::json!("kani");
+        fs::write(
+            &preparation_path,
+            serde_json::to_vec_pretty(&nested_corrupted).unwrap(),
+        )
+        .unwrap();
+        let nested_invalid = KVerusContext
+            .validate_reviewed_integrity(&root_string)
+            .unwrap();
+        assert!(!nested_invalid.valid);
+        assert!(nested_invalid.violations[0].contains("preparation receipt"));
+
+        fs::write(
+            &preparation_path,
+            serde_json::to_vec_pretty(&preparation).unwrap(),
+        )
+        .unwrap();
+
         let mut corrupted = preparation;
         corrupted["proof_credit"] = serde_json::json!(true);
         fs::write(
@@ -582,6 +666,40 @@ mod tests {
         assert!(invalid.violations[0].contains("preparation receipt"));
         assert!(!invalid.proof_credit);
 
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn reviewed_workflow_rejects_completed_lifecycle_before_execution() {
+        use std::fs;
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "kverus-reviewed-workflow-{}-{suffix}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&root).unwrap();
+        for name in [
+            "reviewed-preparation-receipt.json",
+            "verus-binding.json",
+            "verus-receipt-binding.json",
+            "reviewed-finalization-receipt.json",
+        ] {
+            fs::write(root.join(name), b"{}\n").unwrap();
+        }
+        let error = KVerusContext
+            .verify_reviewed(
+                "verification/spec/Cargo.toml",
+                &root.display().to_string(),
+                &root.join("campaign").display().to_string(),
+                "missing-verus",
+            )
+            .unwrap_err();
+        assert!(error.contains("reviewed-empty or reviewed-prepared"), "{error}");
         fs::remove_dir_all(root).unwrap();
     }
 

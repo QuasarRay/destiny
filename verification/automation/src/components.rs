@@ -8,7 +8,7 @@ use crate::{
     ReviewedCampaignExecutionReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
     ReviewedIntegrityArtifact, ReviewedIntegrityReport, ReviewedLifecycleAction,
     ReviewedLifecycleReport, ReviewedLifecycleStage, ReviewedExplanationReport,
-    ReviewedPreparationReceipt,
+    ReviewedPreparationReceipt, ReviewedVerificationReceipt, ReviewedVerificationStep,
 };
 use cgp::prelude::*;
 use comprende::c;
@@ -102,6 +102,11 @@ const COMMANDS: &[(&str, &str, &str)] = &[
         "prepare-reviewed",
         "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>",
         "reviewed_binding",
+    ),
+    (
+        "verify-reviewed",
+        "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path>",
+        "verification",
     ),
     (
         "run-reviewed",
@@ -221,6 +226,18 @@ impl CommandRouter {
                 Ok(AutomationCommand::PrepareReviewed {
                     manifest_path,
                     output_dir,
+                })
+            }
+            "verify-reviewed" => {
+                let values = parse_required_flags(
+                    rest,
+                    &["--manifest-path", "--reviewed-dir", "--campaign-dir", "--verus"],
+                )?;
+                Ok(AutomationCommand::VerifyReviewed {
+                    manifest_path: values[0].clone(),
+                    reviewed_dir: values[1].clone(),
+                    campaign_dir: values[2].clone(),
+                    verus: values[3].clone(),
                 })
             }
             "run-reviewed" => {
@@ -914,12 +931,34 @@ impl JsonReceiptDecoder {
 }
 
 #[derive(Deserialize)]
+struct PreparationCountsArtifact {
+    contracted_functions: usize,
+    contract_clauses: usize,
+}
+
+#[derive(Deserialize)]
+struct PreparationArtifact {
+    schema: u32,
+    status: String,
+    default_engine: String,
+    kani_source_commit: String,
+    proof_credit: bool,
+    manifest_path: String,
+    output_dir: String,
+    metadata_path: String,
+    discovery_path: String,
+    plan_path: String,
+    counts: PreparationCountsArtifact,
+}
+
+#[derive(Deserialize)]
 struct ReviewedPreparationArtifact {
     schema: u32,
     status: String,
     default_engine: String,
     proof_credit: bool,
     verus_campaign_checked: bool,
+    preparation: PreparationArtifact,
     binding_path: String,
     binding_status: String,
     selected_count: usize,
@@ -965,9 +1004,26 @@ fn validate_reviewed_preparation_artifact(
     receipt: &ReviewedPreparationArtifact,
     binding: &ReviewedBindingSummary,
     binding_path: &Path,
+    reviewed_dir: &str,
 ) -> Result<(), String> {
     let expected_binding_path = binding_path.display().to_string();
-    if receipt.schema != 1
+    let root = PathBuf::from(reviewed_dir);
+    let preparation = &receipt.preparation;
+    let preparation_valid = preparation.schema == 1
+        && preparation.status == "KVERUS_PREPARED"
+        && preparation.default_engine == DEFAULT_ENGINE
+        && preparation.kani_source_commit == KANI_SOURCE_COMMIT
+        && !preparation.proof_credit
+        && !preparation.manifest_path.is_empty()
+        && preparation.output_dir == reviewed_dir
+        && preparation.metadata_path == root.join("kani-metadata.json").display().to_string()
+        && preparation.discovery_path == root.join("normalized-discovery.json").display().to_string()
+        && preparation.plan_path == root.join("automation-plan.json").display().to_string()
+        && preparation.counts.contracted_functions == receipt.contract_inventory_count
+        && preparation.counts.contract_clauses == receipt.contract_clause_count;
+
+    if !preparation_valid
+        || receipt.schema != 1
         || receipt.status != "KVERUS_REVIEWED_BINDING_PREPARED"
         || receipt.default_engine != DEFAULT_ENGINE
         || receipt.proof_credit
@@ -1362,6 +1418,7 @@ pub trait CanRunReviewedCampaign {
 #[cgp_impl(new VerusReviewedCampaignExecution)]
 #[uses(
     CanRequireReviewedTransition,
+    CanInspectArtifactPresence,
     CanRunPythonTool,
     CanReadJsonArtifact,
     CanValidateCampaignExecution,
@@ -1387,6 +1444,20 @@ impl ReviewedCampaignExecution {
         let runner_receipt_path = campaign_dir_path.join("verus-campaign-runner-receipt.json");
         let execution_receipt_path =
             campaign_dir_path.join("kverus-reviewed-campaign-execution.json");
+        let freshness_paths = [
+            runner_receipt_path.clone(),
+            execution_receipt_path.clone(),
+            campaign_dir_path.join("binding.json"),
+            campaign_dir_path.join("audit.json"),
+        ];
+        for path in freshness_paths {
+            if self.artifact_exists(&path)? {
+                return Err(format!(
+                    "reviewed Verus campaign requires fresh evidence; choose a different campaign directory because {} already exists",
+                    path.display()
+                ));
+            }
+        }
         let args = vec![
             "--verus".to_string(),
             verus.to_string(),
@@ -1630,7 +1701,12 @@ impl ReviewedEvidenceBuilder {
         let finalization: ReviewedFinalizationArtifact =
             self.decode_json_receipt(finalization_value, "reviewed finalization receipt")?;
 
-        validate_reviewed_preparation_artifact(&preparation, &binding, &binding_path)?;
+        validate_reviewed_preparation_artifact(
+            &preparation,
+            &binding,
+            &binding_path,
+            reviewed_dir,
+        )?;
         validate_reviewed_finalization_artifact(
             &finalization,
             reviewed_dir,
@@ -1842,6 +1918,7 @@ impl ReviewedIntegrityValidation {
                     &preparation,
                     &binding,
                     &binding_path,
+                    reviewed_dir,
                 )?;
                 Ok(vec![
                     reviewed_integrity_artifact(
@@ -1984,6 +2061,140 @@ impl ReviewedIntegrityValidation {
     }
 }
 
+#[cgp_component(ReviewedVerification)]
+pub trait CanVerifyReviewed {
+    fn verify_reviewed(
+        &self,
+        manifest_path: &str,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+    ) -> Result<ReviewedVerificationReceipt, String>;
+}
+
+#[cgp_impl(new FreshReviewedVerification)]
+#[uses(
+    CanInspectReviewedLifecycle,
+    CanValidateReviewedIntegrity,
+    CanReadJsonArtifact,
+    CanDecodeJsonReceipt,
+    CanPrepareReviewedBinding,
+    CanRunReviewedCampaign,
+    CanFinalizeReviewedCampaign,
+    CanAssembleReviewedEvidence,
+    CanAuditReviewedEvidence,
+    CanCanonicalizeStaticIdentity
+)]
+impl ReviewedVerification {
+    fn verify_reviewed(
+        &self,
+        manifest_path: &str,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+    ) -> Result<ReviewedVerificationReceipt, String> {
+        let lifecycle = self.reviewed_lifecycle(reviewed_dir)?;
+        let starting_stage = ReviewedLifecycleStage::from_kverus_name(lifecycle.stage)
+            .ok_or_else(|| format!("unknown reviewed lifecycle stage {}", lifecycle.stage))?;
+        if !lifecycle.consistent
+            || !matches!(
+                starting_stage,
+                ReviewedLifecycleStage::Empty | ReviewedLifecycleStage::Prepared
+            )
+        {
+            return Err(format!(
+                "verify-reviewed requires reviewed-empty or reviewed-prepared so Verus proof execution is fresh; current stage is {}",
+                lifecycle.stage
+            ));
+        }
+
+        let preparation_reused = starting_stage == ReviewedLifecycleStage::Prepared;
+        if preparation_reused {
+            let integrity = self.validate_reviewed_integrity(reviewed_dir)?;
+            if !integrity.valid {
+                return Err(format!(
+                    "verify-reviewed refuses invalid prepared evidence: {}",
+                    integrity.violations.join("; ")
+                ));
+            }
+            let preparation_path =
+                PathBuf::from(reviewed_dir).join("reviewed-preparation-receipt.json");
+            let preparation: ReviewedPreparationArtifact = self.decode_json_receipt(
+                self.read_json_artifact(&preparation_path)?,
+                "reviewed preparation receipt",
+            )?;
+            if preparation.preparation.manifest_path != manifest_path {
+                return Err(format!(
+                    "verify-reviewed manifest mismatch: prepared evidence is bound to {:?}, requested {:?}",
+                    preparation.preparation.manifest_path, manifest_path
+                ));
+            }
+        } else {
+            self.prepare_reviewed_binding(manifest_path, reviewed_dir)?;
+        }
+
+        let execution = self.run_reviewed_campaign(reviewed_dir, campaign_dir, verus)?;
+        let finalization = self.finalize_reviewed_campaign(reviewed_dir, campaign_dir)?;
+        let manifest = self.assemble_reviewed_evidence(reviewed_dir)?;
+        if finalization.checked_receipt_count != manifest.checked_receipt_count {
+            return Err("verify-reviewed finalization and manifest receipt counts diverged".into());
+        }
+        let audit = self.audit_reviewed_evidence(reviewed_dir)?;
+        if audit.verified_artifact_count != manifest.artifacts.len() {
+            return Err("verify-reviewed audit and manifest artifact counts diverged".into());
+        }
+        let integrity = self.validate_reviewed_integrity(reviewed_dir)?;
+        if !integrity.valid
+            || integrity.lifecycle_stage != ReviewedLifecycleStage::Audited.kverus_name()
+        {
+            return Err(format!(
+                "verify-reviewed final integrity validation failed at {}: {}",
+                integrity.lifecycle_stage,
+                integrity.violations.join("; ")
+            ));
+        }
+
+        let executed_steps = c![
+            step.kverus_name()
+            for step in ReviewedVerificationStep::ALL.iter().copied()
+            if !preparation_reused || step != ReviewedVerificationStep::Prepare
+        ];
+        let reused_steps = c![
+            step.kverus_name()
+            for step in ReviewedVerificationStep::ALL.iter().copied()
+            if preparation_reused && step == ReviewedVerificationStep::Prepare
+        ];
+
+        Ok(ReviewedVerificationReceipt {
+            schema: 1,
+            status: "KVERUS_REVIEWED_WORKFLOW_COMPLETE",
+            engine: DEFAULT_ENGINE,
+            reviewed_dir: reviewed_dir.to_string(),
+            campaign_dir: campaign_dir.to_string(),
+            canonical_workflow: self.canonicalize_static_identity("reviewed-verification")?,
+            starting_stage: lifecycle.stage.to_string(),
+            preparation_reused,
+            executed_steps,
+            reused_steps,
+            selected_count: manifest.selected_count,
+            controller_obligation_count: manifest.controller_obligation_count,
+            checked_entry_count: execution.checked_entry_count,
+            checked_receipt_count: manifest.checked_receipt_count,
+            verified_artifact_count: audit.verified_artifact_count,
+            contract_inventory_count: manifest.contract_inventory_count,
+            contract_clause_count: manifest.contract_clause_count,
+            translation_correctness: manifest.translation_correctness,
+            manifest_path: audit.manifest_path,
+            manifest_digest_algorithm: audit.manifest_digest_algorithm,
+            manifest_digest: audit.manifest_digest,
+            final_stage: integrity.lifecycle_stage,
+            integrity_valid: integrity.valid,
+            proof_credit: false,
+            proof_credit_source: "existing_verus_checked_scoped_receipts_only",
+        })
+    }
+}
+
 #[cgp_component(ReviewedExplanation)]
 pub trait CanExplainReviewed {
     fn explain_reviewed(&self, reviewed_dir: &str) -> Result<ReviewedExplanationReport, String>;
@@ -2091,6 +2302,8 @@ delegate_and_check_components! {
             ContentAddressedReviewedEvidenceAudit,
         ReviewedIntegrityValidationComponent:
             StrictReviewedIntegrityValidation,
+        ReviewedVerificationComponent:
+            FreshReviewedVerification,
         ReviewedExplanationComponent:
             ComposedReviewedExplanation,
     }
