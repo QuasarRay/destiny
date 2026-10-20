@@ -257,7 +257,7 @@ def main() -> int:
         elif args.target_kind == "bin":
             cmd.extend(["--bin", args.target_name])
         for function in args.function:
-            cmd.extend(["--include-pattern", f"^{re.escape(function)}$"])
+            cmd.extend(["--include-pattern", f"(?:^|::){re.escape(function)}$"])
 
         result = subprocess.run(cmd, cwd=out, env=env, text=True, capture_output=True)
 
