@@ -74,6 +74,39 @@ def supported(registry: dict[str, Any]) -> list[dict[str, Any]]:
     return [row for row in registry["candidates"] if row.get("status") == "supported"]
 
 
+def selected_supported(
+    registry: dict[str, Any],
+    requested_functions: list[str] | None,
+) -> list[dict[str, Any]]:
+    rows = supported(registry)
+    if not requested_functions:
+        return rows
+
+    if len(requested_functions) != len(set(requested_functions)):
+        raise BindingError("configured function selection contains duplicates")
+
+    selected = []
+    seen = set()
+    for requested in requested_functions:
+        matches = [
+            row
+            for row in rows
+            if requested in {row["function"], row["kani_metadata_name"]}
+        ]
+        if len(matches) != 1:
+            raise BindingError(
+                f"configured function {requested!r} does not resolve to exactly one supported registry mapping"
+            )
+        key = matches[0]["kani_metadata_name"]
+        if key in seen:
+            raise BindingError(
+                f"configured function selection aliases the same mapping more than once: {requested!r}"
+            )
+        seen.add(key)
+        selected.append(matches[0])
+    return sorted(selected, key=lambda row: row["kani_metadata_name"])
+
+
 def normalized_contract_inventory(normalized: dict[str, Any]) -> list[dict[str, Any]]:
     rows = normalized.get("contracted_functions", [])
     if not isinstance(rows, list):
@@ -145,6 +178,7 @@ def bind_discovery(
     normalized_path: Path,
     registry_path: Path,
     plan_path: Path,
+    requested_functions: list[str] | None = None,
 ) -> dict[str, Any]:
     normalized = load_json(normalized_path)
     registry = load_registry(registry_path)
@@ -171,7 +205,7 @@ def bind_discovery(
             raise BindingError(f"duplicate Kani candidate identity: {name}")
         by_name[name] = row
 
-    supported_rows = supported(registry)
+    supported_rows = selected_supported(registry, requested_functions)
     supported_by_name = {row["kani_metadata_name"]: row for row in supported_rows}
     if len(supported_by_name) != len(supported_rows):
         raise BindingError("registry contains duplicate Kani metadata identities")
@@ -274,6 +308,7 @@ def bind_discovery(
         "records": records,
         "selected": selected,
         "controller_obligations": obligations,
+        "configured_functions": list(requested_functions or []),
         "contract_inventory": contracts,
         "contract_inventory_count": len(contracts),
         "contract_clause_count": sum(len(row["clauses"]) for row in contracts),
@@ -367,6 +402,7 @@ def main() -> int:
     bind = sub.add_parser("bind")
     bind.add_argument("--normalized", type=Path, required=True)
     bind.add_argument("--output", type=Path, required=True)
+    bind.add_argument("--function", action="append", default=[])
 
     campaign = sub.add_parser("check-campaign")
     campaign.add_argument("--binding", type=Path, required=True)
@@ -382,7 +418,12 @@ def main() -> int:
     if args.command == "bind":
         normalized = args.normalized if args.normalized.is_absolute() else ROOT / args.normalized
         output = args.output if args.output.is_absolute() else ROOT / args.output
-        payload = bind_discovery(normalized, registry_path, plan_path)
+        payload = bind_discovery(
+            normalized,
+            registry_path,
+            plan_path,
+            requested_functions=args.function,
+        )
         write_output(output, payload)
         return 0 if payload["status"] == "BOUND_FOR_VERUS" else 1
 
