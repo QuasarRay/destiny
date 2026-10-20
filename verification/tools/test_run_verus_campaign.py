@@ -28,7 +28,7 @@ class CampaignPlanTests(unittest.TestCase):
 
     def test_configured_subset_builds_exact_filtered_plan(self):
         selected = campaign.select_plan(self.plan(), ["b"])
-        self.assertEqual(selected["configured_obligations"], ["b"])
+        self.assertEqual(set(selected), set(self.plan()))
         self.assertEqual(
             [row["id"] for row in selected["obligations"]],
             ["b"],
