@@ -630,6 +630,22 @@ mod tests {
             .unwrap_err();
         assert!(mismatch.contains("manifest mismatch"), "{mismatch}");
 
+        fs::create_dir_all(&campaign).unwrap();
+        fs::write(campaign.join("binding.json"), b"{}\n").unwrap();
+        let stale_campaign = KVerusContext
+            .verify_reviewed(
+                "verification/spec/Cargo.toml",
+                &root_string,
+                &campaign.display().to_string(),
+                "missing-verus",
+            )
+            .unwrap_err();
+        assert!(
+            stale_campaign.contains("requires fresh evidence"),
+            "{stale_campaign}"
+        );
+        fs::remove_dir_all(&campaign).unwrap();
+
         let mut nested_corrupted = preparation.clone();
         nested_corrupted["preparation"]["default_engine"] = serde_json::json!("kani");
         fs::write(
