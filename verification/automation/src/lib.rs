@@ -7,8 +7,8 @@ pub use components::{
     CanAssembleReviewedEvidence, CanAuditReviewedEvidence, CanBuildAutomationPlan,
     CanBuildReviewedEvidenceManifest, CanCanonicalizeContractClause,
     CanCanonicalizeStaticIdentity, CanDecodeJsonReceipt, CanDescribeCommands,
-    CanDescribeEvidenceArtifacts, CanDigestArtifactBytes, CanFinalizeReviewedCampaign,
-    CanInspectArtifactPresence,
+    CanDescribeEvidenceArtifacts, CanDigestArtifactBytes, CanExplainReviewed,
+    CanFinalizeReviewedCampaign, CanInspectArtifactPresence,
     CanInspectReviewedLifecycle, CanNormalizeMetadata, CanParseMetadataBytes,
     CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
     CanReadWriteArtifacts, CanRequireReviewedTransition, CanRouteCommand,
@@ -24,8 +24,8 @@ pub use model::{
     DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind, EvidenceArtifactSpec,
     PlanCounts, PlannedContractClause, PreparationReceipt, ReviewedBindingSummary,
     ReviewedCampaignExecutionReceipt, ReviewedEvidenceAuditReceipt,
-    ReviewedEvidenceManifest, ReviewedFinalizationReceipt, ReviewedIntegrityArtifact,
-    ReviewedIntegrityReport,
+    ReviewedEvidenceManifest, ReviewedExplanationReport, ReviewedFinalizationReceipt,
+    ReviewedIntegrityArtifact, ReviewedIntegrityReport,
     ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
     ReviewedPreparationReceipt,
 };
@@ -215,6 +215,7 @@ mod tests {
         assert!(usage.contains("audit-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("status-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("validate-reviewed --reviewed-dir <dir>"));
+        assert!(usage.contains("explain-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
 
         let runner = commands
@@ -271,6 +272,14 @@ mod tests {
         assert_eq!(validation.canonical_token, "validate_reviewed");
         assert_eq!(validation.category, "lifecycle");
         assert!(!validation.proof_credit);
+
+        let explanation = commands
+            .iter()
+            .find(|command| command.name == "explain-reviewed")
+            .unwrap();
+        assert_eq!(explanation.canonical_token, "explain_reviewed");
+        assert_eq!(explanation.category, "diagnostics");
+        assert!(!explanation.proof_credit);
     }
 
     #[test]
@@ -388,6 +397,24 @@ mod tests {
         assert_eq!(
             command,
             AutomationCommand::ValidateReviewed {
+                reviewed_dir: ".aegis/reviewed".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn command_router_builds_typed_reviewed_explanation_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "explain-reviewed".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::ExplainReviewed {
                 reviewed_dir: ".aegis/reviewed".to_string(),
             }
         );
@@ -637,6 +664,45 @@ mod tests {
         assert_eq!(inconsistent.stage, "reviewed-inconsistent");
         assert!(!inconsistent.consistent);
         assert!(inconsistent.legal_next_actions.is_empty());
+
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn reviewed_explanation_composes_lifecycle_integrity_and_next_action() {
+        use std::fs;
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "kverus-reviewed-explanation-{}-{suffix}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&root).unwrap();
+        let root_string = root.display().to_string();
+
+        let empty = KVerusContext.explain_reviewed(&root_string).unwrap();
+        assert_eq!(empty.status, "KVERUS_REVIEWED_EXPLANATION");
+        assert_eq!(empty.lifecycle.stage, "reviewed-empty");
+        assert!(empty.integrity.valid);
+        assert_eq!(empty.recommended_next_action, Some("prepare-reviewed"));
+        assert!(empty.ready_for_next_action);
+        assert!(!empty.complete);
+        assert!(empty.blockers.is_empty());
+        assert!(!empty.proof_credit);
+
+        fs::write(root.join("reviewed-preparation-receipt.json"), b"{}\n").unwrap();
+        let inconsistent = KVerusContext.explain_reviewed(&root_string).unwrap();
+        assert_eq!(inconsistent.lifecycle.stage, "reviewed-inconsistent");
+        assert!(!inconsistent.integrity.valid);
+        assert_eq!(inconsistent.recommended_next_action, None);
+        assert!(!inconsistent.ready_for_next_action);
+        assert!(!inconsistent.complete);
+        assert!(!inconsistent.blockers.is_empty());
+        assert!(!inconsistent.proof_credit);
 
         fs::remove_dir_all(root).unwrap();
     }
