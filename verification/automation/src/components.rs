@@ -620,6 +620,44 @@ fn validate_unique_nonempty(values: &[String], label: &str) -> Result<(), String
     Ok(())
 }
 
+fn validate_reviewed_selection(
+    selection: &ReviewedVerificationSelection,
+) -> Result<(), String> {
+    validate_unique_nonempty(&selection.packages, "packages")?;
+    validate_unique_nonempty(&selection.features, "features")?;
+    validate_unique_nonempty(&selection.functions, "functions")?;
+    if selection.all_features && (!selection.features.is_empty() || selection.no_default_features) {
+        return Err(
+            "all_features cannot be combined with explicit features or no_default_features".into(),
+        );
+    }
+    match (selection.target.requires_name(), selection.target_name.as_deref()) {
+        (true, Some(name)) if !name.trim().is_empty() => Ok(()),
+        (true, _) => Err("target=bin requires non-empty target_name".into()),
+        (false, None) => Ok(()),
+        (false, Some(_)) => Err("target_name is only valid when target=bin".into()),
+    }
+}
+
+fn validate_reviewed_limits(limits: &ReviewedVerificationLimits) -> Result<(), String> {
+    if !(1..=120).contains(&limits.timeout_seconds) {
+        return Err(
+            "timeout_seconds must be between 1 and the maintained 120-second scoped Verus limit"
+                .into(),
+        );
+    }
+    if matches!(limits.memory_mib, Some(0)) {
+        return Err("memory_mib must be positive when specified".into());
+    }
+    if limits.max_concurrency != 1 {
+        return Err(
+            "max_concurrency must currently be 1 because the maintained Destiny controller serializes proof execution"
+                .into(),
+        );
+    }
+    Ok(())
+}
+
 #[cgp_component(ReviewedVerificationConfigValidation)]
 pub trait CanValidateReviewedVerificationConfig {
     fn validate_reviewed_verification_config(
@@ -640,43 +678,8 @@ impl ReviewedVerificationConfigValidation {
                 config.schema
             ));
         }
-        validate_unique_nonempty(&config.selection.packages, "packages")?;
-        validate_unique_nonempty(&config.selection.features, "features")?;
-        validate_unique_nonempty(&config.selection.functions, "functions")?;
-        if config.selection.all_features
-            && (!config.selection.features.is_empty() || config.selection.no_default_features)
-        {
-            return Err(
-                "all_features cannot be combined with explicit features or no_default_features"
-                    .into(),
-            );
-        }
-        match (
-            config.selection.target.requires_name(),
-            config.selection.target_name.as_deref(),
-        ) {
-            (true, Some(name)) if !name.trim().is_empty() => {}
-            (true, _) => return Err("target=bin requires non-empty target_name".into()),
-            (false, None) => {}
-            (false, Some(_)) => {
-                return Err("target_name is only valid when target=bin".into());
-            }
-        }
-        if !(1..=120).contains(&config.limits.timeout_seconds) {
-            return Err(
-                "timeout_seconds must be between 1 and the maintained 120-second scoped Verus limit"
-                    .into(),
-            );
-        }
-        if matches!(config.limits.memory_mib, Some(0)) {
-            return Err("memory_mib must be positive when specified".into());
-        }
-        if config.limits.max_concurrency != 1 {
-            return Err(
-                "max_concurrency must currently be 1 because the maintained Destiny controller serializes proof execution"
-                    .into(),
-            );
-        }
+        validate_reviewed_selection(&config.selection)?;
+        validate_reviewed_limits(&config.limits)?;
         Ok(config)
     }
 }
@@ -1188,6 +1191,8 @@ fn validate_reviewed_preparation_artifact(
     let expected_binding_path = binding_path.display().to_string();
     let root = PathBuf::from(reviewed_dir);
     let preparation = &receipt.preparation;
+    validate_reviewed_selection(&preparation.selection)
+        .map_err(|error| format!("reviewed preparation selection is invalid: {error}"))?;
     let preparation_valid = preparation.schema == 1
         && preparation.status == "KVERUS_PREPARED"
         && preparation.default_engine == DEFAULT_ENGINE
@@ -1212,6 +1217,7 @@ fn validate_reviewed_preparation_artifact(
         || receipt.unresolved_count != 0
         || receipt.selected_count != binding.selected_count
         || receipt.controller_obligation_count != binding.controller_obligation_count
+        || preparation.selection.functions != binding.configured_functions
         || receipt.contract_inventory_count != binding.contract_inventory_count
         || receipt.contract_clause_count != binding.contract_clause_count
     {
@@ -1427,6 +1433,7 @@ struct ReviewedBindingReceipt {
     default_engine: String,
     kani_proof_credit: bool,
     selected: Vec<serde_json::Value>,
+    configured_functions: Vec<String>,
     controller_obligations: Vec<String>,
     contract_inventory_count: usize,
     contract_clause_count: usize,
@@ -1472,6 +1479,7 @@ impl ReviewedBindingValidator {
         Ok(ReviewedBindingSummary {
             status: binding.status,
             selected_count: binding.selected.len(),
+            configured_functions: binding.configured_functions,
             controller_obligations: binding.controller_obligations.clone(),
             controller_obligation_count: binding.controller_obligations.len(),
             contract_inventory_count: binding.contract_inventory_count,
@@ -1700,6 +1708,7 @@ impl ReviewedCampaignExecution {
         verus: &str,
         limits: &ReviewedVerificationLimits,
     ) -> Result<ReviewedCampaignExecutionReceipt, String> {
+        validate_reviewed_limits(limits)?;
         self.require_reviewed_action(reviewed_dir, ReviewedLifecycleAction::Run)?;
 
         let binding_path = PathBuf::from(reviewed_dir).join("verus-binding.json");
