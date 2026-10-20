@@ -6,6 +6,7 @@ preserve their receipts and stop the current campaign. Case acceptance remains
 separate and may report incomplete even when all scoped entries are checked.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -52,7 +53,6 @@ def select_plan(plan, requested):
 
     filtered=dict(plan)
     filtered['obligations']=selected
-    filtered['configured_obligations']=[row['id'] for row in selected]
     return filtered
 
 
@@ -153,13 +153,16 @@ def main():
 
         state.mkdir(parents=True,exist_ok=True)
         try:
-            relative_state=state.resolve().relative_to(ROOT.resolve())
+            state.resolve().relative_to(ROOT.resolve())
         except ValueError as error:
             raise ValueError('campaign directory must remain inside the project root') from error
-        selected_plan_path=state/'selected-plan.json'
-        selected_plan_path.write_text(
-            json.dumps(selected_plan,indent=2,sort_keys=True)+'\n'
-        )
+        selected_plan_bytes=(json.dumps(selected_plan,indent=2,sort_keys=True)+'\n').encode()
+        selected_plan_digest=hashlib.sha256(selected_plan_bytes).hexdigest()
+        selected_plan_path=ROOT/'target'/'kverus-plans'/f'{selected_plan_digest}.json'
+        selected_plan_path.parent.mkdir(parents=True,exist_ok=True)
+        if selected_plan_path.exists() and selected_plan_path.read_bytes()!=selected_plan_bytes:
+            raise ValueError('deterministic selected-plan digest collision')
+        selected_plan_path.write_bytes(selected_plan_bytes)
         selected_plan_arg=str(selected_plan_path.relative_to(ROOT))
         bound=run(prefix+['bind',selected_plan_arg],state/'binding.json')
         if bound['status']!='BOUND':
