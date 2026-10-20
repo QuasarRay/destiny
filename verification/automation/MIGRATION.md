@@ -358,3 +358,34 @@ final audited stage, and the existing scoped-Verus proof-credit source while ret
 
 `derive-deftly` owns the workflow-step identity table; `comprende` constructs the
 executed/reused step inventories; CGP composes all stateful operations.
+
+
+## Thirteenth slice: unified selection and resource configuration
+
+`verify-reviewed` now accepts `--config <json>` and uses one typed schema for Cargo
+package/feature/target selection, reviewed function selection, proof timeout, optional
+memory limit, and concurrency. The checked-in
+`verification/automation/reviewed-verification.json` preserves the previous full-scope
+behavior and is exercised by CI.
+
+The configuration is not a shell-only adapter. CGP components validate and load it,
+then thread the same selection through `AutomationPreparation`,
+`ReviewedBindingPreparation`, and `ReviewedVerification`. Pinned Kani's own Cargo and
+autoharness selectors are reused for discovery. Function selection is independently
+resolved against the reviewed registry, persisted in `verus-binding.json`, and checked
+against the nested preparation receipt. The Verus runner builds a filtered campaign plan
+from exactly those bound controller obligation IDs before invoking the maintained
+controller. Unknown or empty effective proof inventories fail closed.
+
+The campaign receipt records the exact obligation list and effective resource limits.
+Timeouts are reported as `TIMEOUT`, not generic proof success or an inferred source bug.
+The configurable timeout cannot exceed the maintained controller's 120-second scoped
+limit. Optional memory limiting uses the host's process address-space limit where
+available. Verification remains serialized: `max_concurrency != 1` is rejected because
+the maintained Destiny controller owns a sequential proof lock and durable attempt budget.
+
+`derive-deftly` generates the target-kind argument metadata instead of duplicating
+target switch tables. `comprende` generates repeated package, feature, function, and
+obligation argument inventories. CGP remains the behavior-bearing boundary for config
+validation/loading, discovery lowering, preparation, binding, execution, and final
+workflow composition.
