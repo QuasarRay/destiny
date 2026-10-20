@@ -342,14 +342,14 @@
     "proof_credit": false
   },
   "reviewed_verification_workflow": {
-    "command": "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path>",
+    "command": "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path> [--config <json>]",
     "status": "supported",
     "architecture": "CGP ReviewedVerification composes reviewed preparation, fresh Verus execution, finalization, evidence manifest, audit, and integrity validation",
     "allowed_starting_stages": [
       "reviewed-empty",
       "reviewed-prepared"
     ],
-    "prepared_reuse": "allowed only after validate-reviewed succeeds and the nested preparation manifest_path exactly matches the requested manifest",
+    "prepared_reuse": "allowed only after validate-reviewed succeeds and the nested preparation manifest_path and selection exactly match the requested manifest/config",
     "rejected_starting_stages": [
       "reviewed-finalized",
       "reviewed-manifested",
@@ -371,5 +371,34 @@
     "receipt_status": "KVERUS_REVIEWED_WORKFLOW_COMPLETE",
     "proof_credit": false,
     "proof_credit_source": "existing_verus_checked_scoped_receipts_only"
+  },
+  "reviewed_verification_config": {
+    "path": "verification/automation/reviewed-verification.json",
+    "schema": 1,
+    "status": "supported",
+    "architecture": "CGP validation/store/selection-lowering components feed the same typed config through Kani discovery, reviewed binding, Verus campaign selection, and final workflow evidence",
+    "selection": {
+      "packages": "repeated pinned-Kani Cargo package selection",
+      "features": "pinned-Kani Cargo feature selection plus all_features/no_default_features",
+      "target": "default | lib | bins | bin; bin requires target_name",
+      "functions": "exact supported registry identity or Kani metadata identity; fail-closed unique resolution and scoped controller-obligation binding"
+    },
+    "limits": {
+      "timeout_seconds": "1..120; outer campaign wall-clock limit, bounded by maintained controller scoped timeout",
+      "memory_mib": "optional positive address-space limit on supported Unix hosts",
+      "max_concurrency": "currently exactly 1; higher values rejected because maintained controller serializes verification"
+    },
+    "upstream_kani_reuse": [
+      "kani-driver/src/args/autoharness_args.rs::CommonAutoharnessArgs",
+      "kani-driver/src/args/cargo.rs::CargoCommonArgs",
+      "kani-driver/src/args/cargo.rs::CargoTargetArgs",
+      "kani-compiler/src/kani_middle/codegen_units.rs::autoharness_filtered_out"
+    ],
+    "macro_refactor": {
+      "target_metadata": "derive-deftly",
+      "repeated_argument_and_obligation_construction": "comprende"
+    },
+    "evidence": "preparation, campaign execution, runner, and final workflow receipts retain effective selection/limits or exact derived obligation inventory",
+    "proof_credit": false
   }
 }
