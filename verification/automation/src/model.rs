@@ -10,25 +10,25 @@ define_derive_deftly! {
 
         pub(crate) const fn kverus_name(self) -> &'static str {
             match self {
-                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+                $(Self::$vname => ${vmeta(kverus(name)) as str},)
             }
         }
 
         pub(crate) const fn filename(self) -> &'static str {
             match self {
-                $(Self::$vname => ${vmeta(kverus(filename)) as expr},)
+                $(Self::$vname => ${vmeta(kverus(filename)) as str},)
             }
         }
 
         pub(crate) const fn status(self) -> &'static str {
             match self {
-                $(Self::$vname => ${vmeta(kverus(status)) as expr},)
+                $(Self::$vname => ${vmeta(kverus(status)) as str},)
             }
         }
 
         pub(crate) const fn proof_credit_source(self) -> &'static str {
             match self {
-                $(Self::$vname => ${vmeta(kverus(proof_credit_source)) as expr},)
+                $(Self::$vname => ${vmeta(kverus(proof_credit_source)) as str},)
             }
         }
     }
@@ -42,7 +42,7 @@ define_derive_deftly! {
 
         pub(crate) const fn kverus_name(self) -> &'static str {
             match self {
-                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+                $(Self::$vname => ${vmeta(kverus(name)) as str},)
             }
         }
 
@@ -75,7 +75,7 @@ define_derive_deftly! {
 
         pub(crate) const fn kverus_name(self) -> &'static str {
             match self {
-                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+                $(Self::$vname => ${vmeta(kverus(name)) as str},)
             }
         }
 
@@ -113,7 +113,7 @@ define_derive_deftly! {
 
         pub(crate) const fn kverus_name(self) -> &'static str {
             match self {
-                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+                $(Self::$vname => ${vmeta(kverus(name)) as str},)
             }
         }
     }
@@ -202,13 +202,13 @@ pub struct AutomationPlan {
 #[derive_deftly(KVerusCargoTargetMetadata)]
 #[serde(rename_all = "snake_case")]
 pub enum ReviewedCargoTarget {
-    #[deftly(kverus(flag = { None }, requires_name = { false }))]
+    #[deftly(kverus(flag = "None", requires_name = "false"))]
     Default,
-    #[deftly(kverus(flag = { Some("--lib") }, requires_name = { false }))]
+    #[deftly(kverus(flag = "Some(\"--lib\")", requires_name = "false"))]
     Lib,
-    #[deftly(kverus(flag = { Some("--bins") }, requires_name = { false }))]
+    #[deftly(kverus(flag = "Some(\"--bins\")", requires_name = "false"))]
     Bins,
-    #[deftly(kverus(flag = { Some("--bin") }, requires_name = { true }))]
+    #[deftly(kverus(flag = "Some(\"--bin\")", requires_name = "true"))]
     Bin,
 }
 
@@ -438,13 +438,13 @@ pub struct EvidenceArtifact {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
 #[derive_deftly(KVerusEvidenceArtifactMetadata)]
 pub enum EvidenceArtifactKind {
-    #[deftly(kverus(name = { "reviewed-preparation-receipt" }, filename = { "reviewed-preparation-receipt.json" }, status = { "KVERUS_REVIEWED_BINDING_PREPARED" }, proof_credit_source = { "none" }))]
+    #[deftly(kverus(name = "reviewed-preparation-receipt", filename = "reviewed-preparation-receipt.json", status = "KVERUS_REVIEWED_BINDING_PREPARED", proof_credit_source = "none"))]
     ReviewedPreparationReceipt,
-    #[deftly(kverus(name = { "verus-binding" }, filename = { "verus-binding.json" }, status = { "BOUND_FOR_VERUS" }, proof_credit_source = { "none" }))]
+    #[deftly(kverus(name = "verus-binding", filename = "verus-binding.json", status = "BOUND_FOR_VERUS", proof_credit_source = "none"))]
     VerusBinding,
-    #[deftly(kverus(name = { "verus-receipt-binding" }, filename = { "verus-receipt-binding.json" }, status = { "KANI_SELECTED_VERUS_CHECKED_SCOPED" }, proof_credit_source = { "verus_checked_scoped" }))]
+    #[deftly(kverus(name = "verus-receipt-binding", filename = "verus-receipt-binding.json", status = "KANI_SELECTED_VERUS_CHECKED_SCOPED", proof_credit_source = "verus_checked_scoped"))]
     VerusReceiptBinding,
-    #[deftly(kverus(name = { "reviewed-finalization-receipt" }, filename = { "reviewed-finalization-receipt.json" }, status = { "KVERUS_REVIEWED_VERUS_FINALIZED" }, proof_credit_source = { "verus_checked_scoped" }))]
+    #[deftly(kverus(name = "reviewed-finalization-receipt", filename = "reviewed-finalization-receipt.json", status = "KVERUS_REVIEWED_VERUS_FINALIZED", proof_credit_source = "verus_checked_scoped"))]
     ReviewedFinalizationReceipt,
 }
 
@@ -492,49 +492,49 @@ pub struct ReviewedEvidenceAuditReceipt {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
 #[derive_deftly(KVerusLifecycleStageMetadata)]
 pub enum ReviewedLifecycleStage {
-    #[deftly(kverus(name = { "reviewed-empty" }, rank = { Some(0u8) }, next = { Some("prepare-reviewed") }))]
+    #[deftly(kverus(name = "reviewed-empty", rank = "Some(0u8)", next = "Some(\"prepare-reviewed\")"))]
     Empty,
-    #[deftly(kverus(name = { "reviewed-prepared" }, rank = { Some(1u8) }, next = { Some("run-reviewed") }))]
+    #[deftly(kverus(name = "reviewed-prepared", rank = "Some(1u8)", next = "Some(\"run-reviewed\")"))]
     Prepared,
-    #[deftly(kverus(name = { "reviewed-finalized" }, rank = { Some(2u8) }, next = { Some("manifest-reviewed") }))]
+    #[deftly(kverus(name = "reviewed-finalized", rank = "Some(2u8)", next = "Some(\"manifest-reviewed\")"))]
     Finalized,
-    #[deftly(kverus(name = { "reviewed-manifested" }, rank = { Some(3u8) }, next = { Some("audit-reviewed") }))]
+    #[deftly(kverus(name = "reviewed-manifested", rank = "Some(3u8)", next = "Some(\"audit-reviewed\")"))]
     Manifested,
-    #[deftly(kverus(name = { "reviewed-audited" }, rank = { Some(4u8) }, next = { None }))]
+    #[deftly(kverus(name = "reviewed-audited", rank = "Some(4u8)", next = "None"))]
     Audited,
-    #[deftly(kverus(name = { "reviewed-inconsistent" }, rank = { None }, next = { None }))]
+    #[deftly(kverus(name = "reviewed-inconsistent", rank = "None", next = "None"))]
     Inconsistent,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
 #[derive_deftly(KVerusLifecycleActionMetadata)]
 pub enum ReviewedLifecycleAction {
-    #[deftly(kverus(name = { "prepare-reviewed" }, allowed = { &[ReviewedLifecycleStage::Empty, ReviewedLifecycleStage::Prepared] }))]
+    #[deftly(kverus(name = "prepare-reviewed", allowed = "&[ReviewedLifecycleStage::Empty, ReviewedLifecycleStage::Prepared]"))]
     Prepare,
-    #[deftly(kverus(name = { "run-reviewed" }, allowed = { &[ReviewedLifecycleStage::Prepared] }))]
+    #[deftly(kverus(name = "run-reviewed", allowed = "&[ReviewedLifecycleStage::Prepared]"))]
     Run,
-    #[deftly(kverus(name = { "finalize-reviewed" }, allowed = { &[ReviewedLifecycleStage::Prepared, ReviewedLifecycleStage::Finalized] }))]
+    #[deftly(kverus(name = "finalize-reviewed", allowed = "&[ReviewedLifecycleStage::Prepared, ReviewedLifecycleStage::Finalized]"))]
     Finalize,
-    #[deftly(kverus(name = { "manifest-reviewed" }, allowed = { &[ReviewedLifecycleStage::Finalized, ReviewedLifecycleStage::Manifested] }))]
+    #[deftly(kverus(name = "manifest-reviewed", allowed = "&[ReviewedLifecycleStage::Finalized, ReviewedLifecycleStage::Manifested]"))]
     Manifest,
-    #[deftly(kverus(name = { "audit-reviewed" }, allowed = { &[ReviewedLifecycleStage::Manifested, ReviewedLifecycleStage::Audited] }))]
+    #[deftly(kverus(name = "audit-reviewed", allowed = "&[ReviewedLifecycleStage::Manifested, ReviewedLifecycleStage::Audited]"))]
     Audit,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
 #[derive_deftly(KVerusReviewedWorkflowStepMetadata)]
 pub enum ReviewedVerificationStep {
-    #[deftly(kverus(name = { "prepare-reviewed" }))]
+    #[deftly(kverus(name = "prepare-reviewed"))]
     Prepare,
-    #[deftly(kverus(name = { "run-reviewed" }))]
+    #[deftly(kverus(name = "run-reviewed"))]
     Run,
-    #[deftly(kverus(name = { "finalize-reviewed" }))]
+    #[deftly(kverus(name = "finalize-reviewed"))]
     Finalize,
-    #[deftly(kverus(name = { "manifest-reviewed" }))]
+    #[deftly(kverus(name = "manifest-reviewed"))]
     Manifest,
-    #[deftly(kverus(name = { "audit-reviewed" }))]
+    #[deftly(kverus(name = "audit-reviewed"))]
     Audit,
-    #[deftly(kverus(name = { "validate-reviewed" }))]
+    #[deftly(kverus(name = "validate-reviewed"))]
     Validate,
 }
 
