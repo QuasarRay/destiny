@@ -728,6 +728,28 @@ mod tests {
         );
         assert!(!valid.proof_credit);
 
+        let mut scope_corrupted = binding.clone();
+        scope_corrupted["configured_functions"] = serde_json::json!(["model::assign_flag"]);
+        fs::write(
+            &binding_path,
+            serde_json::to_vec_pretty(&scope_corrupted).unwrap(),
+        )
+        .unwrap();
+        let scope_invalid = KVerusContext
+            .validate_reviewed_integrity(&root_string)
+            .unwrap();
+        assert!(!scope_invalid.valid);
+        assert!(
+            scope_invalid.violations[0].contains("preparation receipt"),
+            "{:?}",
+            scope_invalid.violations
+        );
+        fs::write(
+            &binding_path,
+            serde_json::to_vec_pretty(&binding).unwrap(),
+        )
+        .unwrap();
+
         let campaign = root.join("campaign");
         let mismatch = KVerusContext
             .verify_reviewed(
