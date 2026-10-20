@@ -4,7 +4,8 @@ use crate::{
     DiscoveryDisposition, DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind,
     EvidenceArtifactSpec, KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause,
     PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceAuditReceipt,
-    ReviewedEvidenceManifest, ReviewedFinalizationReceipt, ReviewedPreparationReceipt,
+    ReviewedEvidenceManifest, ReviewedFinalizationReceipt, ReviewedLifecycleAction,
+    ReviewedLifecycleReport, ReviewedLifecycleStage, ReviewedPreparationReceipt,
 };
 use cgp::prelude::*;
 use kani_metadata::{
