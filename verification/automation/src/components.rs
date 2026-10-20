@@ -2373,12 +2373,22 @@ pub trait CanVerifyReviewed {
         campaign_dir: &str,
         verus: &str,
     ) -> Result<ReviewedVerificationReceipt, String>;
+
+    fn verify_reviewed_with_config(
+        &self,
+        manifest_path: &str,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+        config: &ReviewedVerificationConfig,
+    ) -> Result<ReviewedVerificationReceipt, String>;
 }
 
 #[cgp_impl(new FreshReviewedVerification)]
 #[uses(
     CanInspectReviewedLifecycle,
     CanValidateReviewedIntegrity,
+    CanValidateReviewedVerificationConfig,
     CanReadJsonArtifact,
     CanDecodeJsonReceipt,
     CanPrepareReviewedBinding,
@@ -2396,6 +2406,24 @@ impl ReviewedVerification {
         campaign_dir: &str,
         verus: &str,
     ) -> Result<ReviewedVerificationReceipt, String> {
+        self.verify_reviewed_with_config(
+            manifest_path,
+            reviewed_dir,
+            campaign_dir,
+            verus,
+            &ReviewedVerificationConfig::default(),
+        )
+    }
+
+    fn verify_reviewed_with_config(
+        &self,
+        manifest_path: &str,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+        config: &ReviewedVerificationConfig,
+    ) -> Result<ReviewedVerificationReceipt, String> {
+        let config = self.validate_reviewed_verification_config(config.clone())?;
         let lifecycle = self.reviewed_lifecycle(reviewed_dir)?;
         let starting_stage = ReviewedLifecycleStage::from_kverus_name(lifecycle.stage)
             .ok_or_else(|| format!("unknown reviewed lifecycle stage {}", lifecycle.stage))?;
@@ -2432,11 +2460,26 @@ impl ReviewedVerification {
                     preparation.preparation.manifest_path, manifest_path
                 ));
             }
+            if preparation.preparation.selection != config.selection {
+                return Err(format!(
+                    "verify-reviewed selection mismatch: prepared evidence is bound to {:?}, requested {:?}",
+                    preparation.preparation.selection, config.selection
+                ));
+            }
         } else {
-            self.prepare_reviewed_binding(manifest_path, reviewed_dir)?;
+            self.prepare_reviewed_binding_with_selection(
+                manifest_path,
+                reviewed_dir,
+                &config.selection,
+            )?;
         }
 
-        let execution = self.run_reviewed_campaign(reviewed_dir, campaign_dir, verus)?;
+        let execution = self.run_reviewed_campaign_with_limits(
+            reviewed_dir,
+            campaign_dir,
+            verus,
+            &config.limits,
+        )?;
         let finalization = self.finalize_reviewed_campaign(reviewed_dir, campaign_dir)?;
         let manifest = self.assemble_reviewed_evidence(reviewed_dir)?;
         if finalization.checked_receipt_count != manifest.checked_receipt_count {
@@ -2494,6 +2537,8 @@ impl ReviewedVerification {
             integrity_valid: integrity.valid,
             proof_credit: false,
             proof_credit_source: "existing_verus_checked_scoped_receipts_only",
+            selection: config.selection,
+            limits: config.limits,
         })
     }
 }
