@@ -1126,6 +1126,7 @@ struct PreparationArtifact {
     metadata_path: String,
     discovery_path: String,
     plan_path: String,
+    selection: ReviewedVerificationSelection,
     counts: PreparationCountsArtifact,
 }
 
@@ -1320,12 +1321,20 @@ pub trait CanPrepareAutomation {
         manifest_path: &str,
         output_dir: &str,
     ) -> Result<PreparationReceipt, String>;
+
+    fn prepare_automation_with_selection(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+        selection: &ReviewedVerificationSelection,
+    ) -> Result<PreparationReceipt, String>;
 }
 
 #[cgp_impl(new KaniAutomationPreparation)]
 #[uses(
     CanRunPythonTool,
     CanReadWriteArtifacts,
+    CanBuildDiscoverySelectionArguments,
     CanParseMetadataBytes,
     CanNormalizeMetadata,
     CanBuildAutomationPlan
@@ -1336,12 +1345,26 @@ impl AutomationPreparation {
         manifest_path: &str,
         output_dir: &str,
     ) -> Result<PreparationReceipt, String> {
-        let args = vec![
+        self.prepare_automation_with_selection(
+            manifest_path,
+            output_dir,
+            &ReviewedVerificationSelection::default(),
+        )
+    }
+
+    fn prepare_automation_with_selection(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+        selection: &ReviewedVerificationSelection,
+    ) -> Result<PreparationReceipt, String> {
+        let mut args = vec![
             "--manifest-path".to_string(),
             manifest_path.to_string(),
             "--output-dir".to_string(),
             output_dir.to_string(),
         ];
+        args.extend(self.discovery_selection_args(selection)?);
         let output = self
             .run_python_tool_output(
                 "verification/tools/run_kani_autoharness_discovery.py",
@@ -1388,6 +1411,7 @@ impl AutomationPreparation {
             metadata_path: metadata_path.display().to_string(),
             discovery_path: discovery_path.display().to_string(),
             plan_path: plan_path.display().to_string(),
+            selection: selection.clone(),
             counts: plan.counts.clone(),
         };
         self.write_artifact(&receipt_path, &pretty_json_bytes(&receipt)?)
@@ -1448,6 +1472,7 @@ impl ReviewedBindingValidator {
         Ok(ReviewedBindingSummary {
             status: binding.status,
             selected_count: binding.selected.len(),
+            controller_obligations: binding.controller_obligations.clone(),
             controller_obligation_count: binding.controller_obligations.len(),
             contract_inventory_count: binding.contract_inventory_count,
             contract_clause_count: binding.contract_clause_count,
@@ -1461,6 +1486,13 @@ pub trait CanPrepareReviewedBinding {
         &self,
         manifest_path: &str,
         output_dir: &str,
+    ) -> Result<ReviewedPreparationReceipt, String>;
+
+    fn prepare_reviewed_binding_with_selection(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+        selection: &ReviewedVerificationSelection,
     ) -> Result<ReviewedPreparationReceipt, String>;
 }
 
@@ -1479,19 +1511,38 @@ impl ReviewedBindingPreparation {
         manifest_path: &str,
         output_dir: &str,
     ) -> Result<ReviewedPreparationReceipt, String> {
+        self.prepare_reviewed_binding_with_selection(
+            manifest_path,
+            output_dir,
+            &ReviewedVerificationSelection::default(),
+        )
+    }
+
+    fn prepare_reviewed_binding_with_selection(
+        &self,
+        manifest_path: &str,
+        output_dir: &str,
+        selection: &ReviewedVerificationSelection,
+    ) -> Result<ReviewedPreparationReceipt, String> {
         self.require_reviewed_action(output_dir, ReviewedLifecycleAction::Prepare)?;
-        let preparation = self.prepare_automation(manifest_path, output_dir)?;
+        let preparation =
+            self.prepare_automation_with_selection(manifest_path, output_dir, selection)?;
         let output_dir_path = PathBuf::from(output_dir);
         let binding_path = output_dir_path.join("verus-binding.json");
         let receipt_path = output_dir_path.join("reviewed-preparation-receipt.json");
 
-        let args = vec![
+        let mut args = vec![
             "bind".to_string(),
             "--normalized".to_string(),
             preparation.discovery_path.clone(),
             "--output".to_string(),
             binding_path.display().to_string(),
         ];
+        args.extend(
+            c![vec!["--function".to_string(), function.clone()] for function in &selection.functions]
+                .into_iter()
+                .flatten(),
+        );
         let stdout_binding = self.run_python_json(
             "verification/tools/bind_kani_verus.py",
             &args,
