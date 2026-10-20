@@ -163,13 +163,32 @@ jobs:
           assert "finalize-reviewed" in lifecycle["legal_next_actions"], lifecycle
           PY
 
-          cp -a "$out" "$regression"
+          mkdir -p "$regression"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            prepare-reviewed \
+            --manifest-path verification/spec/Cargo.toml \
+            --output-dir "$regression" \
+            > "$regression/reviewed-preparation-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$regression" \
+            > "$regression/reviewed-lifecycle-prepared.json"
 
           python3 - <<'PY'
           import json
           from pathlib import Path
 
           root=Path(".aegis/destiny/kverus-reviewed-lifecycle-regression")
+          binding=json.loads((root/"verus-binding.json").read_text())
+          receipt=json.loads((root/"reviewed-preparation-receipt.json").read_text())
+          stdout_receipt=json.loads((root/"reviewed-preparation-stdout.json").read_text())
+          lifecycle=json.loads((root/"reviewed-lifecycle-prepared.json").read_text())
+          assert receipt == stdout_receipt, (receipt, stdout_receipt)
+          assert receipt["binding_path"] == str(root/"verus-binding.json"), receipt
+          assert lifecycle["stage"] == "reviewed-prepared", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_prepared", lifecycle
+          assert lifecycle["consistent"] is True, lifecycle
           binding=json.loads((root/"verus-binding.json").read_text())
           campaign=root/"synthetic-finalization-campaign"
           campaign.mkdir(parents=True, exist_ok=True)
