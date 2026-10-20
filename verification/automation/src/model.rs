@@ -38,6 +38,8 @@ define_derive_deftly! {
     KVerusLifecycleStageMetadata:
 
     impl $ttype {
+        pub(crate) const ALL: &'static [Self] = &[$(Self::$vname,)];
+
         pub(crate) const fn kverus_name(self) -> &'static str {
             match self {
                 $(Self::$vname => ${vmeta(kverus(name)) as expr},)
@@ -57,10 +59,10 @@ define_derive_deftly! {
         }
 
         pub(crate) fn from_kverus_name(name: &str) -> Option<Self> {
-            match name {
-                $(${vmeta(kverus(name)) as expr} => Some(Self::$vname),)
-                _ => None,
-            }
+            Self::ALL
+                .iter()
+                .copied()
+                .find(|stage| stage.kverus_name() == name)
         }
     }
 }
