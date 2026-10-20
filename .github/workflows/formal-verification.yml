@@ -158,6 +158,10 @@ jobs:
             --manifest-path verification/automation/Cargo.toml --locked -- \
             validate-reviewed --reviewed-dir "$out" \
             > "$out/reviewed-integrity-prepared.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            explain-reviewed --reviewed-dir "$out" \
+            > "$out/reviewed-explanation-prepared.json"
 
           python3 -B verification/tools/test_bind_kani_verus.py
           python3 - <<'PY'
@@ -171,6 +175,7 @@ jobs:
           stdout_receipt=json.loads((root/"reviewed-preparation-stdout.json").read_text())
           lifecycle=json.loads((root/"reviewed-lifecycle-prepared.json").read_text())
           integrity=json.loads((root/"reviewed-integrity-prepared.json").read_text())
+          explanation=json.loads((root/"reviewed-explanation-prepared.json").read_text())
 
           assert discovery["default_engine"] == "verus", discovery
           assert discovery["proof_credit"] is False, discovery
@@ -214,6 +219,15 @@ jobs:
               "reviewed-preparation-receipt",
               "verus-binding",
           }, integrity
+
+          assert explanation["status"] == "KVERUS_REVIEWED_EXPLANATION", explanation
+          assert explanation["lifecycle"]["stage"] == "reviewed-prepared", explanation
+          assert explanation["integrity"]["valid"] is True, explanation
+          assert explanation["recommended_next_action"] == "run-reviewed", explanation
+          assert explanation["ready_for_next_action"] is True, explanation
+          assert explanation["complete"] is False, explanation
+          assert explanation["blockers"] == [], explanation
+          assert explanation["proof_credit"] is False, explanation
           PY
 
           mkdir -p "$regression"
@@ -398,6 +412,10 @@ jobs:
             --manifest-path verification/automation/Cargo.toml --locked -- \
             validate-reviewed --reviewed-dir "$regression" \
             > "$regression/reviewed-integrity-audited.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            explain-reviewed --reviewed-dir "$regression" \
+            > "$regression/reviewed-explanation-audited.json"
 
           if cargo +nightly-2026-08-21 run --quiet \
               --manifest-path verification/automation/Cargo.toml --locked -- \
@@ -425,6 +443,7 @@ jobs:
           drift_lifecycle=json.loads((regression/"reviewed-lifecycle-after-drift-failure.json").read_text())
           audited_lifecycle=json.loads((regression/"reviewed-lifecycle-audited.json").read_text())
           audited_integrity=json.loads((regression/"reviewed-integrity-audited.json").read_text())
+          audited_explanation=json.loads((regression/"reviewed-explanation-audited.json").read_text())
 
           assert audit == stdout_audit, (audit, stdout_audit)
           assert audit["status"] == "KVERUS_REVIEWED_EVIDENCE_AUDITED", audit
@@ -456,6 +475,15 @@ jobs:
               "reviewed-evidence-manifest",
               "reviewed-evidence-audit",
           }, audited_integrity
+
+          assert audited_explanation["status"] == "KVERUS_REVIEWED_EXPLANATION", audited_explanation
+          assert audited_explanation["lifecycle"]["stage"] == "reviewed-audited", audited_explanation
+          assert audited_explanation["integrity"]["valid"] is True, audited_explanation
+          assert audited_explanation["recommended_next_action"] is None, audited_explanation
+          assert audited_explanation["ready_for_next_action"] is False, audited_explanation
+          assert audited_explanation["complete"] is True, audited_explanation
+          assert audited_explanation["blockers"] == [], audited_explanation
+          assert audited_explanation["proof_credit"] is False, audited_explanation
 
           handoff=Path(".aegis/destiny/kani-autoharness-discovery")
           handoff_lifecycle=json.loads((handoff/"reviewed-lifecycle-handoff.json").read_text())
