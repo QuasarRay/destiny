@@ -3,6 +3,7 @@
 use destiny_verification_automation::{
     AutomationCommand, CanAssembleReviewedEvidence, CanAuditReviewedEvidence,
     CanBuildAutomationPlan, CanDescribeCommands, CanExplainReviewed,
+    CanLoadReviewedVerificationConfig,
     CanFinalizeReviewedCampaign, CanInspectReviewedLifecycle, CanPrepareAutomation,
     CanRunReviewedCampaign,
     CanValidateReviewedIntegrity, CanVerifyReviewed,
@@ -137,8 +138,23 @@ fn verify_reviewed(
     reviewed_dir: &str,
     campaign_dir: &str,
     verus: &str,
+    config_path: Option<&str>,
 ) -> ExitCode {
-    match KVerusContext.verify_reviewed(manifest_path, reviewed_dir, campaign_dir, verus) {
+    let result = match config_path {
+        Some(path) => KVerusContext
+            .load_reviewed_verification_config(path)
+            .and_then(|config| {
+                KVerusContext.verify_reviewed_with_config(
+                    manifest_path,
+                    reviewed_dir,
+                    campaign_dir,
+                    verus,
+                    &config,
+                )
+            }),
+        None => KVerusContext.verify_reviewed(manifest_path, reviewed_dir, campaign_dir, verus),
+    };
+    match result {
         Ok(receipt) => emit_json(&receipt),
         Err(error) => {
             eprintln!("{error}");
@@ -262,7 +278,14 @@ fn main() -> ExitCode {
             reviewed_dir,
             campaign_dir,
             verus,
-        } => verify_reviewed(&manifest_path, &reviewed_dir, &campaign_dir, &verus),
+            config_path,
+        } => verify_reviewed(
+            &manifest_path,
+            &reviewed_dir,
+            &campaign_dir,
+            &verus,
+            config_path.as_deref(),
+        ),
         AutomationCommand::RunReviewed {
             reviewed_dir,
             campaign_dir,
