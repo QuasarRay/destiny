@@ -164,6 +164,7 @@ jobs:
             > "$out/reviewed-explanation-prepared.json"
 
           python3 -B verification/tools/test_bind_kani_verus.py
+          python3 -B verification/tools/test_run_verus_campaign.py
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -921,6 +922,7 @@ jobs:
             --reviewed-dir "$reviewed" \
             --campaign-dir "$campaign" \
             --verus "$VERUS_BIN" \
+            --config verification/automation/reviewed-verification.json \
             > "$campaign/kverus-reviewed-verification-stdout.json"
 
           cargo +nightly-2026-08-21 run --quiet \
@@ -963,6 +965,20 @@ jobs:
           assert workflow["integrity_valid"] is True, workflow
           assert workflow["proof_credit"] is False, workflow
           assert workflow["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", workflow
+          assert workflow["selection"] == {
+              "packages": [],
+              "features": [],
+              "all_features": False,
+              "no_default_features": False,
+              "target": "default",
+              "target_name": None,
+              "functions": [],
+          }, workflow
+          assert workflow["limits"] == {
+              "timeout_seconds": 120,
+              "memory_mib": None,
+              "max_concurrency": 1,
+          }, workflow
 
           assert execution["status"] == "KVERUS_REVIEWED_CAMPAIGN_EXECUTED", execution
           assert execution["engine"] == "verus", execution
@@ -971,6 +987,9 @@ jobs:
           assert execution["verus_checked_scoped"] is True, execution
           assert execution["checked_entry_count"] == workflow["checked_entry_count"], (execution, workflow)
           assert execution["case_acceptance_exit"] == 0, execution
+          assert execution["obligations"], execution
+          assert len(execution["obligations"]) == execution["checked_entry_count"], execution
+          assert execution["limits"] == workflow["limits"], (execution, workflow)
           assert execution["proof_credit"] is False, execution
 
           assert runner["status"] == "CHECKED_SCOPED", runner
@@ -979,6 +998,12 @@ jobs:
           assert runner["verus_checked_scoped"] is True, runner
           assert runner["formal_audit"] == "CHECKED_SCOPED", runner
           assert runner["case_acceptance_exit"] == 0, runner
+          assert runner["case_acceptance_scope"] == "full_catalog", runner
+          assert runner["obligations"] == execution["obligations"], (runner, execution)
+          assert runner["timeout_seconds"] == workflow["limits"]["timeout_seconds"], runner
+          assert runner["memory_mib"] == workflow["limits"]["memory_mib"], runner
+          assert runner["max_concurrency"] == workflow["limits"]["max_concurrency"], runner
+          assert workflow["controller_obligation_count"] == len(runner["obligations"]), (workflow, runner)
 
           assert lifecycle["stage"] == "reviewed-audited", lifecycle
           assert lifecycle["canonical_stage"] == "reviewed_audited", lifecycle
