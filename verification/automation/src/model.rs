@@ -1,5 +1,89 @@
+use derive_deftly::{Deftly, define_derive_deftly};
 use kani_metadata::ContractClause;
 use serde::Serialize;
+
+define_derive_deftly! {
+    KVerusEvidenceArtifactMetadata:
+
+    impl $ttype {
+        pub(crate) const ALL: &'static [Self] = &[$(Self::$vname,)];
+
+        pub(crate) const fn kverus_name(self) -> &'static str {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+            }
+        }
+
+        pub(crate) const fn filename(self) -> &'static str {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(filename)) as expr},)
+            }
+        }
+
+        pub(crate) const fn status(self) -> &'static str {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(status)) as expr},)
+            }
+        }
+
+        pub(crate) const fn proof_credit_source(self) -> &'static str {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(proof_credit_source)) as expr},)
+            }
+        }
+    }
+}
+
+define_derive_deftly! {
+    KVerusLifecycleStageMetadata:
+
+    impl $ttype {
+        pub(crate) const fn kverus_name(self) -> &'static str {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+            }
+        }
+
+        pub(crate) const fn rank(self) -> Option<u8> {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(rank)) as expr},)
+            }
+        }
+
+        pub(crate) const fn recommended_next_action(self) -> Option<&'static str> {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(next)) as expr},)
+            }
+        }
+
+        pub(crate) fn from_kverus_name(name: &str) -> Option<Self> {
+            match name {
+                $(${vmeta(kverus(name)) as expr} => Some(Self::$vname),)
+                _ => None,
+            }
+        }
+    }
+}
+
+define_derive_deftly! {
+    KVerusLifecycleActionMetadata:
+
+    impl $ttype {
+        pub(crate) const ALL: &'static [Self] = &[$(Self::$vname,)];
+
+        pub(crate) const fn kverus_name(self) -> &'static str {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(name)) as expr},)
+            }
+        }
+
+        pub(crate) const fn allowed_stages(self) -> &'static [ReviewedLifecycleStage] {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(allowed)) as expr},)
+            }
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -122,6 +206,7 @@ pub enum AutomationCommand {
     AuditReviewed { reviewed_dir: String },
     StatusReviewed { reviewed_dir: String },
     ValidateReviewed { reviewed_dir: String },
+    ExplainReviewed { reviewed_dir: String },
     Explain,
     Verify { args: Vec<String> },
     ReplayKaniReference { args: Vec<String> },
@@ -216,11 +301,16 @@ pub struct EvidenceArtifact {
     pub digest: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(KVerusEvidenceArtifactMetadata)]
 pub enum EvidenceArtifactKind {
+    #[deftly(kverus(name = { "reviewed-preparation-receipt" }, filename = { "reviewed-preparation-receipt.json" }, status = { "KVERUS_REVIEWED_BINDING_PREPARED" }, proof_credit_source = { "none" }))]
     ReviewedPreparationReceipt,
+    #[deftly(kverus(name = { "verus-binding" }, filename = { "verus-binding.json" }, status = { "BOUND_FOR_VERUS" }, proof_credit_source = { "none" }))]
     VerusBinding,
+    #[deftly(kverus(name = { "verus-receipt-binding" }, filename = { "verus-receipt-binding.json" }, status = { "KANI_SELECTED_VERUS_CHECKED_SCOPED" }, proof_credit_source = { "verus_checked_scoped" }))]
     VerusReceiptBinding,
+    #[deftly(kverus(name = { "reviewed-finalization-receipt" }, filename = { "reviewed-finalization-receipt.json" }, status = { "KVERUS_REVIEWED_VERUS_FINALIZED" }, proof_credit_source = { "verus_checked_scoped" }))]
     ReviewedFinalizationReceipt,
 }
 
@@ -265,22 +355,35 @@ pub struct ReviewedEvidenceAuditReceipt {
     pub proof_credit_source: &'static str,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(KVerusLifecycleStageMetadata)]
 pub enum ReviewedLifecycleStage {
+    #[deftly(kverus(name = { "reviewed-empty" }, rank = { Some(0u8) }, next = { Some("prepare-reviewed") }))]
     Empty,
+    #[deftly(kverus(name = { "reviewed-prepared" }, rank = { Some(1u8) }, next = { Some("run-reviewed") }))]
     Prepared,
+    #[deftly(kverus(name = { "reviewed-finalized" }, rank = { Some(2u8) }, next = { Some("manifest-reviewed") }))]
     Finalized,
+    #[deftly(kverus(name = { "reviewed-manifested" }, rank = { Some(3u8) }, next = { Some("audit-reviewed") }))]
     Manifested,
+    #[deftly(kverus(name = { "reviewed-audited" }, rank = { Some(4u8) }, next = { None }))]
     Audited,
+    #[deftly(kverus(name = { "reviewed-inconsistent" }, rank = { None }, next = { None }))]
     Inconsistent,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(KVerusLifecycleActionMetadata)]
 pub enum ReviewedLifecycleAction {
+    #[deftly(kverus(name = { "prepare-reviewed" }, allowed = { &[ReviewedLifecycleStage::Empty, ReviewedLifecycleStage::Prepared] }))]
     Prepare,
+    #[deftly(kverus(name = { "run-reviewed" }, allowed = { &[ReviewedLifecycleStage::Prepared] }))]
     Run,
+    #[deftly(kverus(name = { "finalize-reviewed" }, allowed = { &[ReviewedLifecycleStage::Prepared, ReviewedLifecycleStage::Finalized] }))]
     Finalize,
+    #[deftly(kverus(name = { "manifest-reviewed" }, allowed = { &[ReviewedLifecycleStage::Finalized, ReviewedLifecycleStage::Manifested] }))]
     Manifest,
+    #[deftly(kverus(name = { "audit-reviewed" }, allowed = { &[ReviewedLifecycleStage::Manifested, ReviewedLifecycleStage::Audited] }))]
     Audit,
 }
 
@@ -318,5 +421,19 @@ pub struct ReviewedLifecycleReport {
     pub present_artifacts: Vec<String>,
     pub missing_artifacts: Vec<String>,
     pub legal_next_actions: Vec<&'static str>,
+    pub proof_credit: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedExplanationReport {
+    pub schema: u32,
+    pub status: &'static str,
+    pub reviewed_dir: String,
+    pub lifecycle: ReviewedLifecycleReport,
+    pub integrity: ReviewedIntegrityReport,
+    pub recommended_next_action: Option<&'static str>,
+    pub ready_for_next_action: bool,
+    pub complete: bool,
+    pub blockers: Vec<String>,
     pub proof_credit: bool,
 }
