@@ -11,11 +11,13 @@ pub use components::{
     CanDigestArtifactBytes, CanExplainReviewed, CanLoadReviewedVerificationConfig,
     CanFinalizeReviewedCampaign, CanInspectArtifactPresence,
     CanInspectReviewedLifecycle, CanNormalizeMetadata, CanParseMetadataBytes,
-    CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
-    CanReadWriteArtifacts, CanRequireReviewedTransition, CanRouteCommand,
-    CanRunJsonPythonTool, CanRunPythonTool, CanRunReviewedCampaign,
+    CanPrepareAutomation, CanPrepareAutomationWithSelection, CanPrepareReviewedBinding,
+    CanPrepareReviewedBindingWithSelection, CanReadJsonArtifact, CanReadWriteArtifacts,
+    CanRequireReviewedTransition, CanRouteCommand, CanRunJsonPythonTool, CanRunPythonTool,
+    CanRunReviewedCampaign, CanRunReviewedCampaignWithLimits,
     CanValidateCampaignBinding, CanValidateCampaignExecution,
     CanValidateReviewedIntegrity, CanValidateReviewedVerificationConfig, CanVerifyReviewed,
+    CanVerifyReviewedWithConfig,
     CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
