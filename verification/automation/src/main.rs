@@ -6,7 +6,7 @@ use destiny_verification_automation::{
     CanLoadReviewedVerificationConfig,
     CanFinalizeReviewedCampaign, CanInspectReviewedLifecycle, CanPrepareAutomation,
     CanRunReviewedCampaign,
-    CanValidateReviewedIntegrity, CanVerifyReviewed,
+    CanValidateReviewedIntegrity, CanVerifyReviewed, CanVerifyReviewedWithConfig,
     CanPrepareReviewedBinding, CanRouteCommand, CanRunPythonTool, DEFAULT_ENGINE,
     DiscoveryReport, KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata,
     parse_metadata,
