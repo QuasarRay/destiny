@@ -408,6 +408,7 @@ pub struct ReviewedFinalizationReceipt {
 pub struct ReviewedBindingSummary {
     pub status: String,
     pub selected_count: usize,
+    pub configured_functions: Vec<String>,
     pub controller_obligations: Vec<String>,
     pub controller_obligation_count: usize,
     pub contract_inventory_count: usize,
