@@ -112,6 +112,68 @@ class BindingTests(unittest.TestCase):
             "compiler_parsed_clauses_available",
         )
 
+    def test_configured_function_selection_scopes_expected_registry(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            registry=self.registry()
+            registry["candidates"].append({
+                "function":"destiny_original_spec::model::follow_allowed",
+                "status":"supported",
+                "reason":"Boolean equality",
+                "controller_obligation":"proofs-reviewed-inventory",
+                "verus_entry":"verification/verus/proofs.rs",
+                "kani_metadata_name":"model::follow_allowed",
+            })
+            normalized=self.normalized()
+            normalized["candidates"].append({
+                "crate_name":"destiny_original_spec",
+                "function":"model::follow_allowed",
+                "disposition":"kani_eligible",
+                "reason":"fixture",
+                "provenance":"kani_metadata::AutoHarnessMetadata::chosen",
+            })
+            reg=self.write(root,"registry.json",registry)
+            norm=self.write(root,"normalized.json",normalized)
+            plan=self.write(root,"plan.json",{
+                "obligations":[
+                    {"id":"state-contracts-reviewed-inventory"},
+                    {"id":"proofs-reviewed-inventory"},
+                ]
+            })
+            result=bridge.bind_discovery(
+                norm,
+                reg,
+                plan,
+                requested_functions=["model::assign_flag"],
+            )
+        self.assertEqual(result["status"],"BOUND_FOR_VERUS")
+        self.assertEqual(result["configured_functions"],["model::assign_flag"])
+        self.assertEqual(
+            result["controller_obligations"],
+            ["state-contracts-reviewed-inventory"],
+        )
+        selected=[row for row in result["records"] if row["classification"]=="selected"]
+        self.assertEqual(
+            [row["kani_metadata_name"] for row in selected],
+            ["model::assign_flag"],
+        )
+
+    def test_unknown_configured_function_is_rejected(self):
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            reg=self.write(root,"registry.json",self.registry())
+            norm=self.write(root,"normalized.json",self.normalized())
+            plan=self.write(root,"plan.json",{
+                "obligations":[{"id":"state-contracts-reviewed-inventory"}]
+            })
+            with self.assertRaises(bridge.BindingError):
+                bridge.bind_discovery(
+                    norm,
+                    reg,
+                    plan,
+                    requested_functions=["model::not_registered"],
+                )
+
     def test_duplicate_contract_inventory_is_rejected(self):
         with tempfile.TemporaryDirectory() as td:
             root=Path(td)
