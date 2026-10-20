@@ -2,8 +2,9 @@
 
 use destiny_verification_automation::{
     AutomationCommand, CanAssembleReviewedEvidence, CanAuditReviewedEvidence,
-    CanBuildAutomationPlan, CanDescribeCommands, CanFinalizeReviewedCampaign,
-    CanInspectReviewedLifecycle, CanPrepareAutomation, CanRunReviewedCampaign,
+    CanBuildAutomationPlan, CanDescribeCommands, CanExplainReviewed,
+    CanFinalizeReviewedCampaign, CanInspectReviewedLifecycle, CanPrepareAutomation,
+    CanRunReviewedCampaign,
     CanValidateReviewedIntegrity,
     CanPrepareReviewedBinding, CanRouteCommand, CanRunPythonTool, DEFAULT_ENGINE,
     DiscoveryReport, KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata,
@@ -207,6 +208,16 @@ fn validate_reviewed(reviewed_dir: &str) -> ExitCode {
     }
 }
 
+fn explain_reviewed(reviewed_dir: &str) -> ExitCode {
+    match KVerusContext.explain_reviewed(reviewed_dir) {
+        Ok(report) => emit_json(&report),
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let args = env::args().skip(1).collect::<Vec<_>>();
     let command = KVerusContext
@@ -248,6 +259,7 @@ fn main() -> ExitCode {
         AutomationCommand::ValidateReviewed { reviewed_dir } => {
             validate_reviewed(&reviewed_dir)
         }
+        AutomationCommand::ExplainReviewed { reviewed_dir } => explain_reviewed(&reviewed_dir),
         AutomationCommand::Explain => {
             print!("{}", include_str!("../capabilities.json"));
             ExitCode::SUCCESS
