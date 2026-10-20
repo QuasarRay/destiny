@@ -4,19 +4,22 @@ mod components;
 mod model;
 
 pub use components::{
-    CanAssembleReviewedEvidence, CanBuildAutomationPlan, CanCanonicalizeContractClause,
-    CanCanonicalizeStaticIdentity, CanDescribeCommands, CanFinalizeReviewedCampaign,
-    CanNormalizeMetadata, CanParseMetadataBytes, CanPrepareAutomation,
-    CanPrepareReviewedBinding, CanReadJsonArtifact, CanReadWriteArtifacts,
-    CanRouteCommand, CanRunJsonPythonTool, CanRunPythonTool, CanValidateCampaignBinding,
-    CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
+    CanAssembleReviewedEvidence, CanAuditReviewedEvidence, CanBuildAutomationPlan,
+    CanBuildReviewedEvidenceManifest, CanCanonicalizeContractClause,
+    CanCanonicalizeStaticIdentity, CanDescribeCommands, CanDescribeEvidenceArtifacts,
+    CanDigestArtifactBytes, CanFinalizeReviewedCampaign, CanNormalizeMetadata,
+    CanParseMetadataBytes, CanPrepareAutomation, CanPrepareReviewedBinding,
+    CanReadJsonArtifact, CanReadWriteArtifacts, CanRouteCommand, CanRunJsonPythonTool,
+    CanRunPythonTool, CanValidateCampaignBinding, CanValidateContractClause,
+    CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
     AutomationCommand, AutomationPlan, CampaignBindingSummary, CommandDescriptor,
     ContractDiscovery, ContractPlan, DiscoveryCandidate, DiscoveryDisposition,
-    DiscoveryReport, EvidenceArtifact, PlanCounts, PlannedContractClause,
-    PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceManifest,
-    ReviewedFinalizationReceipt, ReviewedPreparationReceipt,
+    DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind, EvidenceArtifactSpec,
+    PlanCounts, PlannedContractClause, PreparationReceipt, ReviewedBindingSummary,
+    ReviewedEvidenceAuditReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
+    ReviewedPreparationReceipt,
 };
 
 use kani_metadata::KaniMetadata;
@@ -198,6 +201,7 @@ mod tests {
         assert!(usage.contains("prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"));
         assert!(usage.contains("finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>"));
         assert!(usage.contains("manifest-reviewed --reviewed-dir <dir>"));
+        assert!(usage.contains("audit-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
 
         let finalizer = commands
@@ -222,6 +226,14 @@ mod tests {
                 .unwrap(),
             "reviewed_finalization_receipt"
         );
+
+        let audit = commands
+            .iter()
+            .find(|command| command.name == "audit-reviewed")
+            .unwrap();
+        assert_eq!(audit.canonical_token, "audit_reviewed");
+        assert_eq!(audit.category, "evidence");
+        assert!(!audit.proof_credit);
     }
 
     #[test]
@@ -282,6 +294,49 @@ mod tests {
                 reviewed_dir: ".aegis/reviewed".to_string(),
             }
         );
+    }
+
+    #[test]
+    fn command_router_builds_typed_reviewed_audit_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "audit-reviewed".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::AuditReviewed {
+                reviewed_dir: ".aegis/reviewed".to_string(),
+            }
+        );
+    }
+
+    #[test]
+    fn sha256_digest_provider_is_deterministic_and_standard() {
+        assert_eq!(
+            KVerusContext.digest_artifact_bytes(b"abc"),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+    }
+
+    #[test]
+    fn reviewed_evidence_policy_is_typed_and_complete() {
+        let specs = KVerusContext.reviewed_evidence_artifact_specs();
+        assert_eq!(specs.len(), 4);
+        assert_eq!(
+            KVerusContext.evidence_artifact_kind_name(specs[0].kind),
+            "reviewed-preparation-receipt"
+        );
+        assert_eq!(specs[0].filename, "reviewed-preparation-receipt.json");
+        assert_eq!(specs[0].proof_credit_source, "none");
+        assert_eq!(
+            KVerusContext.evidence_artifact_kind_name(specs[2].kind),
+            "verus-receipt-binding"
+        );
+        assert_eq!(specs[2].proof_credit_source, "verus_checked_scoped");
     }
 
     #[test]

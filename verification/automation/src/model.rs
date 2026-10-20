@@ -114,6 +114,7 @@ pub enum AutomationCommand {
     PrepareReviewed { manifest_path: String, output_dir: String },
     FinalizeReviewed { reviewed_dir: String, campaign_dir: String },
     ManifestReviewed { reviewed_dir: String },
+    AuditReviewed { reviewed_dir: String },
     Explain,
     Verify { args: Vec<String> },
     ReplayKaniReference { args: Vec<String> },
@@ -179,6 +180,24 @@ pub struct EvidenceArtifact {
     pub path: String,
     pub status: String,
     pub proof_credit_source: String,
+    pub digest_algorithm: &'static str,
+    pub digest: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EvidenceArtifactKind {
+    ReviewedPreparationReceipt,
+    VerusBinding,
+    VerusReceiptBinding,
+    ReviewedFinalizationReceipt,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct EvidenceArtifactSpec {
+    pub kind: EvidenceArtifactKind,
+    pub filename: &'static str,
+    pub status: &'static str,
+    pub proof_credit_source: &'static str,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -197,4 +216,19 @@ pub struct ReviewedEvidenceManifest {
     pub translation_correctness: String,
     pub proof_credit_source: &'static str,
     pub artifacts: Vec<EvidenceArtifact>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedEvidenceAuditReceipt {
+    pub schema: u32,
+    pub status: &'static str,
+    pub engine: &'static str,
+    pub kani_proof_credit: bool,
+    pub verus_checked_scoped: bool,
+    pub reviewed_dir: String,
+    pub manifest_path: String,
+    pub manifest_digest_algorithm: &'static str,
+    pub manifest_digest: String,
+    pub verified_artifact_count: usize,
+    pub proof_credit_source: &'static str,
 }

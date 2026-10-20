@@ -206,6 +206,7 @@ jobs:
           stdout_manifest=json.loads((root/"reviewed-evidence-manifest-stdout.json").read_text())
 
           assert manifest == stdout_manifest, (manifest, stdout_manifest)
+          assert manifest["schema"] == 2, manifest
           assert manifest["status"] == "KVERUS_REVIEWED_EVIDENCE_MANIFEST", manifest
           assert manifest["engine"] == "verus", manifest
           assert manifest["kani_proof_credit"] is False, manifest
@@ -223,9 +224,47 @@ jobs:
               "verus-receipt-binding",
               "reviewed-finalization-receipt",
           }, kinds
+          assert all(row["digest_algorithm"] == "sha256" for row in kinds.values()), kinds
+          assert all(len(row["digest"]) == 64 for row in kinds.values()), kinds
+          assert all(all(ch in "0123456789abcdef" for ch in row["digest"]) for row in kinds.values()), kinds
           assert kinds["reviewed-finalization-receipt"]["canonical_token"] == "reviewed_finalization_receipt", kinds
           assert kinds["verus-receipt-binding"]["proof_credit_source"] == "verus_checked_scoped", kinds
           assert kinds["verus-binding"]["proof_credit_source"] == "none", kinds
+          PY
+
+          cp "$out/verus-binding.json" "$out/verus-binding.json.audit-backup"
+          printf '\n' >> "$out/verus-binding.json"
+          if cargo +nightly-2026-08-21 run --quiet \
+              --manifest-path verification/automation/Cargo.toml --locked -- \
+              audit-reviewed --reviewed-dir "$out" \
+              > "$out/audit-drift-unexpected-success.json" 2> "$out/audit-drift-stderr.txt"; then
+            echo "audit-reviewed unexpectedly accepted byte-level evidence drift" >&2
+            exit 1
+          fi
+          mv "$out/verus-binding.json.audit-backup" "$out/verus-binding.json"
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            audit-reviewed \
+            --reviewed-dir "$out" \
+            > "$out/reviewed-evidence-audit-stdout.json"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path(".aegis/destiny/kani-autoharness-discovery")
+          audit=json.loads((root/"reviewed-evidence-audit.json").read_text())
+          stdout_audit=json.loads((root/"reviewed-evidence-audit-stdout.json").read_text())
+          assert audit == stdout_audit, (audit, stdout_audit)
+          assert audit["status"] == "KVERUS_REVIEWED_EVIDENCE_AUDITED", audit
+          assert audit["engine"] == "verus", audit
+          assert audit["kani_proof_credit"] is False, audit
+          assert audit["verus_checked_scoped"] is True, audit
+          assert audit["manifest_digest_algorithm"] == "sha256", audit
+          assert len(audit["manifest_digest"]) == 64, audit
+          assert audit["verified_artifact_count"] == 4, audit
+          assert audit["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", audit
           PY
 
       - name: Discover the generated-obligation fixture corpus through the same Kani compiler path
@@ -666,18 +705,32 @@ jobs:
             manifest-reviewed \
             --reviewed-dir "$reviewed" \
             > "$reviewed/reviewed-evidence-manifest-stdout.json"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            audit-reviewed \
+            --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-evidence-audit-stdout.json"
           python3 - <<'PY'
           import json
           from pathlib import Path
           root=Path(".aegis/destiny/kani-autoharness-discovery")
           manifest=json.loads((root/"reviewed-evidence-manifest.json").read_text())
           stdout_manifest=json.loads((root/"reviewed-evidence-manifest-stdout.json").read_text())
+          audit=json.loads((root/"reviewed-evidence-audit.json").read_text())
+          stdout_audit=json.loads((root/"reviewed-evidence-audit-stdout.json").read_text())
           assert manifest == stdout_manifest, (manifest, stdout_manifest)
+          assert manifest["schema"] == 2, manifest
           assert manifest["status"] == "KVERUS_REVIEWED_EVIDENCE_MANIFEST", manifest
           assert manifest["engine"] == "verus", manifest
           assert manifest["kani_proof_credit"] is False, manifest
           assert manifest["verus_checked_scoped"] is True, manifest
           assert manifest["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", manifest
+          assert audit == stdout_audit, (audit, stdout_audit)
+          assert audit["status"] == "KVERUS_REVIEWED_EVIDENCE_AUDITED", audit
+          assert audit["engine"] == "verus", audit
+          assert audit["kani_proof_credit"] is False, audit
+          assert audit["verus_checked_scoped"] is True, audit
+          assert audit["verified_artifact_count"] == len(manifest["artifacts"]), audit
           PY
 
       - name: Retain complete counted results, VIR inventories and scope audit

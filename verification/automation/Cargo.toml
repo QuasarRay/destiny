@@ -11,6 +11,7 @@ kani_metadata = { path = "../../third_party/kani/kani_metadata" }
 proc-macro2 = "=1.0.107"
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.151"
+sha2 = "=0.10.8"
 synthez = { version = "=0.5.1", features = ["full"] }
 
 [lints.rust]

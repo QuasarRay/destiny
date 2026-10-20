@@ -100,7 +100,9 @@
     "json_artifact_loading": "CGP JsonArtifactStore over ArtifactStore",
     "token_identity": "CGP TokenIdentity using proc_macro2 + safe arcane-rs/synthez ToTokens replay",
     "reviewed_binding_validation": "CGP ReviewedBindingValidator",
-    "campaign_binding_validation": "CGP CampaignBindingValidator"
+    "campaign_binding_validation": "CGP CampaignBindingValidator",
+    "artifact_digest": "CGP ArtifactDigest using SHA-256 over exact artifact bytes",
+    "evidence_artifact_policy": "CGP EvidenceArtifactPolicy with typed reviewed artifact kinds"
   },
   "preparation": {
     "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
@@ -189,6 +191,30 @@
       "reviewed-evidence-manifest.json"
     ],
     "proof_credit_source": "existing Verus CHECKED_SCOPED campaign receipts only",
+    "kani_proof_credit": false,
+    "schema": 2,
+    "content_addressing": {
+      "algorithm": "sha256",
+      "scope": "exact stored bytes of every reviewed preparation/binding/finalization artifact",
+      "provider": "CGP ArtifactDigest"
+    },
+    "artifact_policy": "CGP EvidenceArtifactPolicy"
+  },
+  "reviewed_evidence_audit": {
+    "command": "audit-reviewed --reviewed-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP ReviewedEvidenceAudit rebuilds the expected manifest from current artifacts and compares it structurally with the stored schema-2 manifest",
+    "detects": [
+      "byte-level drift in reviewed artifacts even when JSON semantics remain equivalent",
+      "manifest field/status/count/provenance divergence",
+      "cross-run path substitution rejected by reviewed evidence builder invariants"
+    ],
+    "emits": [
+      "reviewed-evidence-audit.json"
+    ],
+    "manifest_digest": "sha256 over the exact stored reviewed-evidence-manifest.json bytes",
+    "proof_credit_source": "existing Verus CHECKED_SCOPED campaign receipts only",
+    "limitation": "content-addressed/tamper-evident, not cryptographically signed against an external trust anchor",
     "kani_proof_credit": false
   }
 }

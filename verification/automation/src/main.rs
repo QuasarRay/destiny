@@ -1,8 +1,9 @@
 #![forbid(unsafe_code)]
 
 use destiny_verification_automation::{
-    AutomationCommand, CanAssembleReviewedEvidence, CanBuildAutomationPlan,
-    CanDescribeCommands, CanFinalizeReviewedCampaign, CanPrepareAutomation,
+    AutomationCommand, CanAssembleReviewedEvidence, CanAuditReviewedEvidence,
+    CanBuildAutomationPlan, CanDescribeCommands, CanFinalizeReviewedCampaign,
+    CanPrepareAutomation,
     CanPrepareReviewedBinding, CanRouteCommand, CanRunPythonTool, DEFAULT_ENGINE,
     DiscoveryReport, KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata,
     parse_metadata,
@@ -149,6 +150,16 @@ fn manifest_reviewed(reviewed_dir: &str) -> ExitCode {
     }
 }
 
+fn audit_reviewed(reviewed_dir: &str) -> ExitCode {
+    match KVerusContext.audit_reviewed_evidence(reviewed_dir) {
+        Ok(receipt) => emit_json(&receipt),
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let args = env::args().skip(1).collect::<Vec<_>>();
     let command = KVerusContext
@@ -180,6 +191,7 @@ fn main() -> ExitCode {
         AutomationCommand::ManifestReviewed { reviewed_dir } => {
             manifest_reviewed(&reviewed_dir)
         }
+        AutomationCommand::AuditReviewed { reviewed_dir } => audit_reviewed(&reviewed_dir),
         AutomationCommand::Explain => {
             print!("{}", include_str!("../capabilities.json"));
             ExitCode::SUCCESS

@@ -1,8 +1,9 @@
 use crate::{
     AutomationCommand, AutomationPlan, CampaignBindingSummary, CommandDescriptor,
     ContractDiscovery, ContractPlan, DEFAULT_ENGINE, DiscoveryCandidate,
-    DiscoveryDisposition, DiscoveryReport, EvidenceArtifact, KANI_SOURCE_COMMIT,
-    PlanCounts, PlannedContractClause, PreparationReceipt, ReviewedBindingSummary,
+    DiscoveryDisposition, DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind,
+    EvidenceArtifactSpec, KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause,
+    PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceAuditReceipt,
     ReviewedEvidenceManifest, ReviewedFinalizationReceipt, ReviewedPreparationReceipt,
 };
 use cgp::prelude::*;
@@ -11,6 +12,7 @@ use kani_metadata::{
 };
 use proc_macro2::TokenStream;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::{
     env,
     ffi::OsString,
@@ -104,6 +106,11 @@ const COMMANDS: &[(&str, &str, &str)] = &[
     (
         "manifest-reviewed",
         "manifest-reviewed --reviewed-dir <dir>",
+        "evidence",
+    ),
+    (
+        "audit-reviewed",
+        "audit-reviewed --reviewed-dir <dir>",
         "evidence",
     ),
     ("explain", "explain", "diagnostics"),
@@ -206,6 +213,9 @@ impl CommandRouter {
                 })
             }
             "manifest-reviewed" => Ok(AutomationCommand::ManifestReviewed {
+                reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
+            }),
+            "audit-reviewed" => Ok(AutomationCommand::AuditReviewed {
                 reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
             }),
             "explain" if rest.is_empty() => Ok(AutomationCommand::Explain),
@@ -661,6 +671,70 @@ impl ArtifactStore {
     }
 }
 
+#[cgp_component(ArtifactDigest)]
+pub trait CanDigestArtifactBytes {
+    fn digest_artifact_bytes(&self, bytes: &[u8]) -> String;
+}
+
+#[cgp_impl(new Sha256ArtifactDigest)]
+impl ArtifactDigest {
+    fn digest_artifact_bytes(&self, bytes: &[u8]) -> String {
+        let digest = Sha256::digest(bytes);
+        format!("{digest:x}")
+    }
+}
+
+#[cgp_component(EvidenceArtifactPolicy)]
+pub trait CanDescribeEvidenceArtifacts {
+    fn reviewed_evidence_artifact_specs(&self) -> Vec<EvidenceArtifactSpec>;
+    fn evidence_artifact_kind_name(&self, kind: EvidenceArtifactKind) -> &'static str;
+}
+
+#[cgp_impl(new StaticEvidenceArtifactPolicy)]
+impl EvidenceArtifactPolicy {
+    fn reviewed_evidence_artifact_specs(&self) -> Vec<EvidenceArtifactSpec> {
+        vec![
+            EvidenceArtifactSpec {
+                kind: EvidenceArtifactKind::ReviewedPreparationReceipt,
+                filename: "reviewed-preparation-receipt.json",
+                status: "KVERUS_REVIEWED_BINDING_PREPARED",
+                proof_credit_source: "none",
+            },
+            EvidenceArtifactSpec {
+                kind: EvidenceArtifactKind::VerusBinding,
+                filename: "verus-binding.json",
+                status: "BOUND_FOR_VERUS",
+                proof_credit_source: "none",
+            },
+            EvidenceArtifactSpec {
+                kind: EvidenceArtifactKind::VerusReceiptBinding,
+                filename: "verus-receipt-binding.json",
+                status: "KANI_SELECTED_VERUS_CHECKED_SCOPED",
+                proof_credit_source: "verus_checked_scoped",
+            },
+            EvidenceArtifactSpec {
+                kind: EvidenceArtifactKind::ReviewedFinalizationReceipt,
+                filename: "reviewed-finalization-receipt.json",
+                status: "KVERUS_REVIEWED_VERUS_FINALIZED",
+                proof_credit_source: "verus_checked_scoped",
+            },
+        ]
+    }
+
+    fn evidence_artifact_kind_name(&self, kind: EvidenceArtifactKind) -> &'static str {
+        match kind {
+            EvidenceArtifactKind::ReviewedPreparationReceipt => {
+                "reviewed-preparation-receipt"
+            }
+            EvidenceArtifactKind::VerusBinding => "verus-binding",
+            EvidenceArtifactKind::VerusReceiptBinding => "verus-receipt-binding",
+            EvidenceArtifactKind::ReviewedFinalizationReceipt => {
+                "reviewed-finalization-receipt"
+            }
+        }
+    }
+}
+
 #[cgp_component(JsonArtifactStore)]
 pub trait CanReadJsonArtifact {
     fn read_json_artifact(&self, path: &Path) -> Result<serde_json::Value, String>;
@@ -1014,24 +1088,26 @@ impl ReviewedCampaignFinalization {
     }
 }
 
-#[cgp_component(ReviewedEvidenceAssembly)]
-pub trait CanAssembleReviewedEvidence {
-    fn assemble_reviewed_evidence(
+#[cgp_component(ReviewedEvidenceBuilder)]
+pub trait CanBuildReviewedEvidenceManifest {
+    fn build_reviewed_evidence_manifest(
         &self,
         reviewed_dir: &str,
     ) -> Result<ReviewedEvidenceManifest, String>;
 }
 
-#[cgp_impl(new StrictReviewedEvidenceAssembly)]
+#[cgp_impl(new StrictReviewedEvidenceBuilder)]
 #[uses(
     CanReadJsonArtifact,
     CanReadWriteArtifacts,
     CanValidateReviewedBinding,
     CanValidateCampaignBinding,
-    CanCanonicalizeStaticIdentity
+    CanCanonicalizeStaticIdentity,
+    CanDescribeEvidenceArtifacts,
+    CanDigestArtifactBytes
 )]
-impl ReviewedEvidenceAssembly {
-    fn assemble_reviewed_evidence(
+impl ReviewedEvidenceBuilder {
+    fn build_reviewed_evidence_manifest(
         &self,
         reviewed_dir: &str,
     ) -> Result<ReviewedEvidenceManifest, String> {
@@ -1040,7 +1116,6 @@ impl ReviewedEvidenceAssembly {
         let binding_path = root.join("verus-binding.json");
         let campaign_binding_path = root.join("verus-receipt-binding.json");
         let finalization_path = root.join("reviewed-finalization-receipt.json");
-        let manifest_path = root.join("reviewed-evidence-manifest.json");
 
         let preparation = self.read_json_artifact(&preparation_path)?;
         let binding_value = self.read_json_artifact(&binding_path)?;
@@ -1128,42 +1203,32 @@ impl ReviewedEvidenceAssembly {
         if binding.contract_inventory_count != campaign.contract_inventory_count
             || binding.contract_clause_count != campaign.contract_clause_count
         {
-            return Err("reviewed preparation and finalized campaign contract metadata counts diverged".into());
+            return Err(
+                "reviewed preparation and finalized campaign contract metadata counts diverged"
+                    .into(),
+            );
         }
 
-        let artifacts = vec![
-            evidence_artifact(
-                self,
-                "reviewed-preparation-receipt",
-                &preparation_path,
-                "KVERUS_REVIEWED_BINDING_PREPARED",
-                "none",
-            )?,
-            evidence_artifact(
-                self,
-                "verus-binding",
-                &binding_path,
-                &binding.status,
-                "none",
-            )?,
-            evidence_artifact(
-                self,
-                "verus-receipt-binding",
-                &campaign_binding_path,
-                &campaign.status,
-                "verus_checked_scoped",
-            )?,
-            evidence_artifact(
-                self,
-                "reviewed-finalization-receipt",
-                &finalization_path,
-                "KVERUS_REVIEWED_VERUS_FINALIZED",
-                "verus_checked_scoped",
-            )?,
-        ];
+        let mut artifacts = Vec::new();
+        for spec in self.reviewed_evidence_artifact_specs() {
+            let kind = self.evidence_artifact_kind_name(spec.kind);
+            let path = root.join(spec.filename);
+            let bytes = self
+                .read_artifact(&path)
+                .map_err(|error| format!("cannot read {} for digest: {error}", path.display()))?;
+            artifacts.push(EvidenceArtifact {
+                kind: kind.to_string(),
+                canonical_token: self.canonicalize_static_identity(kind)?,
+                path: path.display().to_string(),
+                status: spec.status.to_string(),
+                proof_credit_source: spec.proof_credit_source.to_string(),
+                digest_algorithm: "sha256",
+                digest: self.digest_artifact_bytes(&bytes),
+            });
+        }
 
-        let manifest = ReviewedEvidenceManifest {
-            schema: 1,
+        Ok(ReviewedEvidenceManifest {
+            schema: 2,
             status: "KVERUS_REVIEWED_EVIDENCE_MANIFEST",
             engine: DEFAULT_ENGINE,
             kani_proof_credit: false,
@@ -1177,27 +1242,89 @@ impl ReviewedEvidenceAssembly {
             translation_correctness: campaign.translation_correctness,
             proof_credit_source: "existing_verus_checked_scoped_receipts_only",
             artifacts,
-        };
+        })
+    }
+}
+
+#[cgp_component(ReviewedEvidenceAssembly)]
+pub trait CanAssembleReviewedEvidence {
+    fn assemble_reviewed_evidence(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedEvidenceManifest, String>;
+}
+
+#[cgp_impl(new ContentAddressedReviewedEvidenceAssembly)]
+#[uses(CanBuildReviewedEvidenceManifest, CanReadWriteArtifacts)]
+impl ReviewedEvidenceAssembly {
+    fn assemble_reviewed_evidence(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedEvidenceManifest, String> {
+        let manifest = self.build_reviewed_evidence_manifest(reviewed_dir)?;
+        let manifest_path = PathBuf::from(reviewed_dir).join("reviewed-evidence-manifest.json");
         self.write_artifact(&manifest_path, &pretty_json_bytes(&manifest)?)
             .map_err(|error| format!("cannot write {}: {error}", manifest_path.display()))?;
         Ok(manifest)
     }
 }
 
-fn evidence_artifact(
-    context: &impl CanCanonicalizeStaticIdentity,
-    kind: &str,
-    path: &Path,
-    status: &str,
-    proof_credit_source: &str,
-) -> Result<EvidenceArtifact, String> {
-    Ok(EvidenceArtifact {
-        kind: kind.to_string(),
-        canonical_token: context.canonicalize_static_identity(kind)?,
-        path: path.display().to_string(),
-        status: status.to_string(),
-        proof_credit_source: proof_credit_source.to_string(),
-    })
+#[cgp_component(ReviewedEvidenceAudit)]
+pub trait CanAuditReviewedEvidence {
+    fn audit_reviewed_evidence(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedEvidenceAuditReceipt, String>;
+}
+
+#[cgp_impl(new ContentAddressedReviewedEvidenceAudit)]
+#[uses(
+    CanBuildReviewedEvidenceManifest,
+    CanReadJsonArtifact,
+    CanReadWriteArtifacts,
+    CanDigestArtifactBytes
+)]
+impl ReviewedEvidenceAudit {
+    fn audit_reviewed_evidence(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedEvidenceAuditReceipt, String> {
+        let root = PathBuf::from(reviewed_dir);
+        let manifest_path = root.join("reviewed-evidence-manifest.json");
+        let audit_path = root.join("reviewed-evidence-audit.json");
+
+        let stored_manifest = self.read_json_artifact(&manifest_path)?;
+        let expected_manifest = self.build_reviewed_evidence_manifest(reviewed_dir)?;
+        let expected_value = serde_json::to_value(&expected_manifest)
+            .map_err(|error| format!("cannot serialize expected reviewed manifest: {error}"))?;
+
+        if stored_manifest != expected_value {
+            return Err(
+                "reviewed evidence manifest diverged from the current content-addressed evidence"
+                    .into(),
+            );
+        }
+
+        let manifest_bytes = self
+            .read_artifact(&manifest_path)
+            .map_err(|error| format!("cannot read {}: {error}", manifest_path.display()))?;
+        let receipt = ReviewedEvidenceAuditReceipt {
+            schema: 1,
+            status: "KVERUS_REVIEWED_EVIDENCE_AUDITED",
+            engine: DEFAULT_ENGINE,
+            kani_proof_credit: false,
+            verus_checked_scoped: true,
+            reviewed_dir: reviewed_dir.to_string(),
+            manifest_path: manifest_path.display().to_string(),
+            manifest_digest_algorithm: "sha256",
+            manifest_digest: self.digest_artifact_bytes(&manifest_bytes),
+            verified_artifact_count: expected_manifest.artifacts.len(),
+            proof_credit_source: "existing_verus_checked_scoped_receipts_only",
+        };
+        self.write_artifact(&audit_path, &pretty_json_bytes(&receipt)?)
+            .map_err(|error| format!("cannot write {}: {error}", audit_path.display()))?;
+        Ok(receipt)
+    }
 }
 
 fn json_field<'a>(
@@ -1298,6 +1425,10 @@ delegate_and_check_components! {
             CapturedJsonPythonToolRunner,
         ArtifactStoreComponent:
             StdArtifactStore,
+        ArtifactDigestComponent:
+            Sha256ArtifactDigest,
+        EvidenceArtifactPolicyComponent:
+            StaticEvidenceArtifactPolicy,
         JsonArtifactStoreComponent:
             SerdeJsonArtifactStore,
         AutomationPreparationComponent:
@@ -1310,8 +1441,12 @@ delegate_and_check_components! {
             KaniReviewedBindingPreparation,
         ReviewedCampaignFinalizationComponent:
             KaniReviewedCampaignFinalization,
+        ReviewedEvidenceBuilderComponent:
+            StrictReviewedEvidenceBuilder,
         ReviewedEvidenceAssemblyComponent:
-            StrictReviewedEvidenceAssembly,
+            ContentAddressedReviewedEvidenceAssembly,
+        ReviewedEvidenceAuditComponent:
+            ContentAddressedReviewedEvidenceAudit,
     }
 }
 

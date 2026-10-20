@@ -151,3 +151,35 @@ surface safe and avoids introducing `arcane-rs/delegation` or unsafe code.
 
 No Rust-to-Verus lowering semantics, Kani contract semantics, reviewed mappings, or
 proof campaign acceptance rules changed in this slice.
+
+## Seventh slice: content-addressed reviewed evidence and independent audit
+
+The reviewed evidence manifest is explicitly versioned to schema 2. Every declared
+reviewed artifact now carries:
+
+- a typed artifact kind selected by `EvidenceArtifactPolicy`;
+- its canonical token identity from `TokenIdentity`;
+- the exact repository/runtime path;
+- expected semantic status and proof-credit provenance;
+- `digest_algorithm = sha256`;
+- the SHA-256 digest of the exact stored bytes.
+
+`ArtifactDigest` is a CGP capability implemented by the safe RustCrypto `sha2`
+interface. `EvidenceArtifactPolicy` centralizes the reviewed artifact set so the
+assembler and auditor cannot silently drift to different inventories.
+
+The new `audit-reviewed --reviewed-dir <dir>` command does not trust the stored
+manifest as an oracle. It rebuilds an expected schema-2 manifest from the current
+preparation/binding/finalization artifacts using the existing semantic validators,
+recomputes every byte digest, and requires structural equality with the stored
+`reviewed-evidence-manifest.json`. On success it emits
+`reviewed-evidence-audit.json`, including the SHA-256 digest of the manifest itself.
+
+The automation regression lane includes a negative test that appends whitespace to a
+reviewed JSON artifact after manifest creation and requires `audit-reviewed` to fail,
+then restores the artifact and requires a successful audit. This demonstrates
+byte-level drift detection independently of JSON semantic equivalence.
+
+This is tamper-evident/content-addressed evidence, not a digital signature: an actor
+capable of replacing both the evidence and its manifest can still create a new
+self-consistent bundle. No proof semantics or proof-credit rules change.
