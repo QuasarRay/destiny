@@ -7,14 +7,15 @@ pub use components::{
     CanAssembleReviewedEvidence, CanAuditReviewedEvidence, CanBuildAutomationPlan,
     CanBuildReviewedEvidenceManifest, CanCanonicalizeContractClause,
     CanCanonicalizeStaticIdentity, CanDecodeJsonReceipt, CanDescribeCommands,
-    CanDescribeEvidenceArtifacts, CanDigestArtifactBytes, CanExplainReviewed,
+    CanBuildDiscoverySelectionArguments, CanDescribeEvidenceArtifacts,
+    CanDigestArtifactBytes, CanExplainReviewed, CanLoadReviewedVerificationConfig,
     CanFinalizeReviewedCampaign, CanInspectArtifactPresence,
     CanInspectReviewedLifecycle, CanNormalizeMetadata, CanParseMetadataBytes,
     CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
     CanReadWriteArtifacts, CanRequireReviewedTransition, CanRouteCommand,
     CanRunJsonPythonTool, CanRunPythonTool, CanRunReviewedCampaign,
     CanValidateCampaignBinding, CanValidateCampaignExecution,
-    CanValidateReviewedIntegrity, CanVerifyReviewed,
+    CanValidateReviewedIntegrity, CanValidateReviewedVerificationConfig, CanVerifyReviewed,
     CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
@@ -26,8 +27,10 @@ pub use model::{
     ReviewedCampaignExecutionReceipt, ReviewedEvidenceAuditReceipt,
     ReviewedEvidenceManifest, ReviewedExplanationReport, ReviewedFinalizationReceipt,
     ReviewedIntegrityArtifact, ReviewedIntegrityReport,
-    ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
-    ReviewedPreparationReceipt, ReviewedVerificationReceipt, ReviewedVerificationStep,
+    ReviewedCargoTarget, ReviewedLifecycleAction, ReviewedLifecycleReport,
+    ReviewedLifecycleStage, ReviewedPreparationReceipt, ReviewedVerificationConfig,
+    ReviewedVerificationLimits, ReviewedVerificationReceipt, ReviewedVerificationSelection,
+    ReviewedVerificationStep,
 };
 
 use kani_metadata::KaniMetadata;
@@ -208,7 +211,7 @@ mod tests {
         let usage = KVerusContext.command_usage().unwrap();
         assert!(usage.contains("prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"));
         assert!(usage.contains(
-            "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path>"
+            "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path> [--config <json>]"
         ));
         assert!(usage.contains(
             "run-reviewed --reviewed-dir <dir> --campaign-dir <dir> --verus <path>"
@@ -337,7 +340,91 @@ mod tests {
                 reviewed_dir: ".aegis/reviewed".to_string(),
                 campaign_dir: ".aegis/campaign".to_string(),
                 verus: "verus-dist/verus".to_string(),
+                config_path: None,
             }
+        );
+    }
+
+    #[test]
+    fn command_router_accepts_reviewed_config_path() {
+        let command = KVerusContext
+            .route_command(&[
+                "verify-reviewed".to_string(),
+                "--manifest-path".to_string(),
+                "verification/spec/Cargo.toml".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+                "--campaign-dir".to_string(),
+                ".aegis/campaign".to_string(),
+                "--verus".to_string(),
+                "verus-dist/verus".to_string(),
+                "--config".to_string(),
+                "verification/automation/reviewed-verification.json".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::VerifyReviewed {
+                manifest_path: "verification/spec/Cargo.toml".to_string(),
+                reviewed_dir: ".aegis/reviewed".to_string(),
+                campaign_dir: ".aegis/campaign".to_string(),
+                verus: "verus-dist/verus".to_string(),
+                config_path: Some(
+                    "verification/automation/reviewed-verification.json".to_string()
+                ),
+            }
+        );
+    }
+
+    #[test]
+    fn reviewed_config_builds_kani_selection_arguments() {
+        let config = KVerusContext
+            .validate_reviewed_verification_config(ReviewedVerificationConfig {
+                schema: 1,
+                selection: ReviewedVerificationSelection {
+                    packages: vec!["destiny-original-spec".to_string()],
+                    features: vec!["feature-a".to_string()],
+                    all_features: false,
+                    no_default_features: true,
+                    target: ReviewedCargoTarget::Bin,
+                    target_name: Some("spec-bin".to_string()),
+                    functions: vec!["model::assign_flag".to_string()],
+                },
+                limits: ReviewedVerificationLimits {
+                    timeout_seconds: 60,
+                    memory_mib: Some(2048),
+                    max_concurrency: 1,
+                },
+            })
+            .unwrap();
+
+        assert_eq!(
+            KVerusContext
+                .discovery_selection_args(&config.selection)
+                .unwrap(),
+            vec![
+                "--package",
+                "destiny-original-spec",
+                "--feature",
+                "feature-a",
+                "--no-default-features",
+                "--target-kind",
+                "bin",
+                "--target-name",
+                "spec-bin",
+                "--function",
+                "model::assign_flag",
+            ]
+        );
+
+        let mut invalid = config;
+        invalid.limits.max_concurrency = 2;
+        assert!(
+            KVerusContext
+                .validate_reviewed_verification_config(invalid)
+                .unwrap_err()
+                .contains("max_concurrency")
         );
     }
 
@@ -468,12 +555,20 @@ mod tests {
             "verus_checked_scoped": true,
             "deduplicated_entries": 3,
             "formal_audit": "CHECKED_SCOPED",
-            "case_acceptance_exit": 0
+            "case_acceptance_exit": 0,
+            "obligations": ["a", "b", "c"],
+            "timeout_seconds": 120,
+            "memory_mib": null,
+            "max_concurrency": 1
         });
         let summary = KVerusContext.validate_campaign_execution(value).unwrap();
         assert_eq!(summary.status, "CHECKED_SCOPED");
         assert_eq!(summary.checked_entry_count, 3);
         assert_eq!(summary.case_acceptance_exit, 0);
+        assert_eq!(summary.obligations, vec!["a", "b", "c"]);
+        assert_eq!(summary.timeout_seconds, 120);
+        assert_eq!(summary.memory_mib, None);
+        assert_eq!(summary.max_concurrency, 1);
 
         let rejected = serde_json::json!({
             "schema": 1,
@@ -483,7 +578,11 @@ mod tests {
             "verus_checked_scoped": true,
             "deduplicated_entries": 3,
             "formal_audit": "CHECKED_SCOPED",
-            "case_acceptance_exit": 1
+            "case_acceptance_exit": 1,
+            "obligations": ["a", "b", "c"],
+            "timeout_seconds": 120,
+            "memory_mib": null,
+            "max_concurrency": 1
         });
         assert!(KVerusContext.validate_campaign_execution(rejected).is_err());
     }
@@ -582,6 +681,15 @@ mod tests {
                 "metadata_path": root.join("kani-metadata.json").display().to_string(),
                 "discovery_path": root.join("normalized-discovery.json").display().to_string(),
                 "plan_path": root.join("automation-plan.json").display().to_string(),
+                "selection": {
+                    "packages": [],
+                    "features": [],
+                    "all_features": false,
+                    "no_default_features": false,
+                    "target": "default",
+                    "target_name": null,
+                    "functions": []
+                },
                 "counts": {
                     "contracted_functions": 1,
                     "contract_clauses": 2
