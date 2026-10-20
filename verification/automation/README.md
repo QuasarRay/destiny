@@ -18,7 +18,8 @@ cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml
   --manifest-path verification/spec/Cargo.toml --output-dir path/to/reviewed-evidence
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- verify-reviewed \
   --manifest-path verification/spec/Cargo.toml --reviewed-dir path/to/reviewed-evidence \
-  --campaign-dir path/to/verus-final-campaign --verus path/to/verus
+  --campaign-dir path/to/verus-final-campaign --verus path/to/verus \
+  --config verification/automation/reviewed-verification.json
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- run-reviewed \
   --reviewed-dir path/to/reviewed-evidence --campaign-dir path/to/verus-final-campaign \
   --verus path/to/verus
@@ -140,3 +141,50 @@ has `proof_credit: false`; formal credit remains solely in the exact fresh
 The workflow-step inventory is generated with `derive-deftly`, and `comprende` builds
 the executed/reused step lists. CGP remains responsible for behavior and component
 composition.
+
+
+## Unified reviewed verification configuration
+
+`verification/automation/reviewed-verification.json` is the single optional configuration
+source for `verify-reviewed`. Schema 1 contains `selection` and `limits` objects.
+
+Selection is carried end to end rather than interpreted as UI-only filtering:
+
+- `packages` forwards repeated Cargo package selection to Kani autoharness discovery;
+- `features`, `all_features`, and `no_default_features` forward Cargo feature selection;
+- `target` is one of `default`, `lib`, `bins`, or `bin`; `bin` requires
+  `target_name`;
+- `functions` accepts exact supported reviewed registry identities or their Kani metadata
+  names. Each value is lowered to an escaped suffix-exact Kani `--include-pattern`,
+  because pinned Kani filters autoharness candidates using a crate-qualified function name.
+  The binder independently resolves every requested value to exactly one supported registry
+  mapping and rejects unknown, ambiguous, duplicated, or alias-duplicated selections.
+
+The selected function set therefore constrains Kani discovery, the Kani-to-Verus reviewed
+binding, and the generated Verus campaign plan together. The campaign binds and audits that
+filtered plan, so a partial configured run is never credited as though the full registry
+had executed. An empty function list preserves the existing full reviewed registry.
+
+The upstream selector behavior is taken from pinned Kani
+`kani-driver/src/args/autoharness_args.rs::CommonAutoharnessArgs`,
+`kani-driver/src/args/cargo.rs::{CargoCommonArgs,CargoTargetArgs}`, and
+`kani-compiler/src/kani_middle/codegen_units.rs::autoharness_filtered_out`; KVerus
+adapts those existing selectors instead of implementing a parallel discovery language.
+
+Resource controls are deliberately fail-closed:
+
+- `timeout_seconds` must be 1 through 120. The outer campaign process enforces the
+  requested wall-clock limit while the maintained Destiny controller retains its existing
+  120-second scoped reservation and durable attempt accounting;
+- `memory_mib` is optional. When set, the campaign applies an address-space limit to
+  each controller/verifier subprocess tree on platforms exposing `resource.RLIMIT_AS`;
+- `max_concurrency` is currently required to be `1`, matching the maintained
+  controller's sequential verification lock. Higher values are rejected rather than
+  silently ignored.
+
+The CGP `ReviewedVerificationConfigValidation`,
+`ReviewedVerificationConfigStore`, and `DiscoverySelectionArguments` components own
+validation, loading, and lowering. `derive-deftly` generates the Cargo-target metadata
+used by that lowering, while `comprende` constructs repeated package, feature, function,
+and obligation argument inventories. The exact effective selection and limits are retained
+in preparation/execution/final workflow evidence. They do not grant proof credit.
