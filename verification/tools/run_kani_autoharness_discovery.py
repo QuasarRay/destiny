@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import stat
@@ -149,7 +150,23 @@ def main() -> int:
         type=Path,
         default=ROOT / ".aegis/destiny/kani-autoharness-discovery",
     )
+    parser.add_argument("--package", action="append", default=[])
+    parser.add_argument("--feature", action="append", default=[])
+    parser.add_argument("--all-features", action="store_true")
+    parser.add_argument("--no-default-features", action="store_true")
+    parser.add_argument(
+        "--target-kind",
+        choices=("default", "lib", "bins", "bin"),
+        default="default",
+    )
+    parser.add_argument("--target-name")
+    parser.add_argument("--function", action="append", default=[])
     args = parser.parse_args()
+
+    if args.target_kind == "bin" and not args.target_name:
+        parser.error("--target-kind bin requires --target-name")
+    if args.target_kind != "bin" and args.target_name:
+        parser.error("--target-name is only valid with --target-kind bin")
 
     driver = args.kani_driver.resolve(strict=True)
     if driver.parent.name == "scripts" and driver.name == "cargo-kani":
@@ -225,6 +242,23 @@ def main() -> int:
             "--target-dir",
             str(out / "kani-target"),
         ]
+        for package in args.package:
+            cmd.extend(["--package", package])
+        if args.feature:
+            cmd.extend(["--features", ",".join(args.feature)])
+        if args.all_features:
+            cmd.append("--all-features")
+        if args.no_default_features:
+            cmd.append("--no-default-features")
+        if args.target_kind == "lib":
+            cmd.append("--lib")
+        elif args.target_kind == "bins":
+            cmd.append("--bins")
+        elif args.target_kind == "bin":
+            cmd.extend(["--bin", args.target_name])
+        for function in args.function:
+            cmd.extend(["--include-pattern", f"^{re.escape(function)}$"])
+
         result = subprocess.run(cmd, cwd=out, env=env, text=True, capture_output=True)
 
     (out / "command.json").write_text(json.dumps(cmd, indent=2) + "\n", encoding="utf-8")
@@ -274,6 +308,15 @@ def main() -> int:
         "status": "KANI_AUTOHARNESS_DISCOVERY_ONLY",
         "proof_credit": False,
         "manifest": str(manifest.relative_to(ROOT)),
+        "selection": {
+            "packages": args.package,
+            "features": args.feature,
+            "all_features": args.all_features,
+            "no_default_features": args.no_default_features,
+            "target": args.target_kind,
+            "target_name": args.target_name,
+            "functions": args.function,
+        },
         "driver": str(driver),
         "driver_binary": {
             "path": str(driver_binary),
