@@ -653,6 +653,7 @@ mod tests {
             "default_engine": "verus",
             "kani_proof_credit": false,
             "selected": [{}],
+            "configured_functions": [],
             "controller_obligations": ["obligation-1"],
             "contract_inventory_count": 1,
             "contract_clause_count": 2,
