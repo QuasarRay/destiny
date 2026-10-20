@@ -4,6 +4,7 @@ use destiny_verification_automation::{
     AutomationCommand, CanAssembleReviewedEvidence, CanAuditReviewedEvidence,
     CanBuildAutomationPlan, CanDescribeCommands, CanFinalizeReviewedCampaign,
     CanInspectReviewedLifecycle, CanPrepareAutomation, CanRunReviewedCampaign,
+    CanValidateReviewedIntegrity,
     CanPrepareReviewedBinding, CanRouteCommand, CanRunPythonTool, DEFAULT_ENGINE,
     DiscoveryReport, KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata,
     parse_metadata,
@@ -180,6 +181,32 @@ fn status_reviewed(reviewed_dir: &str) -> ExitCode {
     }
 }
 
+fn validate_reviewed(reviewed_dir: &str) -> ExitCode {
+    match KVerusContext.validate_reviewed_integrity(reviewed_dir) {
+        Ok(report) => {
+            let valid = report.valid;
+            match serde_json::to_string_pretty(&report) {
+                Ok(json) => {
+                    println!("{json}");
+                    if valid {
+                        ExitCode::SUCCESS
+                    } else {
+                        ExitCode::FAILURE
+                    }
+                }
+                Err(error) => {
+                    eprintln!("{error}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let args = env::args().skip(1).collect::<Vec<_>>();
     let command = KVerusContext
@@ -218,6 +245,9 @@ fn main() -> ExitCode {
         }
         AutomationCommand::AuditReviewed { reviewed_dir } => audit_reviewed(&reviewed_dir),
         AutomationCommand::StatusReviewed { reviewed_dir } => status_reviewed(&reviewed_dir),
+        AutomationCommand::ValidateReviewed { reviewed_dir } => {
+            validate_reviewed(&reviewed_dir)
+        }
         AutomationCommand::Explain => {
             print!("{}", include_str!("../capabilities.json"));
             ExitCode::SUCCESS

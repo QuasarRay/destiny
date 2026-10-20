@@ -274,3 +274,45 @@ CI tests the new runner receipt protocol without requiring Verus by deliberately
 supplying a missing plan and requiring a persisted `INCOMPLETE` receipt plus nonzero
 exit. The real Verus job now invokes `run-reviewed`; it no longer calls
 `run_verus_campaign.py` directly.
+
+
+## Tenth slice: read-only reviewed integrity validation and typed receipt decoding
+
+The lifecycle state machine intentionally classifies reviewed directories by artifact
+presence. That keeps `status-reviewed` cheap and makes transition legality independent
+of JSON parser behavior, but presence alone is not evidence integrity. The new
+`validate-reviewed --reviewed-dir <dir>` command adds a separate read-only semantic
+validation layer.
+
+`ReviewedIntegrityValidation` is a CGP component that composes the existing lifecycle,
+reviewed-binding validator, campaign-binding validator, content-addressed manifest
+builder, digest provider, and token-identity provider. It validates only the artifacts
+implied by the current lifecycle stage:
+
+1. `reviewed-prepared`: decode the preparation receipt, validate the reviewed binding,
+   and cross-check path/status/count correspondence.
+2. `reviewed-finalized`: additionally validate the campaign binding and finalization
+   receipt, including translation/count correspondence.
+3. `reviewed-manifested`: rebuild the expected content-addressed manifest and require
+   structural equality with the stored manifest, so byte-level drift in an underlying
+   reviewed artifact is detected even when its parsed JSON meaning is unchanged.
+4. `reviewed-audited`: additionally decode the audit receipt and require its manifest
+   SHA-256 digest, verified-artifact count, engine/status, and proof-credit-source
+   invariants to match the current evidence.
+
+The command returns a typed `ReviewedIntegrityReport` containing the presence lifecycle
+stage, proc-macro-canonical stage/validation identities, validated artifact identities,
+and any violations. It mutates no evidence and always reports `proof_credit = false`.
+The CLI exits nonzero when `valid = false`, while still printing the machine-readable
+report.
+
+This slice also adds the generic CGP `JsonReceiptDecoder`. Existing reviewed-binding,
+campaign-execution, and campaign-binding validators now share that typed
+`serde::de::DeserializeOwned` decoding boundary. Reviewed preparation/finalization
+validation was factored into reusable typed helpers, replacing the previous ad-hoc
+`serde_json::Value` field extractors in manifest construction.
+
+All new command/artifact identities continue through `TokenIdentity`, backed by
+`proc_macro2` and the safe `arcane-rs/synthez::ToTokens` replay wrapper. No unsafe
+Arcane macro is introduced, and no proof-generation or Rust-to-Verus translation
+semantics change.

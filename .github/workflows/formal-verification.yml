@@ -154,6 +154,11 @@ jobs:
             status-reviewed --reviewed-dir "$out" \
             > "$out/reviewed-lifecycle-prepared.json"
 
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            validate-reviewed --reviewed-dir "$out" \
+            > "$out/reviewed-integrity-prepared.json"
+
           python3 -B verification/tools/test_bind_kani_verus.py
           python3 - <<'PY'
           import json
@@ -165,6 +170,7 @@ jobs:
           receipt=json.loads((root/"reviewed-preparation-receipt.json").read_text())
           stdout_receipt=json.loads((root/"reviewed-preparation-stdout.json").read_text())
           lifecycle=json.loads((root/"reviewed-lifecycle-prepared.json").read_text())
+          integrity=json.loads((root/"reviewed-integrity-prepared.json").read_text())
 
           assert discovery["default_engine"] == "verus", discovery
           assert discovery["proof_credit"] is False, discovery
@@ -195,6 +201,19 @@ jobs:
           assert lifecycle["consistent"] is True, lifecycle
           assert lifecycle["proof_credit"] is False, lifecycle
           assert "finalize-reviewed" in lifecycle["legal_next_actions"], lifecycle
+
+          assert integrity["status"] == "KVERUS_REVIEWED_INTEGRITY", integrity
+          assert integrity["lifecycle_stage"] == "reviewed-prepared", integrity
+          assert integrity["canonical_stage"] == "reviewed_prepared", integrity
+          assert integrity["canonical_validation"] == "reviewed_integrity_validation", integrity
+          assert integrity["valid"] is True, integrity
+          assert integrity["validated_artifact_count"] == 2, integrity
+          assert integrity["violations"] == [], integrity
+          assert integrity["proof_credit"] is False, integrity
+          assert {row["kind"] for row in integrity["artifacts"]} == {
+              "reviewed-preparation-receipt",
+              "verus-binding",
+          }, integrity
           PY
 
           mkdir -p "$regression"
@@ -337,6 +356,28 @@ jobs:
             echo "audit-reviewed unexpectedly accepted byte-level evidence drift" >&2
             exit 1
           fi
+          if cargo +nightly-2026-08-21 run --quiet \
+              --manifest-path verification/automation/Cargo.toml --locked -- \
+              validate-reviewed --reviewed-dir "$regression" \
+              > "$regression/reviewed-integrity-drift.json" \
+              2> "$regression/reviewed-integrity-drift-stderr.txt"; then
+            echo "validate-reviewed unexpectedly accepted byte-level evidence drift" >&2
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path(".aegis/destiny/kverus-reviewed-lifecycle-regression")
+          integrity=json.loads((root/"reviewed-integrity-drift.json").read_text())
+          assert integrity["status"] == "KVERUS_REVIEWED_INTEGRITY", integrity
+          assert integrity["lifecycle_stage"] == "reviewed-manifested", integrity
+          assert integrity["valid"] is False, integrity
+          assert integrity["validated_artifact_count"] == 4, integrity
+          assert integrity["violations"], integrity
+          assert any("manifest diverged" in row for row in integrity["violations"]), integrity
+          assert integrity["proof_credit"] is False, integrity
+          PY
           cargo +nightly-2026-08-21 run --quiet \
             --manifest-path verification/automation/Cargo.toml --locked -- \
             status-reviewed --reviewed-dir "$regression" \
@@ -352,6 +393,11 @@ jobs:
             --manifest-path verification/automation/Cargo.toml --locked -- \
             status-reviewed --reviewed-dir "$regression" \
             > "$regression/reviewed-lifecycle-audited.json"
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            validate-reviewed --reviewed-dir "$regression" \
+            > "$regression/reviewed-integrity-audited.json"
 
           if cargo +nightly-2026-08-21 run --quiet \
               --manifest-path verification/automation/Cargo.toml --locked -- \
@@ -378,6 +424,7 @@ jobs:
           stdout_audit=json.loads((regression/"reviewed-evidence-audit-stdout.json").read_text())
           drift_lifecycle=json.loads((regression/"reviewed-lifecycle-after-drift-failure.json").read_text())
           audited_lifecycle=json.loads((regression/"reviewed-lifecycle-audited.json").read_text())
+          audited_integrity=json.loads((regression/"reviewed-integrity-audited.json").read_text())
 
           assert audit == stdout_audit, (audit, stdout_audit)
           assert audit["status"] == "KVERUS_REVIEWED_EVIDENCE_AUDITED", audit
@@ -393,6 +440,22 @@ jobs:
           assert audited_lifecycle["stage"] == "reviewed-audited", audited_lifecycle
           assert audited_lifecycle["canonical_stage"] == "reviewed_audited", audited_lifecycle
           assert audited_lifecycle["legal_next_actions"] == ["audit-reviewed"], audited_lifecycle
+
+          assert audited_integrity["status"] == "KVERUS_REVIEWED_INTEGRITY", audited_integrity
+          assert audited_integrity["lifecycle_stage"] == "reviewed-audited", audited_integrity
+          assert audited_integrity["canonical_stage"] == "reviewed_audited", audited_integrity
+          assert audited_integrity["valid"] is True, audited_integrity
+          assert audited_integrity["validated_artifact_count"] == 6, audited_integrity
+          assert audited_integrity["violations"] == [], audited_integrity
+          assert audited_integrity["proof_credit"] is False, audited_integrity
+          assert {row["kind"] for row in audited_integrity["artifacts"]} == {
+              "reviewed-preparation-receipt",
+              "verus-binding",
+              "verus-receipt-binding",
+              "reviewed-finalization-receipt",
+              "reviewed-evidence-manifest",
+              "reviewed-evidence-audit",
+          }, audited_integrity
 
           handoff=Path(".aegis/destiny/kani-autoharness-discovery")
           handoff_lifecycle=json.loads((handoff/"reviewed-lifecycle-handoff.json").read_text())

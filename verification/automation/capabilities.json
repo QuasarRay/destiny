@@ -108,7 +108,9 @@
     "reviewed_lifecycle_transition": "CGP ReviewedLifecycleTransition",
     "campaign_execution_validator": "CGP CampaignExecutionValidator over persisted run_verus_campaign.py receipts",
     "reviewed_campaign_execution": "CGP ReviewedCampaignExecution owns reviewed-prepared execution precondition and runner invocation",
-    "required_flag_parser": "generic exact named-flag parser shared by reviewed CLI commands"
+    "required_flag_parser": "generic exact named-flag parser shared by reviewed CLI commands",
+    "json_receipt_decoding": "CGP JsonReceiptDecoder using serde DeserializeOwned; shared by binding, campaign, and reviewed receipt validators",
+    "reviewed_integrity_validation": "CGP ReviewedIntegrityValidation over lifecycle, typed receipt decoding, existing validators, and content-addressed manifest reconstruction"
   },
   "preparation": {
     "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
@@ -252,6 +254,9 @@
       "audit-reviewed": [
         "reviewed-manifested",
         "reviewed-audited"
+      ],
+      "run-reviewed": [
+        "reviewed-prepared"
       ]
     },
     "inconsistent_policy": "reject any partial or non-prefix reviewed artifact inventory",
@@ -280,5 +285,43 @@
     "canonical_identity": "proc_macro2 + safe arcane-rs/synthez through CGP TokenIdentity",
     "proof_credit": false,
     "proof_credit_source": "existing_verus_checked_scoped_receipts_only"
+  },
+  "reviewed_integrity_validation": {
+    "command": "validate-reviewed --reviewed-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP ReviewedIntegrityValidation + JsonReceiptDecoder + existing reviewed/campaign validators",
+    "relationship_to_status": "status-reviewed is presence-only; validate-reviewed parses and cross-checks artifacts implied by that presence stage",
+    "stages": [
+      "reviewed-empty",
+      "reviewed-prepared",
+      "reviewed-finalized",
+      "reviewed-manifested",
+      "reviewed-audited",
+      "reviewed-inconsistent"
+    ],
+    "prepared_checks": [
+      "reviewed preparation receipt schema/status/engine/no-credit invariants",
+      "binding path/status/count correspondence",
+      "existing ReviewedBindingValidator invariants"
+    ],
+    "finalized_checks": [
+      "existing CampaignBindingValidator invariants",
+      "finalization path/status/count/translation correspondence",
+      "preparation/finalization contract metadata count equality"
+    ],
+    "manifested_checks": [
+      "rebuild expected content-addressed reviewed evidence manifest",
+      "require structural equality with stored manifest",
+      "therefore detect exact-byte digest drift in reviewed artifacts"
+    ],
+    "audited_checks": [
+      "audit receipt schema/status/engine/no-Kani-credit invariants",
+      "manifest SHA-256 digest equality",
+      "verified artifact count equality",
+      "proof-credit source remains existing scoped Verus receipts only"
+    ],
+    "canonical_identity": "proc_macro2 + safe arcane-rs/synthez through CGP TokenIdentity",
+    "mutates_evidence": false,
+    "proof_credit": false
   }
 }

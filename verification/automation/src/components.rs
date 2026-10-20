@@ -6,7 +6,8 @@ use crate::{
     EvidenceArtifactSpec, KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause,
     PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceAuditReceipt,
     ReviewedCampaignExecutionReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
-    ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
+    ReviewedIntegrityArtifact, ReviewedIntegrityReport, ReviewedLifecycleAction,
+    ReviewedLifecycleReport, ReviewedLifecycleStage,
     ReviewedPreparationReceipt,
 };
 use cgp::prelude::*;
@@ -14,7 +15,7 @@ use kani_metadata::{
     AutoHarnessSkipReason, ContractClause, ContractClauseKind, KaniMetadata,
 };
 use proc_macro2::TokenStream;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
     env,
@@ -124,6 +125,11 @@ const COMMANDS: &[(&str, &str, &str)] = &[
     (
         "status-reviewed",
         "status-reviewed --reviewed-dir <dir>",
+        "lifecycle",
+    ),
+    (
+        "validate-reviewed",
+        "validate-reviewed --reviewed-dir <dir>",
         "lifecycle",
     ),
     ("explain", "explain", "diagnostics"),
@@ -243,6 +249,9 @@ impl CommandRouter {
                 reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
             }),
             "status-reviewed" => Ok(AutomationCommand::StatusReviewed {
+                reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
+            }),
+            "validate-reviewed" => Ok(AutomationCommand::ValidateReviewed {
                 reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
             }),
             "explain" if rest.is_empty() => Ok(AutomationCommand::Explain),
@@ -952,6 +961,198 @@ impl JsonArtifactStore {
     }
 }
 
+#[cgp_component(JsonReceiptDecoder)]
+pub trait CanDecodeJsonReceipt {
+    fn decode_json_receipt<T>(
+        &self,
+        value: serde_json::Value,
+        label: &str,
+    ) -> Result<T, String>
+    where
+        T: DeserializeOwned;
+}
+
+#[cgp_impl(new SerdeJsonReceiptDecoder)]
+impl JsonReceiptDecoder {
+    fn decode_json_receipt<T>(
+        &self,
+        value: serde_json::Value,
+        label: &str,
+    ) -> Result<T, String>
+    where
+        T: DeserializeOwned,
+    {
+        serde_json::from_value(value)
+            .map_err(|error| format!("invalid {label}: {error}"))
+    }
+}
+
+#[derive(Deserialize)]
+struct ReviewedPreparationArtifact {
+    schema: u32,
+    status: String,
+    default_engine: String,
+    proof_credit: bool,
+    verus_campaign_checked: bool,
+    binding_path: String,
+    binding_status: String,
+    selected_count: usize,
+    unresolved_count: usize,
+    controller_obligation_count: usize,
+    contract_inventory_count: usize,
+    contract_clause_count: usize,
+}
+
+#[derive(Deserialize)]
+struct ReviewedFinalizationArtifact {
+    schema: u32,
+    status: String,
+    engine: String,
+    kani_proof_credit: bool,
+    verus_checked_scoped: bool,
+    reviewed_dir: String,
+    binding_path: String,
+    campaign_binding_path: String,
+    campaign_binding_status: String,
+    checked_receipt_count: usize,
+    contract_inventory_count: usize,
+    contract_clause_count: usize,
+    translation_correctness: String,
+}
+
+#[derive(Deserialize)]
+struct ReviewedEvidenceAuditArtifact {
+    schema: u32,
+    status: String,
+    engine: String,
+    kani_proof_credit: bool,
+    verus_checked_scoped: bool,
+    reviewed_dir: String,
+    manifest_path: String,
+    manifest_digest_algorithm: String,
+    manifest_digest: String,
+    verified_artifact_count: usize,
+    proof_credit_source: String,
+}
+
+fn validate_reviewed_preparation_artifact(
+    receipt: &ReviewedPreparationArtifact,
+    binding: &ReviewedBindingSummary,
+    binding_path: &Path,
+) -> Result<(), String> {
+    let expected_binding_path = binding_path.display().to_string();
+    if receipt.schema != 1
+        || receipt.status != "KVERUS_REVIEWED_BINDING_PREPARED"
+        || receipt.default_engine != DEFAULT_ENGINE
+        || receipt.proof_credit
+        || receipt.verus_campaign_checked
+        || receipt.binding_path != expected_binding_path
+        || receipt.binding_status != binding.status
+        || receipt.unresolved_count != 0
+        || receipt.selected_count != binding.selected_count
+        || receipt.controller_obligation_count != binding.controller_obligation_count
+        || receipt.contract_inventory_count != binding.contract_inventory_count
+        || receipt.contract_clause_count != binding.contract_clause_count
+    {
+        return Err(format!(
+            "reviewed preparation receipt violated KVerus invariants:              schema={}, status={}, engine={}, proof_credit={}, campaign_checked={},              binding_path={}, binding_status={}, selected={}, unresolved={},              controller_obligations={}, contract_inventory={}, contract_clauses={}",
+            receipt.schema,
+            receipt.status,
+            receipt.default_engine,
+            receipt.proof_credit,
+            receipt.verus_campaign_checked,
+            receipt.binding_path,
+            receipt.binding_status,
+            receipt.selected_count,
+            receipt.unresolved_count,
+            receipt.controller_obligation_count,
+            receipt.contract_inventory_count,
+            receipt.contract_clause_count
+        ));
+    }
+    Ok(())
+}
+
+fn validate_reviewed_finalization_artifact(
+    receipt: &ReviewedFinalizationArtifact,
+    reviewed_dir: &str,
+    binding_path: &Path,
+    campaign_binding_path: &Path,
+    campaign: &CampaignBindingSummary,
+) -> Result<(), String> {
+    let expected_binding_path = binding_path.display().to_string();
+    let expected_campaign_binding_path = campaign_binding_path.display().to_string();
+    if receipt.schema != 1
+        || receipt.status != "KVERUS_REVIEWED_VERUS_FINALIZED"
+        || receipt.engine != DEFAULT_ENGINE
+        || receipt.kani_proof_credit
+        || !receipt.verus_checked_scoped
+        || receipt.reviewed_dir != reviewed_dir
+        || receipt.binding_path != expected_binding_path
+        || receipt.campaign_binding_path != expected_campaign_binding_path
+        || receipt.campaign_binding_status != campaign.status
+        || receipt.checked_receipt_count != campaign.checked_receipt_count
+        || receipt.contract_inventory_count != campaign.contract_inventory_count
+        || receipt.contract_clause_count != campaign.contract_clause_count
+        || receipt.translation_correctness != campaign.translation_correctness
+    {
+        return Err(format!(
+            "reviewed finalization receipt violated KVerus invariants:              schema={}, status={}, engine={}, kani_proof_credit={}, verus_checked_scoped={},              reviewed_dir={}, binding_path={}, campaign_binding_path={},              campaign_binding_status={}, checked_receipts={}, contract_inventory={},              contract_clauses={}, translation_correctness={}",
+            receipt.schema,
+            receipt.status,
+            receipt.engine,
+            receipt.kani_proof_credit,
+            receipt.verus_checked_scoped,
+            receipt.reviewed_dir,
+            receipt.binding_path,
+            receipt.campaign_binding_path,
+            receipt.campaign_binding_status,
+            receipt.checked_receipt_count,
+            receipt.contract_inventory_count,
+            receipt.contract_clause_count,
+            receipt.translation_correctness
+        ));
+    }
+    Ok(())
+}
+
+fn validate_reviewed_audit_artifact(
+    receipt: &ReviewedEvidenceAuditArtifact,
+    reviewed_dir: &str,
+    manifest_path: &Path,
+    manifest_digest: &str,
+    verified_artifact_count: usize,
+) -> Result<(), String> {
+    let expected_manifest_path = manifest_path.display().to_string();
+    if receipt.schema != 1
+        || receipt.status != "KVERUS_REVIEWED_EVIDENCE_AUDITED"
+        || receipt.engine != DEFAULT_ENGINE
+        || receipt.kani_proof_credit
+        || !receipt.verus_checked_scoped
+        || receipt.reviewed_dir != reviewed_dir
+        || receipt.manifest_path != expected_manifest_path
+        || receipt.manifest_digest_algorithm != "sha256"
+        || receipt.manifest_digest != manifest_digest
+        || receipt.verified_artifact_count != verified_artifact_count
+        || receipt.proof_credit_source != "existing_verus_checked_scoped_receipts_only"
+    {
+        return Err(format!(
+            "reviewed audit receipt violated KVerus invariants:              schema={}, status={}, engine={}, kani_proof_credit={}, verus_checked_scoped={},              reviewed_dir={}, manifest_path={}, digest_algorithm={}, verified_artifacts={},              proof_credit_source={}",
+            receipt.schema,
+            receipt.status,
+            receipt.engine,
+            receipt.kani_proof_credit,
+            receipt.verus_checked_scoped,
+            receipt.reviewed_dir,
+            receipt.manifest_path,
+            receipt.manifest_digest_algorithm,
+            receipt.verified_artifact_count,
+            receipt.proof_credit_source
+        ));
+    }
+    Ok(())
+}
+
 #[cgp_component(AutomationPreparation)]
 pub trait CanPrepareAutomation {
     fn prepare_automation(
@@ -1057,13 +1258,14 @@ pub trait CanValidateReviewedBinding {
 }
 
 #[cgp_impl(new StrictReviewedBindingValidator)]
+#[uses(CanDecodeJsonReceipt)]
 impl ReviewedBindingValidator {
     fn validate_reviewed_binding(
         &self,
         value: serde_json::Value,
     ) -> Result<ReviewedBindingSummary, String> {
-        let binding: ReviewedBindingReceipt = serde_json::from_value(value)
-            .map_err(|error| format!("invalid reviewed binder receipt: {error}"))?;
+        let binding: ReviewedBindingReceipt =
+            self.decode_json_receipt(value, "reviewed binder receipt")?;
 
         if binding.schema != 1
             || binding.status != "BOUND_FOR_VERUS"
@@ -1182,13 +1384,14 @@ pub trait CanValidateCampaignExecution {
 }
 
 #[cgp_impl(new StrictCampaignExecutionValidator)]
+#[uses(CanDecodeJsonReceipt)]
 impl CampaignExecutionValidator {
     fn validate_campaign_execution(
         &self,
         value: serde_json::Value,
     ) -> Result<CampaignExecutionSummary, String> {
-        let receipt: CampaignRunnerReceipt = serde_json::from_value(value)
-            .map_err(|error| format!("invalid Verus campaign runner receipt: {error}"))?;
+        let receipt: CampaignRunnerReceipt =
+            self.decode_json_receipt(value, "Verus campaign runner receipt")?;
 
         if receipt.schema != 1
             || receipt.status != "CHECKED_SCOPED"
@@ -1349,13 +1552,14 @@ pub trait CanValidateCampaignBinding {
 }
 
 #[cgp_impl(new StrictCampaignBindingValidator)]
+#[uses(CanDecodeJsonReceipt)]
 impl CampaignBindingValidator {
     fn validate_campaign_binding(
         &self,
         value: serde_json::Value,
     ) -> Result<CampaignBindingSummary, String> {
-        let campaign: CampaignBindingReceipt = serde_json::from_value(value)
-            .map_err(|error| format!("invalid campaign binding receipt: {error}"))?;
+        let campaign: CampaignBindingReceipt =
+            self.decode_json_receipt(value, "campaign binding receipt")?;
 
         if campaign.schema != 1
             || campaign.status != "KANI_SELECTED_VERUS_CHECKED_SCOPED"
@@ -1469,6 +1673,7 @@ pub trait CanBuildReviewedEvidenceManifest {
 #[cgp_impl(new StrictReviewedEvidenceBuilder)]
 #[uses(
     CanReadJsonArtifact,
+    CanDecodeJsonReceipt,
     CanReadWriteArtifacts,
     CanValidateReviewedBinding,
     CanValidateCampaignBinding,
@@ -1487,87 +1692,25 @@ impl ReviewedEvidenceBuilder {
         let campaign_binding_path = root.join("verus-receipt-binding.json");
         let finalization_path = root.join("reviewed-finalization-receipt.json");
 
-        let preparation = self.read_json_artifact(&preparation_path)?;
+        let preparation_value = self.read_json_artifact(&preparation_path)?;
         let binding_value = self.read_json_artifact(&binding_path)?;
         let campaign_value = self.read_json_artifact(&campaign_binding_path)?;
-        let finalization = self.read_json_artifact(&finalization_path)?;
+        let finalization_value = self.read_json_artifact(&finalization_path)?;
 
+        let preparation: ReviewedPreparationArtifact =
+            self.decode_json_receipt(preparation_value, "reviewed preparation receipt")?;
         let binding = self.validate_reviewed_binding(binding_value)?;
         let campaign = self.validate_campaign_binding(campaign_value)?;
+        let finalization: ReviewedFinalizationArtifact =
+            self.decode_json_receipt(finalization_value, "reviewed finalization receipt")?;
 
-        require_json_u64(&preparation, "schema", 1)?;
-        require_json_str(&preparation, "status", "KVERUS_REVIEWED_BINDING_PREPARED")?;
-        require_json_str(&preparation, "default_engine", DEFAULT_ENGINE)?;
-        require_json_bool(&preparation, "proof_credit", false)?;
-        require_json_bool(&preparation, "verus_campaign_checked", false)?;
-        require_json_str(
-            &preparation,
-            "binding_path",
-            &binding_path.display().to_string(),
-        )?;
-        require_json_str(&preparation, "binding_status", &binding.status)?;
-        require_json_usize(&preparation, "unresolved_count", 0)?;
-        require_json_usize(&preparation, "selected_count", binding.selected_count)?;
-        require_json_usize(
-            &preparation,
-            "controller_obligation_count",
-            binding.controller_obligation_count,
-        )?;
-        require_json_usize(
-            &preparation,
-            "contract_inventory_count",
-            binding.contract_inventory_count,
-        )?;
-        require_json_usize(
-            &preparation,
-            "contract_clause_count",
-            binding.contract_clause_count,
-        )?;
-
-        require_json_u64(&finalization, "schema", 1)?;
-        require_json_str(
+        validate_reviewed_preparation_artifact(&preparation, &binding, &binding_path)?;
+        validate_reviewed_finalization_artifact(
             &finalization,
-            "status",
-            "KVERUS_REVIEWED_VERUS_FINALIZED",
-        )?;
-        require_json_str(&finalization, "engine", DEFAULT_ENGINE)?;
-        require_json_bool(&finalization, "kani_proof_credit", false)?;
-        require_json_bool(&finalization, "verus_checked_scoped", true)?;
-        require_json_str(&finalization, "reviewed_dir", reviewed_dir)?;
-        require_json_str(
-            &finalization,
-            "binding_path",
-            &binding_path.display().to_string(),
-        )?;
-        require_json_str(
-            &finalization,
-            "campaign_binding_path",
-            &campaign_binding_path.display().to_string(),
-        )?;
-        require_json_usize(
-            &finalization,
-            "checked_receipt_count",
-            campaign.checked_receipt_count,
-        )?;
-        require_json_usize(
-            &finalization,
-            "contract_inventory_count",
-            campaign.contract_inventory_count,
-        )?;
-        require_json_usize(
-            &finalization,
-            "contract_clause_count",
-            campaign.contract_clause_count,
-        )?;
-        require_json_str(
-            &finalization,
-            "campaign_binding_status",
-            &campaign.status,
-        )?;
-        require_json_str(
-            &finalization,
-            "translation_correctness",
-            &campaign.translation_correctness,
+            reviewed_dir,
+            &binding_path,
+            &campaign_binding_path,
+            &campaign,
         )?;
 
         if binding.contract_inventory_count != campaign.contract_inventory_count
@@ -1704,68 +1847,226 @@ impl ReviewedEvidenceAudit {
     }
 }
 
-fn json_field<'a>(
-    value: &'a serde_json::Value,
-    field: &str,
-) -> Result<&'a serde_json::Value, String> {
-    value
-        .get(field)
-        .ok_or_else(|| format!("missing JSON field {field:?}"))
+fn reviewed_integrity_artifact(
+    context: &impl CanCanonicalizeStaticIdentity,
+    kind: &str,
+    path: &Path,
+) -> Result<ReviewedIntegrityArtifact, String> {
+    Ok(ReviewedIntegrityArtifact {
+        kind: kind.to_string(),
+        canonical_token: context.canonicalize_static_identity(kind)?,
+        path: path.display().to_string(),
+        status: "valid",
+    })
 }
 
-fn require_json_str(
-    value: &serde_json::Value,
-    field: &str,
-    expected: &str,
-) -> Result<(), String> {
-    let actual = json_field(value, field)?
-        .as_str()
-        .ok_or_else(|| format!("JSON field {field:?} is not a string"))?;
-    if actual == expected {
-        Ok(())
-    } else {
-        Err(format!("JSON field {field:?} expected {expected:?}, got {actual:?}"))
+fn reviewed_lifecycle_rank(stage: &str) -> Option<u8> {
+    match stage {
+        "reviewed-empty" => Some(0),
+        "reviewed-prepared" => Some(1),
+        "reviewed-finalized" => Some(2),
+        "reviewed-manifested" => Some(3),
+        "reviewed-audited" => Some(4),
+        "reviewed-inconsistent" => None,
+        _ => None,
     }
 }
 
-fn require_json_bool(
-    value: &serde_json::Value,
-    field: &str,
-    expected: bool,
-) -> Result<(), String> {
-    let actual = json_field(value, field)?
-        .as_bool()
-        .ok_or_else(|| format!("JSON field {field:?} is not a boolean"))?;
-    if actual == expected {
-        Ok(())
-    } else {
-        Err(format!("JSON field {field:?} expected {expected}, got {actual}"))
-    }
+#[cgp_component(ReviewedIntegrityValidation)]
+pub trait CanValidateReviewedIntegrity {
+    fn validate_reviewed_integrity(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedIntegrityReport, String>;
 }
 
-fn require_json_u64(
-    value: &serde_json::Value,
-    field: &str,
-    expected: u64,
-) -> Result<(), String> {
-    let actual = json_field(value, field)?
-        .as_u64()
-        .ok_or_else(|| format!("JSON field {field:?} is not an unsigned integer"))?;
-    if actual == expected {
-        Ok(())
-    } else {
-        Err(format!("JSON field {field:?} expected {expected}, got {actual}"))
-    }
-}
+#[cgp_impl(new StrictReviewedIntegrityValidation)]
+#[uses(
+    CanInspectReviewedLifecycle,
+    CanReadJsonArtifact,
+    CanDecodeJsonReceipt,
+    CanValidateReviewedBinding,
+    CanValidateCampaignBinding,
+    CanBuildReviewedEvidenceManifest,
+    CanReadWriteArtifacts,
+    CanDigestArtifactBytes,
+    CanCanonicalizeStaticIdentity
+)]
+impl ReviewedIntegrityValidation {
+    fn validate_reviewed_integrity(
+        &self,
+        reviewed_dir: &str,
+    ) -> Result<ReviewedIntegrityReport, String> {
+        let lifecycle = self.reviewed_lifecycle(reviewed_dir)?;
+        let root = PathBuf::from(reviewed_dir);
+        let mut artifacts = Vec::new();
+        let mut violations = Vec::new();
+        let rank = reviewed_lifecycle_rank(lifecycle.stage);
 
-fn require_json_usize(
-    value: &serde_json::Value,
-    field: &str,
-    expected: usize,
-) -> Result<(), String> {
-    let expected = u64::try_from(expected)
-        .map_err(|_| format!("expected value for {field:?} does not fit u64"))?;
-    require_json_u64(value, field, expected)
+        if !lifecycle.consistent || rank.is_none() {
+            violations.push(format!(
+                "reviewed lifecycle is inconsistent at stage {} (present: {}; missing: {})",
+                lifecycle.stage,
+                lifecycle.present_artifacts.join(", "),
+                lifecycle.missing_artifacts.join(", "),
+            ));
+        }
+
+        if rank.is_some_and(|value| value >= 1) {
+            let result = (|| -> Result<Vec<ReviewedIntegrityArtifact>, String> {
+                let preparation_path = root.join("reviewed-preparation-receipt.json");
+                let binding_path = root.join("verus-binding.json");
+                let preparation_value = self.read_json_artifact(&preparation_path)?;
+                let binding_value = self.read_json_artifact(&binding_path)?;
+                let preparation: ReviewedPreparationArtifact = self.decode_json_receipt(
+                    preparation_value,
+                    "reviewed preparation receipt",
+                )?;
+                let binding = self.validate_reviewed_binding(binding_value)?;
+                validate_reviewed_preparation_artifact(
+                    &preparation,
+                    &binding,
+                    &binding_path,
+                )?;
+                Ok(vec![
+                    reviewed_integrity_artifact(
+                        self,
+                        "reviewed-preparation-receipt",
+                        &preparation_path,
+                    )?,
+                    reviewed_integrity_artifact(self, "verus-binding", &binding_path)?,
+                ])
+            })();
+            match result {
+                Ok(rows) => artifacts.extend(rows),
+                Err(error) => violations.push(error),
+            }
+        }
+
+        if rank.is_some_and(|value| value >= 2) {
+            let result = (|| -> Result<Vec<ReviewedIntegrityArtifact>, String> {
+                let binding_path = root.join("verus-binding.json");
+                let campaign_binding_path = root.join("verus-receipt-binding.json");
+                let finalization_path = root.join("reviewed-finalization-receipt.json");
+
+                let binding =
+                    self.validate_reviewed_binding(self.read_json_artifact(&binding_path)?)?;
+                let campaign = self.validate_campaign_binding(
+                    self.read_json_artifact(&campaign_binding_path)?,
+                )?;
+                let finalization: ReviewedFinalizationArtifact = self.decode_json_receipt(
+                    self.read_json_artifact(&finalization_path)?,
+                    "reviewed finalization receipt",
+                )?;
+                validate_reviewed_finalization_artifact(
+                    &finalization,
+                    reviewed_dir,
+                    &binding_path,
+                    &campaign_binding_path,
+                    &campaign,
+                )?;
+
+                if binding.contract_inventory_count != campaign.contract_inventory_count
+                    || binding.contract_clause_count != campaign.contract_clause_count
+                {
+                    return Err(
+                        "reviewed preparation and finalized campaign contract metadata counts diverged"
+                            .into(),
+                    );
+                }
+
+                Ok(vec![
+                    reviewed_integrity_artifact(
+                        self,
+                        "verus-receipt-binding",
+                        &campaign_binding_path,
+                    )?,
+                    reviewed_integrity_artifact(
+                        self,
+                        "reviewed-finalization-receipt",
+                        &finalization_path,
+                    )?,
+                ])
+            })();
+            match result {
+                Ok(rows) => artifacts.extend(rows),
+                Err(error) => violations.push(error),
+            }
+        }
+
+        if rank.is_some_and(|value| value >= 3) {
+            let result = (|| -> Result<ReviewedIntegrityArtifact, String> {
+                let manifest_path = root.join("reviewed-evidence-manifest.json");
+                let stored_manifest = self.read_json_artifact(&manifest_path)?;
+                let expected_manifest = self.build_reviewed_evidence_manifest(reviewed_dir)?;
+                let expected_value = serde_json::to_value(&expected_manifest).map_err(|error| {
+                    format!("cannot serialize expected reviewed manifest: {error}")
+                })?;
+                if stored_manifest != expected_value {
+                    return Err(
+                        "reviewed evidence manifest diverged from the current content-addressed evidence"
+                            .into(),
+                    );
+                }
+                reviewed_integrity_artifact(
+                    self,
+                    "reviewed-evidence-manifest",
+                    &manifest_path,
+                )
+            })();
+            match result {
+                Ok(row) => artifacts.push(row),
+                Err(error) => violations.push(error),
+            }
+        }
+
+        if rank.is_some_and(|value| value >= 4) {
+            let result = (|| -> Result<ReviewedIntegrityArtifact, String> {
+                let manifest_path = root.join("reviewed-evidence-manifest.json");
+                let audit_path = root.join("reviewed-evidence-audit.json");
+                let expected_manifest = self.build_reviewed_evidence_manifest(reviewed_dir)?;
+                let manifest_bytes = self
+                    .read_artifact(&manifest_path)
+                    .map_err(|error| format!("cannot read {}: {error}", manifest_path.display()))?;
+                let digest = self.digest_artifact_bytes(&manifest_bytes);
+                let audit: ReviewedEvidenceAuditArtifact = self.decode_json_receipt(
+                    self.read_json_artifact(&audit_path)?,
+                    "reviewed evidence audit receipt",
+                )?;
+                validate_reviewed_audit_artifact(
+                    &audit,
+                    reviewed_dir,
+                    &manifest_path,
+                    &digest,
+                    expected_manifest.artifacts.len(),
+                )?;
+                reviewed_integrity_artifact(
+                    self,
+                    "reviewed-evidence-audit",
+                    &audit_path,
+                )
+            })();
+            match result {
+                Ok(row) => artifacts.push(row),
+                Err(error) => violations.push(error),
+            }
+        }
+
+        Ok(ReviewedIntegrityReport {
+            schema: 1,
+            status: "KVERUS_REVIEWED_INTEGRITY",
+            reviewed_dir: reviewed_dir.to_string(),
+            lifecycle_stage: lifecycle.stage.to_string(),
+            canonical_stage: lifecycle.canonical_stage,
+            canonical_validation: self
+                .canonicalize_static_identity("reviewed-integrity-validation")?,
+            valid: lifecycle.consistent && violations.is_empty(),
+            validated_artifact_count: artifacts.len(),
+            artifacts,
+            violations,
+            proof_credit: false,
+        })
+    }
 }
 
 fn pretty_json_bytes(value: &impl Serialize) -> Result<Vec<u8>, String> {
@@ -1814,6 +2115,8 @@ delegate_and_check_components! {
             StaticEvidenceArtifactPolicy,
         JsonArtifactStoreComponent:
             SerdeJsonArtifactStore,
+        JsonReceiptDecoderComponent:
+            SerdeJsonReceiptDecoder,
         AutomationPreparationComponent:
             KaniAutomationPreparation,
         ReviewedBindingValidatorComponent:
@@ -1834,6 +2137,8 @@ delegate_and_check_components! {
             ContentAddressedReviewedEvidenceAssembly,
         ReviewedEvidenceAuditComponent:
             ContentAddressedReviewedEvidenceAudit,
+        ReviewedIntegrityValidationComponent:
+            StrictReviewedIntegrityValidation,
     }
 }
 

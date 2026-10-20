@@ -6,13 +6,15 @@ mod model;
 pub use components::{
     CanAssembleReviewedEvidence, CanAuditReviewedEvidence, CanBuildAutomationPlan,
     CanBuildReviewedEvidenceManifest, CanCanonicalizeContractClause,
-    CanCanonicalizeStaticIdentity, CanDescribeCommands, CanDescribeEvidenceArtifacts,
-    CanDigestArtifactBytes, CanFinalizeReviewedCampaign, CanInspectArtifactPresence,
+    CanCanonicalizeStaticIdentity, CanDecodeJsonReceipt, CanDescribeCommands,
+    CanDescribeEvidenceArtifacts, CanDigestArtifactBytes, CanFinalizeReviewedCampaign,
+    CanInspectArtifactPresence,
     CanInspectReviewedLifecycle, CanNormalizeMetadata, CanParseMetadataBytes,
     CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
     CanReadWriteArtifacts, CanRequireReviewedTransition, CanRouteCommand,
     CanRunJsonPythonTool, CanRunPythonTool, CanRunReviewedCampaign,
     CanValidateCampaignBinding, CanValidateCampaignExecution,
+    CanValidateReviewedIntegrity,
     CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
@@ -22,7 +24,8 @@ pub use model::{
     DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind, EvidenceArtifactSpec,
     PlanCounts, PlannedContractClause, PreparationReceipt, ReviewedBindingSummary,
     ReviewedCampaignExecutionReceipt, ReviewedEvidenceAuditReceipt,
-    ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
+    ReviewedEvidenceManifest, ReviewedFinalizationReceipt, ReviewedIntegrityArtifact,
+    ReviewedIntegrityReport,
     ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
     ReviewedPreparationReceipt,
 };
@@ -211,6 +214,7 @@ mod tests {
         assert!(usage.contains("manifest-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("audit-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("status-reviewed --reviewed-dir <dir>"));
+        assert!(usage.contains("validate-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
 
         let runner = commands
@@ -259,6 +263,14 @@ mod tests {
         assert_eq!(status.canonical_token, "status_reviewed");
         assert_eq!(status.category, "lifecycle");
         assert!(!status.proof_credit);
+
+        let validation = commands
+            .iter()
+            .find(|command| command.name == "validate-reviewed")
+            .unwrap();
+        assert_eq!(validation.canonical_token, "validate_reviewed");
+        assert_eq!(validation.category, "lifecycle");
+        assert!(!validation.proof_credit);
     }
 
     #[test]
@@ -364,6 +376,24 @@ mod tests {
     }
 
     #[test]
+    fn command_router_builds_typed_reviewed_validation_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "validate-reviewed".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::ValidateReviewed {
+                reviewed_dir: ".aegis/reviewed".to_string(),
+            }
+        );
+    }
+
+    #[test]
     fn campaign_execution_validator_requires_checked_scoped_verus_receipts() {
         let value = serde_json::json!({
             "schema": 1,
@@ -434,6 +464,98 @@ mod tests {
                 reviewed_dir: ".aegis/reviewed".to_string(),
             }
         );
+    }
+
+    #[test]
+    fn reviewed_integrity_validates_semantics_beyond_presence() {
+        use std::fs;
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "kverus-reviewed-integrity-{}-{suffix}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&root).unwrap();
+        let root_string = root.display().to_string();
+        let binding_path = root.join("verus-binding.json");
+
+        let binding = serde_json::json!({
+            "schema": 1,
+            "status": "BOUND_FOR_VERUS",
+            "default_engine": "verus",
+            "kani_proof_credit": false,
+            "selected": [{}],
+            "controller_obligations": ["obligation-1"],
+            "contract_inventory_count": 1,
+            "contract_clause_count": 2,
+            "unresolved": []
+        });
+        fs::write(
+            &binding_path,
+            serde_json::to_vec_pretty(&binding).unwrap(),
+        )
+        .unwrap();
+
+        let preparation = serde_json::json!({
+            "schema": 1,
+            "status": "KVERUS_REVIEWED_BINDING_PREPARED",
+            "default_engine": "verus",
+            "proof_credit": false,
+            "verus_campaign_checked": false,
+            "binding_path": binding_path.display().to_string(),
+            "binding_status": "BOUND_FOR_VERUS",
+            "selected_count": 1,
+            "unresolved_count": 0,
+            "controller_obligation_count": 1,
+            "contract_inventory_count": 1,
+            "contract_clause_count": 2
+        });
+        let preparation_path = root.join("reviewed-preparation-receipt.json");
+        fs::write(
+            &preparation_path,
+            serde_json::to_vec_pretty(&preparation).unwrap(),
+        )
+        .unwrap();
+
+        let valid = KVerusContext
+            .validate_reviewed_integrity(&root_string)
+            .unwrap();
+        assert!(valid.valid, "{:?}", valid.violations);
+        assert_eq!(valid.lifecycle_stage, "reviewed-prepared");
+        assert_eq!(valid.canonical_stage, "reviewed_prepared");
+        assert_eq!(valid.canonical_validation, "reviewed_integrity_validation");
+        assert_eq!(valid.validated_artifact_count, 2);
+        assert_eq!(
+            valid.artifacts
+                .iter()
+                .map(|row| row.kind.as_str())
+                .collect::<Vec<_>>(),
+            vec!["reviewed-preparation-receipt", "verus-binding"]
+        );
+        assert!(!valid.proof_credit);
+
+        let mut corrupted = preparation;
+        corrupted["proof_credit"] = serde_json::json!(true);
+        fs::write(
+            &preparation_path,
+            serde_json::to_vec_pretty(&corrupted).unwrap(),
+        )
+        .unwrap();
+
+        let invalid = KVerusContext
+            .validate_reviewed_integrity(&root_string)
+            .unwrap();
+        assert_eq!(invalid.lifecycle_stage, "reviewed-prepared");
+        assert!(!invalid.valid);
+        assert!(!invalid.violations.is_empty());
+        assert!(invalid.violations[0].contains("preparation receipt"));
+        assert!(!invalid.proof_credit);
+
+        fs::remove_dir_all(root).unwrap();
     }
 
     #[test]
