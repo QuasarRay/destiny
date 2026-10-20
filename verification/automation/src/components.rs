@@ -1584,6 +1584,10 @@ struct CampaignRunnerReceipt {
     deduplicated_entries: usize,
     formal_audit: String,
     case_acceptance_exit: i32,
+    obligations: Vec<String>,
+    timeout_seconds: u64,
+    memory_mib: Option<u64>,
+    max_concurrency: usize,
 }
 
 #[cgp_component(CampaignExecutionValidator)]
@@ -1612,6 +1616,12 @@ impl CampaignExecutionValidator {
             || receipt.deduplicated_entries == 0
             || receipt.formal_audit != "CHECKED_SCOPED"
             || receipt.case_acceptance_exit != 0
+            || receipt.obligations.is_empty()
+            || receipt.obligations.len() != receipt.deduplicated_entries
+            || receipt.timeout_seconds == 0
+            || receipt.timeout_seconds > 120
+            || matches!(receipt.memory_mib, Some(0))
+            || receipt.max_concurrency != 1
         {
             return Err(format!(
                 "Verus campaign runner receipt violated KVerus invariants:                  schema={}, status={}, engine={}, kani_proof_credit={},                  verus_checked_scoped={}, entries={}, formal_audit={},                  case_acceptance_exit={}",
@@ -1630,6 +1640,10 @@ impl CampaignExecutionValidator {
             status: receipt.status,
             checked_entry_count: receipt.deduplicated_entries,
             case_acceptance_exit: receipt.case_acceptance_exit,
+            obligations: receipt.obligations,
+            timeout_seconds: receipt.timeout_seconds,
+            memory_mib: receipt.memory_mib,
+            max_concurrency: receipt.max_concurrency,
         })
     }
 }
@@ -1642,6 +1656,14 @@ pub trait CanRunReviewedCampaign {
         campaign_dir: &str,
         verus: &str,
     ) -> Result<ReviewedCampaignExecutionReceipt, String>;
+
+    fn run_reviewed_campaign_with_limits(
+        &self,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+        limits: &ReviewedVerificationLimits,
+    ) -> Result<ReviewedCampaignExecutionReceipt, String>;
 }
 
 #[cgp_impl(new VerusReviewedCampaignExecution)]
@@ -1650,6 +1672,7 @@ pub trait CanRunReviewedCampaign {
     CanInspectArtifactPresence,
     CanRunPythonTool,
     CanReadJsonArtifact,
+    CanValidateReviewedBinding,
     CanValidateCampaignExecution,
     CanCanonicalizeStaticIdentity,
     CanReadWriteArtifacts,
@@ -1662,7 +1685,28 @@ impl ReviewedCampaignExecution {
         campaign_dir: &str,
         verus: &str,
     ) -> Result<ReviewedCampaignExecutionReceipt, String> {
+        self.run_reviewed_campaign_with_limits(
+            reviewed_dir,
+            campaign_dir,
+            verus,
+            &ReviewedVerificationLimits::default(),
+        )
+    }
+
+    fn run_reviewed_campaign_with_limits(
+        &self,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+        limits: &ReviewedVerificationLimits,
+    ) -> Result<ReviewedCampaignExecutionReceipt, String> {
         self.require_reviewed_action(reviewed_dir, ReviewedLifecycleAction::Run)?;
+
+        let binding_path = PathBuf::from(reviewed_dir).join("verus-binding.json");
+        let binding = self.validate_reviewed_binding(self.read_json_artifact(&binding_path)?)?;
+        if binding.controller_obligations.is_empty() {
+            return Err("reviewed Verus campaign cannot execute an empty obligation set".into());
+        }
 
         let requested_campaign_dir = PathBuf::from(campaign_dir);
         let campaign_dir_path = if requested_campaign_dir.is_absolute() {
@@ -1687,14 +1731,27 @@ impl ReviewedCampaignExecution {
                 ));
             }
         }
-        let args = vec![
+        let mut args = vec![
             "--verus".to_string(),
             verus.to_string(),
             "--campaign-dir".to_string(),
             campaign_dir_path.display().to_string(),
             "--receipt".to_string(),
             runner_receipt_path.display().to_string(),
+            "--timeout-seconds".to_string(),
+            limits.timeout_seconds.to_string(),
+            "--max-concurrency".to_string(),
+            limits.max_concurrency.to_string(),
         ];
+        if let Some(memory_mib) = limits.memory_mib {
+            args.push("--memory-mib".to_string());
+            args.push(memory_mib.to_string());
+        }
+        args.extend(
+            c![vec!["--obligation".to_string(), obligation.clone()] for obligation in &binding.controller_obligations]
+                .into_iter()
+                .flatten(),
+        );
 
         let output = self
             .run_python_tool_output("verification/tools/run_verus_campaign.py", &args)
@@ -1725,6 +1782,21 @@ impl ReviewedCampaignExecution {
         }
 
         let summary = self.validate_campaign_execution(runner_value)?;
+        if summary.obligations != binding.controller_obligations {
+            return Err(format!(
+                "reviewed Verus campaign executed a different obligation inventory: expected {:?}, got {:?}",
+                binding.controller_obligations, summary.obligations
+            ));
+        }
+        if summary.timeout_seconds != limits.timeout_seconds
+            || summary.memory_mib != limits.memory_mib
+            || summary.max_concurrency != limits.max_concurrency
+        {
+            return Err(
+                "reviewed Verus campaign resource limits diverged from the requested configuration"
+                    .into(),
+            );
+        }
         let receipt = ReviewedCampaignExecutionReceipt {
             schema: 1,
             status: "KVERUS_REVIEWED_CAMPAIGN_EXECUTED",
@@ -1739,6 +1811,8 @@ impl ReviewedCampaignExecution {
             verus_checked_scoped: true,
             checked_entry_count: summary.checked_entry_count,
             case_acceptance_exit: summary.case_acceptance_exit,
+            obligations: summary.obligations,
+            limits: limits.clone(),
             proof_credit: false,
             proof_credit_source: "existing_verus_checked_scoped_receipts_only",
         };
