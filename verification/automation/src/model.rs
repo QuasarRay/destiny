@@ -1,6 +1,6 @@
 use derive_deftly::{Deftly, define_derive_deftly};
 use kani_metadata::ContractClause;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 define_derive_deftly! {
     KVerusEvidenceArtifactMetadata:
@@ -82,6 +82,24 @@ define_derive_deftly! {
         pub(crate) const fn allowed_stages(self) -> &'static [ReviewedLifecycleStage] {
             match self {
                 $(Self::$vname => ${vmeta(kverus(allowed)) as expr},)
+            }
+        }
+    }
+}
+
+define_derive_deftly! {
+    KVerusCargoTargetMetadata:
+
+    impl $ttype {
+        pub(crate) const fn kani_flag(self) -> Option<&'static str> {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(flag)) as expr},)
+            }
+        }
+
+        pub(crate) const fn requires_name(self) -> bool {
+            match self {
+                $(Self::$vname => ${vmeta(kverus(requires_name)) as expr},)
             }
         }
     }
@@ -180,6 +198,90 @@ pub struct AutomationPlan {
     pub contracted_functions: Vec<ContractPlan>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Deftly)]
+#[derive_deftly(KVerusCargoTargetMetadata)]
+#[serde(rename_all = "snake_case")]
+pub enum ReviewedCargoTarget {
+    #[deftly(kverus(flag = { None }, requires_name = { false }))]
+    Default,
+    #[deftly(kverus(flag = { Some("--lib") }, requires_name = { false }))]
+    Lib,
+    #[deftly(kverus(flag = { Some("--bins") }, requires_name = { false }))]
+    Bins,
+    #[deftly(kverus(flag = { Some("--bin") }, requires_name = { true }))]
+    Bin,
+}
+
+impl Default for ReviewedCargoTarget {
+    fn default() -> Self {
+        Self::Default
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ReviewedVerificationSelection {
+    pub packages: Vec<String>,
+    pub features: Vec<String>,
+    pub all_features: bool,
+    pub no_default_features: bool,
+    pub target: ReviewedCargoTarget,
+    pub target_name: Option<String>,
+    pub functions: Vec<String>,
+}
+
+impl Default for ReviewedVerificationSelection {
+    fn default() -> Self {
+        Self {
+            packages: Vec::new(),
+            features: Vec::new(),
+            all_features: false,
+            no_default_features: false,
+            target: ReviewedCargoTarget::Default,
+            target_name: None,
+            functions: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct ReviewedVerificationLimits {
+    pub timeout_seconds: u64,
+    pub memory_mib: Option<u64>,
+    pub max_concurrency: usize,
+}
+
+impl Default for ReviewedVerificationLimits {
+    fn default() -> Self {
+        Self {
+            timeout_seconds: 120,
+            memory_mib: None,
+            max_concurrency: 1,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ReviewedVerificationConfig {
+    pub schema: u32,
+    #[serde(default)]
+    pub selection: ReviewedVerificationSelection,
+    #[serde(default)]
+    pub limits: ReviewedVerificationLimits,
+}
+
+impl Default for ReviewedVerificationConfig {
+    fn default() -> Self {
+        Self {
+            schema: 1,
+            selection: ReviewedVerificationSelection::default(),
+            limits: ReviewedVerificationLimits::default(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct PreparationReceipt {
     pub schema: u32,
@@ -192,6 +294,7 @@ pub struct PreparationReceipt {
     pub metadata_path: String,
     pub discovery_path: String,
     pub plan_path: String,
+    pub selection: ReviewedVerificationSelection,
     pub counts: PlanCounts,
 }
 
@@ -217,6 +320,7 @@ pub enum AutomationCommand {
         reviewed_dir: String,
         campaign_dir: String,
         verus: String,
+        config_path: Option<String>,
     },
     RunReviewed {
         reviewed_dir: String,
@@ -256,6 +360,10 @@ pub struct CampaignExecutionSummary {
     pub status: String,
     pub checked_entry_count: usize,
     pub case_acceptance_exit: i32,
+    pub obligations: Vec<String>,
+    pub timeout_seconds: u64,
+    pub memory_mib: Option<u64>,
+    pub max_concurrency: usize,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -272,6 +380,8 @@ pub struct ReviewedCampaignExecutionReceipt {
     pub verus_checked_scoped: bool,
     pub checked_entry_count: usize,
     pub case_acceptance_exit: i32,
+    pub obligations: Vec<String>,
+    pub limits: ReviewedVerificationLimits,
     pub proof_credit: bool,
     pub proof_credit_source: &'static str,
 }
@@ -298,6 +408,7 @@ pub struct ReviewedFinalizationReceipt {
 pub struct ReviewedBindingSummary {
     pub status: String,
     pub selected_count: usize,
+    pub controller_obligations: Vec<String>,
     pub controller_obligation_count: usize,
     pub contract_inventory_count: usize,
     pub contract_clause_count: usize,
@@ -504,4 +615,6 @@ pub struct ReviewedVerificationReceipt {
     pub integrity_valid: bool,
     pub proof_credit: bool,
     pub proof_credit_source: &'static str,
+    pub selection: ReviewedVerificationSelection,
+    pub limits: ReviewedVerificationLimits,
 }
