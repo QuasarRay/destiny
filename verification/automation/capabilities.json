@@ -110,7 +110,9 @@
     "reviewed_campaign_execution": "CGP ReviewedCampaignExecution owns reviewed-prepared execution precondition and runner invocation",
     "required_flag_parser": "generic exact named-flag parser shared by reviewed CLI commands",
     "json_receipt_decoding": "CGP JsonReceiptDecoder using serde DeserializeOwned; shared by binding, campaign, and reviewed receipt validators",
-    "reviewed_integrity_validation": "CGP ReviewedIntegrityValidation over lifecycle, typed receipt decoding, existing validators, and content-addressed manifest reconstruction"
+    "reviewed_integrity_validation": "CGP ReviewedIntegrityValidation over lifecycle, typed receipt decoding, existing validators, and content-addressed manifest reconstruction",
+    "enum_metadata_derivation": "derive-deftly 1.14.0 derives lifecycle-stage/action and reviewed evidence-artifact metadata from enum-local declarations",
+    "collection_comprehensions": "comprende 1.0.0 builds command descriptors, planner partitions, legal lifecycle actions, evidence specs, and explanation blockers without handwritten push/map/collect scaffolding"
   },
   "preparation": {
     "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
@@ -322,6 +324,19 @@
     ],
     "canonical_identity": "proc_macro2 + safe arcane-rs/synthez through CGP TokenIdentity",
     "mutates_evidence": false,
+    "proof_credit": false
+  },
+  "reviewed_explanation": {
+    "command": "explain-reviewed --reviewed-dir <dir>",
+    "status": "supported",
+    "architecture": "CGP ReviewedExplanation composes ReviewedLifecycleInspection and ReviewedIntegrityValidation",
+    "read_only": true,
+    "recommendation_policy": "emit one smallest useful next reviewed transition only when semantic integrity is valid; audited valid evidence is complete and has no next transition",
+    "invalid_policy": "inconsistent or semantically invalid evidence has no recommended transition and exposes integrity violations as blockers",
+    "macro_refactor": {
+      "enum_metadata": "derive-deftly",
+      "collection_construction": "comprende"
+    },
     "proof_credit": false
   }
 }
