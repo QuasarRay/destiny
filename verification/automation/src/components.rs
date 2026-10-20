@@ -5,10 +5,12 @@ use crate::{
     DiscoveryDisposition, DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind,
     EvidenceArtifactSpec, KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause,
     PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceAuditReceipt,
-    ReviewedCampaignExecutionReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
-    ReviewedIntegrityArtifact, ReviewedIntegrityReport, ReviewedLifecycleAction,
-    ReviewedLifecycleReport, ReviewedLifecycleStage, ReviewedExplanationReport,
-    ReviewedPreparationReceipt, ReviewedVerificationReceipt, ReviewedVerificationStep,
+    ReviewedCampaignExecutionReceipt, ReviewedCargoTarget, ReviewedEvidenceManifest,
+    ReviewedFinalizationReceipt, ReviewedIntegrityArtifact, ReviewedIntegrityReport,
+    ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
+    ReviewedExplanationReport, ReviewedPreparationReceipt, ReviewedVerificationConfig,
+    ReviewedVerificationLimits, ReviewedVerificationReceipt, ReviewedVerificationSelection,
+    ReviewedVerificationStep,
 };
 use cgp::prelude::*;
 use comprende::c;
@@ -105,7 +107,7 @@ const COMMANDS: &[(&str, &str, &str)] = &[
     ),
     (
         "verify-reviewed",
-        "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path>",
+        "verify-reviewed --manifest-path <Cargo.toml> --reviewed-dir <dir> --campaign-dir <dir> --verus <path> [--config <json>]",
         "verification",
     ),
     (
@@ -229,15 +231,40 @@ impl CommandRouter {
                 })
             }
             "verify-reviewed" => {
-                let values = parse_required_flags(
-                    rest,
-                    &["--manifest-path", "--reviewed-dir", "--campaign-dir", "--verus"],
-                )?;
+                let (values, config_path) = match rest.len() {
+                    8 => (
+                        parse_required_flags(
+                            rest,
+                            &["--manifest-path", "--reviewed-dir", "--campaign-dir", "--verus"],
+                        )?,
+                        None,
+                    ),
+                    10 => {
+                        let values = parse_required_flags(
+                            rest,
+                            &[
+                                "--manifest-path",
+                                "--reviewed-dir",
+                                "--campaign-dir",
+                                "--verus",
+                                "--config",
+                            ],
+                        )?;
+                        (values[..4].to_vec(), Some(values[4].clone()))
+                    }
+                    _ => {
+                        return Err(
+                            "verify-reviewed expects four required named arguments and optional --config <json>"
+                                .into(),
+                        )
+                    }
+                };
                 Ok(AutomationCommand::VerifyReviewed {
                     manifest_path: values[0].clone(),
                     reviewed_dir: values[1].clone(),
                     campaign_dir: values[2].clone(),
                     verus: values[3].clone(),
+                    config_path,
                 })
             }
             "run-reviewed" => {
@@ -577,6 +604,157 @@ impl AutomationPlanner {
             excluded,
             contracted_functions,
         })
+    }
+}
+
+fn validate_unique_nonempty(values: &[String], label: &str) -> Result<(), String> {
+    let mut seen = std::collections::BTreeSet::new();
+    for value in values {
+        if value.trim().is_empty() {
+            return Err(format!("{label} entries must be non-empty"));
+        }
+        if !seen.insert(value) {
+            return Err(format!("{label} contains duplicate entry {value:?}"));
+        }
+    }
+    Ok(())
+}
+
+#[cgp_component(ReviewedVerificationConfigValidation)]
+pub trait CanValidateReviewedVerificationConfig {
+    fn validate_reviewed_verification_config(
+        &self,
+        config: ReviewedVerificationConfig,
+    ) -> Result<ReviewedVerificationConfig, String>;
+}
+
+#[cgp_impl(new StrictReviewedVerificationConfigValidation)]
+impl ReviewedVerificationConfigValidation {
+    fn validate_reviewed_verification_config(
+        &self,
+        config: ReviewedVerificationConfig,
+    ) -> Result<ReviewedVerificationConfig, String> {
+        if config.schema != 1 {
+            return Err(format!(
+                "unsupported reviewed verification config schema {}",
+                config.schema
+            ));
+        }
+        validate_unique_nonempty(&config.selection.packages, "packages")?;
+        validate_unique_nonempty(&config.selection.features, "features")?;
+        validate_unique_nonempty(&config.selection.functions, "functions")?;
+        if config.selection.all_features
+            && (!config.selection.features.is_empty() || config.selection.no_default_features)
+        {
+            return Err(
+                "all_features cannot be combined with explicit features or no_default_features"
+                    .into(),
+            );
+        }
+        match (
+            config.selection.target.requires_name(),
+            config.selection.target_name.as_deref(),
+        ) {
+            (true, Some(name)) if !name.trim().is_empty() => {}
+            (true, _) => return Err("target=bin requires non-empty target_name".into()),
+            (false, None) => {}
+            (false, Some(_)) => {
+                return Err("target_name is only valid when target=bin".into());
+            }
+        }
+        if !(1..=120).contains(&config.limits.timeout_seconds) {
+            return Err(
+                "timeout_seconds must be between 1 and the maintained 120-second scoped Verus limit"
+                    .into(),
+            );
+        }
+        if matches!(config.limits.memory_mib, Some(0)) {
+            return Err("memory_mib must be positive when specified".into());
+        }
+        if config.limits.max_concurrency != 1 {
+            return Err(
+                "max_concurrency must currently be 1 because the maintained Destiny controller serializes proof execution"
+                    .into(),
+            );
+        }
+        Ok(config)
+    }
+}
+
+#[cgp_component(ReviewedVerificationConfigStore)]
+pub trait CanLoadReviewedVerificationConfig {
+    fn load_reviewed_verification_config(
+        &self,
+        path: &str,
+    ) -> Result<ReviewedVerificationConfig, String>;
+}
+
+#[cgp_impl(new JsonReviewedVerificationConfigStore)]
+#[uses(CanReadWriteArtifacts, CanValidateReviewedVerificationConfig)]
+impl ReviewedVerificationConfigStore {
+    fn load_reviewed_verification_config(
+        &self,
+        path: &str,
+    ) -> Result<ReviewedVerificationConfig, String> {
+        let bytes = self
+            .read_artifact(Path::new(path))
+            .map_err(|error| format!("cannot read reviewed verification config {path}: {error}"))?;
+        let config: ReviewedVerificationConfig = serde_json::from_slice(&bytes)
+            .map_err(|error| format!("invalid reviewed verification config {path}: {error}"))?;
+        self.validate_reviewed_verification_config(config)
+    }
+}
+
+#[cgp_component(DiscoverySelectionArguments)]
+pub trait CanBuildDiscoverySelectionArguments {
+    fn discovery_selection_args(
+        &self,
+        selection: &ReviewedVerificationSelection,
+    ) -> Result<Vec<String>, String>;
+}
+
+#[cgp_impl(new KaniDiscoverySelectionArguments)]
+impl DiscoverySelectionArguments {
+    fn discovery_selection_args(
+        &self,
+        selection: &ReviewedVerificationSelection,
+    ) -> Result<Vec<String>, String> {
+        let mut args = Vec::new();
+        args.extend(
+            c![vec!["--package".to_string(), package.clone()] for package in &selection.packages]
+                .into_iter()
+                .flatten(),
+        );
+        args.extend(
+            c![vec!["--feature".to_string(), feature.clone()] for feature in &selection.features]
+                .into_iter()
+                .flatten(),
+        );
+        if selection.all_features {
+            args.push("--all-features".to_string());
+        }
+        if selection.no_default_features {
+            args.push("--no-default-features".to_string());
+        }
+        if let Some(flag) = selection.target.kani_flag() {
+            args.push("--target-kind".to_string());
+            args.push(flag.trim_start_matches("--").to_string());
+            if selection.target.requires_name() {
+                args.push("--target-name".to_string());
+                args.push(
+                    selection
+                        .target_name
+                        .clone()
+                        .ok_or_else(|| "target=bin requires target_name".to_string())?,
+                );
+            }
+        }
+        args.extend(
+            c![vec!["--function".to_string(), function.clone()] for function in &selection.functions]
+                .into_iter()
+                .flatten(),
+        );
+        Ok(args)
     }
 }
 
@@ -2258,6 +2436,12 @@ delegate_and_check_components! {
             KaniMetadataNormalizer,
         AutomationPlannerComponent:
             KaniAutomationPlanner,
+        ReviewedVerificationConfigValidationComponent:
+            StrictReviewedVerificationConfigValidation,
+        ReviewedVerificationConfigStoreComponent:
+            JsonReviewedVerificationConfigStore,
+        DiscoverySelectionArgumentsComponent:
+            KaniDiscoverySelectionArguments,
         ProjectLayoutComponent:
             CargoManifestProjectLayout,
         PythonToolRunnerComponent:
