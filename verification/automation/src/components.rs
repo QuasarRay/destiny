@@ -7,10 +7,11 @@ use crate::{
     PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceAuditReceipt,
     ReviewedCampaignExecutionReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
     ReviewedIntegrityArtifact, ReviewedIntegrityReport, ReviewedLifecycleAction,
-    ReviewedLifecycleReport, ReviewedLifecycleStage,
+    ReviewedLifecycleReport, ReviewedLifecycleStage, ReviewedExplanationReport,
     ReviewedPreparationReceipt,
 };
 use cgp::prelude::*;
+use comprende::c;
 use kani_metadata::{
     AutoHarnessSkipReason, ContractClause, ContractClauseKind, KaniMetadata,
 };
@@ -132,6 +133,11 @@ const COMMANDS: &[(&str, &str, &str)] = &[
         "validate-reviewed --reviewed-dir <dir>",
         "lifecycle",
     ),
+    (
+        "explain-reviewed",
+        "explain-reviewed --reviewed-dir <dir>",
+        "diagnostics",
+    ),
     ("explain", "explain", "diagnostics"),
     ("verify", "verify <verus-subset args...>", "verification"),
     (
@@ -144,18 +150,16 @@ const COMMANDS: &[(&str, &str, &str)] = &[
 fn static_command_descriptors(
     context: &impl CanCanonicalizeStaticIdentity,
 ) -> Result<Vec<CommandDescriptor>, String> {
-    COMMANDS
-        .iter()
-        .map(|(name, synopsis, category)| {
-            Ok(CommandDescriptor {
-                name: (*name).to_string(),
-                synopsis: (*synopsis).to_string(),
-                category: (*category).to_string(),
-                canonical_token: context.canonicalize_static_identity(name)?,
-                proof_credit: false,
-            })
-        })
-        .collect()
+    Ok(c![
+        CommandDescriptor {
+            name: name.to_string(),
+            synopsis: synopsis.to_string(),
+            category: category.to_string(),
+            canonical_token: context.canonicalize_static_identity(name)?,
+            proof_credit: false,
+        }
+        for (name, synopsis, category) in COMMANDS.iter().copied()
+    ])
 }
 
 fn static_command_usage(
@@ -164,11 +168,7 @@ fn static_command_usage(
     let commands = static_command_descriptors(context)?;
     Ok(format!(
         "usage: destiny-verification-automation {}",
-        commands
-            .iter()
-            .map(|command| command.synopsis.as_str())
-            .collect::<Vec<_>>()
-            .join(" | ")
+        c![command.synopsis.as_str() for command in &commands].join(" | ")
     ))
 }
 
@@ -252,6 +252,9 @@ impl CommandRouter {
                 reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
             }),
             "validate-reviewed" => Ok(AutomationCommand::ValidateReviewed {
+                reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
+            }),
+            "explain-reviewed" => Ok(AutomationCommand::ExplainReviewed {
                 reviewed_dir: parse_required_value(rest, "--reviewed-dir")?,
             }),
             "explain" if rest.is_empty() => Ok(AutomationCommand::Explain),
@@ -501,19 +504,10 @@ impl AutomationPlanner {
         &self,
         report: &DiscoveryReport,
     ) -> Result<AutomationPlan, String> {
-        let mut selected = Vec::new();
-        let mut blocked = Vec::new();
-        let mut unsupported = Vec::new();
-        let mut excluded = Vec::new();
-
-        for candidate in &report.candidates {
-            match candidate.disposition {
-                DiscoveryDisposition::KaniEligible => selected.push(candidate.clone()),
-                DiscoveryDisposition::Blocked => blocked.push(candidate.clone()),
-                DiscoveryDisposition::Unsupported => unsupported.push(candidate.clone()),
-                DiscoveryDisposition::Excluded => excluded.push(candidate.clone()),
-            }
-        }
+        let selected = c![candidate.clone() for candidate in &report.candidates if candidate.disposition == DiscoveryDisposition::KaniEligible];
+        let blocked = c![candidate.clone() for candidate in &report.candidates if candidate.disposition == DiscoveryDisposition::Blocked];
+        let unsupported = c![candidate.clone() for candidate in &report.candidates if candidate.disposition == DiscoveryDisposition::Unsupported];
+        let excluded = c![candidate.clone() for candidate in &report.candidates if candidate.disposition == DiscoveryDisposition::Excluded];
 
         let mut contracted_functions = Vec::new();
         let mut contract_clause_count = 0;
@@ -777,7 +771,7 @@ impl ReviewedLifecycleInspection {
             [true, true, true, true, true, true] => ReviewedLifecycleStage::Audited,
             _ => ReviewedLifecycleStage::Inconsistent,
         };
-        let stage_name = reviewed_lifecycle_stage_name(stage);
+        let stage_name = stage.kverus_name();
 
         Ok(ReviewedLifecycleReport {
             schema: 1,
@@ -812,30 +806,14 @@ impl ReviewedLifecycleTransition {
         action: ReviewedLifecycleAction,
     ) -> Result<ReviewedLifecycleReport, String> {
         let report = self.reviewed_lifecycle(reviewed_dir)?;
-        let allowed = match action {
-            ReviewedLifecycleAction::Prepare => matches!(
-                report.stage,
-                "reviewed-empty" | "reviewed-prepared"
-            ),
-            ReviewedLifecycleAction::Run => report.stage == "reviewed-prepared",
-            ReviewedLifecycleAction::Finalize => matches!(
-                report.stage,
-                "reviewed-prepared" | "reviewed-finalized"
-            ),
-            ReviewedLifecycleAction::Manifest => matches!(
-                report.stage,
-                "reviewed-finalized" | "reviewed-manifested"
-            ),
-            ReviewedLifecycleAction::Audit => matches!(
-                report.stage,
-                "reviewed-manifested" | "reviewed-audited"
-            ),
-        };
+        let stage = ReviewedLifecycleStage::from_kverus_name(report.stage)
+            .unwrap_or(ReviewedLifecycleStage::Inconsistent);
+        let allowed = action.allowed_stages().contains(&stage);
 
         if !report.consistent || !allowed {
             return Err(format!(
                 "reviewed lifecycle rejects {} from stage {} (present: {}; missing: {})",
-                reviewed_lifecycle_action_name(action),
+                action.kverus_name(),
                 report.stage,
                 report.present_artifacts.join(", "),
                 report.missing_artifacts.join(", "),
@@ -846,38 +824,12 @@ impl ReviewedLifecycleTransition {
     }
 }
 
-fn reviewed_lifecycle_stage_name(stage: ReviewedLifecycleStage) -> &'static str {
-    match stage {
-        ReviewedLifecycleStage::Empty => "reviewed-empty",
-        ReviewedLifecycleStage::Prepared => "reviewed-prepared",
-        ReviewedLifecycleStage::Finalized => "reviewed-finalized",
-        ReviewedLifecycleStage::Manifested => "reviewed-manifested",
-        ReviewedLifecycleStage::Audited => "reviewed-audited",
-        ReviewedLifecycleStage::Inconsistent => "reviewed-inconsistent",
-    }
-}
-
-fn reviewed_lifecycle_action_name(action: ReviewedLifecycleAction) -> &'static str {
-    match action {
-        ReviewedLifecycleAction::Prepare => "prepare-reviewed",
-        ReviewedLifecycleAction::Run => "run-reviewed",
-        ReviewedLifecycleAction::Finalize => "finalize-reviewed",
-        ReviewedLifecycleAction::Manifest => "manifest-reviewed",
-        ReviewedLifecycleAction::Audit => "audit-reviewed",
-    }
-}
-
 fn reviewed_lifecycle_legal_actions(stage: ReviewedLifecycleStage) -> Vec<&'static str> {
-    match stage {
-        ReviewedLifecycleStage::Empty => vec!["prepare-reviewed"],
-        ReviewedLifecycleStage::Prepared => {
-            vec!["prepare-reviewed", "run-reviewed", "finalize-reviewed"]
-        }
-        ReviewedLifecycleStage::Finalized => vec!["finalize-reviewed", "manifest-reviewed"],
-        ReviewedLifecycleStage::Manifested => vec!["manifest-reviewed", "audit-reviewed"],
-        ReviewedLifecycleStage::Audited => vec!["audit-reviewed"],
-        ReviewedLifecycleStage::Inconsistent => Vec::new(),
-    }
+    c![
+        action.kverus_name()
+        for action in ReviewedLifecycleAction::ALL.iter().copied()
+        if action.allowed_stages().contains(&stage)
+    ]
 }
 
 #[cgp_component(ArtifactDigest)]
@@ -902,45 +854,19 @@ pub trait CanDescribeEvidenceArtifacts {
 #[cgp_impl(new StaticEvidenceArtifactPolicy)]
 impl EvidenceArtifactPolicy {
     fn reviewed_evidence_artifact_specs(&self) -> Vec<EvidenceArtifactSpec> {
-        vec![
+        c![
             EvidenceArtifactSpec {
-                kind: EvidenceArtifactKind::ReviewedPreparationReceipt,
-                filename: "reviewed-preparation-receipt.json",
-                status: "KVERUS_REVIEWED_BINDING_PREPARED",
-                proof_credit_source: "none",
-            },
-            EvidenceArtifactSpec {
-                kind: EvidenceArtifactKind::VerusBinding,
-                filename: "verus-binding.json",
-                status: "BOUND_FOR_VERUS",
-                proof_credit_source: "none",
-            },
-            EvidenceArtifactSpec {
-                kind: EvidenceArtifactKind::VerusReceiptBinding,
-                filename: "verus-receipt-binding.json",
-                status: "KANI_SELECTED_VERUS_CHECKED_SCOPED",
-                proof_credit_source: "verus_checked_scoped",
-            },
-            EvidenceArtifactSpec {
-                kind: EvidenceArtifactKind::ReviewedFinalizationReceipt,
-                filename: "reviewed-finalization-receipt.json",
-                status: "KVERUS_REVIEWED_VERUS_FINALIZED",
-                proof_credit_source: "verus_checked_scoped",
-            },
+                kind,
+                filename: kind.filename(),
+                status: kind.status(),
+                proof_credit_source: kind.proof_credit_source(),
+            }
+            for kind in EvidenceArtifactKind::ALL.iter().copied()
         ]
     }
 
     fn evidence_artifact_kind_name(&self, kind: EvidenceArtifactKind) -> &'static str {
-        match kind {
-            EvidenceArtifactKind::ReviewedPreparationReceipt => {
-                "reviewed-preparation-receipt"
-            }
-            EvidenceArtifactKind::VerusBinding => "verus-binding",
-            EvidenceArtifactKind::VerusReceiptBinding => "verus-receipt-binding",
-            EvidenceArtifactKind::ReviewedFinalizationReceipt => {
-                "reviewed-finalization-receipt"
-            }
-        }
+        kind.kverus_name()
     }
 }
 
@@ -1860,18 +1786,6 @@ fn reviewed_integrity_artifact(
     })
 }
 
-fn reviewed_lifecycle_rank(stage: &str) -> Option<u8> {
-    match stage {
-        "reviewed-empty" => Some(0),
-        "reviewed-prepared" => Some(1),
-        "reviewed-finalized" => Some(2),
-        "reviewed-manifested" => Some(3),
-        "reviewed-audited" => Some(4),
-        "reviewed-inconsistent" => None,
-        _ => None,
-    }
-}
-
 #[cgp_component(ReviewedIntegrityValidation)]
 pub trait CanValidateReviewedIntegrity {
     fn validate_reviewed_integrity(
@@ -1901,7 +1815,8 @@ impl ReviewedIntegrityValidation {
         let root = PathBuf::from(reviewed_dir);
         let mut artifacts = Vec::new();
         let mut violations = Vec::new();
-        let rank = reviewed_lifecycle_rank(lifecycle.stage);
+        let rank = ReviewedLifecycleStage::from_kverus_name(lifecycle.stage)
+            .and_then(ReviewedLifecycleStage::rank);
 
         if !lifecycle.consistent || rank.is_none() {
             violations.push(format!(
@@ -2069,6 +1984,43 @@ impl ReviewedIntegrityValidation {
     }
 }
 
+#[cgp_component(ReviewedExplanation)]
+pub trait CanExplainReviewed {
+    fn explain_reviewed(&self, reviewed_dir: &str) -> Result<ReviewedExplanationReport, String>;
+}
+
+#[cgp_impl(new ComposedReviewedExplanation)]
+#[uses(CanInspectReviewedLifecycle, CanValidateReviewedIntegrity)]
+impl ReviewedExplanation {
+    fn explain_reviewed(&self, reviewed_dir: &str) -> Result<ReviewedExplanationReport, String> {
+        let lifecycle = self.reviewed_lifecycle(reviewed_dir)?;
+        let integrity = self.validate_reviewed_integrity(reviewed_dir)?;
+        let stage = ReviewedLifecycleStage::from_kverus_name(lifecycle.stage)
+            .unwrap_or(ReviewedLifecycleStage::Inconsistent);
+        let integrity_valid = integrity.valid;
+        let recommended_next_action = if integrity_valid {
+            stage.recommended_next_action()
+        } else {
+            None
+        };
+        let complete = integrity_valid && stage == ReviewedLifecycleStage::Audited;
+        let blockers = c![violation.clone() for violation in &integrity.violations];
+
+        Ok(ReviewedExplanationReport {
+            schema: 1,
+            status: "KVERUS_REVIEWED_EXPLANATION",
+            reviewed_dir: reviewed_dir.to_string(),
+            lifecycle,
+            integrity,
+            recommended_next_action,
+            ready_for_next_action: recommended_next_action.is_some(),
+            complete,
+            blockers,
+            proof_credit: false,
+        })
+    }
+}
+
 fn pretty_json_bytes(value: &impl Serialize) -> Result<Vec<u8>, String> {
     let mut bytes = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
     bytes.push(b'\n');
@@ -2139,6 +2091,8 @@ delegate_and_check_components! {
             ContentAddressedReviewedEvidenceAudit,
         ReviewedIntegrityValidationComponent:
             StrictReviewedIntegrityValidation,
+        ReviewedExplanationComponent:
+            ComposedReviewedExplanation,
     }
 }
 
