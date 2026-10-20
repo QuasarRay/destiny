@@ -29,6 +29,8 @@ cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml
   --reviewed-dir path/to/reviewed-evidence
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- validate-reviewed \
   --reviewed-dir path/to/reviewed-evidence
+cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- explain-reviewed \
+  --reviewed-dir path/to/reviewed-evidence
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- explain
 cargo +nightly-2026-08-21 run --manifest-path verification/automation/Cargo.toml --locked -- verify \
   --manifest-path path/to/Cargo.toml --discovery path/to/normalized-discovery.json \
@@ -94,3 +96,20 @@ The Kani-to-Verus binder validates those rows and carries them with `proof_credi
 Pinned Kani 0.68 records in its source that automatic harnesses do not support concrete playback. Therefore replay is intentionally **not** part of the Verus-default autoharness path.
 
 `verification/tools/replay_kani_fixture.py` creates a temporary manual Kani harness that imports the original failing fixture with Rust's `#[path]` attribute. Kani/CBMC generates the concrete witness and Kani playback executes that harness. A result is called `reproduced_source_failure` only when playback fails at the original source assertion line and the original source remains byte-for-byte unchanged. This lane is explicitly labeled `kani_cbmc_reference` and grants no Verus proof credit.
+
+
+## Derived reviewed-state metadata and composed explanation
+
+The reviewed-state model now keeps lifecycle-stage names/ranks/recommendations, legal action
+names/stage sets, and reviewed evidence-artifact metadata on their enum variants and derives
+the repetitive accessors with `derive-deftly`. `comprende` builds command descriptors,
+planner partitions, lifecycle action lists, and evidence specifications from those typed
+sources. CGP remains the component boundary; the macros remove table-shaped boilerplate
+without changing verifier semantics.
+
+`explain-reviewed --reviewed-dir <dir>` is a read-only CGP composition of
+`ReviewedLifecycleInspection` and `ReviewedIntegrityValidation`. It reports the full
+lifecycle and integrity records together with one smallest useful recommended next action.
+An invalid/inconsistent directory has no recommended transition and exposes its integrity
+violations as blockers. A valid audited directory reports `complete: true`. The command
+never grants proof credit and does not mutate evidence.
