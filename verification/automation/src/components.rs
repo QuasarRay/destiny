@@ -1327,7 +1327,10 @@ pub trait CanPrepareAutomation {
         manifest_path: &str,
         output_dir: &str,
     ) -> Result<PreparationReceipt, String>;
+}
 
+#[cgp_component(SelectedAutomationPreparation)]
+pub trait CanPrepareAutomationWithSelection {
     fn prepare_automation_with_selection(
         &self,
         manifest_path: &str,
@@ -1336,15 +1339,8 @@ pub trait CanPrepareAutomation {
     ) -> Result<PreparationReceipt, String>;
 }
 
-#[cgp_impl(new KaniAutomationPreparation)]
-#[uses(
-    CanRunPythonTool,
-    CanReadWriteArtifacts,
-    CanBuildDiscoverySelectionArguments,
-    CanParseMetadataBytes,
-    CanNormalizeMetadata,
-    CanBuildAutomationPlan
-)]
+#[cgp_impl(new DefaultKaniAutomationPreparation)]
+#[uses(CanPrepareAutomationWithSelection)]
 impl AutomationPreparation {
     fn prepare_automation(
         &self,
@@ -1357,7 +1353,18 @@ impl AutomationPreparation {
             &ReviewedVerificationSelection::default(),
         )
     }
+}
 
+#[cgp_impl(new KaniAutomationPreparation)]
+#[uses(
+    CanRunPythonTool,
+    CanReadWriteArtifacts,
+    CanBuildDiscoverySelectionArguments,
+    CanParseMetadataBytes,
+    CanNormalizeMetadata,
+    CanBuildAutomationPlan
+)]
+impl SelectedAutomationPreparation {
     fn prepare_automation_with_selection(
         &self,
         manifest_path: &str,
@@ -1495,7 +1502,10 @@ pub trait CanPrepareReviewedBinding {
         manifest_path: &str,
         output_dir: &str,
     ) -> Result<ReviewedPreparationReceipt, String>;
+}
 
+#[cgp_component(SelectedReviewedBindingPreparation)]
+pub trait CanPrepareReviewedBindingWithSelection {
     fn prepare_reviewed_binding_with_selection(
         &self,
         manifest_path: &str,
@@ -1504,15 +1514,8 @@ pub trait CanPrepareReviewedBinding {
     ) -> Result<ReviewedPreparationReceipt, String>;
 }
 
-#[cgp_impl(new KaniReviewedBindingPreparation)]
-#[uses(
-    CanRequireReviewedTransition,
-    CanPrepareAutomation,
-    CanRunJsonPythonTool,
-    CanReadJsonArtifact,
-    CanValidateReviewedBinding,
-    CanReadWriteArtifacts
-)]
+#[cgp_impl(new DefaultKaniReviewedBindingPreparation)]
+#[uses(CanPrepareReviewedBindingWithSelection)]
 impl ReviewedBindingPreparation {
     fn prepare_reviewed_binding(
         &self,
@@ -1525,7 +1528,18 @@ impl ReviewedBindingPreparation {
             &ReviewedVerificationSelection::default(),
         )
     }
+}
 
+#[cgp_impl(new KaniReviewedBindingPreparation)]
+#[uses(
+    CanRequireReviewedTransition,
+    CanPrepareAutomationWithSelection,
+    CanRunJsonPythonTool,
+    CanReadJsonArtifact,
+    CanValidateReviewedBinding,
+    CanReadWriteArtifacts
+)]
+impl SelectedReviewedBindingPreparation {
     fn prepare_reviewed_binding_with_selection(
         &self,
         manifest_path: &str,
@@ -1664,7 +1678,10 @@ pub trait CanRunReviewedCampaign {
         campaign_dir: &str,
         verus: &str,
     ) -> Result<ReviewedCampaignExecutionReceipt, String>;
+}
 
+#[cgp_component(LimitedReviewedCampaignExecution)]
+pub trait CanRunReviewedCampaignWithLimits {
     fn run_reviewed_campaign_with_limits(
         &self,
         reviewed_dir: &str,
@@ -1674,18 +1691,8 @@ pub trait CanRunReviewedCampaign {
     ) -> Result<ReviewedCampaignExecutionReceipt, String>;
 }
 
-#[cgp_impl(new VerusReviewedCampaignExecution)]
-#[uses(
-    CanRequireReviewedTransition,
-    CanInspectArtifactPresence,
-    CanRunPythonTool,
-    CanReadJsonArtifact,
-    CanValidateReviewedBinding,
-    CanValidateCampaignExecution,
-    CanCanonicalizeStaticIdentity,
-    CanReadWriteArtifacts,
-    HasProjectRoot
-)]
+#[cgp_impl(new DefaultVerusReviewedCampaignExecution)]
+#[uses(CanRunReviewedCampaignWithLimits)]
 impl ReviewedCampaignExecution {
     fn run_reviewed_campaign(
         &self,
@@ -1700,7 +1707,21 @@ impl ReviewedCampaignExecution {
             &ReviewedVerificationLimits::default(),
         )
     }
+}
 
+#[cgp_impl(new VerusReviewedCampaignExecution)]
+#[uses(
+    CanRequireReviewedTransition,
+    CanInspectArtifactPresence,
+    CanRunPythonTool,
+    CanReadJsonArtifact,
+    CanValidateReviewedBinding,
+    CanValidateCampaignExecution,
+    CanCanonicalizeStaticIdentity,
+    CanReadWriteArtifacts,
+    HasProjectRoot
+)]
+impl LimitedReviewedCampaignExecution {
     fn run_reviewed_campaign_with_limits(
         &self,
         reviewed_dir: &str,
@@ -2382,7 +2403,10 @@ pub trait CanVerifyReviewed {
         campaign_dir: &str,
         verus: &str,
     ) -> Result<ReviewedVerificationReceipt, String>;
+}
 
+#[cgp_component(ConfiguredReviewedVerification)]
+pub trait CanVerifyReviewedWithConfig {
     fn verify_reviewed_with_config(
         &self,
         manifest_path: &str,
@@ -2393,20 +2417,8 @@ pub trait CanVerifyReviewed {
     ) -> Result<ReviewedVerificationReceipt, String>;
 }
 
-#[cgp_impl(new FreshReviewedVerification)]
-#[uses(
-    CanInspectReviewedLifecycle,
-    CanValidateReviewedIntegrity,
-    CanValidateReviewedVerificationConfig,
-    CanReadJsonArtifact,
-    CanDecodeJsonReceipt,
-    CanPrepareReviewedBinding,
-    CanRunReviewedCampaign,
-    CanFinalizeReviewedCampaign,
-    CanAssembleReviewedEvidence,
-    CanAuditReviewedEvidence,
-    CanCanonicalizeStaticIdentity
-)]
+#[cgp_impl(new DefaultReviewedVerification)]
+#[uses(CanVerifyReviewedWithConfig)]
 impl ReviewedVerification {
     fn verify_reviewed(
         &self,
@@ -2423,7 +2435,23 @@ impl ReviewedVerification {
             &ReviewedVerificationConfig::default(),
         )
     }
+}
 
+#[cgp_impl(new FreshReviewedVerification)]
+#[uses(
+    CanInspectReviewedLifecycle,
+    CanValidateReviewedIntegrity,
+    CanValidateReviewedVerificationConfig,
+    CanReadJsonArtifact,
+    CanDecodeJsonReceipt,
+    CanPrepareReviewedBindingWithSelection,
+    CanRunReviewedCampaignWithLimits,
+    CanFinalizeReviewedCampaign,
+    CanAssembleReviewedEvidence,
+    CanAuditReviewedEvidence,
+    CanCanonicalizeStaticIdentity
+)]
+impl ConfiguredReviewedVerification {
     fn verify_reviewed_with_config(
         &self,
         manifest_path: &str,
@@ -2644,6 +2672,8 @@ delegate_and_check_components! {
         JsonReceiptDecoderComponent:
             SerdeJsonReceiptDecoder,
         AutomationPreparationComponent:
+            DefaultKaniAutomationPreparation,
+        SelectedAutomationPreparationComponent:
             KaniAutomationPreparation,
         ReviewedBindingValidatorComponent:
             StrictReviewedBindingValidator,
@@ -2652,8 +2682,12 @@ delegate_and_check_components! {
         CampaignBindingValidatorComponent:
             StrictCampaignBindingValidator,
         ReviewedBindingPreparationComponent:
+            DefaultKaniReviewedBindingPreparation,
+        SelectedReviewedBindingPreparationComponent:
             KaniReviewedBindingPreparation,
         ReviewedCampaignExecutionComponent:
+            DefaultVerusReviewedCampaignExecution,
+        LimitedReviewedCampaignExecutionComponent:
             VerusReviewedCampaignExecution,
         ReviewedCampaignFinalizationComponent:
             KaniReviewedCampaignFinalization,
@@ -2666,6 +2700,8 @@ delegate_and_check_components! {
         ReviewedIntegrityValidationComponent:
             StrictReviewedIntegrityValidation,
         ReviewedVerificationComponent:
+            DefaultReviewedVerification,
+        ConfiguredReviewedVerificationComponent:
             FreshReviewedVerification,
         ReviewedExplanationComponent:
             ComposedReviewedExplanation,
