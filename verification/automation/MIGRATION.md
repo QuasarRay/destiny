@@ -316,3 +316,21 @@ All new command/artifact identities continue through `TokenIdentity`, backed by
 `proc_macro2` and the safe `arcane-rs/synthez::ToTokens` replay wrapper. No unsafe
 Arcane macro is introduced, and no proof-generation or Rust-to-Verus translation
 semantics change.
+
+
+## Eleventh slice: derived state metadata and composed reviewed explanation
+
+This slice removes three handwritten metadata tables from the reviewed path. Lifecycle
+stages, lifecycle actions, and evidence-artifact kinds now carry their own declarative
+metadata and use `derive-deftly` to generate names, ranks, transition sets, and artifact
+properties. `comprende` replaces repeated filter/push/map/collect scaffolding in the
+automation planner, command catalog, lifecycle action derivation, and evidence policy.
+CGP still owns all behavior-bearing boundaries; the macros only derive deterministic
+metadata and collections.
+
+The new `explain-reviewed` operation composes the existing presence lifecycle and
+semantic integrity validator. It is read-only, grants no proof credit, recommends the
+smallest legal next reviewed transition only when integrity is valid, and reports audited
+valid evidence as complete. This gives callers one machine-readable decision surface
+without weakening or bypassing `status-reviewed`, `validate-reviewed`, or any verifier
+gate.
