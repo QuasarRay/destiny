@@ -112,6 +112,11 @@ pub enum AutomationCommand {
     Plan { path: String },
     Prepare { manifest_path: String, output_dir: String },
     PrepareReviewed { manifest_path: String, output_dir: String },
+    RunReviewed {
+        reviewed_dir: String,
+        campaign_dir: String,
+        verus: String,
+    },
     FinalizeReviewed { reviewed_dir: String, campaign_dir: String },
     ManifestReviewed { reviewed_dir: String },
     AuditReviewed { reviewed_dir: String },
@@ -136,6 +141,31 @@ pub struct ReviewedPreparationReceipt {
     pub controller_obligation_count: usize,
     pub contract_inventory_count: usize,
     pub contract_clause_count: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CampaignExecutionSummary {
+    pub status: String,
+    pub checked_entry_count: usize,
+    pub case_acceptance_exit: i32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ReviewedCampaignExecutionReceipt {
+    pub schema: u32,
+    pub status: &'static str,
+    pub engine: &'static str,
+    pub reviewed_dir: String,
+    pub campaign_dir: String,
+    pub runner_receipt_path: String,
+    pub execution_receipt_path: String,
+    pub canonical_execution: String,
+    pub runner_status: String,
+    pub verus_checked_scoped: bool,
+    pub checked_entry_count: usize,
+    pub case_acceptance_exit: i32,
+    pub proof_credit: bool,
+    pub proof_credit_source: &'static str,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -247,6 +277,7 @@ pub enum ReviewedLifecycleStage {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ReviewedLifecycleAction {
     Prepare,
+    Run,
     Finalize,
     Manifest,
     Audit,

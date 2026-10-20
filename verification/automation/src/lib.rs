@@ -11,15 +11,18 @@ pub use components::{
     CanInspectReviewedLifecycle, CanNormalizeMetadata, CanParseMetadataBytes,
     CanPrepareAutomation, CanPrepareReviewedBinding, CanReadJsonArtifact,
     CanReadWriteArtifacts, CanRequireReviewedTransition, CanRouteCommand,
-    CanRunJsonPythonTool, CanRunPythonTool, CanValidateCampaignBinding,
+    CanRunJsonPythonTool, CanRunPythonTool, CanRunReviewedCampaign,
+    CanValidateCampaignBinding, CanValidateCampaignExecution,
     CanValidateContractClause, CanValidateReviewedBinding, HasProjectRoot, KVerusContext,
 };
 pub use model::{
-    AutomationCommand, AutomationPlan, CampaignBindingSummary, CommandDescriptor,
+    AutomationCommand, AutomationPlan, CampaignBindingSummary, CampaignExecutionSummary,
+    CommandDescriptor,
     ContractDiscovery, ContractPlan, DiscoveryCandidate, DiscoveryDisposition,
     DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind, EvidenceArtifactSpec,
     PlanCounts, PlannedContractClause, PreparationReceipt, ReviewedBindingSummary,
-    ReviewedEvidenceAuditReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
+    ReviewedCampaignExecutionReceipt, ReviewedEvidenceAuditReceipt,
+    ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
     ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
     ReviewedPreparationReceipt,
 };
@@ -201,11 +204,22 @@ mod tests {
 
         let usage = KVerusContext.command_usage().unwrap();
         assert!(usage.contains("prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>"));
+        assert!(usage.contains(
+            "run-reviewed --reviewed-dir <dir> --campaign-dir <dir> --verus <path>"
+        ));
         assert!(usage.contains("finalize-reviewed --reviewed-dir <dir> --campaign-dir <dir>"));
         assert!(usage.contains("manifest-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("audit-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("status-reviewed --reviewed-dir <dir>"));
         assert!(usage.contains("replay-kani-reference <replay args...>"));
+
+        let runner = commands
+            .iter()
+            .find(|command| command.name == "run-reviewed")
+            .unwrap();
+        assert_eq!(runner.canonical_token, "run_reviewed");
+        assert_eq!(runner.category, "verification");
+        assert!(!runner.proof_credit);
 
         let finalizer = commands
             .iter()
@@ -269,6 +283,30 @@ mod tests {
     }
 
     #[test]
+    fn command_router_builds_typed_reviewed_execution_invocation() {
+        let command = KVerusContext
+            .route_command(&[
+                "run-reviewed".to_string(),
+                "--verus".to_string(),
+                "verus-dist/verus".to_string(),
+                "--campaign-dir".to_string(),
+                ".aegis/campaign".to_string(),
+                "--reviewed-dir".to_string(),
+                ".aegis/reviewed".to_string(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            command,
+            AutomationCommand::RunReviewed {
+                reviewed_dir: ".aegis/reviewed".to_string(),
+                campaign_dir: ".aegis/campaign".to_string(),
+                verus: "verus-dist/verus".to_string(),
+            }
+        );
+    }
+
+    #[test]
     fn command_router_builds_typed_reviewed_finalization_invocation() {
         let command = KVerusContext
             .route_command(&[
@@ -323,6 +361,36 @@ mod tests {
                 reviewed_dir: ".aegis/reviewed".to_string(),
             }
         );
+    }
+
+    #[test]
+    fn campaign_execution_validator_requires_checked_scoped_verus_receipts() {
+        let value = serde_json::json!({
+            "schema": 1,
+            "status": "CHECKED_SCOPED",
+            "engine": "verus",
+            "kani_proof_credit": false,
+            "verus_checked_scoped": true,
+            "deduplicated_entries": 3,
+            "formal_audit": "CHECKED_SCOPED",
+            "case_acceptance_exit": 0
+        });
+        let summary = KVerusContext.validate_campaign_execution(value).unwrap();
+        assert_eq!(summary.status, "CHECKED_SCOPED");
+        assert_eq!(summary.checked_entry_count, 3);
+        assert_eq!(summary.case_acceptance_exit, 0);
+
+        let rejected = serde_json::json!({
+            "schema": 1,
+            "status": "CHECKED_SCOPED",
+            "engine": "verus",
+            "kani_proof_credit": false,
+            "verus_checked_scoped": true,
+            "deduplicated_entries": 3,
+            "formal_audit": "CHECKED_SCOPED",
+            "case_acceptance_exit": 1
+        });
+        assert!(KVerusContext.validate_campaign_execution(rejected).is_err());
     }
 
     #[test]
@@ -400,7 +468,11 @@ mod tests {
         let prepared = KVerusContext.reviewed_lifecycle(&root_string).unwrap();
         assert_eq!(prepared.stage, "reviewed-prepared");
         assert_eq!(prepared.canonical_stage, "reviewed_prepared");
+        assert!(prepared.legal_next_actions.contains(&"run-reviewed"));
         assert!(prepared.legal_next_actions.contains(&"finalize-reviewed"));
+        KVerusContext
+            .require_reviewed_action(&root_string, ReviewedLifecycleAction::Run)
+            .unwrap();
         KVerusContext
             .require_reviewed_action(&root_string, ReviewedLifecycleAction::Finalize)
             .unwrap();

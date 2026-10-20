@@ -105,7 +105,10 @@
     "evidence_artifact_policy": "CGP EvidenceArtifactPolicy with typed reviewed artifact kinds",
     "artifact_presence": "CGP ArtifactPresence over filesystem metadata",
     "reviewed_lifecycle_inspection": "CGP ReviewedLifecycleInspection",
-    "reviewed_lifecycle_transition": "CGP ReviewedLifecycleTransition"
+    "reviewed_lifecycle_transition": "CGP ReviewedLifecycleTransition",
+    "campaign_execution_validator": "CGP CampaignExecutionValidator over persisted run_verus_campaign.py receipts",
+    "reviewed_campaign_execution": "CGP ReviewedCampaignExecution owns reviewed-prepared execution precondition and runner invocation",
+    "required_flag_parser": "generic exact named-flag parser shared by reviewed CLI commands"
   },
   "preparation": {
     "command": "prepare --manifest-path <Cargo.toml> --output-dir <dir>",
@@ -254,5 +257,28 @@
     "inconsistent_policy": "reject any partial or non-prefix reviewed artifact inventory",
     "workflow_handoff": "real Verus handoff remains reviewed-prepared; synthetic lifecycle regression is isolated in a separate artifact",
     "proof_credit": false
+  },
+  "reviewed_campaign_execution": {
+    "command": "run-reviewed --reviewed-dir <dir> --campaign-dir <dir> --verus <path>",
+    "status": "supported",
+    "architecture": "CGP ReviewedCampaignExecution + CampaignExecutionValidator over existing run_verus_campaign.py",
+    "lifecycle_precondition": "reviewed-prepared",
+    "lifecycle_effect": "none; reviewed lifecycle remains prepared until finalize-reviewed binds checked campaign receipts",
+    "runner_receipt": "verus-campaign-runner-receipt.json",
+    "kverus_receipt": "kverus-reviewed-campaign-execution.json",
+    "success_invariants": {
+      "schema": 1,
+      "engine": "verus",
+      "status": "CHECKED_SCOPED",
+      "kani_proof_credit": false,
+      "verus_checked_scoped": true,
+      "formal_audit": "CHECKED_SCOPED",
+      "nonempty_deduplicated_entries": true,
+      "case_acceptance_exit": 0
+    },
+    "runner_failure_receipt": "INCOMPLETE",
+    "canonical_identity": "proc_macro2 + safe arcane-rs/synthez through CGP TokenIdentity",
+    "proof_credit": false,
+    "proof_credit_source": "existing_verus_checked_scoped_receipts_only"
   }
 }

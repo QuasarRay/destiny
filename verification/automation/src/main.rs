@@ -3,7 +3,7 @@
 use destiny_verification_automation::{
     AutomationCommand, CanAssembleReviewedEvidence, CanAuditReviewedEvidence,
     CanBuildAutomationPlan, CanDescribeCommands, CanFinalizeReviewedCampaign,
-    CanInspectReviewedLifecycle, CanPrepareAutomation,
+    CanInspectReviewedLifecycle, CanPrepareAutomation, CanRunReviewedCampaign,
     CanPrepareReviewedBinding, CanRouteCommand, CanRunPythonTool, DEFAULT_ENGINE,
     DiscoveryReport, KANI_SOURCE_COMMIT, KVerusContext, normalize_autoharness_metadata,
     parse_metadata,
@@ -130,6 +130,16 @@ fn prepare_reviewed(manifest_path: &str, output_dir: &str) -> ExitCode {
     }
 }
 
+fn run_reviewed(reviewed_dir: &str, campaign_dir: &str, verus: &str) -> ExitCode {
+    match KVerusContext.run_reviewed_campaign(reviewed_dir, campaign_dir, verus) {
+        Ok(receipt) => emit_json(&receipt),
+        Err(error) => {
+            eprintln!("{error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn finalize_reviewed(reviewed_dir: &str, campaign_dir: &str) -> ExitCode {
     match KVerusContext.finalize_reviewed_campaign(reviewed_dir, campaign_dir) {
         Ok(receipt) => emit_json(&receipt),
@@ -194,6 +204,11 @@ fn main() -> ExitCode {
             manifest_path,
             output_dir,
         } => prepare_reviewed(&manifest_path, &output_dir),
+        AutomationCommand::RunReviewed {
+            reviewed_dir,
+            campaign_dir,
+            verus,
+        } => run_reviewed(&reviewed_dir, &campaign_dir, &verus),
         AutomationCommand::FinalizeReviewed {
             reviewed_dir,
             campaign_dir,

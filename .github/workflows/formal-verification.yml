@@ -87,6 +87,40 @@ jobs:
           cargo +nightly-2026-08-21 test --manifest-path verification/automation/Cargo.toml --locked
           python3 -B verification/tools/test_kani_discovery.py
 
+      - name: Test reviewed campaign runner receipt protocol
+        run: |
+          set -euo pipefail
+          tmp=".aegis/destiny/campaign-runner-contract-test"
+          rm -rf "$tmp"
+          mkdir -p "$tmp"
+          set +e
+          python3 -B verification/tools/run_verus_campaign.py \
+            --verus "$tmp/not-used-verus" \
+            --plan "$tmp/missing-plan.json" \
+            --campaign-dir "$tmp/campaign" \
+            --receipt "$tmp/runner-receipt.json" \
+            > "$tmp/stdout.jsonl"
+          rc=$?
+          set -e
+          test "$rc" -eq 1
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root=Path(".aegis/destiny/campaign-runner-contract-test")
+          receipt=json.loads((root/"runner-receipt.json").read_text())
+          final_stdout=json.loads((root/"stdout.jsonl").read_text().splitlines()[-1])
+          assert receipt == final_stdout, (receipt, final_stdout)
+          assert receipt["schema"] == 1, receipt
+          assert receipt["status"] == "INCOMPLETE", receipt
+          assert receipt["engine"] == "verus", receipt
+          assert receipt["kani_proof_credit"] is False, receipt
+          assert receipt["verus_checked_scoped"] is False, receipt
+          assert receipt["formal_audit"] == "INCOMPLETE", receipt
+          assert receipt["case_acceptance_exit"] == -1, receipt
+          assert "missing-plan.json" in receipt["reason"], receipt
+          PY
+
       - name: Build patched pinned Kani from source
         working-directory: third_party/kani
         run: cargo +nightly-2026-08-21 build-dev -- --release
@@ -783,8 +817,61 @@ jobs:
 
       - name: Verify logical refinement proofs
         run: |
+          set -euo pipefail
+          reviewed=".aegis/destiny/kani-autoharness-discovery"
+          campaign=".aegis/destiny/verus-final-campaign"
+          mkdir -p "$campaign"
+
           python3 -B verification/tools/check_concurrency_acceptance.py --structure-only
-          python3 -B verification/tools/run_verus_campaign.py --verus "$VERUS_BIN"
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            run-reviewed \
+            --reviewed-dir "$reviewed" \
+            --campaign-dir "$campaign" \
+            --verus "$VERUS_BIN" \
+            > "$campaign/kverus-reviewed-campaign-execution-stdout.json"
+
+          cargo +nightly-2026-08-21 run --quiet \
+            --manifest-path verification/automation/Cargo.toml --locked -- \
+            status-reviewed --reviewed-dir "$reviewed" \
+            > "$reviewed/reviewed-lifecycle-after-execution.json"
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          reviewed=Path(".aegis/destiny/kani-autoharness-discovery")
+          campaign=Path(".aegis/destiny/verus-final-campaign")
+          receipt=json.loads((campaign/"kverus-reviewed-campaign-execution.json").read_text())
+          stdout_receipt=json.loads(
+              (campaign/"kverus-reviewed-campaign-execution-stdout.json").read_text()
+          )
+          runner=json.loads((campaign/"verus-campaign-runner-receipt.json").read_text())
+          lifecycle=json.loads((reviewed/"reviewed-lifecycle-after-execution.json").read_text())
+
+          assert receipt == stdout_receipt, (receipt, stdout_receipt)
+          assert receipt["status"] == "KVERUS_REVIEWED_CAMPAIGN_EXECUTED", receipt
+          assert receipt["engine"] == "verus", receipt
+          assert receipt["canonical_execution"] == "reviewed_campaign_execution", receipt
+          assert receipt["runner_status"] == "CHECKED_SCOPED", receipt
+          assert receipt["verus_checked_scoped"] is True, receipt
+          assert receipt["checked_entry_count"] > 0, receipt
+          assert receipt["case_acceptance_exit"] == 0, receipt
+          assert receipt["proof_credit"] is False, receipt
+          assert receipt["proof_credit_source"] == "existing_verus_checked_scoped_receipts_only", receipt
+
+          assert runner["status"] == "CHECKED_SCOPED", runner
+          assert runner["engine"] == "verus", runner
+          assert runner["kani_proof_credit"] is False, runner
+          assert runner["verus_checked_scoped"] is True, runner
+          assert runner["formal_audit"] == "CHECKED_SCOPED", runner
+          assert runner["case_acceptance_exit"] == 0, runner
+
+          assert lifecycle["stage"] == "reviewed-prepared", lifecycle
+          assert lifecycle["canonical_stage"] == "reviewed_prepared", lifecycle
+          assert lifecycle["consistent"] is True, lifecycle
+          assert lifecycle["proof_credit"] is False, lifecycle
+          PY
 
       - name: Finalize Kani-selected identities against the fresh Verus campaign
         run: |

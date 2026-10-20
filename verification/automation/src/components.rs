@@ -1,11 +1,13 @@
 use crate::{
-    AutomationCommand, AutomationPlan, CampaignBindingSummary, CommandDescriptor,
+    AutomationCommand, AutomationPlan, CampaignBindingSummary, CampaignExecutionSummary,
+    CommandDescriptor,
     ContractDiscovery, ContractPlan, DEFAULT_ENGINE, DiscoveryCandidate,
     DiscoveryDisposition, DiscoveryReport, EvidenceArtifact, EvidenceArtifactKind,
     EvidenceArtifactSpec, KANI_SOURCE_COMMIT, PlanCounts, PlannedContractClause,
     PreparationReceipt, ReviewedBindingSummary, ReviewedEvidenceAuditReceipt,
-    ReviewedEvidenceManifest, ReviewedFinalizationReceipt, ReviewedLifecycleAction,
-    ReviewedLifecycleReport, ReviewedLifecycleStage, ReviewedPreparationReceipt,
+    ReviewedCampaignExecutionReceipt, ReviewedEvidenceManifest, ReviewedFinalizationReceipt,
+    ReviewedLifecycleAction, ReviewedLifecycleReport, ReviewedLifecycleStage,
+    ReviewedPreparationReceipt,
 };
 use cgp::prelude::*;
 use kani_metadata::{
@@ -98,6 +100,11 @@ const COMMANDS: &[(&str, &str, &str)] = &[
         "prepare-reviewed",
         "prepare-reviewed --manifest-path <Cargo.toml> --output-dir <dir>",
         "reviewed_binding",
+    ),
+    (
+        "run-reviewed",
+        "run-reviewed --reviewed-dir <dir> --campaign-dir <dir> --verus <path>",
+        "verification",
     ),
     (
         "finalize-reviewed",
@@ -210,6 +217,17 @@ impl CommandRouter {
                     output_dir,
                 })
             }
+            "run-reviewed" => {
+                let values = parse_required_flags(
+                    rest,
+                    &["--reviewed-dir", "--campaign-dir", "--verus"],
+                )?;
+                Ok(AutomationCommand::RunReviewed {
+                    reviewed_dir: values[0].clone(),
+                    campaign_dir: values[1].clone(),
+                    verus: values[2].clone(),
+                })
+            }
             "finalize-reviewed" => {
                 let (reviewed_dir, campaign_dir) =
                     parse_required_pair(rest, "--reviewed-dir", "--campaign-dir")?;
@@ -242,11 +260,41 @@ impl CommandRouter {
     }
 }
 
-fn parse_required_value(args: &[String], flag: &str) -> Result<String, String> {
-    if args.len() != 2 || args[0] != flag {
-        return Err(format!("exactly {flag} <value> is required"));
+fn parse_required_flags(args: &[String], flags: &[&str]) -> Result<Vec<String>, String> {
+    if args.len() != flags.len() * 2 {
+        return Err(format!(
+            "expected exactly {} named arguments: {}",
+            flags.len(),
+            flags.join(", ")
+        ));
     }
-    Ok(args[1].clone())
+
+    let mut values = vec![None; flags.len()];
+    let mut index = 0;
+    while index < args.len() {
+        let flag = args[index].as_str();
+        let value = args
+            .get(index + 1)
+            .ok_or_else(|| format!("missing value for {flag}"))?
+            .clone();
+        let Some(position) = flags.iter().position(|candidate| *candidate == flag) else {
+            return Err(format!("unexpected argument {flag}"));
+        };
+        if values[position].replace(value).is_some() {
+            return Err(format!("duplicate argument {flag}"));
+        }
+        index += 2;
+    }
+
+    flags
+        .iter()
+        .zip(values)
+        .map(|(flag, value)| value.ok_or_else(|| format!("missing required argument {flag}")))
+        .collect()
+}
+
+fn parse_required_value(args: &[String], flag: &str) -> Result<String, String> {
+    Ok(parse_required_flags(args, &[flag])?.remove(0))
 }
 
 fn parse_required_pair(
@@ -254,30 +302,8 @@ fn parse_required_pair(
     first_flag: &str,
     second_flag: &str,
 ) -> Result<(String, String), String> {
-    let mut first = None;
-    let mut second = None;
-    let mut index = 0;
-
-    while index < args.len() {
-        let flag = args[index].as_str();
-        let value = args
-            .get(index + 1)
-            .ok_or_else(|| format!("missing value for {flag}"))?
-            .clone();
-        if flag == first_flag && first.is_none() {
-            first = Some(value);
-        } else if flag == second_flag && second.is_none() {
-            second = Some(value);
-        } else {
-            return Err(format!("unexpected or duplicate argument {flag}"));
-        }
-        index += 2;
-    }
-
-    match (first, second) {
-        (Some(first), Some(second)) => Ok((first, second)),
-        _ => Err(format!("both {first_flag} and {second_flag} are required")),
-    }
+    let values = parse_required_flags(args, &[first_flag, second_flag])?;
+    Ok((values[0].clone(), values[1].clone()))
 }
 
 #[cgp_component(MetadataParser)]
@@ -782,6 +808,7 @@ impl ReviewedLifecycleTransition {
                 report.stage,
                 "reviewed-empty" | "reviewed-prepared"
             ),
+            ReviewedLifecycleAction::Run => report.stage == "reviewed-prepared",
             ReviewedLifecycleAction::Finalize => matches!(
                 report.stage,
                 "reviewed-prepared" | "reviewed-finalized"
@@ -824,6 +851,7 @@ fn reviewed_lifecycle_stage_name(stage: ReviewedLifecycleStage) -> &'static str 
 fn reviewed_lifecycle_action_name(action: ReviewedLifecycleAction) -> &'static str {
     match action {
         ReviewedLifecycleAction::Prepare => "prepare-reviewed",
+        ReviewedLifecycleAction::Run => "run-reviewed",
         ReviewedLifecycleAction::Finalize => "finalize-reviewed",
         ReviewedLifecycleAction::Manifest => "manifest-reviewed",
         ReviewedLifecycleAction::Audit => "audit-reviewed",
@@ -833,7 +861,9 @@ fn reviewed_lifecycle_action_name(action: ReviewedLifecycleAction) -> &'static s
 fn reviewed_lifecycle_legal_actions(stage: ReviewedLifecycleStage) -> Vec<&'static str> {
     match stage {
         ReviewedLifecycleStage::Empty => vec!["prepare-reviewed"],
-        ReviewedLifecycleStage::Prepared => vec!["prepare-reviewed", "finalize-reviewed"],
+        ReviewedLifecycleStage::Prepared => {
+            vec!["prepare-reviewed", "run-reviewed", "finalize-reviewed"]
+        }
         ReviewedLifecycleStage::Finalized => vec!["finalize-reviewed", "manifest-reviewed"],
         ReviewedLifecycleStage::Manifested => vec!["manifest-reviewed", "audit-reviewed"],
         ReviewedLifecycleStage::Audited => vec!["audit-reviewed"],
@@ -1127,6 +1157,172 @@ impl ReviewedBindingPreparation {
         };
         self.write_artifact(&receipt_path, &pretty_json_bytes(&receipt)?)
             .map_err(|error| format!("cannot write {}: {error}", receipt_path.display()))?;
+        Ok(receipt)
+    }
+}
+
+#[derive(Deserialize)]
+struct CampaignRunnerReceipt {
+    schema: u32,
+    status: String,
+    engine: String,
+    kani_proof_credit: bool,
+    verus_checked_scoped: bool,
+    deduplicated_entries: usize,
+    formal_audit: String,
+    case_acceptance_exit: i32,
+}
+
+#[cgp_component(CampaignExecutionValidator)]
+pub trait CanValidateCampaignExecution {
+    fn validate_campaign_execution(
+        &self,
+        value: serde_json::Value,
+    ) -> Result<CampaignExecutionSummary, String>;
+}
+
+#[cgp_impl(new StrictCampaignExecutionValidator)]
+impl CampaignExecutionValidator {
+    fn validate_campaign_execution(
+        &self,
+        value: serde_json::Value,
+    ) -> Result<CampaignExecutionSummary, String> {
+        let receipt: CampaignRunnerReceipt = serde_json::from_value(value)
+            .map_err(|error| format!("invalid Verus campaign runner receipt: {error}"))?;
+
+        if receipt.schema != 1
+            || receipt.status != "CHECKED_SCOPED"
+            || receipt.engine != DEFAULT_ENGINE
+            || receipt.kani_proof_credit
+            || !receipt.verus_checked_scoped
+            || receipt.deduplicated_entries == 0
+            || receipt.formal_audit != "CHECKED_SCOPED"
+            || receipt.case_acceptance_exit != 0
+        {
+            return Err(format!(
+                "Verus campaign runner receipt violated KVerus invariants:                  schema={}, status={}, engine={}, kani_proof_credit={},                  verus_checked_scoped={}, entries={}, formal_audit={},                  case_acceptance_exit={}",
+                receipt.schema,
+                receipt.status,
+                receipt.engine,
+                receipt.kani_proof_credit,
+                receipt.verus_checked_scoped,
+                receipt.deduplicated_entries,
+                receipt.formal_audit,
+                receipt.case_acceptance_exit
+            ));
+        }
+
+        Ok(CampaignExecutionSummary {
+            status: receipt.status,
+            checked_entry_count: receipt.deduplicated_entries,
+            case_acceptance_exit: receipt.case_acceptance_exit,
+        })
+    }
+}
+
+#[cgp_component(ReviewedCampaignExecution)]
+pub trait CanRunReviewedCampaign {
+    fn run_reviewed_campaign(
+        &self,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+    ) -> Result<ReviewedCampaignExecutionReceipt, String>;
+}
+
+#[cgp_impl(new VerusReviewedCampaignExecution)]
+#[uses(
+    CanRequireReviewedTransition,
+    CanRunPythonTool,
+    CanReadJsonArtifact,
+    CanValidateCampaignExecution,
+    CanCanonicalizeStaticIdentity,
+    CanReadWriteArtifacts,
+    HasProjectRoot
+)]
+impl ReviewedCampaignExecution {
+    fn run_reviewed_campaign(
+        &self,
+        reviewed_dir: &str,
+        campaign_dir: &str,
+        verus: &str,
+    ) -> Result<ReviewedCampaignExecutionReceipt, String> {
+        self.require_reviewed_action(reviewed_dir, ReviewedLifecycleAction::Run)?;
+
+        let requested_campaign_dir = PathBuf::from(campaign_dir);
+        let campaign_dir_path = if requested_campaign_dir.is_absolute() {
+            requested_campaign_dir
+        } else {
+            self.project_root().join(requested_campaign_dir)
+        };
+        let runner_receipt_path = campaign_dir_path.join("verus-campaign-runner-receipt.json");
+        let execution_receipt_path =
+            campaign_dir_path.join("kverus-reviewed-campaign-execution.json");
+        let args = vec![
+            "--verus".to_string(),
+            verus.to_string(),
+            "--campaign-dir".to_string(),
+            campaign_dir_path.display().to_string(),
+            "--receipt".to_string(),
+            runner_receipt_path.display().to_string(),
+        ];
+
+        let output = self
+            .run_python_tool_output("verification/tools/run_verus_campaign.py", &args)
+            .map_err(|error| format!("failed to execute reviewed Verus campaign: {error}"))?;
+
+        let runner_value = self.read_json_artifact(&runner_receipt_path).map_err(|error| {
+            format!(
+                "reviewed Verus campaign did not produce {}: {error}",
+                runner_receipt_path.display()
+            )
+        })?;
+
+        if !output.status.success() {
+            let runner_status = runner_value
+                .get("status")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("UNKNOWN");
+            let reason = runner_value
+                .get("reason")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("runner returned a non-zero exit status");
+            return Err(format!(
+                "reviewed Verus campaign failed with {}: status={runner_status}, reason={reason};                  stdout={} stderr={}",
+                output.status,
+                String::from_utf8_lossy(&output.stdout).trim(),
+                String::from_utf8_lossy(&output.stderr).trim()
+            ));
+        }
+
+        let summary = self.validate_campaign_execution(runner_value)?;
+        let receipt = ReviewedCampaignExecutionReceipt {
+            schema: 1,
+            status: "KVERUS_REVIEWED_CAMPAIGN_EXECUTED",
+            engine: DEFAULT_ENGINE,
+            reviewed_dir: reviewed_dir.to_string(),
+            campaign_dir: campaign_dir.to_string(),
+            runner_receipt_path: runner_receipt_path.display().to_string(),
+            execution_receipt_path: execution_receipt_path.display().to_string(),
+            canonical_execution: self
+                .canonicalize_static_identity("reviewed-campaign-execution")?,
+            runner_status: summary.status,
+            verus_checked_scoped: true,
+            checked_entry_count: summary.checked_entry_count,
+            case_acceptance_exit: summary.case_acceptance_exit,
+            proof_credit: false,
+            proof_credit_source: "existing_verus_checked_scoped_receipts_only",
+        };
+        self.write_artifact(
+            &execution_receipt_path,
+            &pretty_json_bytes(&receipt)?,
+        )
+        .map_err(|error| {
+            format!(
+                "cannot write {}: {error}",
+                execution_receipt_path.display()
+            )
+        })?;
         Ok(receipt)
     }
 }
@@ -1622,10 +1818,14 @@ delegate_and_check_components! {
             KaniAutomationPreparation,
         ReviewedBindingValidatorComponent:
             StrictReviewedBindingValidator,
+        CampaignExecutionValidatorComponent:
+            StrictCampaignExecutionValidator,
         CampaignBindingValidatorComponent:
             StrictCampaignBindingValidator,
         ReviewedBindingPreparationComponent:
             KaniReviewedBindingPreparation,
+        ReviewedCampaignExecutionComponent:
+            VerusReviewedCampaignExecution,
         ReviewedCampaignFinalizationComponent:
             KaniReviewedCampaignFinalization,
         ReviewedEvidenceBuilderComponent:

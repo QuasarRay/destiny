@@ -225,3 +225,52 @@ stage before consuming fresh campaign receipts.
 
 No verifier semantics, Kani metadata semantics, reviewed function mappings, or proof
 credit rules changed.
+
+
+## Ninth slice: CGP-owned reviewed Verus campaign execution
+
+The reviewed Verus campaign is no longer launched directly from workflow shell code.
+The new `run-reviewed --reviewed-dir <dir> --campaign-dir <dir> --verus <path>`
+command introduces two provider boundaries:
+
+- `ReviewedCampaignExecution` owns the reviewed execution precondition, invocation of
+  the existing `verification/tools/run_verus_campaign.py` proof loop, and the KVerus
+  execution receipt;
+- `CampaignExecutionValidator` owns the machine-readable runner-receipt invariants.
+
+The Python runner keeps its proof semantics unchanged. It still binds the declared plan,
+executes each reviewed Verus entry once, rejects any non-Verus method, requires every
+per-obligation result to be `CHECKED_SCOPED`, performs the existing final audit, and
+retains the existing case-acceptance exit behavior. This slice only adds explicit
+`--campaign-dir` and `--receipt` plumbing so the Rust orchestration layer can consume
+the result deterministically. Failures now persist an `INCOMPLETE` runner receipt for
+diagnosis instead of existing only in mixed stdout/stderr.
+
+A successful KVerus execution receipt requires:
+
+- schema 1 and engine `verus`;
+- `status = CHECKED_SCOPED`;
+- `kani_proof_credit = false`;
+- `verus_checked_scoped = true`;
+- a nonempty deduplicated reviewed-entry count;
+- `formal_audit = CHECKED_SCOPED`;
+- `case_acceptance_exit = 0`.
+
+The KVerus wrapper writes
+`<campaign-dir>/kverus-reviewed-campaign-execution.json`, with
+`proof_credit = false` and
+`proof_credit_source = existing_verus_checked_scoped_receipts_only`. This artifact is
+execution/orchestration evidence, not part of the reviewed binding lifecycle and not a
+new proof source. The reviewed directory intentionally remains `reviewed-prepared`
+until `finalize-reviewed` binds actual campaign receipts.
+
+The CLI parser is also simplified: one generic required-named-flag parser now backs the
+one-, two-, and three-argument reviewed commands, replacing command-specific flag
+parsers. The new `run-reviewed` command identity and its
+`reviewed-campaign-execution` receipt identity continue through the shared
+`proc_macro2` + safe `arcane-rs/synthez::ToTokens` `TokenIdentity` provider.
+
+CI tests the new runner receipt protocol without requiring Verus by deliberately
+supplying a missing plan and requiring a persisted `INCOMPLETE` receipt plus nonzero
+exit. The real Verus job now invokes `run-reviewed`; it no longer calls
+`run_verus_campaign.py` directly.
