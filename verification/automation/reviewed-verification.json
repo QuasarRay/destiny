@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "selection": {
+    "packages": [],
+    "features": [],
+    "all_features": false,
+    "no_default_features": false,
+    "target": "default",
+    "target_name": null,
+    "functions": []
+  },
+  "limits": {
+    "timeout_seconds": 120,
+    "memory_mib": null,
+    "max_concurrency": 1
+  }
+}
