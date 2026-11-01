@@ -18,17 +18,17 @@ fn box_cpp_constructor_bounds_defaults_and_parent() {
     let entity = get_or_create_box(app.world_mut(), 5, 9, 13, 7).unwrap();
     let world = app.world();
     let child = world.get::<PartitionBox>(entity).unwrap();
-    assert_eq!(child.key, BoxKey::new(5, 9, 13, 1 << 37));
-    assert_eq!(child.level, 7);
+    assert_eq!(child.mKey, BoxKey::new(5, 9, 13, 1 << 37));
+    assert_eq!(child.mLevel, 7);
     assert_eq!(child.hi - child.lo, DVec3::splat(480.0));
-    assert_eq!(child.bubble, -1);
-    assert!(!child.handled);
-    assert!(child.balls.is_empty() && child.statics.is_empty() && child.children.is_empty());
-    let parent = world.get::<PartitionBox>(child.parent.unwrap()).unwrap();
-    assert_eq!((parent.key.ix,parent.key.iy,parent.key.iz),(1,2,3));
-    assert_eq!(parent.children.get(&child.key),Some(&entity));
+    assert_eq!(child.mBubble, -1);
+    assert!(!child.mHandled);
+    assert!(child.balls.is_empty() && child.mStaticCollidables.is_empty() && child.mChildren.is_empty());
+    let parent = world.get::<PartitionBox>(child.mParent.unwrap()).unwrap();
+    assert_eq!((parent.mKey.ix,parent.mKey.iy,parent.mKey.iz),(1,2,3));
+    assert_eq!(parent.mChildren.get(&child.mKey),Some(&entity));
     assert_eq!(Partition::topmost(world,Some(entity))
-        .and_then(|e|world.get::<PartitionBox>(e)).map(|b|b.level),Some(0));
+        .and_then(|e|world.get::<PartitionBox>(e)).map(|b|b.mLevel),Some(0));
 }
 
 #[test]
@@ -36,10 +36,10 @@ fn duplicate_children_and_bad_parents_are_rejected() {
     let mut app = app();
     let a = get_or_create_box(app.world_mut(), 5, 9, 13, 7).unwrap();
     let other = get_or_create_box(app.world_mut(), 8, 8, 8, 6).unwrap();
-    let parent = app.world().get::<PartitionBox>(a).unwrap().parent.unwrap();
+    let parent = app.world().get::<PartitionBox>(a).unwrap().mParent.unwrap();
     assert!(!Partition::add_child(app.world_mut(),parent,a));
     assert!(!Partition::add_child(app.world_mut(),other,a));
-    assert_eq!(app.world().get::<PartitionBox>(parent).unwrap().children.len(),1);
+    assert_eq!(app.world().get::<PartitionBox>(parent).unwrap().mChildren.len(),1);
 }
 
 #[test]
@@ -69,7 +69,7 @@ fn static_collidable_keys_are_parent_first_and_unique() {
     app.world_mut().resource_scope(|world,p:Mut<'_,Partition>| {
         for &e in &objects { assert!(p.insert_static(world,box_entity,e)); }
     });
-    let ordered: Vec<Entity> = app.world().get::<PartitionBox>(box_entity).unwrap().statics.values().copied().collect();
+    let ordered: Vec<Entity> = app.world().get::<PartitionBox>(box_entity).unwrap().mStaticCollidables.values().copied().collect();
     assert_eq!(ordered,vec![objects[2],objects[0],objects[1]]);
 }
 
@@ -91,8 +91,8 @@ fn box_traverse_visits_26_neighbors_only_at_same_level() {
     let diagonal=get_or_create_box(app.world_mut(),11,11,11,7).unwrap();
     let outside=get_or_create_box(app.world_mut(),14,10,10,7).unwrap();
     app.world_mut().resource_scope(|world,p:Mut<'_,Partition>|p.traverse(world,mid,101));
-    assert_eq!(app.world().get::<PartitionBox>(diagonal).unwrap().bubble,101);
-    assert_eq!(app.world().get::<PartitionBox>(outside).unwrap().bubble,-1);
+    assert_eq!(app.world().get::<PartitionBox>(diagonal).unwrap().mBubble,101);
+    assert_eq!(app.world().get::<PartitionBox>(outside).unwrap().mBubble,-1);
     let p=app.world().resource::<Partition>();
     assert_eq!(p.nearby_bubbles(app.world(),outside),None);
     assert_eq!(p.nearby_bubbles(app.world(),mid),Some(101));
@@ -117,15 +117,15 @@ fn release_empty_leaf_keeps_occupied_parent_and_sibling() {
     let mut app=app();
     let bx=get_or_create_box(app.world_mut(),10,10,10,7).unwrap();
     let sibling=get_or_create_box(app.world_mut(),11,10,10,7).unwrap();
-    let parent=app.world().get::<PartitionBox>(bx).unwrap().parent.unwrap();
+    let parent=app.world().get::<PartitionBox>(bx).unwrap().mParent.unwrap();
     app.world_mut().resource_scope(|world,mut p:Mut<'_,Partition>| {
         assert!(p.release_box(world,bx));
     });
     assert!(app.world().get::<PartitionBox>(bx).is_none());
     assert!(app.world().get::<PartitionBox>(parent).is_some());
     let parent_box=app.world().get::<PartitionBox>(parent).unwrap();
-    assert_eq!(parent_box.children.len(),1);
-    assert_eq!(parent_box.children.values().next().copied(),Some(sibling));
+    assert_eq!(parent_box.mChildren.len(),1);
+    assert_eq!(parent_box.mChildren.values().next().copied(),Some(sibling));
     assert_eq!(app.world().resource::<Partition>().size(),8);
 }
 
@@ -161,7 +161,7 @@ fn canonical_box_methods_keep_original_ownership_and_bubble_sentinel() {
     let next = get_or_create_box(app.world_mut(), 21, 20, 20, 7).unwrap();
     assert_eq!(destiny_rs::Box::NearbyBubbles(app.world(), first), -1);
     destiny_rs::Box::Traverse(app.world_mut(), first, 123);
-    assert_eq!(app.world().get::<PartitionBox>(next).unwrap().bubble, 123);
+    assert_eq!(app.world().get::<PartitionBox>(next).unwrap().mBubble, 123);
     assert_eq!(destiny_rs::Box::NearbyBubbles(app.world(), first), 123);
 }
 
@@ -169,8 +169,8 @@ fn canonical_box_methods_keep_original_ownership_and_bubble_sentinel() {
 fn original_box_addchildren_uses_key_uniqueness() {
     let mut app = app();
     let first = get_or_create_box(app.world_mut(), 24, 24, 24, 7).unwrap();
-    let parent = app.world().get::<PartitionBox>(first).unwrap().parent.unwrap();
+    let parent = app.world().get::<PartitionBox>(first).unwrap().mParent.unwrap();
     destiny_rs::Box::AddChildren(app.world_mut(), parent, Some(first));
     destiny_rs::Box::AddChildren(app.world_mut(), parent, None);
-    assert_eq!(app.world().get::<PartitionBox>(parent).unwrap().children.len(), 1);
+    assert_eq!(app.world().get::<PartitionBox>(parent).unwrap().mChildren.len(), 1);
 }

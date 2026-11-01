@@ -165,7 +165,7 @@ impl Partition {
 
     #[must_use]
     pub fn check_box(&self, ix: i64, iy: i64, iz: i64, level: i32) -> Option<Entity> {
-        let (i, key) = self.key(ix, iy, iz, level)?;
+        let (i, key) = self.mKey(ix, iy, iz, level)?;
         self.levels[i].get(&key).copied()
     }
 
@@ -174,7 +174,7 @@ impl Partition {
     pub fn get_box(
         &mut self, world: &mut World, ix: i64, iy: i64, iz: i64, level: i32,
     ) -> Option<Entity> {
-        let (i, key) = self.key(ix, iy, iz, level)?;
+        let (i, key) = self.mKey(ix, iy, iz, level)?;
         if let Some(entity) = self.levels[i].get(&key).copied() {
             return Some(entity);
         }
@@ -191,16 +191,16 @@ impl Partition {
             key.iz as f64 * width - center_offset,
         );
         let entity = world.spawn(PartitionBox {
-            key,
-            level: i,
+            mKey: key,
+            mLevel: i,
             lo,
             hi: lo + DVec3::splat(width),
-            parent,
-            children: BTreeMap::new(),
+            mParent: parent,
+            mChildren: BTreeMap::new(),
             balls: BTreeMap::new(),
-            statics: BTreeMap::new(),
-            bubble: -1,
-            handled: false,
+            mStaticCollidables: BTreeMap::new(),
+            mBubble: -1,
+            mHandled: false,
             mObject: None,
         }).id();
         self.levels[i].insert(key, entity);
@@ -216,18 +216,18 @@ impl Partition {
     /// arbitrary reparenting would corrupt the Partition hierarchy.
     pub fn add_child(world: &mut World, parent: Entity, child: Entity) -> bool {
         let (child_key, child_level, child_parent) = match world.get::<PartitionBox>(child) {
-            Some(b) => (b.key, b.level, b.parent),
+            Some(b) => (b.mKey, b.mLevel, b.mParent),
             None => return false,
         };
         let Some(p) = world.get::<PartitionBox>(parent) else { return false };
         if child_parent != Some(parent)
-            || child_level != p.level + 1
+            || child_level != p.mLevel + 1
             || (child_key.ix >> 2, child_key.iy >> 2, child_key.iz >> 2)
-                != (p.key.ix, p.key.iy, p.key.iz)
+                != (p.mKey.ix, p.mKey.iy, p.mKey.iz)
         {
             return false;
         }
-        if world.get::<PartitionBox>(parent).unwrap().children.contains_key(&child_key) {
+        if world.get::<PartitionBox>(parent).unwrap().mChildren.contains_key(&child_key) {
             false
         } else {
             PartitionBox::AddChildren(world, parent, Some(child));
@@ -287,7 +287,7 @@ impl Partition {
     #[must_use]
     pub fn topmost(world: &World, box_entity: Option<Entity>) -> Option<Entity> {
         let mut entity = box_entity?;
-        while let Some(parent) = world.get::<PartitionBox>(entity)?.parent {
+        while let Some(parent) = world.get::<PartitionBox>(entity)?.mParent {
             entity = parent;
         }
         Some(entity)
@@ -298,17 +298,17 @@ impl Partition {
         &self, world: &World, box_entity: Option<Entity>, offset: (i64,i64,i64),
     ) -> Option<Entity> {
         let b = world.get::<PartitionBox>(box_entity?)?;
-        let x = b.key.ix.checked_add(offset.0)?;
-        let y = b.key.iy.checked_add(offset.1)?;
-        let z = b.key.iz.checked_add(offset.2)?;
-        self.check_box(x,y,z,b.level as i32)
+        let x = b.mKey.ix.checked_add(offset.0)?;
+        let y = b.mKey.iy.checked_add(offset.1)?;
+        let z = b.mKey.iz.checked_add(offset.2)?;
+        self.check_box(x,y,z,b.mLevel as i32)
     }
 
     pub fn get_offset_box(
         &mut self, world: &mut World, box_entity: Option<Entity>, offset: (i64,i64,i64),
     ) -> Option<Entity> {
         let b = world.get::<PartitionBox>(box_entity?)?;
-        let (k,l) = (b.key,b.level);
+        let (k,l) = (b.mKey,b.mLevel);
         self.get_box(
             world,
             k.ix.checked_add(offset.0)?,
@@ -321,7 +321,7 @@ impl Partition {
     pub fn clear_traversal_flag(&self, world: &mut World) {
         for entity in self.levels[0].values().copied() {
             if let Some(mut b) = world.get_mut::<PartitionBox>(entity) {
-                b.bubble = -1;
+                b.mBubble = -1;
             }
         }
     }
@@ -360,7 +360,7 @@ impl Partition {
                 if let Some(b) = world.get::<PartitionBox>(*entity) {
                     result.push(format!(
                         "Level {level}: {} balls and {} children in Box [{},{},{}]",
-                        b.balls.len(), b.children.len(), key.ix,key.iy,key.iz,
+                        b.balls.len(), b.mChildren.len(), key.ix,key.iy,key.iz,
                     ));
                 }
             }
@@ -372,7 +372,7 @@ impl Partition {
     /// A separate future Ball port owns physics and any cached active-box flags.
     pub fn insert_ball(&self, world: &mut World, box_entity: Entity, ball: Entity) -> bool {
         let Some(b) = world.get::<PartitionBox>(box_entity) else {return false};
-        let key = b.key;
+        let key = b.mKey;
         let Some(p) = world.get::<Partitionable>(ball) else {return false};
         let Some(meta) = world.get::<PartitionBall>(ball) else {return false};
         let order = ball_order(p.id, meta.owner_id);
@@ -392,13 +392,13 @@ impl Partition {
     /// Add a static collider reference with the C++ (parent ID, local ID) order.
     pub fn insert_static(&self, world: &mut World, box_entity: Entity, object: Entity) -> bool {
         let Some(b) = world.get::<PartitionBox>(box_entity) else {return false};
-        let key=b.key;
+        let key=b.mKey;
         let Some(p)=world.get::<Partitionable>(object) else{return false};
         let Some(meta)=world.get::<PartitionStatic>(object) else{return false};
         let order=(meta.parent_ball_id,p.id);
         let inserted={
             use std::collections::btree_map::Entry;
-            match world.get_mut::<PartitionBox>(box_entity).unwrap().statics.entry(order) {
+            match world.get_mut::<PartitionBox>(box_entity).unwrap().mStaticCollidables.entry(order) {
                 Entry::Vacant(slot) => { slot.insert(object); true }
                 Entry::Occupied(_) => false,
             }
@@ -414,15 +414,15 @@ impl Partition {
     pub fn remove_ball(&mut self, world: &mut World, box_entity: Entity, ball: Entity) {
         if let Some(mut b)=world.get_mut::<PartitionBox>(box_entity) {
             b.balls.retain(|_,e| *e != ball);
-            let key=b.key;
+            let key=b.mKey;
             if let Some(mut p)=world.get_mut::<Partitionable>(ball) {p.untrack_box(&key);}
         }
         self.prune_empty(world,box_entity);
     }
     pub fn remove_static(&mut self, world: &mut World, box_entity: Entity, object: Entity) {
         if let Some(mut b)=world.get_mut::<PartitionBox>(box_entity) {
-            b.statics.retain(|_,e| *e != object);
-            let key=b.key;
+            b.mStaticCollidables.retain(|_,e| *e != object);
+            let key=b.mKey;
             if let Some(mut p)=world.get_mut::<Partitionable>(object) {p.untrack_box(&key);}
         }
         self.prune_empty(world,box_entity);
@@ -434,7 +434,7 @@ impl Partition {
     /// matching Box::RemoveChildren / RemoveBall / RemoveStaticCollidable.
     pub fn release_box(&mut self, world: &mut World, entity: Entity) -> bool {
         let Some(b) = world.get::<PartitionBox>(entity) else { return false };
-        if !b.is_empty() || self.levels.get(b.level).and_then(|m| m.get(&b.key)) != Some(&entity) {
+        if !b.is_empty() || self.levels.get(b.mLevel).and_then(|m| m.get(&b.mKey)) != Some(&entity) {
             return false;
         }
         self.prune_empty(world, entity);
@@ -445,13 +445,13 @@ impl Partition {
         loop {
             let Some(b)=world.get::<PartitionBox>(entity) else {break};
             if !b.is_empty() {break;}
-            let (key,level,parent)=(b.key,b.level,b.parent);
+            let (key,level,parent)=(b.mKey,b.mLevel,b.mParent);
             self.levels[level].remove(&key);
             let _ = world.despawn(entity);
             let Some(p)=parent else {break};
             if let Some(mut parent_box)=world.get_mut::<PartitionBox>(p) {
-                if parent_box.children.get(&key) == Some(&entity) {
-                    parent_box.children.remove(&key);
+                if parent_box.mChildren.get(&key) == Some(&entity) {
+                    parent_box.mChildren.remove(&key);
                 }
             }
             entity=p;
@@ -461,7 +461,7 @@ impl Partition {
     /// Matches the C++ child-first recursion (without recursive stack growth).
     fn explode_children(&self, world: &World, current: Entity, out: &mut Vec<Entity>) {
         let Some(b)=world.get::<PartitionBox>(current) else {return};
-        for child in b.children.values() {
+        for child in b.mChildren.values() {
             self.explode_children(world,*child,out);
         }
         if b.contains_collidables() {out.push(current);}
@@ -485,23 +485,23 @@ impl Partition {
         let mut seen_boxes=BTreeSet::new();
         for (_,starting) in source_p.boxes() {
             if world.get::<PartitionBox>(starting).is_none() {continue;}
-            let mut ancestor=world.get::<PartitionBox>(starting).and_then(|b| b.parent);
+            let mut ancestor=world.get::<PartitionBox>(starting).and_then(|b| b.mParent);
             while let Some(parent)=ancestor {
                 let Some(b)=world.get::<PartitionBox>(parent) else {break};
                 if b.contains_collidables() && seen_boxes.insert(parent) {
                     todo.push(parent);
                 }
-                ancestor=b.parent;
+                ancestor=b.mParent;
             }
             let Some(b)=world.get::<PartitionBox>(starting) else {continue};
-            for child in b.children.values().copied() {
+            for child in b.mChildren.values().copied() {
                 let mut exploded=Vec::new();
                 self.explode_children(world,child,&mut exploded);
                 for entity in exploded {
                     if seen_boxes.insert(entity) {todo.push(entity);}
                 }
             }
-            if (b.balls.len()>1 || !b.statics.is_empty()) && seen_boxes.insert(starting) {
+            if (b.balls.len()>1 || !b.mStaticCollidables.is_empty()) && seen_boxes.insert(starting) {
                 todo.push(starting);
             }
         }
@@ -533,7 +533,7 @@ impl Partition {
                 result.balls.push(other);
             }
             if !filter.exclude_fixed_balls {
-                for other in b.statics.values().copied() {
+                for other in b.mStaticCollidables.values().copied() {
                     if !seen_statics.insert(other) {continue;}
                     let Some(p)=world.get::<Partitionable>(other) else {continue};
                     if is_master && p.new_bubble != source_p.new_bubble {continue;}

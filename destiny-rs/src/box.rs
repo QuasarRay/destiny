@@ -16,26 +16,26 @@ type BallSortKey = (u8, i64, i64);
 #[derive(Component, Debug)]
 #[allow(non_snake_case)] // Original C++ Box::mObject identity
 pub struct Box {
-    pub key: BoxKey,
-    pub level: usize,
+    pub mKey: BoxKey,
+    pub mLevel: usize,
     pub lo: DVec3,
     pub hi: DVec3,
-    pub parent: Option<Entity>,
-    pub children: BTreeMap<BoxKey, Entity>,
+    pub mParent: Option<Entity>,
+    pub mChildren: BTreeMap<BoxKey, Entity>,
     pub balls: BTreeMap<BallSortKey, Entity>,
-    pub statics: BTreeMap<(i64, i64), Entity>,
-    pub bubble: i32,
-    pub handled: bool,
+    pub mStaticCollidables: BTreeMap<(i64, i64), Entity>,
+    pub mBubble: i32,
+    pub mHandled: bool,
     /// Owns the C++ Box::mObject Python reference within the Box itself.
     pub mObject: Option<Py<PyAny>>,
 }
 impl Box {
     #[must_use]
     pub fn is_empty(&self) -> bool {
-        self.children.is_empty() && self.balls.is_empty() && self.statics.is_empty()
+        self.mChildren.is_empty() && self.balls.is_empty() && self.mStaticCollidables.is_empty()
     }
     pub(crate) fn contains_collidables(&self) -> bool {
-        !self.balls.is_empty() || !self.statics.is_empty()
+        !self.balls.is_empty() || !self.mStaticCollidables.is_empty()
     }
 }
 
@@ -71,9 +71,9 @@ impl Box {
     #[allow(non_snake_case)]
     pub fn AddChildren(world: &mut World, box_entity: Entity, child: Option<Entity>) {
         let Some(child) = child else { return };
-        let Some(key) = world.get::<Self>(child).map(|b| b.key) else { return };
+        let Some(key) = world.get::<Self>(child).map(|b| b.mKey) else { return };
         if let Some(mut b) = world.get_mut::<Self>(box_entity) {
-            b.children.entry(key).or_insert(child);
+            b.mChildren.entry(key).or_insert(child);
         }
     }
 
@@ -95,9 +95,9 @@ impl Box {
         let mut todo = vec![start];
         while let Some(entity) = todo.pop() {
             let Some(b) = world.get::<Self>(entity) else { continue };
-            if b.bubble != -1 { continue; }
-            let (key, level) = (b.key, b.level as i32);
-            world.get_mut::<Self>(entity).unwrap().bubble = seed;
+            if b.mBubble != -1 { continue; }
+            let (key, level) = (b.mKey, b.mLevel as i32);
+            world.get_mut::<Self>(entity).unwrap().mBubble = seed;
             for dx in -1..=1 {
                 for dy in -1..=1 {
                     for dz in -1..=1 {
@@ -137,8 +137,8 @@ impl Box {
                         partition.check_offset_box(world, Some(entity), (x, y, z))
                     {
                         if let Some(other) = world.get::<Self>(neighbor) {
-                            if other.bubble != -1 {
-                                return Some(other.bubble);
+                            if other.mBubble != -1 {
+                                return Some(other.mBubble);
                             }
                         }
                     }
@@ -151,7 +151,7 @@ impl Box {
     /// C++ Box::operator== compares the keys, not object identity.
     #[must_use]
     pub fn same_key(&self, other: &Self) -> bool {
-        self.key == other.key
+        self.mKey == other.mKey
     }
 }
 

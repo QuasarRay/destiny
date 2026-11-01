@@ -47,17 +47,17 @@ fn creates_coarser_ancestors_and_reuses_clamped_keys() {
     let two=get_or_create_box(app.world_mut(),9,13,17,7).unwrap();
     assert_eq!(one,two);
     let node=app.world().get::<PartitionBox>(one).unwrap();
-    assert_eq!((node.key.ix,node.key.iy,node.key.iz),(9,13,17));
+    assert_eq!((node.mKey.ix,node.mKey.iy,node.mKey.iz),(9,13,17));
     assert_eq!(node.hi-node.lo,DVec3::splat(480.0));
     assert_eq!(Partition::topmost(app.world(),Some(one))
         .and_then(|e|app.world().get::<PartitionBox>(e))
-        .map(|b|b.level),Some(0));
+        .map(|b|b.mLevel),Some(0));
     assert_eq!(app.world().resource::<Partition>().size(),8);
     let grid=app.world().resource::<Partition>().level_grid[7];
     let boundary=get_or_create_box(app.world_mut(),-500,grid+7,17,7).unwrap();
     let b=app.world().get::<PartitionBox>(boundary).unwrap();
-    assert_eq!(b.key.ix,0);
-    assert_eq!(b.key.iy,grid-1);
+    assert_eq!(b.mKey.ix,0);
+    assert_eq!(b.mKey.iy,grid-1);
 }
 
 #[test]
@@ -89,12 +89,12 @@ fn active_boxes_and_traversal_bubbles() {
     let b=get_or_create_box(app.world_mut(),11,10,10,7).unwrap();
     assert_eq!(app.world().resource::<Partition>().nearby_bubbles(app.world(),a),None);
     app.world_mut().resource_scope(|world,part:Mut<'_,Partition>|part.traverse(world,a,55));
-    assert_eq!(app.world().get::<PartitionBox>(b).unwrap().bubble,55);
+    assert_eq!(app.world().get::<PartitionBox>(b).unwrap().mBubble,55);
     let act=app.world().resource::<Partition>().active_boxes(app.world(),7).unwrap();
     assert_eq!(act.1.len(),2);
     app.world_mut().resource_scope(|world,part:Mut<'_,Partition>|part.clear_traversal_flag(world));
     let top=Partition::topmost(app.world(),Some(a)).unwrap();
-    assert_eq!(app.world().get::<PartitionBox>(top).unwrap().bubble,-1);
+    assert_eq!(app.world().get::<PartitionBox>(top).unwrap().mBubble,-1);
 }
 
 #[test]

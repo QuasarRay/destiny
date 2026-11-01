@@ -14,7 +14,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "C++ Box owns mObject, SetObject, AddChildren, Traverse, NearbyBubbles in Rust; remaining methods and semantic equivalence are incomplete."
+      "notes": "Canonical Box now directly owns C++-named mKey, mLevel, mParent, mChildren, mStaticCollidables, mBubble, mHandled, mObject, lo, hi and balls; SetObject, AddChildren, Traverse and NearbyBubbles are Box-owned; other methods and proof remain pending."
     },
     {
       "cpp_type": "Partitionable",
