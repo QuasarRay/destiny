@@ -1,11 +1,12 @@
 //! Native Bevy Destiny port. Blue supplies reusable Python/CGP infrastructure.
-pub mod box;
+#[path = "box.rs"]
+pub mod spatial_box;
 pub mod partition;
 pub mod partitionable;
 pub mod quaternion;
 pub mod settings;
 
-pub use box::{BoxObject, PartitionBox};
+pub use spatial_box::{BoxObject, PartitionBox};
 pub use partition::{
     BallMode, NearbyCandidates, NearbyCriteria, Partition, PartitionBall, PartitionPlugin,
     PartitionStatic, get_or_create_box, py_get_box_center, register_partition_python,
