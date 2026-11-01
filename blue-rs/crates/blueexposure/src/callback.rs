@@ -1,3 +1,4 @@
+use bevy::ecs::reflect::ReflectComponent;
 use pyo3::{prelude::*, types::PyAny};
 
 use crate::{blue_methods, blue_pyclass};

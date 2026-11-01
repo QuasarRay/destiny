@@ -1,3 +1,4 @@
+use bevy::ecs::reflect::ReflectResource;
 // Copyright © 2023 CCP ehf. (original C++ implementation)
 // Rust port for Carbon Engine, against Bevy 0.20.1 and Blue-rs CGP.
 

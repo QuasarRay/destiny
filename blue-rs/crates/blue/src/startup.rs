@@ -1,3 +1,4 @@
+use bevy::ecs::reflect::ReflectResource;
 use blueexposure::{blue_methods, blue_pyclass};
 use delegate::delegate;
 

@@ -1,0 +1,27 @@
+name: Blue-rs Rust checks
+on:
+  push:
+    branches: [destiny-rs-dev-2]
+    paths:
+      - 'blue-rs/**'
+      - '.github/workflows/blue-rs.yml'
+  pull_request:
+    paths:
+      - 'blue-rs/**'
+      - '.github/workflows/blue-rs.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blue-rs
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.98.1
+      - name: Check all workspace targets
+        run: cargo check --workspace --all-targets
+      - name: Test workspace
+        run: cargo test --workspace

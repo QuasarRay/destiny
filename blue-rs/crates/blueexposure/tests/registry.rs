@@ -1,3 +1,4 @@
+use bevy::ecs::reflect::ReflectComponent;
 use bevy::prelude::*;
 use blueexposure::prelude::*;
 

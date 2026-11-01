@@ -1,3 +1,4 @@
+use bevy::ecs::reflect::ReflectResource;
 use std::collections::BTreeMap;
 
 use bevy::prelude::{Reflect, Resource};

@@ -8,7 +8,7 @@ pub trait BlueMetadataShape {
     fn rust_field_names() -> &'static [&'static str];
 }
 
-/// Generate metadata schemas from Rust fields, without a second list.
+// Generate metadata schemas from Rust fields, without a second list.
 define_derive_deftly! {
     BlueMetadataShape:
     impl crate::metadata::BlueMetadataShape for $ttype {

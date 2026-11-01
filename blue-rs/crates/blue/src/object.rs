@@ -1,3 +1,4 @@
+use bevy::ecs::reflect::ReflectComponent;
 use blueexposure::{blue_methods, blue_pyclass};
 
 #[blue_pyclass(module = "blue", name = "BlueObjectMetadata", kind = "component")]

@@ -88,7 +88,7 @@ fn render_tests(tests: &[LegacyTest]) -> Result<String, genco::fmt::Error> {
             None => quote! { None },
         };
         quote_in! { body =>
-            registry.register_legacy_test($&register {
+            registry.register_legacy_test($(register.clone()) {
                 source: $(quoted(source)).to_owned(),
                 legacy_name: $(quoted(legacy)).to_owned(),
                 rust_test: $rust_test,
@@ -211,4 +211,25 @@ fn sanitize_ident(value: &str) -> String {
         out.insert(0, '_');
     }
     out
+}
+
+#[cfg(test)]
+mod regression_tests {
+    use super::*;
+
+    #[test]
+    fn legacy_import_is_reused_for_multiple_generated_registrations() {
+        let tests = ["First", "Second"].into_iter().map(|name| LegacyTest {
+            source: "legacy.cpp".to_owned(),
+            legacy_name: name.to_owned(),
+            line: None,
+            discovery: "regression".to_owned(),
+            rust_test: None,
+        }).collect::<Vec<_>>();
+        let generated = render_tests(&tests).expect("Genco should render multiple imports");
+        assert!(generated.contains("BlueLegacyTestInfo"));
+        assert!(generated.contains("First"));
+        assert!(generated.contains("Second"));
+        assert!(!generated.contains("$&register"));
+    }
 }
