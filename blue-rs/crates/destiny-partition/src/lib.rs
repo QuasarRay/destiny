@@ -12,7 +12,6 @@ use pyo3::{exceptions::PyTypeError, prelude::*};
 
 const LEVEL_COUNT: usize = 8;
 const GRID_UNIT: f64 = 480.0;
-type BallSortKey = (u8, i64, i64);
 
 /// Box membership metadata only: eventually supplied by the Rust Ball port.
 /// The remaining common state lives in the existing Partitionable component.
@@ -63,31 +62,8 @@ pub struct PartitionStatic {
     pub parent_ball_id: i64,
 }
 
-/// Mirrors Box.h: an ECS entity owns each spatial node; Partition indexes them.
-/// Box member collections order ball and collidable identities by the original
-/// C++ comparators, rather than by Bevy's Entity IDs.
-#[derive(Component, Debug, Clone)]
-pub struct PartitionBox {
-    pub key: BoxKey,
-    pub level: usize,
-    pub lo: DVec3,
-    pub hi: DVec3,
-    pub parent: Option<Entity>,
-    pub children: BTreeMap<BoxKey, Entity>,
-    pub balls: BTreeMap<BallSortKey, Entity>,
-    pub statics: BTreeMap<(i64, i64), Entity>,
-    pub bubble: i32,
-    pub handled: bool,
-}
-impl PartitionBox {
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.children.is_empty() && self.balls.is_empty() && self.statics.is_empty()
-    }
-    fn contains_collidables(&self) -> bool {
-        !self.balls.is_empty() || !self.statics.is_empty()
-    }
-}
+mod box;
+pub use box::{BoxObject, PartitionBox};
 
 /// Bevy World-local equivalent of Partition's level maps and grid geometry.
 #[derive(Resource, Debug)]
@@ -182,11 +158,33 @@ impl Partition {
         }).id();
         self.levels[i].insert(key, entity);
         if let Some(parent) = parent {
-            if let Some(mut parent_box) = world.get_mut::<PartitionBox>(parent) {
-                parent_box.children.insert(key, entity);
-            }
+            debug_assert!(Self::add_child(world, parent, entity), "new Box must attach to parent");
         }
         Some(entity)
+    }
+
+    /// Box::AddChildren. No pointer-order sorting or silent key replacement.
+    ///
+    /// Only accepts the real parent of a directly subordinate spatial cell;
+    /// arbitrary reparenting would corrupt the Partition hierarchy.
+    pub fn add_child(world: &mut World, parent: Entity, child: Entity) -> bool {
+        let (child_key, child_level, child_parent) = match world.get::<PartitionBox>(child) {
+            Some(b) => (b.key, b.level, b.parent),
+            None => return false,
+        };
+        let Some(p) = world.get::<PartitionBox>(parent) else { return false };
+        if child_parent != Some(parent)
+            || child_level != p.level + 1
+            || (child_key.ix >> 2, child_key.iy >> 2, child_key.iz >> 2)
+                != (p.key.ix, p.key.iy, p.key.iz)
+        {
+            return false;
+        }
+        use std::collections::btree_map::Entry;
+        match world.get_mut::<PartitionBox>(parent).unwrap().children.entry(child_key) {
+            Entry::Vacant(slot) => { slot.insert(child); true }
+            Entry::Occupied(_) => false,
+        }
     }
 
     #[must_use]
@@ -360,8 +358,13 @@ impl Partition {
         let Some(p) = world.get::<Partitionable>(ball) else {return false};
         let Some(meta) = world.get::<PartitionBall>(ball) else {return false};
         let order = ball_order(p.id, meta.owner_id);
-        let inserted = world.get_mut::<PartitionBox>(box_entity).unwrap()
-            .balls.insert(order,ball).is_none();
+        let inserted = {
+            use std::collections::btree_map::Entry;
+            match world.get_mut::<PartitionBox>(box_entity).unwrap().balls.entry(order) {
+                Entry::Vacant(slot) => { slot.insert(ball); true }
+                Entry::Occupied(_) => false,
+            }
+        };
         if inserted {
             world.get_mut::<Partitionable>(ball).unwrap().track_box(key, box_entity);
         }
@@ -375,8 +378,13 @@ impl Partition {
         let Some(p)=world.get::<Partitionable>(object) else{return false};
         let Some(meta)=world.get::<PartitionStatic>(object) else{return false};
         let order=(meta.parent_ball_id,p.id);
-        let inserted=world.get_mut::<PartitionBox>(box_entity).unwrap()
-            .statics.insert(order,object).is_none();
+        let inserted={
+            use std::collections::btree_map::Entry;
+            match world.get_mut::<PartitionBox>(box_entity).unwrap().statics.entry(order) {
+                Entry::Vacant(slot) => { slot.insert(object); true }
+                Entry::Occupied(_) => false,
+            }
+        };
         if inserted {
             world.get_mut::<Partitionable>(object).unwrap().track_box(key,box_entity);
         }
@@ -401,6 +409,20 @@ impl Partition {
         }
         self.prune_empty(world,box_entity);
     }
+    /// C++ Box::ReleaseBox / destructor. A nonempty Box cannot be released:
+    /// doing so would leave dangling child, Ball, and StaticCollidable links.
+    ///
+    /// Removing the final child/member recursively prunes empty ancestors,
+    /// matching Box::RemoveChildren / RemoveBall / RemoveStaticCollidable.
+    pub fn release_box(&mut self, world: &mut World, entity: Entity) -> bool {
+        let Some(b) = world.get::<PartitionBox>(entity) else { return false };
+        if !b.is_empty() || self.levels.get(b.level).and_then(|m| m.get(&b.key)) != Some(&entity) {
+            return false;
+        }
+        self.prune_empty(world, entity);
+        true
+    }
+
     fn prune_empty(&mut self, world: &mut World, mut entity: Entity) {
         loop {
             let Some(b)=world.get::<PartitionBox>(entity) else {break};
@@ -410,7 +432,9 @@ impl Partition {
             let _ = world.despawn(entity);
             let Some(p)=parent else {break};
             if let Some(mut parent_box)=world.get_mut::<PartitionBox>(p) {
-                parent_box.children.remove(&key);
+                if parent_box.children.get(&key) == Some(&entity) {
+                    parent_box.children.remove(&key);
+                }
             }
             entity=p;
         }

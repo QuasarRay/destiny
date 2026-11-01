@@ -20,3 +20,11 @@ cargo check --workspace --all-targets
 cargo test -p destiny-partition
 cargo test --workspace
 ```
+
+## Box.cpp / Box.h Bevy implementation
+
+The C++ `Box` uses the existing `PartitionBox` Bevy component (not a second box implementation). `box.rs` now owns the component definition, C++ key equality, and `Box::SetObject` semantics. `BoxObject(Py<PyAny>)` is an optional ECS component; Python reference ownership is handled by PyO3 and dropping the Bevy entity releases it, rather than manually calling `Py_INCREF`/`Py_DECREF`.
+
+The existing partition API constructs Box parents, calculates their `DVec3` bounds, traverses 26 neighbors and reads adjacent bubbles. `Partition::add_child` checks parent/key correctness. `Partition::release_box` models the destructor plus `ReleaseBox` by removing only empty boxes from the spatial index and recursively pruning empty ancestors; no custom memory allocator is needed. `insert_ball` and `insert_static` now reject duplicate C++ comparator keys rather than silently replacing existing entities. `remove_ball` and `remove_static` continue to maintain reciprocal `Partitionable` links.
+
+The full physics behavior for `Ball`, `StaticCollidable`, and `Ballpark` remains a separate port. Spatial-index lifecycle is tested in `tests/box.rs`.
