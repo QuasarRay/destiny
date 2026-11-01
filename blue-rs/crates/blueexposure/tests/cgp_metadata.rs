@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use blueexposure::{
     BlueClassInfo, BlueClassKind, BlueFieldInfo, BlueMetadataShape,
+    BlueMetadataWriter, BlueMetadataWriterComponent,
     BlueRegistration, BlueRegistry, CanWriteBlueMetadata,
 };
 use cgp::prelude::*;
