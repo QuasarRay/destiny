@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use bevy::{math::DVec3, prelude::{Component, Entity, World}};
-use destiny_partitionable::BoxKey;
+use crate::partitionable::BoxKey;
 use pyo3::{prelude::*, types::PyAny};
 
 type BallSortKey = (u8, i64, i64);

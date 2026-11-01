@@ -1,3 +1,5 @@
+use bevy::ecs::reflect::ReflectResource;
+use bevy::ecs::change_detection::DetectChanges;
 use std::sync::{Arc, Mutex};
 
 use bevy::prelude::{App, First, Last, Plugin, Res, ResMut, World};

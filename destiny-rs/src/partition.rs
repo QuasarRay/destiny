@@ -7,7 +7,7 @@ use bevy::{
     prelude::{App, Component, Entity, Plugin, Resource, World},
 };
 use blueexposure::{blue_function, BlueAppExt, BlueModule};
-use destiny_partitionable::{BoxKey, Partitionable};
+use crate::partitionable::{BoxKey, Partitionable};
 use pyo3::{exceptions::PyTypeError, prelude::*};
 
 const LEVEL_COUNT: usize = 8;
@@ -63,9 +63,7 @@ pub struct PartitionStatic {
     pub parent_ball_id: i64,
 }
 
-#[path = "box.rs"]
-mod spatial_box;
-pub use spatial_box::{BoxObject, PartitionBox};
+pub use crate::box::{BoxObject, PartitionBox};
 
 /// Bevy World-local equivalent of Partition's level maps and grid geometry.
 #[derive(Resource, Debug)]
