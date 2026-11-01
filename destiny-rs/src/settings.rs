@@ -12,6 +12,7 @@ use std::sync::{
     atomic::{AtomicBool, AtomicUsize, Ordering},
 };
 
+use bevy::ecs::reflect::ReflectResource;
 use bevy::prelude::{App, First, Plugin, ResMut, World};
 use blueexposure::{blue_methods, blue_pyclass, BlueAppExt, BlueModule};
 use pyo3::{
