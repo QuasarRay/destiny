@@ -1,3 +1,4 @@
+use pyo3::types::PyAnyMethods;
 use bevy::prelude::*;
 use blueexposure::{BlueClass, BlueRegistry};
 use destiny_settings::{
