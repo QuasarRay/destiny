@@ -69,7 +69,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Partition now uses canonical mLevels, mLevelWidth, mLevelGrid, mNumberOfLevels, mGridUnit fields, and original-named public geometry/index methods; mBoxAllocator and many internal/physics methods remain missing; C++ overload GetBox(radius,position,bool) has Rust GetBoxByRadius due language restriction."
+      "notes": "Partition fields mLevels, mLevelWidth, mLevelGrid, mNumberOfLevels and mGridUnit restored, original-named index/geometry methods added, NearbyCriteria flags and case constructor restored. BoxAllocator, other internal and physics methods remain incomplete; C++ overloaded GetBox(radius) uses Rust GetBoxByRadius."
     },
     {
       "cpp_type": "SettingsConfiguration",

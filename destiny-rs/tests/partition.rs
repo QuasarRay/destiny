@@ -190,3 +190,22 @@ fn original_partition_field_names_and_methods_match_constructor() {
     assert_eq!(app.world().resource::<Partition>().GetTopmost(app.world(), Some(entity)),
         Partition::topmost(app.world(), Some(entity)));
 }
+
+
+#[test]
+fn nearby_criteria_keeps_original_bitfield_names_and_switch_cases() {
+    let defaults = NearbyCriteria::new(0);
+    assert_eq!(defaults, NearbyCriteria::default());
+    assert_eq!(NearbyCriteria::new(2), NearbyCriteria::default());
+    assert_eq!(NearbyCriteria::new(-10), NearbyCriteria::default());
+    let one = NearbyCriteria::new(1);
+    assert_eq!(one, NearbyCriteria::CASE_1);
+    assert!(one.EXCLUDE_CLOAKED);
+    assert!(one.EXCLUDE_MISSILES);
+    assert!(!one.EXCLUDE_FIXED_BALLS);
+    let three = NearbyCriteria::new(3);
+    assert_eq!(three, NearbyCriteria::CASE_3);
+    assert!(three.EXCLUDE_CLOAKED);
+    assert!(!three.EXCLUDE_MISSILES);
+    assert!(!three.EXCLUDE_HARMONICS_TEST);
+}

@@ -533,7 +533,7 @@ impl Partition {
             world.get::<Partitionable>(source),
             world.get::<PartitionBall>(source),
         ) else {return result};
-        if filter.exclude_inert_balls && interactive_count==0 {return result;}
+        if filter.EXCLUDE_INERT_BALLS && interactive_count==0 {return result;}
         let mut todo=Vec::new();
         let mut seen_boxes=BTreeSet::new();
         for (_,starting) in source_p.boxes() {
@@ -569,23 +569,23 @@ impl Partition {
                     world.get::<PartitionBall>(other),
                 ) else {continue};
                 if p.isMoribund {continue;}
-                if filter.exclude_cloaked && (info.cloaked || !info.massive) {continue;}
-                if filter.exclude_inert_balls {
+                if filter.EXCLUDE_CLOAKED && (info.cloaked || !info.massive) {continue;}
+                if filter.EXCLUDE_INERT_BALLS {
                     if !p.isInteractive {continue;}
                 } else {
                     if is_master && p.mNewBubble != source_p.mNewBubble && !info.global {continue;}
-                    if filter.exclude_fixed_balls && !info.free {continue;}
-                    if info.mode == BallMode::Field && !filter.exclude_harmonics_test {
+                    if filter.EXCLUDE_FIXED_BALLS && !info.free {continue;}
+                    if info.mode == BallMode::Field && !filter.EXCLUDE_HARMONICS_TEST {
                         if source_b.harmonic == -2 {continue;}
                         if info.harmonic != -1 && info.harmonic == source_b.harmonic {continue;}
                         if info.corporation_id != -1 && info.corporation_id == source_b.corporation_id {continue;}
                         if info.alliance_id != -1 && info.alliance_id == source_b.alliance_id {continue;}
                     }
-                    if filter.exclude_missiles && info.mode == BallMode::Missile {continue;}
+                    if filter.EXCLUDE_MISSILES && info.mode == BallMode::Missile {continue;}
                 }
                 result.balls.push(other);
             }
-            if !filter.exclude_fixed_balls {
+            if !filter.EXCLUDE_FIXED_BALLS {
                 for other in b.mStaticCollidables.values().copied() {
                     if !seen_statics.insert(other) {continue;}
                     let Some(p)=world.get::<Partitionable>(other) else {continue};
@@ -605,9 +605,9 @@ impl Partition {
             world.get::<Partitionable>(source),world.get::<PartitionBall>(source)
         ) else {return NearbyCandidates::default()};
         let filter=NearbyCriteria {
-            exclude_harmonics_test:true,
-            exclude_fixed_balls:!b.cloaked,
-            exclude_inert_balls:b.proximity_only_interactives,
+            EXCLUDE_HARMONICS_TEST:true,
+            EXCLUDE_FIXED_BALLS:!b.cloaked,
+            EXCLUDE_INERT_BALLS:b.proximity_only_interactives,
             ..Default::default()
         };
         let _=p;
@@ -640,21 +640,33 @@ impl Partition {
 /// Same flag meanings and preconfigured cases as C++ NearbyCriteria.
 /// Important: C++ collisionCase3 excludes cloaked/nonmassive, NOT missiles.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[allow(non_snake_case)] // Preserve C++ NearbyCriteria bitfield names
 pub struct NearbyCriteria {
-    pub exclude_fixed_balls: bool,
-    pub exclude_inert_balls: bool,
-    pub exclude_missiles: bool,
-    pub exclude_cloaked: bool,
-    pub exclude_harmonics_test: bool,
+    pub EXCLUDE_FIXED_BALLS: bool,
+    pub EXCLUDE_INERT_BALLS: bool,
+    pub EXCLUDE_MISSILES: bool,
+    pub EXCLUDE_CLOAKED: bool,
+    pub EXCLUDE_HARMONICS_TEST: bool,
 }
 impl NearbyCriteria {
+    /// Original C++ NearbyCriteria(int casenum=0) case selection.
+    /// Invalid or unrecognized case numbers leave all five flags false.
+    #[must_use]
+    pub fn new(casenum: i32) -> Self {
+        match casenum {
+            1 => Self::CASE_1,
+            3 => Self::CASE_3,
+            _ => Self::default(),
+        }
+    }
+
     pub const CASE_1: Self=Self {
-        exclude_missiles:true,exclude_cloaked:true,
-        exclude_fixed_balls:false,exclude_inert_balls:false,exclude_harmonics_test:false,
+        EXCLUDE_MISSILES:true,EXCLUDE_CLOAKED:true,
+        EXCLUDE_FIXED_BALLS:false,EXCLUDE_INERT_BALLS:false,EXCLUDE_HARMONICS_TEST:false,
     };
     pub const CASE_3: Self=Self {
-        exclude_cloaked:true,exclude_missiles:false,
-        exclude_fixed_balls:false,exclude_inert_balls:false,exclude_harmonics_test:false,
+        EXCLUDE_CLOAKED:true,EXCLUDE_MISSILES:false,
+        EXCLUDE_FIXED_BALLS:false,EXCLUDE_INERT_BALLS:false,EXCLUDE_HARMONICS_TEST:false,
     };
 }
 #[derive(Debug, Default, PartialEq, Eq)]
