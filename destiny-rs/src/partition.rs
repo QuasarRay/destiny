@@ -196,11 +196,6 @@ impl Partition {
         if let Some(entity) = self.levels[i].get(&key).copied() {
             return Some(entity);
         }
-        let parent = if i == 0 {
-            None
-        } else {
-            self.get_box(world, key.ix >> 2, key.iy >> 2, key.iz >> 2, level - 1)
-        };
         let width = self.level_width[i];
         let center_offset = 0.5 * width * self.level_grid[i] as f64;
         let lo = DVec3::new(
@@ -213,7 +208,7 @@ impl Partition {
             mLevel: i,
             lo,
             hi: lo + DVec3::splat(width),
-            mParent: parent,
+            mParent: None,
             mChildren: BTreeMap::new(),
             balls: BTreeMap::new(),
             mStaticCollidables: BTreeMap::new(),
@@ -221,10 +216,10 @@ impl Partition {
             mHandled: false,
             mObject: None,
         }).id();
+        // Box constructor calls SetParent BEFORE inserting itself into the
+        // Partition level index, matching original Box.cpp's lifecycle.
+        PartitionBox::SetParent(self, world, entity);
         self.levels[i].insert(key, entity);
-        if let Some(parent) = parent {
-            debug_assert!(Self::add_child(world, parent, entity), "new Box must attach to parent");
-        }
         Some(entity)
     }
 
@@ -442,11 +437,7 @@ impl Partition {
             self.levels[level].remove(&key);
             let _ = world.despawn(entity);
             let Some(p)=parent else {break};
-            if let Some(mut parent_box)=world.get_mut::<PartitionBox>(p) {
-                if parent_box.mChildren.get(&key) == Some(&entity) {
-                    parent_box.mChildren.remove(&key);
-                }
-            }
+            PartitionBox::unlink_child(world, p, entity, key);
             entity=p;
         }
     }

@@ -212,3 +212,23 @@ fn cpp_box_remove_operations_are_box_owned_and_prune_via_partition() {
     assert_eq!(app.world().get::<Partitionable>(ball).unwrap().boxes().count(), 0);
     assert_eq!(app.world().resource::<Partition>().size(), 0);
 }
+
+
+#[test]
+fn canonical_box_setparent_and_removechildren_match_owner_boundaries() {
+    let mut app = app();
+    let child = get_or_create_box(app.world_mut(), 5, 5, 5, 7).unwrap();
+    let parent = app.world().get::<PartitionBox>(child).unwrap().mParent.unwrap();
+    app.world_mut().resource_scope(|world, mut partition: Mut<'_, Partition>| {
+        destiny_rs::Box::SetParent(&mut partition, world, child);
+    });
+    assert_eq!(app.world().get::<PartitionBox>(child).unwrap().mParent, Some(parent));
+    assert_eq!(app.world().get::<PartitionBox>(parent).unwrap().mChildren.len(), 1);
+
+    app.world_mut().resource_scope(|world, mut partition: Mut<'_, Partition>| {
+        destiny_rs::Box::RemoveChildren(&mut partition, world, parent, child);
+    });
+    // The child is still alive, and the parent index was removed only after
+    // its last child was unlinked (this direct call simulates the destructor).
+    assert!(app.world().get::<PartitionBox>(parent).is_none());
+}

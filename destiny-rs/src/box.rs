@@ -77,6 +77,52 @@ impl Box {
         }
     }
 
+    /// Original Box::SetParent: lazily obtain the coarser Box, set mParent,
+    /// and register this Box in its parent's child collection. C++'s
+    /// Partition* is supplied explicitly as the Bevy World resource.
+    #[allow(non_snake_case)]
+    pub fn SetParent(partition: &mut Partition, world: &mut World, child: Entity) {
+        let Some((level, key)) =
+            world.get::<Self>(child).map(|bx| (bx.mLevel, bx.mKey))
+        else { return };
+        if level == 0 { return; }
+        let parent = partition.get_box(
+            world, key.ix >> 2, key.iy >> 2, key.iz >> 2,
+            (level - 1) as i32,
+        );
+        if let Some(parent) = parent {
+            if let Some(mut bx) = world.get_mut::<Self>(child) {
+                bx.mParent = Some(parent);
+            }
+            Self::AddChildren(world, parent, Some(child));
+        }
+    }
+
+    /// Used by Partition::prune_empty when the child has already despawned.
+    /// The original C++ destructor also disconnects its parent.
+    pub(crate) fn unlink_child(
+        world: &mut World, parent: Entity, child: Entity, key: BoxKey,
+    ) -> bool {
+        let Some(mut bx) = world.get_mut::<Self>(parent) else { return false };
+        if bx.mChildren.get(&key) == Some(&child) {
+            bx.mChildren.remove(&key);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Original Box::RemoveChildren: erase a child, then release the parent
+    /// when it no longer holds any collidables or other children.
+    #[allow(non_snake_case)]
+    pub fn RemoveChildren(
+        partition: &mut Partition, world: &mut World, parent: Entity, child: Entity,
+    ) {
+        let Some(key) = world.get::<Self>(child).map(|b| b.mKey) else { return };
+        Self::unlink_child(world, parent, child, key);
+        Self::ReleaseBox(partition, world, parent);
+    }
+
     /// Original Box::AddBall: insert a Ball into the key-ordered Box set.
     /// Its reciprocal Partitionable::mBoxes link is maintained by the Ball
     /// adapter at the Bevy ECS boundary, not by this Box operation.

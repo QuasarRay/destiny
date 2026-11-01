@@ -14,7 +14,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Box now owns canonical AddChildren, AddBall, AddStaticCollidable, RemoveBall, RemoveStaticCollidable, ReleaseBox, SetObject, Traverse and NearbyBubbles entrypoints. Partition provides Bevy boundary adapters and spatial index. All equivalence obligations remain unverified."
+      "notes": "Box now owns original SetParent, AddChildren, RemoveChildren, AddBall, AddStaticCollidable, RemoveBall, RemoveStaticCollidable, ReleaseBox, SetObject, Traverse and NearbyBubbles algorithms or entrypoints. Bevy Partition remains authoritative index; full equivalence not established."
     },
     {
       "cpp_type": "Partitionable",
