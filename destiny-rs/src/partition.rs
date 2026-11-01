@@ -63,7 +63,7 @@ pub struct PartitionStatic {
     pub parent_ball_id: i64,
 }
 
-pub use crate::spatial_box::{BoxObject, PartitionBox};
+pub use crate::spatial_box::PartitionBox;
 
 /// Bevy World-local equivalent of Partition's level maps and grid geometry.
 #[derive(Resource, Debug)]
@@ -155,6 +155,7 @@ impl Partition {
             statics: BTreeMap::new(),
             bubble: -1,
             handled: false,
+            mObject: None,
         }).id();
         self.levels[i].insert(key, entity);
         if let Some(parent) = parent {

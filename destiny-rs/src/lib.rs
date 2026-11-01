@@ -6,7 +6,7 @@ pub mod partitionable;
 pub mod quaternion;
 pub mod settings;
 
-pub use spatial_box::{Box, BoxObject, PartitionBox};
+pub use spatial_box::{Box, PartitionBox};
 pub use partition::{
     BallMode, NearbyCandidates, NearbyCriteria, Partition, PartitionBall, PartitionPlugin,
     PartitionStatic, get_or_create_box, py_get_box_center, register_partition_python,

@@ -75,3 +75,10 @@ unmapped original test is a strict-gate blocker, not a passing test.
 
 The original test corpus is not replaced by the existing Rust unit tests
 merely because both suites have successful exit codes.
+### Consolidated Box Python state
+
+The canonical `Box` component now owns `mObject: Option<Py<PyAny>>`
+directly rather than assigning the original C++ `Box::mObject` member to a
+second `BoxObject` ECS component. This removes a known structural split.
+Box is no longer unconditionally `Clone`: cloning a Python-owned reference
+requires explicit Python attachment and is not an implicit Box operation.

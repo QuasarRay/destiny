@@ -77,10 +77,11 @@ fn static_collidable_keys_are_parent_first_and_unique() {
 fn same_key_equality_follows_cpp_not_entity_identity() {
     let mut app = app();
     let e=get_or_create_box(app.world_mut(),3,2,1,7).unwrap();
+    let other=get_or_create_box(app.world_mut(),4,2,1,7).unwrap();
     let box_ref=app.world().get::<PartitionBox>(e).unwrap();
-    let copy=box_ref.clone();
-    assert!(box_ref.same_key(&copy));
-    assert!(copy.same_key(box_ref));
+    let other_ref=app.world().get::<PartitionBox>(other).unwrap();
+    assert!(box_ref.same_key(box_ref));
+    assert!(!box_ref.same_key(other_ref));
 }
 
 #[test]
