@@ -131,23 +131,30 @@ pub use crate::spatial_box::PartitionBox;
 
 /// Bevy World-local equivalent of Partition's level maps and grid geometry.
 #[derive(Resource, Debug)]
+#[allow(non_snake_case)] // Original Partition.h field ownership and names
 pub struct Partition {
-    levels: Vec<BTreeMap<BoxKey, Entity>>,
-    pub level_width: Vec<f64>,
-    pub level_grid: Vec<i64>,
+    pub mLevels: Vec<BTreeMap<BoxKey, Entity>>,
+    pub mLevelWidth: Vec<f64>,
+    pub mLevelGrid: Vec<i64>,
+    pub mNumberOfLevels: i32,
+    pub mGridUnit: f64,
 }
 
 impl Default for Partition {
     fn default() -> Self {
-        let bigbox = ((1_u64 << 16) as f64) * GRID_UNIT * 0.25;
+        let mNumberOfLevels = LEVEL_COUNT as i32;
+        let mGridUnit = GRID_UNIT;
+        let bigbox = ((1_u64 << (2 * LEVEL_COUNT)) as f64) * mGridUnit * 0.25;
         Self {
-            levels: (0..LEVEL_COUNT).map(|_| BTreeMap::new()).collect(),
-            level_width: (0..LEVEL_COUNT)
+            mLevels: (0..LEVEL_COUNT).map(|_| BTreeMap::new()).collect(),
+            mLevelWidth: (0..LEVEL_COUNT)
                 .map(|i| bigbox / ((1_u64 << (2 * i)) as f64))
                 .collect(),
-            level_grid: (0..LEVEL_COUNT)
+            mLevelGrid: (0..LEVEL_COUNT)
                 .map(|i| 1_i64 << (2 * i + 23))
                 .collect(),
+            mNumberOfLevels,
+            mGridUnit,
         }
     }
 }
@@ -155,14 +162,14 @@ impl Default for Partition {
 impl Partition {
     #[must_use]
     pub fn number_of_levels(&self) -> usize {
-        self.levels.len()
+        self.mNumberOfLevels as usize
     }
 
     #[must_use]
     pub fn get_box_key(&self, position: DVec3, level: i32) -> (i64, i64, i64) {
         let Some(i) = self.valid_level(level) else { return (0, 0, 0); };
-        let w = self.level_width[i];
-        let offset = 0.5 * w * self.level_grid[i] as f64;
+        let w = self.mLevelWidth[i];
+        let offset = 0.5 * w * self.mLevelGrid[i] as f64;
         let fac = 1.0 / w;
         (
             ((position.x + offset) * fac) as i64,
@@ -173,18 +180,80 @@ impl Partition {
 
     fn valid_level(&self, level: i32) -> Option<usize> {
         let i = usize::try_from(level).ok()?;
-        (i < self.levels.len()).then_some(i)
+        (i < self.number_of_levels() && i < self.mLevels.len()).then_some(i)
     }
 
     fn key(&self, ix: i64, iy: i64, iz: i64, level: i32) -> Option<(usize, BoxKey)> {
         let i = self.valid_level(level)?;
-        Some((i, BoxKey::new(ix, iy, iz, self.level_grid[i])))
+        Some((i, BoxKey::new(ix, iy, iz, self.mLevelGrid[i])))
     }
 
     #[must_use]
     pub fn check_box(&self, ix: i64, iy: i64, iz: i64, level: i32) -> Option<Entity> {
         let (i, key) = self.key(ix, iy, iz, level)?;
-        self.levels[i].get(&key).copied()
+        self.mLevels[i].get(&key).copied()
+    }
+
+    /// Original Partition::GetBoxKey, retaining owner and spelling.
+    #[allow(non_snake_case)]
+    pub fn GetBoxKey(&self, position: DVec3, level: i32) -> (i64, i64, i64) {
+        self.get_box_key(position, level)
+    }
+
+    /// Original Partition::CheckBox (non-creating lookup).
+    #[allow(non_snake_case)]
+    pub fn CheckBox(&self, ix: i64, iy: i64, iz: i64, level: i32) -> Option<Entity> {
+        self.check_box(ix, iy, iz, level)
+    }
+
+    /// Original Partition::GetBox(int64_t,int64_t,int64_t,long).
+    /// World is the explicit Bevy allocation / object-identity boundary.
+    #[allow(non_snake_case)]
+    pub fn GetBox(
+        &mut self, world: &mut World, ix: i64, iy: i64, iz: i64, level: i32,
+    ) -> Option<Entity> {
+        self.get_box(world, ix, iy, iz, level)
+    }
+
+    /// C++ overload Partition::GetBox(double, Vector3d, bool).
+    /// Rust cannot overload an inherent method: an explicit suffix marks
+    /// this language-mandated difference in the correspondence catalog.
+    #[allow(non_snake_case)]
+    pub fn GetBoxByRadius(
+        &mut self, world: &mut World, radius: f64, pos: DVec3, create: bool,
+    ) -> Option<Entity> {
+        self.box_for_radius(world, radius, pos, create)
+    }
+
+    /// Original Partition::GetExistingTopBox.
+    #[allow(non_snake_case)]
+    pub fn GetExistingTopBox(&self, position: DVec3) -> Option<Entity> {
+        self.existing_top_box(position)
+    }
+
+    /// Original Partition::GetBoxCenter mutates the supplied coordinate.
+    /// The original method assumes a valid level, whereas the Blue bridge
+    /// explicitly raises TypeError on invalid input.
+    #[allow(non_snake_case)]
+    pub fn GetBoxCenter(&self, level: i32, position: &mut DVec3) {
+        *position = self.get_box_center(level, *position)
+            .expect("Partition::GetBoxCenter requires a valid level");
+    }
+
+    /// Original Partition::GetSize return value.
+    #[allow(non_snake_case)]
+    pub fn GetSize(&self) -> i32 { self.size() as i32 }
+
+    /// Original Partition::GetTopmost.
+    #[allow(non_snake_case)]
+    pub fn GetTopmost(&self, world: &World, entity: Option<Entity>) -> Option<Entity> {
+        Self::topmost(world, entity)
+    }
+
+    /// Original Partition::ClearTraversalFlag.
+    #[allow(non_snake_case)]
+    pub fn ClearTraversalFlag(&self, world: &mut World) {
+        self.clear_traversal_flag(world);
     }
 
     /// Equivalent to GetBox(i,j,k,level), using World entities in place of BoxAllocator.
@@ -193,11 +262,11 @@ impl Partition {
         &mut self, world: &mut World, ix: i64, iy: i64, iz: i64, level: i32,
     ) -> Option<Entity> {
         let (i, key) = self.key(ix, iy, iz, level)?;
-        if let Some(entity) = self.levels[i].get(&key).copied() {
+        if let Some(entity) = self.mLevels[i].get(&key).copied() {
             return Some(entity);
         }
-        let width = self.level_width[i];
-        let center_offset = 0.5 * width * self.level_grid[i] as f64;
+        let width = self.mLevelWidth[i];
+        let center_offset = 0.5 * width * self.mLevelGrid[i] as f64;
         let lo = DVec3::new(
             key.ix as f64 * width - center_offset,
             key.iy as f64 * width - center_offset,
@@ -219,7 +288,7 @@ impl Partition {
         // Box constructor calls SetParent BEFORE inserting itself into the
         // Partition level index, matching original Box.cpp's lifecycle.
         PartitionBox::SetParent(self, world, entity);
-        self.levels[i].insert(key, entity);
+        self.mLevels[i].insert(key, entity);
         Some(entity)
     }
 
@@ -252,7 +321,7 @@ impl Partition {
     pub fn choose_level(&self, radius: f64) -> usize {
         let mut level = 0;
         for i in 0..self.number_of_levels() {
-            if 3.0 * radius > self.level_width[i] {
+            if 3.0 * radius > self.mLevelWidth[i] {
                 break;
             }
             level = i;
@@ -282,9 +351,9 @@ impl Partition {
     #[must_use]
     pub fn get_box_center(&self, level: i32, position: DVec3) -> Option<DVec3> {
         let i = self.valid_level(level)?;
-        let width = self.level_width[i];
+        let width = self.mLevelWidth[i];
         let (x,y,z) = self.get_box_key(position, level);
-        let offset = width * 0.5 - width * self.level_grid[i] as f64 * 0.5;
+        let offset = width * 0.5 - width * self.mLevelGrid[i] as f64 * 0.5;
         Some(DVec3::new(
             x as f64 * width + offset,
             y as f64 * width + offset,
@@ -294,7 +363,7 @@ impl Partition {
 
     #[must_use]
     pub fn size(&self) -> usize {
-        self.levels.iter().map(BTreeMap::len).sum()
+        self.mLevels.iter().map(BTreeMap::len).sum()
     }
 
     #[must_use]
@@ -332,7 +401,7 @@ impl Partition {
     }
 
     pub fn clear_traversal_flag(&self, world: &mut World) {
-        for entity in self.levels[0].values().copied() {
+        for entity in self.mLevels[0].values().copied() {
             if let Some(mut b) = world.get_mut::<PartitionBox>(entity) {
                 b.mBubble = -1;
             }
@@ -355,20 +424,20 @@ impl Partition {
     #[must_use]
     pub fn active_boxes(&self, world: &World, level: i32) -> Option<(f32,Vec<[f32;3]>)> {
         let i = self.valid_level(level)?;
-        if self.levels[i].is_empty() { return None; }
-        let corners = self.levels[i].values().filter_map(|entity| {
+        if self.mLevels[i].is_empty() { return None; }
+        let corners = self.mLevels[i].values().filter_map(|entity| {
             world.get::<PartitionBox>(*entity).map(|b| [
                 b.lo.x as f32, b.lo.y as f32, b.lo.z as f32,
             ])
         }).collect();
-        Some((self.level_width[i] as f32,corners))
+        Some((self.mLevelWidth[i] as f32,corners))
     }
 
     /// Human-readable substitute for CCP_LOG_CH DumpPartition.
     #[must_use]
     pub fn dump(&self, world: &World) -> Vec<String> {
         let mut result = Vec::new();
-        for (level, boxes) in self.levels.iter().enumerate() {
+        for (level, boxes) in self.mLevels.iter().enumerate() {
             for (key, entity) in boxes {
                 if let Some(b) = world.get::<PartitionBox>(*entity) {
                     result.push(format!(
@@ -422,7 +491,7 @@ impl Partition {
     /// matching Box::RemoveChildren / RemoveBall / RemoveStaticCollidable.
     pub fn release_box(&mut self, world: &mut World, entity: Entity) -> bool {
         let Some(b) = world.get::<PartitionBox>(entity) else { return false };
-        if !b.is_empty() || self.levels.get(b.mLevel).and_then(|m| m.get(&b.mKey)) != Some(&entity) {
+        if !b.is_empty() || self.mLevels.get(b.mLevel).and_then(|m| m.get(&b.mKey)) != Some(&entity) {
             return false;
         }
         self.prune_empty(world, entity);
@@ -434,7 +503,7 @@ impl Partition {
             let Some(b)=world.get::<PartitionBox>(entity) else {break};
             if !b.is_empty() {break;}
             let (key,level,parent)=(b.mKey,b.mLevel,b.mParent);
-            self.levels[level].remove(&key);
+            self.mLevels[level].remove(&key);
             let _ = world.despawn(entity);
             let Some(p)=parent else {break};
             PartitionBox::unlink_child(world, p, entity, key);

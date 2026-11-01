@@ -69,7 +69,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Resource semantics and method ownership differ; BoxAllocator and full Ball integration absent."
+      "notes": "Partition now uses canonical mLevels, mLevelWidth, mLevelGrid, mNumberOfLevels, mGridUnit fields, and original-named public geometry/index methods; mBoxAllocator and many internal/physics methods remain missing; C++ overload GetBox(radius,position,bool) has Rust GetBoxByRadius due language restriction."
     },
     {
       "cpp_type": "SettingsConfiguration",

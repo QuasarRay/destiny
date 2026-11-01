@@ -22,10 +22,10 @@ fn setup()->App {
 fn constructor_matches_cpp_grid() {
     let p=Partition::default();
     assert_eq!(p.number_of_levels(),8);
-    assert_eq!(p.level_width[0],7_864_320.0);
-    assert_eq!(p.level_width[7],480.0);
-    assert_eq!(p.level_grid[0],1<<23);
-    assert_eq!(p.level_grid[7],1<<37);
+    assert_eq!(p.mLevelWidth[0],7_864_320.0);
+    assert_eq!(p.mLevelWidth[7],480.0);
+    assert_eq!(p.mLevelGrid[0],1<<23);
+    assert_eq!(p.mLevelGrid[7],1<<37);
     assert_eq!(p.size(),0);
 }
 
@@ -53,7 +53,7 @@ fn creates_coarser_ancestors_and_reuses_clamped_keys() {
         .and_then(|e|app.world().get::<PartitionBox>(e))
         .map(|b|b.mLevel),Some(0));
     assert_eq!(app.world().resource::<Partition>().size(),8);
-    let grid=app.world().resource::<Partition>().level_grid[7];
+    let grid=app.world().resource::<Partition>().mLevelGrid[7];
     let boundary=get_or_create_box(app.world_mut(),-500,grid+7,17,7).unwrap();
     let b=app.world().get::<PartitionBox>(boundary).unwrap();
     assert_eq!(b.mKey.ix,0);
@@ -75,7 +75,7 @@ fn lookup_does_not_create_and_checks_offset() {
 #[test]
 fn box_center_matches_cpp_truncation_and_python_contract() {
     let p=Partition::default();
-    let width=p.level_width[7];
+    let width=p.mLevelWidth[7];
     let center=p.get_box_center(7,DVec3::ZERO).unwrap();
     assert_eq!(center,DVec3::splat(width/2.0));
     assert_eq!(py_get_box_center(7,0.0,0.0,0.0).unwrap(),(240.0,240.0,240.0));
@@ -167,4 +167,26 @@ fn blue_python_get_box_center_is_registered() {
         assert_eq!(result.extract::<(f64,f64,f64)>()?,(240.0,240.0,240.0));
         Ok(())
     }).unwrap();
+}
+
+
+#[test]
+fn original_partition_field_names_and_methods_match_constructor() {
+    let mut app = setup();
+    let p = app.world().resource::<Partition>();
+    assert_eq!(p.mNumberOfLevels, 8);
+    assert_eq!(p.mGridUnit, 480.0);
+    assert_eq!(p.mLevels.len(), 8);
+    assert_eq!(p.GetBoxKey(DVec3::ZERO, 7), p.get_box_key(DVec3::ZERO, 7));
+    assert_eq!(p.CheckBox(11, 22, 33, 7), None);
+    let entity = app.world_mut().resource_scope(|world, mut p: Mut<'_, Partition>| {
+        p.GetBox(world, 11, 22, 33, 7)
+    }).unwrap();
+    assert_eq!(app.world().resource::<Partition>().CheckBox(11, 22, 33, 7), Some(entity));
+    assert_eq!(app.world().resource::<Partition>().GetSize(), 8);
+    let mut center = DVec3::ZERO;
+    app.world().resource::<Partition>().GetBoxCenter(7, &mut center);
+    assert_eq!(center, DVec3::splat(240.0));
+    assert_eq!(app.world().resource::<Partition>().GetTopmost(app.world(), Some(entity)),
+        Partition::topmost(app.world(), Some(entity)));
 }
