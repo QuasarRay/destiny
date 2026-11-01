@@ -6,6 +6,12 @@ use destiny_partition::{
 use destiny_partitionable::Partitionable;
 use pyo3::types::PyAnyMethods;
 
+fn partitionable_with_id(id: i64) -> Partitionable {
+    let mut p = Partitionable::default();
+    p.id = id;
+    p
+}
+
 fn setup()->App {
     let mut app=App::new();
     app.add_plugins(PartitionPlugin);
@@ -114,11 +120,11 @@ fn nearby_filters_avoid_missiles_and_preserve_statically_ordered_objects() {
     let bx=get_or_create_box(app.world_mut(),3,3,3,7).unwrap();
     let origin=app.world_mut().spawn((Partitionable::default(),PartitionBall::default())).id();
     let target=app.world_mut().spawn((
-        Partitionable {id:42,..Default::default()},
+        partitionable_with_id(42),
         PartitionBall {massive:true,free:true,..Default::default()},
     )).id();
     let missile=app.world_mut().spawn((
-        Partitionable {id:43,..Default::default()},
+        partitionable_with_id(43),
         PartitionBall {massive:true,mode:BallMode::Missile,..Default::default()},
     )).id();
     app.world_mut().resource_scope(|world,part:Mut<'_,Partition>|{
@@ -137,7 +143,7 @@ fn statics_share_box_membership_without_duplicate_results() {
     let box_a=get_or_create_box(app.world_mut(),1,1,1,7).unwrap();
     let box_b=get_or_create_box(app.world_mut(),2,1,1,7).unwrap();
     let source=app.world_mut().spawn((Partitionable::default(),PartitionBall::default())).id();
-    let stat=app.world_mut().spawn((Partitionable {id:7,..Default::default()},PartitionStatic {parent_ball_id:22})).id();
+    let stat=app.world_mut().spawn((partitionable_with_id(7),PartitionStatic {parent_ball_id:22})).id();
     app.world_mut().resource_scope(|world,part:Mut<'_,Partition>|{
         part.insert_ball(world,box_a,source);
         part.insert_static(world,box_a,stat);

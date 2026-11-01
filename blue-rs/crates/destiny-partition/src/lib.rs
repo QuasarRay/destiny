@@ -305,7 +305,7 @@ impl Partition {
 
     #[must_use]
     pub fn nearby_bubbles(&self, world: &World, entity: Entity) -> Option<i32> {
-        let b = world.get::<PartitionBox>(entity)?;
+        world.get::<PartitionBox>(entity)?;
         for x in -1..=1 {
             for y in -1..=1 {
                 for z in -1..=1 {
