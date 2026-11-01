@@ -38,7 +38,12 @@ impl QuaternionD {
     /// The angle is in radians. The axis must be nonzero.
     pub fn from_axis_angle(mut axis: DVec3, angle: f64) -> Self {
         if axis.length_squared() != 1.0 {
-            axis = axis.normalize();
+            // Source Vector3d::Normalize returns unchanged for a zero-length
+            // axis, whereas DVec3::normalize returns non-finite components.
+            let norm = axis.length();
+            if norm != 0.0 {
+                axis *= 1.0 / norm;
+            }
         }
 
         let half_angle = angle * 0.5;

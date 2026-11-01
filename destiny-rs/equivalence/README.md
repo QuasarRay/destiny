@@ -82,3 +82,13 @@ directly rather than assigning the original C++ `Box::mObject` member to a
 second `BoxObject` ECS component. This removes a known structural split.
 Box is no longer unconditionally `Clone`: cloning a Python-owned reference
 requires explicit Python attachment and is not an implicit Box operation.
+
+## Executable differential oracle (original headers)
+
+Run `python3 tools/run_cpp_rust_differential.py`. It compiles and executes
+original `src/Quaternion.h` and `src/Partition.h` against the Rust port,
+using a minimal definition for the external Blue `Vector3` dependency in
+`Vector3d.h`. It compares finite output fixtures for constructors,
+clamping, quaternion arithmetic, zero-axis normalization and rotation.
+The CI job runs it separately from the lexical inventory. Finite fixtures
+are **not** universal correctness proofs, and depend on a C++ compiler.

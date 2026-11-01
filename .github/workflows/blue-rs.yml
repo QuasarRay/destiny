@@ -38,6 +38,8 @@ jobs:
           cat target/equivalence.md >> "$GITHUB_STEP_SUMMARY"
       - name: Compile all workspace targets from the repository root
         run: cargo check --locked --workspace --all-targets
+      - name: Differential test original C++ Quaternion and Key implementations
+        run: python3 tools/run_cpp_rust_differential.py
       - name: Test all workspace members
         run: cargo test --locked --workspace
       - name: Build both projects by package name

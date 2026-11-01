@@ -56,3 +56,10 @@ fn unary_minus_is_cpp_inverse_not_quaternion_negation() {
     assert_eq!(inverted, QuaternionD::new(1.0 / 30.0, -2.0 / 30.0, -3.0 / 30.0, -4.0 / 30.0));
     assert_ne!(inverted, QuaternionD::new(-1.0, -2.0, -3.0, -4.0));
 }
+
+#[test]
+fn quaternion_axis_angle_zero_axis_follows_cpp_vector_normalize() {
+    let q = QuaternionD::from_axis_angle(DVec3::ZERO, 1.5);
+    assert_eq!(q.v, DVec3::ZERO);
+    assert!(q.w.is_finite());
+}
