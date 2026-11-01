@@ -137,7 +137,7 @@ fn python_blue_module_round_trip() {
 
 #[test]
 fn cgp_component_providers_are_wired_to_settings_context() {
-    use destiny_settings::{CanApplyDestinySettings, CanReadDestinySettings};
+    use destiny_rs::{CanApplyDestinySettings, CanReadDestinySettings};
     fn assert_contract<T: CanApplyDestinySettings + CanReadDestinySettings>() {}
     assert_contract::<GlobalSettings>();
 }
