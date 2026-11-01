@@ -63,3 +63,11 @@ fn quaternion_axis_angle_zero_axis_follows_cpp_vector_normalize() {
     assert_eq!(q.v, DVec3::ZERO);
     assert!(q.w.is_finite());
 }
+
+#[test]
+fn original_keyhash_type_returns_consistent_size_t() {
+    let h = destiny_rs::KeyHash;
+    let a = Key::new(1, 2, 3, 8);
+    let b = Key::new(1, 2, 3, 8);
+    assert_eq!(h.hash(&a), h.hash(&b));
+}

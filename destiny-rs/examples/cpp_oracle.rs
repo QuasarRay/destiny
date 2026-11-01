@@ -1,6 +1,6 @@
 //! Deterministic values from the Rust side of the original-header oracle.
 use bevy::math::DVec3;
-use destiny_rs::{Key, QuaternionD};
+use destiny_rs::{Key, KeyHash, QuaternionD};
 
 fn output(name: &str, a: f64, b: f64, c: f64, d: f64) {
     println!("{name} {a:.17} {b:.17} {c:.17} {d:.17}");
@@ -23,6 +23,7 @@ fn main() {
     output_q("default", QuaternionD::default());
     let key = Key::new(-1, 99, 2, 8);
     output("clamp", key.ix as f64, key.iy as f64, key.iz as f64, key.n as f64);
+    println!("key_hash {} 0 0 0", KeyHash.hash(&key));
     let key_zero = Key::new(0, 0, 0, 0);
     output("zero_extent", key_zero.ix as f64, key_zero.iy as f64, key_zero.iz as f64, key_zero.n as f64);
 }

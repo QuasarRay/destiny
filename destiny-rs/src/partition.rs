@@ -58,6 +58,28 @@ impl Key {
     }
 }
 
+/// Original C++ KeyHash from Partition.h. The hash-combine expression is
+/// reproduced with wrapping size_t arithmetic. For integral keys, GCC's
+/// std::hash<int64_t> returns the value converted to size_t. Other C++
+/// standard-library implementations must be checked independently.
+#[derive(Debug, Default, Clone, Copy)]
+pub struct KeyHash;
+
+impl KeyHash {
+    #[must_use]
+    pub fn hash(&self, key: &Key) -> usize {
+        let mut seed = 0usize;
+        for value in [key.ix, key.iy, key.iz, key.n] {
+            let value_hash = value as usize;
+            seed ^= value_hash
+                .wrapping_add(0x9e3779b9usize)
+                .wrapping_add(seed.wrapping_shl(6))
+                .wrapping_add(seed >> 2);
+        }
+        seed
+    }
+}
+
 type BallSortKey = (u8, i64, i64);
 
 /// Box membership metadata only: eventually supplied by the Rust Ball port.

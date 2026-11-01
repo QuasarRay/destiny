@@ -44,6 +44,19 @@
       "notes": "Canonical Key now declared in partition.rs with C++-named Clamp and original branch ordering; KeyHash and proof remain unimplemented."
     },
     {
+      "cpp_type": "KeyHash",
+      "cpp_header": "src/Partition.h",
+      "cpp_files": [
+        "src/Partition.h"
+      ],
+      "rust_type": "KeyHash",
+      "rust_file": "destiny-rs/src/partition.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Ported C++ hash-combine expression under wrapping size_t arithmetic with GCC std::hash<int64_t> identity; operator() syntax has no stable Rust equivalent and global equivalence is unproven."
+    },
+    {
       "cpp_type": "Partition",
       "cpp_header": "src/Partition.h",
       "cpp_files": [

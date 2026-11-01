@@ -11,7 +11,7 @@ pub use partition::{
     BallMode, NearbyCandidates, NearbyCriteria, Partition, PartitionBall, PartitionPlugin,
     PartitionStatic, get_or_create_box, py_get_box_center, register_partition_python,
 };
-pub use partition::Key;
+pub use partition::{Key, KeyHash};
 pub use partitionable::{BoxKey, DestinyId, Partitionable, PartitionableBehavior};
 pub use quaternion::QuaternionD;
 pub use settings::{

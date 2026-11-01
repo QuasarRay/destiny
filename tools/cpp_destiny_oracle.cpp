@@ -38,6 +38,7 @@ int main() {
     output_q("default", QuaternionD());
     Key key(-1, 99, 2, 8);
     output("clamp", (double)key.ix, (double)key.iy, (double)key.iz, (double)key.n);
+    std::cout << "key_hash " << KeyHash{}(key) << " 0 0 0\n";
     Key key_zero(0, 0, 0, 0);
     output("zero_extent", (double)key_zero.ix, (double)key_zero.iy,
            (double)key_zero.iz, (double)key_zero.n);

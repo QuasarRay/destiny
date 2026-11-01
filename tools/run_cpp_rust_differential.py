@@ -27,7 +27,10 @@ def parse(text: str) -> dict[str, tuple[float, ...]]:
         name = tokens[0]
         if name in cases:
             raise ValueError(f"Duplicate oracle case {name}")
-        cases[name] = tuple(float(x) for x in tokens[1:])
+        if name == "key_hash":
+            cases[name] = (int(tokens[1]), 0, 0, 0)
+        else:
+            cases[name] = tuple(float(x) for x in tokens[1:])
     return cases
 
 
@@ -43,7 +46,10 @@ def main() -> int:
     failures = []
     for case in cpp:
         for i, (a, b) in enumerate(zip(cpp[case], rust[case])):
-            if not math.isfinite(a) or not math.isfinite(b):
+            if case == "key_hash":
+                if a != b:
+                    failures.append((case, i, a, b, "exact integer hash mismatch"))
+            elif not math.isfinite(a) or not math.isfinite(b):
                 failures.append((case, i, a, b, "non-finite output"))
             elif not math.isclose(a, b, rel_tol=1e-13, abs_tol=1e-13):
                 failures.append((case, i, a, b, "numeric mismatch"))
