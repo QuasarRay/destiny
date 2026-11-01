@@ -51,7 +51,7 @@ class PartitionableHeaderContract(unittest.TestCase):
     def test_all_original_constructor_initialized_fields_match(self):
         init = re.search(r"Partitionable::Partitionable\s*\(\s*\)\s*:(.*?)\{", CPP, re.S)
         self.assertIsNotNone(init)
-        values = dict(re.findall(r"(m\w+|isInteractive)\s*\(\s*([^)]*)\s*\)", init.group(1)))
+        values = dict(re.findall(r"(m\w+|is\w+)\s*\(\s*([^)]*)\s*\)", init.group(1)))
         expected = {
             "mId": "0", "mMyBox": "nullptr", "mPark": "nullptr",
             "mHandled": "false", "mNewBubble": "-1", "mOldBubble": "-1",
