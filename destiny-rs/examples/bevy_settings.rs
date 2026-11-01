@@ -3,7 +3,7 @@ use destiny_rs::{DestinySettingsPlugin, SettingsConfiguration};
 
 fn show_configuration(settings: Res<'_, SettingsConfiguration>) {
     if settings.is_changed() {
-        println!("Collision iterations: {}", settings.collision_max_iterations);
+        println!("Collision iterations: {}", settings.m_collisionMaxIterations);
     }
 }
 

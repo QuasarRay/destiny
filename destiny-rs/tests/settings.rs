@@ -15,11 +15,11 @@ fn app() -> App {
 #[test]
 fn original_defaults_are_preserved() {
     let config = SettingsConfiguration::default();
-    assert_eq!(config.collision_max_iterations, 20);
-    assert!(!config.use_iterative_collision);
-    assert!(!config.use_dynamical_orientation);
-    assert!(!config.disable_dynamical_orientation_for_missiles);
-    assert!(!config.use_new_orbit);
+    assert_eq!(config.m_collisionMaxIterations, 20);
+    assert!(!config.m_useIterativeCollision);
+    assert!(!config.m_useDynamicalOrientation);
+    assert!(!config.m_disableDynamicalOrientationForMissiles);
+    assert!(!config.m_useNewOrbit);
 }
 
 #[test]
@@ -27,11 +27,11 @@ fn apply_get_getdefault_reset() {
     let mut app = app();
     let settings = GlobalSettings::from_world(app.world()).unwrap();
     let desired = SettingsConfiguration {
-        collision_max_iterations: 5, // documented as discouraged, NOT invalid
-        use_iterative_collision: true,
-        use_dynamical_orientation: true,
-        disable_dynamical_orientation_for_missiles: true,
-        use_new_orbit: true,
+        m_collisionMaxIterations: 5, // documented as discouraged, NOT invalid
+        m_useIterativeCollision: true,
+        m_useDynamicalOrientation: true,
+        m_disableDynamicalOrientationForMissiles: true,
+        m_useNewOrbit: true,
     };
     settings.apply(desired);
     assert_eq!(settings.get(), desired);
@@ -49,9 +49,9 @@ fn apply_get_getdefault_reset() {
 fn direct_bevy_changes_publish_to_blue() {
     let mut app = app();
     let settings = GlobalSettings::from_world(app.world()).unwrap();
-    app.world_mut().resource_mut::<SettingsConfiguration>().use_new_orbit = true;
+    app.world_mut().resource_mut::<SettingsConfiguration>().m_useNewOrbit = true;
     app.update();
-    assert!(settings.get().use_new_orbit);
+    assert!(settings.get().m_useNewOrbit);
 }
 
 #[test]
@@ -60,21 +60,21 @@ fn two_worlds_have_independent_configuration() {
     let mut b = app();
     let alpha = GlobalSettings::from_world(a.world()).unwrap();
     let beta = GlobalSettings::from_world(b.world()).unwrap();
-    alpha.apply(SettingsConfiguration { use_new_orbit: true, ..Default::default() });
+    alpha.apply(SettingsConfiguration { m_useNewOrbit: true, ..Default::default() });
     a.update();
     b.update();
-    assert!(a.world().resource::<SettingsConfiguration>().use_new_orbit);
-    assert!(!b.world().resource::<SettingsConfiguration>().use_new_orbit);
-    assert!(!beta.get().use_new_orbit);
+    assert!(a.world().resource::<SettingsConfiguration>().m_useNewOrbit);
+    assert!(!b.world().resource::<SettingsConfiguration>().m_useNewOrbit);
+    assert!(!beta.get().m_useNewOrbit);
 }
 
 #[test]
 fn preconfigured_bevy_resource_is_used() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
-    app.insert_resource(SettingsConfiguration { collision_max_iterations: 71, ..Default::default() });
+    app.insert_resource(SettingsConfiguration { m_collisionMaxIterations: 71, ..Default::default() });
     app.add_plugins(DestinySettingsPlugin);
-    assert_eq!(GlobalSettings::from_world(app.world()).unwrap().get().collision_max_iterations, 71);
+    assert_eq!(GlobalSettings::from_world(app.world()).unwrap().get().m_collisionMaxIterations, 71);
 }
 
 #[test]
@@ -101,7 +101,7 @@ fn concurrent_writers_submit_without_borrowing_world() {
         std::thread::spawn(move || {
             for _ in 0..50 {
                 // The bridge itself is deliberately not an ECS World handle.
-                settings.apply(SettingsConfiguration { collision_max_iterations: n, ..Default::default() });
+                settings.apply(SettingsConfiguration { m_collisionMaxIterations: n, ..Default::default() });
                 let _ = settings.get();
             }
         })
@@ -148,9 +148,9 @@ fn settings_plugin_integrates_with_embedded_blue_runtime() {
     runtime.app_mut().add_plugins(DestinySettingsPlugin);
     let controller = GlobalSettings::from_world(runtime.world()).unwrap();
     controller.apply(SettingsConfiguration {
-        use_new_orbit: true,
+        m_useNewOrbit: true,
         ..Default::default()
     });
     runtime.update();
-    assert!(runtime.world().resource::<SettingsConfiguration>().use_new_orbit);
+    assert!(runtime.world().resource::<SettingsConfiguration>().m_useNewOrbit);
 }

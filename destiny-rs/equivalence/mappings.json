@@ -84,7 +84,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Per-Bevy-World settings differ from original process-global state and original internal field names."
+      "notes": "All five configuration fields now retain their exact C++ m_* names and Blue metadata keeps original Python property names; process-global original settings versus per-Bevy-World staged resource still differs."
     },
     {
       "cpp_type": "GlobalSettings",

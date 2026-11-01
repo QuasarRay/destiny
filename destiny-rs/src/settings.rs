@@ -19,37 +19,38 @@ use pyo3::{exceptions::PyRuntimeError, prelude::*, types::PyModuleMethods};
     doc = "Pass an instance of this to destiny.settings.Apply() to configure Destiny"
 )]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(non_snake_case)] // Original SettingsConfiguration field identities
 pub struct SettingsConfiguration {
     /// The maximum number of collision iterations (assuming iterative collision is enabled).
     /// Recommended value >= 10; at 5 agile ships may fly through thin boxes.
     #[blue(read, write, name = "collisionMaxIterations")]
-    pub collision_max_iterations: usize,
+    pub m_collisionMaxIterations: usize,
 
     /// Boolean flag to enable/disable iterative collision.
     #[blue(read, write, name = "useIterativeCollision")]
-    pub use_iterative_collision: bool,
+    pub m_useIterativeCollision: bool,
 
     /// Boolean flag to enable/disable dynamical orientation.
     #[blue(read, write, name = "useDynamicalOrientation")]
-    pub use_dynamical_orientation: bool,
+    pub m_useDynamicalOrientation: bool,
 
     /// Boolean flag to disable dynamical orientation for missiles
     /// (if dynamical orientation is enabled).
     #[blue(read, write, name = "disableDynamicalOrientationForMissiles")]
-    pub disable_dynamical_orientation_for_missiles: bool,
+    pub m_disableDynamicalOrientationForMissiles: bool,
 
     /// Use the new orbit behavior.
     #[blue(read, write, name = "useNewOrbit")]
-    pub use_new_orbit: bool,
+    pub m_useNewOrbit: bool,
 }
 
 impl SettingsConfiguration {
     pub const DEFAULT: Self = Self {
-        collision_max_iterations: 20,
-        use_iterative_collision: false,
-        use_dynamical_orientation: false,
-        disable_dynamical_orientation_for_missiles: false,
-        use_new_orbit: false,
+        m_collisionMaxIterations: 20,
+        m_useIterativeCollision: false,
+        m_useDynamicalOrientation: false,
+        m_disableDynamicalOrientationForMissiles: false,
+        m_useNewOrbit: false,
     };
 }
 
