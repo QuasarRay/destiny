@@ -58,7 +58,6 @@ impl Key {
     }
 }
 
-\n
 type BallSortKey = (u8, i64, i64);
 
 /// Box membership metadata only: eventually supplied by the Rust Ball port.
