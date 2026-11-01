@@ -10,9 +10,13 @@ repository.workspace = true
 name = "_bluepycore"
 crate-type = ["cdylib", "rlib"]
 
+[features]
+default = []
+extension-module = ["pyo3/extension-module"]
+
 [dependencies]
 bevy.workspace = true
-pyo3 = { workspace = true, features = ["extension-module"] }
+pyo3.workspace = true
 blue = { path = "../blue" }
 blueexposure = { path = "../blueexposure" }
 
