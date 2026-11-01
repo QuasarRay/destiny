@@ -12,7 +12,7 @@ type BallSortKey = (u8, i64, i64);
 /// Box member collections order ball and collidable identities by the original
 /// C++ comparators, rather than by Bevy's Entity IDs.
 #[derive(Component, Debug, Clone)]
-pub struct PartitionBox {
+pub struct Box {
     pub key: BoxKey,
     pub level: usize,
     pub lo: DVec3,
@@ -24,7 +24,7 @@ pub struct PartitionBox {
     pub bubble: i32,
     pub handled: bool,
 }
-impl PartitionBox {
+impl Box {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.children.is_empty() && self.balls.is_empty() && self.statics.is_empty()
@@ -43,7 +43,7 @@ impl PartitionBox {
 #[derive(Component, Debug)]
 pub struct BoxObject(pub Py<PyAny>);
 
-impl PartitionBox {
+impl Box {
     /// C++ `Box::SetObject`: replaces (or clears) an owned Python reference.
     /// A missing or despawned Box is rejected; a Python None is NOT a null
     /// `PyObject*` (use `None` in Rust to clear the association).
@@ -73,3 +73,7 @@ impl PartitionBox {
         self.key == other.key
     }
 }
+
+/// Legacy Rust spelling retained temporarily for existing ECS consumers.
+/// The canonical C++ correspondence is `Box`.
+pub type PartitionBox = Box;

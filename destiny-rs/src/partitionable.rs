@@ -16,14 +16,14 @@ pub type DestinyId = i64;
 /// `BoxSortComparer` compares `Box::mKey`, not box pointers.
 /// Bevy `Entity` identifiers must therefore NOT determine iteration order.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct BoxKey {
+pub struct Key {
     pub ix: i64,
     pub iy: i64,
     pub iz: i64,
     pub n: i64,
 }
 
-impl BoxKey {
+impl Key {
     /// Matches `Key(i, j, k, n)` for the positive grid extents used by Partition.
     ///
     /// The C++ default `Key()` (all zeros) is represented by `Default`.
@@ -38,6 +38,10 @@ impl BoxKey {
         }
     }
 }
+
+/// Transitional alias for callers of the previous Rust partition port.
+/// C++ names this value type `Key`.
+pub type BoxKey = Key;
 
 /// Native Bevy component corresponding to the shared C++ `Partitionable` state.
 ///
