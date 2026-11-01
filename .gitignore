@@ -36,3 +36,5 @@ cmake-build*
 ### Project ###
 # Ignore folder where we copy dependencies to run benchmarks
 /tools/benchmark/bin
+/destiny-rs/target
+/target
