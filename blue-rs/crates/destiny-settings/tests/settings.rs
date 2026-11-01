@@ -115,6 +115,7 @@ fn concurrent_writers_submit_without_borrowing_world() {
 #[test]
 fn python_blue_module_round_trip() {
     let mut app = app();
+    pyo3::Python::initialize();
     pyo3::Python::attach(|py| -> pyo3::PyResult<()> {
         let module = pyo3::types::PyModule::new(py, "destiny")?;
         register_destiny_settings_python(py, &module, app.world())?;
