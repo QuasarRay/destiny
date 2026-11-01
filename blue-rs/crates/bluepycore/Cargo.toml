@@ -17,8 +17,8 @@ extension-module = ["pyo3/extension-module"]
 [dependencies]
 bevy.workspace = true
 pyo3.workspace = true
-blue = { path = "../blue" }
-blueexposure = { path = "../blueexposure" }
+blue.workspace = true
+blueexposure.workspace = true
 
 [lints]
 workspace = true

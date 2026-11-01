@@ -1,27 +1,36 @@
-name: Blue-rs Rust checks
+name: Rust workspace CI
+
 on:
   push:
     branches: [destiny-rs-dev-2]
     paths:
-      - 'blue-rs/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - '.cargo/**'
+      - 'destiny-rs/**'
+      - 'blue-rs/crates/**'
       - '.github/workflows/blue-rs.yml'
   pull_request:
     paths:
-      - 'blue-rs/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - '.cargo/**'
+      - 'destiny-rs/**'
+      - 'blue-rs/crates/**'
       - '.github/workflows/blue-rs.yml'
-
 jobs:
-  check:
+  workspace:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: blue-rs
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: 1.98.1
-      - name: Check all workspace targets
-        run: cargo check --workspace --all-targets
-      - name: Test workspace
-        run: cargo test --workspace
+      - name: Compile all workspace targets from the repository root
+        run: cargo check --locked --workspace --all-targets
+      - name: Test all workspace members
+        run: cargo test --locked --workspace
+      - name: Build both projects by package name
+        run: cargo build --locked -p destiny-rs -p blue

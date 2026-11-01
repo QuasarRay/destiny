@@ -17,7 +17,7 @@ thiserror.workspace = true
 syn.workspace = true
 
 [dev-dependencies]
-blue-macros = { path = "../blue-macros" }
+blue-macros.workspace = true
 
 [lints]
 workspace = true

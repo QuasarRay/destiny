@@ -10,7 +10,7 @@ repository.workspace = true
 bevy.workspace = true
 cgp.workspace = true
 pyo3.workspace = true
-blueexposure = { path = "../blueexposure" }
+blueexposure.workspace = true
 delegate.workspace = true
 derive_more.workspace = true
 serde.workspace = true

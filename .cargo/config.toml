@@ -1,3 +1,4 @@
 [alias]
 blue-gen = "run -p blue-codegen --"
 blue-test = "test --workspace"
+destiny-test = "test -p destiny-rs"
