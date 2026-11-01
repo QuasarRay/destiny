@@ -113,6 +113,34 @@
       "verified_structure": false,
       "verified_internals": false,
       "notes": "Original LengthSq and RotateVector names now exist on QuaternionD; multiplication matches C++ explicit scalar formulas, but proof and all edge cases remain unverified."
+    },
+    {
+      "cpp_type": "StaticCollidable",
+      "cpp_header": "src/StaticCollidable.h",
+      "cpp_files": [
+        "src/StaticCollidable.h",
+        "src/StaticCollidable.cpp"
+      ],
+      "rust_type": "StaticCollidable",
+      "rust_file": "destiny-rs/src/static_collidable.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Ported constructor, ClearBoxes, DeleteFromBoxes, InsertInBox, GetInflatedRadius and SetBoxActive; abstract collision methods are a trait and concrete geometry is not ported."
+    },
+    {
+      "cpp_type": "StaticCollidableSortComparer",
+      "cpp_header": "src/SortedSets.h",
+      "cpp_files": [
+        "src/SortedSets.h",
+        "src/StaticCollidable.cpp"
+      ],
+      "rust_type": "StaticCollidableSortComparer",
+      "rust_file": "destiny-rs/src/static_collidable.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "C++ parent-ball-ID then object-ID ordering is implemented, with Bevy Entity lookups substituting C++ pointers."
     }
   ],
   "test_mappings": []

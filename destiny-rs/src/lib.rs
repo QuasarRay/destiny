@@ -3,6 +3,7 @@
 pub mod spatial_box;
 pub mod partition;
 pub mod partitionable;
+pub mod static_collidable;
 pub mod quaternion;
 pub mod settings;
 
@@ -20,3 +21,5 @@ pub use settings::{
     DestinySettingsReaderComponent, GlobalSettings, ReadStagedSettings,
     SettingsBridge, SettingsConfiguration, register_destiny_settings_python,
 };
+
+pub use static_collidable::{StaticCollidable, StaticCollidableSortComparer, StaticCollidableGeometry};

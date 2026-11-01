@@ -125,11 +125,8 @@ pub enum BallMode {
     Field,
 }
 
-/// Parent ball ID is needed for the deterministic static-collidable sort order.
-#[derive(Component, Clone, Copy, Debug, Default)]
-pub struct PartitionStatic {
-    pub parent_ball_id: i64,
-}
+// Temporary PartitionStatic struct replaced by the canonical C++ type.
+pub use crate::static_collidable::StaticCollidable as PartitionStatic;
 
 pub use crate::spatial_box::PartitionBox;
 
@@ -417,7 +414,7 @@ impl Partition {
         let key=b.mKey;
         let Some(p)=world.get::<Partitionable>(object) else{return false};
         let Some(meta)=world.get::<PartitionStatic>(object) else{return false};
-        let order=(meta.parent_ball_id,p.mId);
+        let order=(meta.mParentBallId,p.mId);
         let inserted={
             use std::collections::btree_map::Entry;
             match world.get_mut::<PartitionBox>(box_entity).unwrap().mStaticCollidables.entry(order) {

@@ -143,7 +143,7 @@ fn statics_share_box_membership_without_duplicate_results() {
     let box_a=get_or_create_box(app.world_mut(),1,1,1,7).unwrap();
     let box_b=get_or_create_box(app.world_mut(),2,1,1,7).unwrap();
     let source=app.world_mut().spawn((Partitionable::default(),PartitionBall::default())).id();
-    let stat=app.world_mut().spawn((partitionable_with_id(7),PartitionStatic {parent_ball_id:22})).id();
+    let stat=app.world_mut().spawn((partitionable_with_id(7),destiny_rs::StaticCollidable {mParentBallId:22})).id();
     app.world_mut().resource_scope(|world,part:Mut<'_,Partition>|{
         part.insert_ball(world,box_a,source);
         part.insert_static(world,box_a,stat);

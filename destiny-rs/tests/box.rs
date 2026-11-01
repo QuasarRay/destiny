@@ -64,7 +64,7 @@ fn static_collidable_keys_are_parent_first_and_unique() {
     let mut app = app();
     let box_entity = get_or_create_box(app.world_mut(), 1, 1, 1, 7).unwrap();
     let objects:Vec<_>=[(5,44),(9,5),(5,22)].into_iter().map(|(parent,id)|{
-        app.world_mut().spawn((with_id(id),PartitionStatic {parent_ball_id:parent})).id()
+        app.world_mut().spawn((with_id(id),destiny_rs::StaticCollidable {mParentBallId:parent})).id()
     }).collect();
     app.world_mut().resource_scope(|world,p:Mut<'_,Partition>| {
         for &e in &objects { assert!(p.insert_static(world,box_entity,e)); }
