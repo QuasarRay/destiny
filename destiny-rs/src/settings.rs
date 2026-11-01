@@ -63,28 +63,28 @@ pub static g_useNewOrbit: AtomicBool =
     module = "destiny",
     name = "SettingsConfiguration",
     kind = "resource",
-    doc = "Pass an instance of this to destiny.settings.Apply() to configure global settings"
+    doc = "Pass an instance of this to destiny.settings.Configure() to apply a settings configuration"
 )]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(non_snake_case)]
 pub struct SettingsConfiguration {
-    /// C++ MAP_ATTRIBUTE collisionMaxIterations (READWRITE).
+    /// The maximum number of collision iterations (assuming iterative collision is enabled). Recommended value >= 10, at 5 agile ships are known to fly through thin boxes.
     #[blue(read, write, name = "collisionMaxIterations")]
     pub m_collisionMaxIterations: usize,
 
-    /// C++ MAP_ATTRIBUTE useIterativeCollision (READWRITE).
+    /// Boolean flag to enable/disable iterative collision
     #[blue(read, write, name = "useIterativeCollision")]
     pub m_useIterativeCollision: bool,
 
-    /// C++ MAP_ATTRIBUTE useDynamicalOrientation (READWRITE).
+    /// Boolean flag to enable/disable dynamical orientation
     #[blue(read, write, name = "useDynamicalOrientation")]
     pub m_useDynamicalOrientation: bool,
 
-    /// C++ MAP_ATTRIBUTE disableDynamicalOrientationForMissiles (READWRITE).
+    /// Boolean flag to disable dynamical orientation for missiles (if dynamical orientation is enabled).
     #[blue(read, write, name = "disableDynamicalOrientationForMissiles")]
     pub m_disableDynamicalOrientationForMissiles: bool,
 
-    /// C++ MAP_ATTRIBUTE useNewOrbit (READWRITE).
+    /// Use the new orbit behavior
     #[blue(read, write, name = "useNewOrbit")]
     pub m_useNewOrbit: bool,
 }
@@ -185,6 +185,7 @@ impl GlobalSettings {
 // Python names, without introducing different authoritative methods.
 #[blue_methods]
 impl GlobalSettings {
+    /// Pass in an instance of destiny.SettingsConfiguration to configure global settings.
     #[blue(name = "Apply")]
     fn py_apply(&self, config: &Bound<'_, PyAny>) -> PyResult<()> {
         let config = config.extract::<PyRef<'_, SettingsConfiguration>>()
@@ -195,16 +196,19 @@ impl GlobalSettings {
         Ok(())
     }
 
+    /// Get the current global settings configuration.
     #[blue(name = "Get")]
     fn py_get(&self) -> SettingsConfiguration {
         self.GetConfiguration()
     }
 
+    /// Get the default global settings configuration.
     #[blue(name = "GetDefault")]
     fn py_get_default(&self) -> SettingsConfiguration {
         self.GetDefaultConfiguration()
     }
 
+    /// Reset the current global settings configuration to the default values.
     #[blue(name = "Reset")]
     fn py_reset(&self) {
         self.ResetConfiguration();
