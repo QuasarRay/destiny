@@ -8,6 +8,7 @@ members = [
     "crates/bluepycore",
     "crates/destiny-settings",
     "crates/destiny-partitionable",
+    "crates/destiny-partition",
 ]
 
 [workspace.package]
