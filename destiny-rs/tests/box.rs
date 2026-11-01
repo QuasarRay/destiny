@@ -153,3 +153,24 @@ fn python_object_reference_replacement_and_despawn_are_ecs_owned() {
         assert!(!Box::set_object(app.world_mut(),entity,None));
     });
 }
+
+#[test]
+fn canonical_box_methods_keep_original_ownership_and_bubble_sentinel() {
+    let mut app = app();
+    let first = get_or_create_box(app.world_mut(), 20, 20, 20, 7).unwrap();
+    let next = get_or_create_box(app.world_mut(), 21, 20, 20, 7).unwrap();
+    assert_eq!(destiny_rs::Box::NearbyBubbles(app.world(), first), -1);
+    destiny_rs::Box::Traverse(app.world_mut(), first, 123);
+    assert_eq!(app.world().get::<PartitionBox>(next).unwrap().bubble, 123);
+    assert_eq!(destiny_rs::Box::NearbyBubbles(app.world(), first), 123);
+}
+
+#[test]
+fn original_box_addchildren_uses_key_uniqueness() {
+    let mut app = app();
+    let first = get_or_create_box(app.world_mut(), 24, 24, 24, 7).unwrap();
+    let parent = app.world().get::<PartitionBox>(first).unwrap().parent.unwrap();
+    destiny_rs::Box::AddChildren(app.world_mut(), parent, Some(first));
+    destiny_rs::Box::AddChildren(app.world_mut(), parent, None);
+    assert_eq!(app.world().get::<PartitionBox>(parent).unwrap().children.len(), 1);
+}

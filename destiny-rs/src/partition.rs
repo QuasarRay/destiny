@@ -227,10 +227,11 @@ impl Partition {
         {
             return false;
         }
-        use std::collections::btree_map::Entry;
-        match world.get_mut::<PartitionBox>(parent).unwrap().children.entry(child_key) {
-            Entry::Vacant(slot) => { slot.insert(child); true }
-            Entry::Occupied(_) => false,
+        if world.get::<PartitionBox>(parent).unwrap().children.contains_key(&child_key) {
+            false
+        } else {
+            PartitionBox::AddChildren(world, parent, Some(child));
+            true
         }
     }
 
@@ -325,45 +326,15 @@ impl Partition {
         }
     }
 
-    /// Bevy-safe iterative equivalent of Box::Traverse (26 connected neighbors).
+    /// Bevy compatibility API; traversal algorithm is owned by Box.
     pub fn traverse(&self, world: &mut World, start: Entity, seed: i32) {
-        let mut todo = vec![start];
-        while let Some(entity) = todo.pop() {
-            let Some(b) = world.get::<PartitionBox>(entity) else { continue };
-            if b.bubble != -1 { continue; }
-            let (key,level) = (b.key,b.level as i32);
-            world.get_mut::<PartitionBox>(entity).unwrap().bubble = seed;
-            for dx in -1..=1 {
-                for dy in -1..=1 {
-                    for dz in -1..=1 {
-                        if dx == 0 && dy == 0 && dz == 0 { continue; }
-                        if let (Some(x),Some(y),Some(z)) = (
-                            key.ix.checked_add(dx), key.iy.checked_add(dy), key.iz.checked_add(dz)
-                        ) {
-                            if let Some(other) = self.check_box(x,y,z,level) { todo.push(other); }
-                        }
-                    }
-                }
-            }
-        }
+        PartitionBox::traverse_with_partition(self, world, start, seed);
     }
 
+    /// Bevy compatibility API; neighbor scan is owned by Box.
     #[must_use]
     pub fn nearby_bubbles(&self, world: &World, entity: Entity) -> Option<i32> {
-        world.get::<PartitionBox>(entity)?;
-        for x in -1..=1 {
-            for y in -1..=1 {
-                for z in -1..=1 {
-                    if x == 0 && y == 0 && z == 0 { continue; }
-                    if let Some(neighbor) = self.check_offset_box(world, Some(entity),(x,y,z)) {
-                        if let Some(found) = world.get::<PartitionBox>(neighbor) {
-                            if found.bubble != -1 { return Some(found.bubble); }
-                        }
-                    }
-                }
-            }
-        }
-        None
+        PartitionBox::nearby_bubbles_with_partition(self, world, entity)
     }
 
     /// Returns (box width, minimum corners), matching C++ GetActiveBoxes.

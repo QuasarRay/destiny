@@ -14,7 +14,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Canonical C++ Box and mObject now reside in one Bevy component; Box operations still largely owned by Partition and other field identities differ."
+      "notes": "C++ Box owns mObject, SetObject, AddChildren, Traverse, NearbyBubbles in Rust; remaining methods and semantic equivalence are incomplete."
     },
     {
       "cpp_type": "Partitionable",
