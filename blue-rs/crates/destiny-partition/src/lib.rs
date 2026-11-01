@@ -12,6 +12,7 @@ use pyo3::{exceptions::PyTypeError, prelude::*};
 
 const LEVEL_COUNT: usize = 8;
 const GRID_UNIT: f64 = 480.0;
+type BallSortKey = (u8, i64, i64);
 
 /// Box membership metadata only: eventually supplied by the Rust Ball port.
 /// The remaining common state lives in the existing Partitionable component.
@@ -62,8 +63,9 @@ pub struct PartitionStatic {
     pub parent_ball_id: i64,
 }
 
-mod box;
-pub use box::{BoxObject, PartitionBox};
+#[path = "box.rs"]
+mod spatial_box;
+pub use spatial_box::{BoxObject, PartitionBox};
 
 /// Bevy World-local equivalent of Partition's level maps and grid geometry.
 #[derive(Resource, Debug)]
