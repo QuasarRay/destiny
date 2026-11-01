@@ -42,6 +42,8 @@ jobs:
         run: python3 tools/run_cpp_rust_differential.py
       - name: Differential test original C++ Settings.cpp against Rust
         run: python3 tools/run_settings_differential.py
+      - name: Differential test original C++ Partitionable constructor against Rust
+        run: python3 tools/run_partitionable_differential.py
       - name: Test all workspace members
         run: cargo test --locked --workspace
       - name: Build both projects by package name
