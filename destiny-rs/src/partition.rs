@@ -187,7 +187,7 @@ impl Partition {
 
     #[must_use]
     pub fn check_box(&self, ix: i64, iy: i64, iz: i64, level: i32) -> Option<Entity> {
-        let (i, key) = self.mKey(ix, iy, iz, level)?;
+        let (i, key) = self.key(ix, iy, iz, level)?;
         self.levels[i].get(&key).copied()
     }
 
@@ -196,7 +196,7 @@ impl Partition {
     pub fn get_box(
         &mut self, world: &mut World, ix: i64, iy: i64, iz: i64, level: i32,
     ) -> Option<Entity> {
-        let (i, key) = self.mKey(ix, iy, iz, level)?;
+        let (i, key) = self.key(ix, iy, iz, level)?;
         if let Some(entity) = self.levels[i].get(&key).copied() {
             return Some(entity);
         }
