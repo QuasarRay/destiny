@@ -12,6 +12,53 @@ use pyo3::{exceptions::PyTypeError, prelude::*};
 
 const LEVEL_COUNT: usize = 8;
 const GRID_UNIT: f64 = 480.0;
+
+/// C++ `Partition::Key`: lexicographic order is (ix, iy, iz, n).
+///
+/// `BoxSortComparer` compares `Box::mKey`, not box pointers.
+/// Bevy `Entity` identifiers must therefore NOT determine iteration order.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Key {
+    pub ix: i64,
+    pub iy: i64,
+    pub iz: i64,
+    pub n: i64,
+}
+
+impl Key {
+    /// Matches `Key(i, j, k, n)` for the positive grid extents used by Partition.
+    ///
+    /// The C++ default `Key()` (all zeros) is represented by `Default`.
+    #[must_use]
+    pub fn new(ix: i64, iy: i64, iz: i64, n: i64) -> Self {
+        let mut key = Self { ix, iy, iz, n };
+        key.Clamp();
+        key
+    }
+    /// Exact C++ `Key::Clamp()` branch ordering, including its behavior at n=0.
+    /// For n=i64::MIN, the original signed subtraction has undefined behavior;
+    /// this Rust implementation likewise does not certify that input.
+    #[allow(non_snake_case)]
+    pub fn Clamp(&mut self) {
+        if self.ix < 0 {
+            self.ix = 0;
+        } else if self.ix >= self.n {
+            self.ix = self.n - 1;
+        }
+        if self.iy < 0 {
+            self.iy = 0;
+        } else if self.iy >= self.n {
+            self.iy = self.n - 1;
+        }
+        if self.iz < 0 {
+            self.iz = 0;
+        } else if self.iz >= self.n {
+            self.iz = self.n - 1;
+        }
+    }
+}
+
+\n
 type BallSortKey = (u8, i64, i64);
 
 /// Box membership metadata only: eventually supplied by the Rust Ball port.

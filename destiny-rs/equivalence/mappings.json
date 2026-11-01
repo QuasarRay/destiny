@@ -37,11 +37,11 @@
         "src/Partition.h"
       ],
       "rust_type": "Key",
-      "rust_file": "destiny-rs/src/partitionable.rs",
+      "rust_file": "destiny-rs/src/partition.rs",
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Canonical Key name restored; Rust derives Ord instead of C++ operators; declaration moved across source files."
+      "notes": "Canonical Key now declared in partition.rs with C++-named Clamp and original branch ordering; KeyHash and proof remain unimplemented."
     },
     {
       "cpp_type": "Partition",
@@ -99,7 +99,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Rust operators can correspond semantically through traits, but cannot retain C++ operator spellings or overload syntax."
+      "notes": "Original LengthSq and RotateVector names now exist on QuaternionD; multiplication matches C++ explicit scalar formulas, but proof and all edge cases remain unverified."
     }
   ],
   "test_mappings": []

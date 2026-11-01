@@ -11,36 +11,9 @@ use bevy::{
 /// Destiny's original `ID` typedef is a signed 64-bit integer.
 pub type DestinyId = i64;
 
-/// C++ `Partition::Key`: lexicographic order is (ix, iy, iz, n).
-///
-/// `BoxSortComparer` compares `Box::mKey`, not box pointers.
-/// Bevy `Entity` identifiers must therefore NOT determine iteration order.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Key {
-    pub ix: i64,
-    pub iy: i64,
-    pub iz: i64,
-    pub n: i64,
-}
-
-impl Key {
-    /// Matches `Key(i, j, k, n)` for the positive grid extents used by Partition.
-    ///
-    /// The C++ default `Key()` (all zeros) is represented by `Default`.
-    #[must_use]
-    pub fn new(ix: i64, iy: i64, iz: i64, n: i64) -> Self {
-        assert!(n > 0, "partition grid extent must be positive");
-        Self {
-            ix: ix.clamp(0, n - 1),
-            iy: iy.clamp(0, n - 1),
-            iz: iz.clamp(0, n - 1),
-            n,
-        }
-    }
-}
-
-/// Transitional alias for callers of the previous Rust partition port.
-/// C++ names this value type `Key`.
+/// Canonical C++ Key declaration lives with Partition, as in Partition.h.
+/// `BoxKey` is a temporary compatibility alias.
+pub use crate::partition::Key;
 pub type BoxKey = Key;
 
 /// Native Bevy component corresponding to the shared C++ `Partitionable` state.

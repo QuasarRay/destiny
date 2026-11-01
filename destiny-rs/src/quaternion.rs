@@ -49,16 +49,23 @@ impl QuaternionD {
         }
     }
 
-    /// Equivalent to LengthSq().
-    pub fn length_squared(self) -> f64 {
+    /// Original C++ `QuaternionD::LengthSq`, preserving the original owner
+    /// and name. `DVec3` implements the vector-length operation below.
+    #[allow(non_snake_case)]
+    pub fn LengthSq(self) -> f64 {
         self.w * self.w + self.v.length_squared()
+    }
+
+    /// Previous Rust spelling retained for callers.
+    pub fn length_squared(self) -> f64 {
+        self.LengthSq()
     }
 
     /// Mathematical inverse, including for non-unit quaternions.
     ///
     /// A zero-length quaternion has no inverse.
     pub fn inverse(self) -> Self {
-        let length_sq = self.length_squared();
+        let length_sq = self.LengthSq();
 
         Self {
             w: self.w,
@@ -66,13 +73,16 @@ impl QuaternionD {
         } / length_sq
     }
 
-    /// Equivalent to RotateVector().
-    ///
-    /// Uses q * (0, vector) * q.inverse(), preserving
-    /// the original implementation's behavior.
+    /// Original C++ `QuaternionD::RotateVector` calculation:
+    /// `(*this) * QuaternionD(0.0, v) * (-*this)`.
+    #[allow(non_snake_case)]
+    pub fn RotateVector(self, vector: DVec3) -> DVec3 {
+        (self * Self::from_scalar_vector(0.0, vector) * (-self)).v
+    }
+
+    /// Previous Rust spelling retained for callers.
     pub fn rotate_vector(self, vector: DVec3) -> DVec3 {
-        let pure = Self::from_scalar_vector(0.0, vector);
-        (self * pure * self.inverse()).v
+        self.RotateVector(vector)
     }
 }
 
@@ -127,12 +137,14 @@ impl Mul for QuaternionD {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        Self {
-            w: self.w * rhs.w - self.v.dot(rhs.v),
-            v: self.w * rhs.v
-                + rhs.w * self.v
-                + self.v.cross(rhs.v),
-        }
+        // Preserve Quaternion.h's exact scalar operation order; avoid
+        // abstracting through Bevy dot/cross which may reorder floating math.
+        Self::new(
+            self.w * rhs.w - self.v.x * rhs.v.x - self.v.y * rhs.v.y - self.v.z * rhs.v.z,
+            self.w * rhs.v.x + self.v.x * rhs.w + self.v.y * rhs.v.z - self.v.z * rhs.v.y,
+            self.w * rhs.v.y + self.v.y * rhs.w + self.v.z * rhs.v.x - self.v.x * rhs.v.z,
+            self.w * rhs.v.z + self.v.z * rhs.w + self.v.x * rhs.v.y - self.v.y * rhs.v.x,
+        )
     }
 }
 
