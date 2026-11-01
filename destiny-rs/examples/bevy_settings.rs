@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use destiny_settings::{DestinySettingsPlugin, SettingsConfiguration};
+use destiny_rs::{DestinySettingsPlugin, SettingsConfiguration};
 
 fn show_configuration(settings: Res<'_, SettingsConfiguration>) {
     if settings.is_changed() {

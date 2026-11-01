@@ -1,7 +1,6 @@
 # Destiny Settings — Bevy 0.20.1 + CGP Blue-rs
 
-Ports CCP's `Settings.h`, `Settings.cpp`, `Settings_Blue.cpp` into the refactored
-Blue-rs workspace. Maintains **native Bevy ECS Resource** `SettingsConfiguration`
+Ports CCP's `Settings.h`, `Settings.cpp`, `Settings_Blue.cpp` into the unified Destiny-rs crate. Maintains **native Bevy ECS Resource** `SettingsConfiguration`
 and **Blue/PyO3** class metadata; no recreated vector, quaternion, ECS or Python
 interoperability framework.
 
@@ -62,7 +61,7 @@ destiny.settings.Reset()
 ## Verification
 
 ```bash
-cargo test -p destiny-settings
+cargo test -p destiny-rs
 cargo test --workspace
 cargo check --workspace --all-targets
 cargo clippy --workspace --all-targets -- -D warnings

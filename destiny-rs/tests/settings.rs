@@ -1,7 +1,7 @@
 use pyo3::types::PyAnyMethods;
 use bevy::prelude::*;
 use blueexposure::{BlueClass, BlueRegistry};
-use destiny_settings::{
+use destiny_rs::{
     DestinySettingsPlugin, GlobalSettings, SettingsConfiguration,
     register_destiny_settings_python,
 };
