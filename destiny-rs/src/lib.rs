@@ -17,10 +17,13 @@ pub use partition::{Key, KeyHash};
 pub use partitionable::{BoxKey, DestinyId, Partitionable, PartitionableBehavior};
 pub use quaternion::QuaternionD;
 pub use settings::{
-    ApplyStagedSettings, CanApplyDestinySettings, CanReadDestinySettings,
-    DestinySettingsApplierComponent, DestinySettingsPlugin,
-    DestinySettingsReaderComponent, GlobalSettings, ReadStagedSettings,
-    SettingsBridge, SettingsConfiguration, register_destiny_settings_python,
+    DestinySettingsPlugin, GlobalSettings, SettingsConfiguration,
+    register_destiny_settings_python, s_globalSettings,
+    g_collisionMaxIterations, g_useIterativeCollision, g_useDynamicalOrientation,
+    g_disableDynamicalOrientationForMissiles, g_useNewOrbit,
+    g_collisionMaxIterationsDefault, g_useIterativeCollisionDefault,
+    g_useDynamicalOrientationDefault,
+    g_disableDynamicalOrientationForMissilesDefault, g_useNewOrbitDefault,
 };
 
 pub use static_collidable::{StaticCollidable, StaticCollidableSortComparer, StaticCollidableGeometry};

@@ -84,7 +84,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "All five configuration fields now retain their exact C++ m_* names and Blue metadata keeps original Python property names; process-global original settings versus per-Bevy-World staged resource still differs."
+      "notes": "All five member names, ordering, types, and Blue-exposed property names preserved; one value-type class, original default constants and process-global atomics retained. Bevy Resource acts as boundary snapshot, not authority. C++ IRoot refcount and platform differences not proven identical."
     },
     {
       "cpp_type": "GlobalSettings",
@@ -99,7 +99,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "CGP providers, bridge and deferred updates introduce additional objects and behavior."
+      "notes": "Four original C++ methods now own direct process-global operations with original names and immediate results; one process-level s_globalSettings singleton and Python module identity; per-world bridges and CGP providers removed. Relaxed atomics replace C++ non-thread-safe globals; Python Blue/IRoot internals and universal concurrency semantics not proven identical."
     },
     {
       "cpp_type": "QuaternionD",

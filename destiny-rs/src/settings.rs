@@ -1,291 +1,264 @@
-use bevy::ecs::reflect::ReflectResource;
-use bevy::ecs::change_detection::DetectChanges;
-use std::sync::{Arc, Mutex};
+// Copyright © 2023 CCP ehf. Original Settings.h / Settings.cpp /
+// Settings_Blue.cpp.
+//
+// One canonical SettingsConfiguration and one GlobalSettings; the five
+// process-global settings retain original names and are authoritative.
+// Bevy's Resource is a read-only-to-Destiny mirror at the ECS boundary.
+// Atomics are a Rust thread-safety translation of C++ ordinary globals.
+// Each field is read/written independently, exactly as in Settings.cpp.
 
-use bevy::prelude::{App, First, Last, Plugin, Res, ResMut, World};
+use std::sync::{
+    OnceLock,
+    atomic::{AtomicBool, AtomicUsize, Ordering},
+};
+
+use bevy::prelude::{App, First, Plugin, ResMut, World};
 use blueexposure::{blue_methods, blue_pyclass, BlueAppExt, BlueModule};
-use cgp::prelude::*;
-use pyo3::{exceptions::PyRuntimeError, prelude::*, types::PyModuleMethods};
+use pyo3::{
+    exceptions::PyTypeError,
+    prelude::*,
+    types::{PyAny, PyModuleMethods},
+};
 
-/// Destiny collision and orientation configuration. This is the canonical
-/// resource in the Bevy World, and also a snapshot-value Python Blue class.
+// The exact five original C++ default constant names and values.
+#[allow(non_upper_case_globals)]
+pub const g_collisionMaxIterationsDefault: usize = 20;
+#[allow(non_upper_case_globals)]
+pub const g_useIterativeCollisionDefault: bool = false;
+#[allow(non_upper_case_globals)]
+pub const g_useDynamicalOrientationDefault: bool = false;
+#[allow(non_upper_case_globals)]
+pub const g_disableDynamicalOrientationForMissilesDefault: bool = false;
+#[allow(non_upper_case_globals)]
+pub const g_useNewOrbitDefault: bool = false;
+
+// The five original process-global variables. Rust atomics prevent undefined
+// concurrent data races, while retaining one global location per C++ variable.
+// Atomic relaxed loads/stores do not provide a five-field transaction; C++
+// performs five independent assignments and likewise provides no atomic
+// multi-field snapshot.
+#[allow(non_upper_case_globals)]
+pub static g_collisionMaxIterations: AtomicUsize =
+    AtomicUsize::new(g_collisionMaxIterationsDefault);
+#[allow(non_upper_case_globals)]
+pub static g_useIterativeCollision: AtomicBool =
+    AtomicBool::new(g_useIterativeCollisionDefault);
+#[allow(non_upper_case_globals)]
+pub static g_useDynamicalOrientation: AtomicBool =
+    AtomicBool::new(g_useDynamicalOrientationDefault);
+#[allow(non_upper_case_globals)]
+pub static g_disableDynamicalOrientationForMissiles: AtomicBool =
+    AtomicBool::new(g_disableDynamicalOrientationForMissilesDefault);
+#[allow(non_upper_case_globals)]
+pub static g_useNewOrbit: AtomicBool =
+    AtomicBool::new(g_useNewOrbitDefault);
+
+/// Original SettingsConfiguration, preserving all five member field names,
+/// their types, order, Python/Blue names, mutability, and constructor defaults.
 ///
-/// The C++ source documents a recommended collision iteration count >= 10,
-/// but does not enforce it. This port preserves that behavior.
+/// The Bevy Resource derive created by blue_pyclass(kind = "resource") is a
+/// view into the ECS boundary; it is not the authoritative settings store.
 #[blue_pyclass(
     module = "destiny",
     name = "SettingsConfiguration",
     kind = "resource",
-    doc = "Pass an instance of this to destiny.settings.Apply() to configure Destiny"
+    doc = "Pass an instance of this to destiny.settings.Apply() to configure global settings"
 )]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[allow(non_snake_case)] // Original SettingsConfiguration field identities
+#[allow(non_snake_case)]
 pub struct SettingsConfiguration {
-    /// The maximum number of collision iterations (assuming iterative collision is enabled).
-    /// Recommended value >= 10; at 5 agile ships may fly through thin boxes.
+    /// C++ MAP_ATTRIBUTE collisionMaxIterations (READWRITE).
     #[blue(read, write, name = "collisionMaxIterations")]
     pub m_collisionMaxIterations: usize,
 
-    /// Boolean flag to enable/disable iterative collision.
+    /// C++ MAP_ATTRIBUTE useIterativeCollision (READWRITE).
     #[blue(read, write, name = "useIterativeCollision")]
     pub m_useIterativeCollision: bool,
 
-    /// Boolean flag to enable/disable dynamical orientation.
+    /// C++ MAP_ATTRIBUTE useDynamicalOrientation (READWRITE).
     #[blue(read, write, name = "useDynamicalOrientation")]
     pub m_useDynamicalOrientation: bool,
 
-    /// Boolean flag to disable dynamical orientation for missiles
-    /// (if dynamical orientation is enabled).
+    /// C++ MAP_ATTRIBUTE disableDynamicalOrientationForMissiles (READWRITE).
     #[blue(read, write, name = "disableDynamicalOrientationForMissiles")]
     pub m_disableDynamicalOrientationForMissiles: bool,
 
-    /// Use the new orbit behavior.
+    /// C++ MAP_ATTRIBUTE useNewOrbit (READWRITE).
     #[blue(read, write, name = "useNewOrbit")]
     pub m_useNewOrbit: bool,
 }
 
 impl SettingsConfiguration {
     pub const DEFAULT: Self = Self {
-        m_collisionMaxIterations: 20,
-        m_useIterativeCollision: false,
-        m_useDynamicalOrientation: false,
-        m_disableDynamicalOrientationForMissiles: false,
-        m_useNewOrbit: false,
+        m_collisionMaxIterations: g_collisionMaxIterationsDefault,
+        m_useIterativeCollision: g_useIterativeCollisionDefault,
+        m_useDynamicalOrientation: g_useDynamicalOrientationDefault,
+        m_disableDynamicalOrientationForMissiles:
+            g_disableDynamicalOrientationForMissilesDefault,
+        m_useNewOrbit: g_useNewOrbitDefault,
     };
 }
 
 impl Default for SettingsConfiguration {
-    fn default() -> Self {
-        Self::DEFAULT
-    }
+    fn default() -> Self { Self::DEFAULT }
 }
 
 #[blue_methods]
 impl SettingsConfiguration {
     #[blue(new)]
-    fn py_new() -> Self {
-        Self::DEFAULT
-    }
+    fn py_new() -> Self { Self::default() }
 }
 
-#[derive(Clone, Copy, Debug)]
-struct BridgeState {
-    desired: SettingsConfiguration,
-    pending: bool,
-}
-
-/// Per-world, thread-safe command/snapshot bridge.
+/// Original C++ GlobalSettings class has no settings data fields.
 ///
-/// Python threads never borrow a Bevy World directly. Writes become visible
-/// to Python immediately and reach Bevy at the beginning of a later update.
-/// Bevy-owned changes are published to Python at the end of an update.
-#[derive(bevy::prelude::Resource, Clone, Debug)]
-pub struct SettingsBridge {
-    state: Arc<Mutex<BridgeState>>,
-}
-
-impl Default for SettingsBridge {
-    fn default() -> Self {
-        Self::new(SettingsConfiguration::DEFAULT)
-    }
-}
-
-impl SettingsBridge {
-    pub fn new(config: SettingsConfiguration) -> Self {
-        Self {
-            state: Arc::new(Mutex::new(BridgeState { desired: config, pending: false })),
-        }
-    }
-
-    fn stage(&self, desired: SettingsConfiguration) {
-        let mut state = self.state.lock().unwrap_or_else(|err| err.into_inner());
-        state.desired = desired;
-        state.pending = true;
-    }
-
-    #[must_use]
-    pub fn snapshot(&self) -> SettingsConfiguration {
-        self.state.lock().unwrap_or_else(|err| err.into_inner()).desired
-    }
-
-    fn take_pending(&self) -> Option<SettingsConfiguration> {
-        let mut state = self.state.lock().unwrap_or_else(|err| err.into_inner());
-        if !state.pending {
-            return None;
-        }
-        state.pending = false;
-        Some(state.desired)
-    }
-
-    fn publish(&self, current: SettingsConfiguration) {
-        let mut state = self.state.lock().unwrap_or_else(|err| err.into_inner());
-        // A Python request made during Bevy's update must not be lost.
-        if !state.pending {
-            state.desired = current;
-        }
-    }
-}
-
-/// Blue's original `GlobalSettings` interface, scoped to one Bevy World.
-/// The bridge is communication machinery, not a second ECS object model.
+/// Its IRoot/Blue exposure is implemented through PyO3/BlueExposure;
+/// the Bevy ECS uses it only as the singleton controller of C++ globals.
 #[blue_pyclass(
     module = "destiny",
     name = "GlobalSettings",
     kind = "resource",
-    doc = "Use this to configure the Destiny module"
+    doc = "Use this to configure the destiny module"
 )]
-#[derive(Clone, Debug, Default)]
-pub struct GlobalSettings {
-    #[blue(skip)]
-    #[reflect(ignore)]
-    bridge: SettingsBridge,
-}
+#[derive(Clone, Copy, Debug, Default)]
+pub struct GlobalSettings;
+
+// C++: extern GlobalSettings* s_globalSettings = new OGlobalSettings();
+// The single zero-field Rust controller has static process lifetime.
+// The Python object identity is separately cached in PY_GLOBAL_SETTINGS.
+#[allow(non_upper_case_globals)]
+pub static s_globalSettings: GlobalSettings = GlobalSettings;
 
 impl GlobalSettings {
-    /// Connect the Python-visible object to a particular Bevy World.
-    pub fn from_world(world: &World) -> Option<Self> {
-        world.get_resource::<SettingsBridge>().cloned().map(|bridge| Self { bridge })
+    /// Original GlobalSettings::ApplyConfiguration: five sequential assignments.
+    /// The change is immediately visible via GetConfiguration and the globals;
+    /// there is no queued command and no intervening Bevy update required.
+    #[allow(non_snake_case)]
+    pub fn ApplyConfiguration(&self, config: &SettingsConfiguration) {
+        g_collisionMaxIterations.store(config.m_collisionMaxIterations, Ordering::Relaxed);
+        g_useIterativeCollision.store(config.m_useIterativeCollision, Ordering::Relaxed);
+        g_useDynamicalOrientation.store(config.m_useDynamicalOrientation, Ordering::Relaxed);
+        g_disableDynamicalOrientationForMissiles.store(
+            config.m_disableDynamicalOrientationForMissiles, Ordering::Relaxed
+        );
+        g_useNewOrbit.store(config.m_useNewOrbit, Ordering::Relaxed);
     }
 
-    /// C++ `ApplyConfiguration`: last submitted complete configuration wins.
-    pub fn apply(&self, config: SettingsConfiguration) {
-        CanApplyDestinySettings::apply_destiny_settings(self, config);
-    }
-
-    /// C++ `GetConfiguration`: returns an independent configuration value.
+    /// Original GlobalSettings::GetConfiguration: independent value snapshot
+    /// freshly populated from the five original process-global settings.
     #[must_use]
-    pub fn get(&self) -> SettingsConfiguration {
-        CanReadDestinySettings::read_destiny_settings(self)
+    #[allow(non_snake_case)]
+    pub fn GetConfiguration(&self) -> SettingsConfiguration {
+        SettingsConfiguration {
+            m_collisionMaxIterations: g_collisionMaxIterations.load(Ordering::Relaxed),
+            m_useIterativeCollision: g_useIterativeCollision.load(Ordering::Relaxed),
+            m_useDynamicalOrientation: g_useDynamicalOrientation.load(Ordering::Relaxed),
+            m_disableDynamicalOrientationForMissiles:
+                g_disableDynamicalOrientationForMissiles.load(Ordering::Relaxed),
+            m_useNewOrbit: g_useNewOrbit.load(Ordering::Relaxed),
+        }
     }
 
+    /// Original GlobalSettings::GetDefaultConfiguration reads the five C++
+    /// defaults, independently of the current globals.
     #[must_use]
-    pub fn get_default(&self) -> SettingsConfiguration {
+    #[allow(non_snake_case)]
+    pub fn GetDefaultConfiguration(&self) -> SettingsConfiguration {
         SettingsConfiguration::DEFAULT
     }
 
-    pub fn reset(&self) {
-        self.apply(SettingsConfiguration::DEFAULT);
+    /// Original GlobalSettings::ResetConfiguration: reset all five globals
+    /// immediately and in declaration order.
+    #[allow(non_snake_case)]
+    pub fn ResetConfiguration(&self) {
+        g_collisionMaxIterations.store(g_collisionMaxIterationsDefault, Ordering::Relaxed);
+        g_useIterativeCollision.store(g_useIterativeCollisionDefault, Ordering::Relaxed);
+        g_useDynamicalOrientation.store(g_useDynamicalOrientationDefault, Ordering::Relaxed);
+        g_disableDynamicalOrientationForMissiles.store(
+            g_disableDynamicalOrientationForMissilesDefault, Ordering::Relaxed
+        );
+        g_useNewOrbit.store(g_useNewOrbitDefault, Ordering::Relaxed);
     }
 }
 
-// CGP selects settings operations statically. The providers below implement
-// the default per-world Bevy scheduling policy, without introducing a runtime
-// executor or overriding Bevy's resource model.
-#[cgp_component(DestinySettingsApplier)]
-pub trait CanApplyDestinySettings {
-    fn apply_destiny_settings(&self, config: SettingsConfiguration);
-}
-
-#[cgp_component(DestinySettingsReader)]
-pub trait CanReadDestinySettings {
-    fn read_destiny_settings(&self) -> SettingsConfiguration;
-}
-
-pub struct ApplyStagedSettings;
-
-#[cgp_provider]
-impl DestinySettingsApplier<GlobalSettings> for ApplyStagedSettings {
-    fn apply_destiny_settings(context: &GlobalSettings, config: SettingsConfiguration) {
-        context.bridge.stage(config);
-    }
-}
-
-pub struct ReadStagedSettings;
-
-#[cgp_provider]
-impl DestinySettingsReader<GlobalSettings> for ReadStagedSettings {
-    fn read_destiny_settings(context: &GlobalSettings) -> SettingsConfiguration {
-        context.bridge.snapshot()
-    }
-}
-
-delegate_components! {
-    GlobalSettings {
-        DestinySettingsApplierComponent: ApplyStagedSettings,
-        DestinySettingsReaderComponent: ReadStagedSettings,
-    }
-}
-
+// Original Settings_Blue.cpp maps the four C++ method names to these exact
+// Python names, without introducing different authoritative methods.
 #[blue_methods]
 impl GlobalSettings {
-    /// Pass in a destiny.SettingsConfiguration to configure global settings.
     #[blue(name = "Apply")]
-    fn py_apply(&self, config: PyRef<'_, SettingsConfiguration>) {
-        self.apply(*config);
+    fn py_apply(&self, config: &Bound<'_, PyAny>) -> PyResult<()> {
+        let config = config.extract::<PyRef<'_, SettingsConfiguration>>()
+            .map_err(|_| PyTypeError::new_err(
+                "Argument 1 is not a SettingsConfiguration"
+            ))?;
+        self.ApplyConfiguration(&config);
+        Ok(())
     }
 
-    /// Get the current global settings configuration.
     #[blue(name = "Get")]
     fn py_get(&self) -> SettingsConfiguration {
-        self.get()
+        self.GetConfiguration()
     }
 
-    /// Get the default global settings configuration.
     #[blue(name = "GetDefault")]
     fn py_get_default(&self) -> SettingsConfiguration {
-        self.get_default()
+        self.GetDefaultConfiguration()
     }
 
-    /// Reset the current global settings configuration to default values.
     #[blue(name = "Reset")]
     fn py_reset(&self) {
-        self.reset();
+        self.ResetConfiguration();
     }
 }
 
-/// Register both Blue classes and a world-bound `destiny.settings` Python
-/// object in the host application's Python module.
-///
-/// In contrast with the original C++ global pointer, this registration is
-/// explicit and bound to one World, allowing independent simulations.
+// Unlike the old implementation, this cache is process-global. Registering
+// in two modules exposes the SAME Python settings object as the C++ global
+// s_globalSettings, rather than a distinct per-Bevy-World controller.
+static PY_GLOBAL_SETTINGS: OnceLock<Py<GlobalSettings>> = OnceLock::new();
+
+/// Blue module registration as in Settings_Blue.cpp. The World parameter is
+/// retained solely as the host-integration boundary; settings remain global.
 pub fn register_destiny_settings_python(
     py: Python<'_>,
-    module: &Bound<'_, PyModule>,
-    world: &World,
+    module: &Bound<'_, pyo3::types::PyModule>,
+    _world: &World,
 ) -> PyResult<()> {
-    let settings = GlobalSettings::from_world(world)
-        .ok_or_else(|| PyRuntimeError::new_err("DestinySettingsPlugin is not installed"))?;
     BlueModule::new(module)
         .class::<SettingsConfiguration>()?
         .class::<GlobalSettings>()?;
-    module.add("settings", Py::new(py, settings)?)?;
+    if PY_GLOBAL_SETTINGS.get().is_none() {
+        let fresh = Py::new(py, s_globalSettings)?;
+        let _ = PY_GLOBAL_SETTINGS.set(fresh);
+    }
+    let shared = PY_GLOBAL_SETTINGS.get()
+        .expect("settings Python singleton initialized above")
+        .clone_ref(py);
+    module.add("settings", shared)?;
     Ok(())
 }
 
-/// Installs the authoritative Bevy resource and its per-world Python bridge.
-/// No locks are held while running simulation systems.
+/// The ONLY Bevy-specific settings machinery. The original five globals
+/// remain authoritative and are imported into each World as a *snapshot*.
+/// Bevy resource changes do not write globals back or create per-world
+/// independent settings, since neither exists in the original C++ source.
 pub struct DestinySettingsPlugin;
 
 impl Plugin for DestinySettingsPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<SettingsConfiguration>();
-        let initial = *app.world().resource::<SettingsConfiguration>();
-        if !app.world().contains_resource::<SettingsBridge>() {
-            app.insert_resource(SettingsBridge::new(initial));
-        }
-        app.register_blue_class::<SettingsConfiguration>()
+        app.init_resource::<SettingsConfiguration>()
+            .register_blue_class::<SettingsConfiguration>()
             .register_blue_class::<GlobalSettings>()
-            .add_systems(First, import_python_requests)
-            .add_systems(Last, publish_bevy_state);
+            .add_systems(First, synchronize_global_settings_to_bevy);
+        // Plugin installation must immediately match the original globals.
+        let current = s_globalSettings.GetConfiguration();
+        *app.world_mut().resource_mut::<SettingsConfiguration>() = current;
     }
 }
 
-fn import_python_requests(
-    mut config: ResMut<'_, SettingsConfiguration>,
-    bridge: Res<'_, SettingsBridge>,
+fn synchronize_global_settings_to_bevy(
+    mut snapshot: ResMut<'_, SettingsConfiguration>,
 ) {
-    if let Some(request) = bridge.take_pending() {
-        if *config != request {
-            *config = request;
-        }
-    }
-}
-
-fn publish_bevy_state(
-    config: Res<'_, SettingsConfiguration>,
-    bridge: Res<'_, SettingsBridge>,
-) {
-    if config.is_changed() {
-        bridge.publish(*config);
+    let current = s_globalSettings.GetConfiguration();
+    if *snapshot != current {
+        *snapshot = current;
     }
 }
