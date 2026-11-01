@@ -14,7 +14,7 @@ pub use partition::{
     PartitionStatic, get_or_create_box, py_get_box_center, register_partition_python,
 };
 pub use partition::{Key, KeyHash};
-pub use partitionable::{BoxKey, DestinyId, Partitionable, PartitionableBehavior};
+pub use partitionable::{BoxKey, DestinyId, ID, SortedSetOfBoxes, Partitionable, PartitionableBehavior};
 pub use quaternion::QuaternionD;
 pub use settings::{
     DestinySettingsPlugin, GlobalSettings, SettingsConfiguration,

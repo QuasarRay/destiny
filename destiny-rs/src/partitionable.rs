@@ -8,13 +8,22 @@ use bevy::{
     prelude::{Component, Entity, World},
 };
 
-/// Destiny's original `ID` typedef is a signed 64-bit integer.
-pub type DestinyId = i64;
+/// Exact original `typedef int64_t ID;` in Partitionable.h.
+pub type ID = i64;
+
+/// Pre-existing Rust compatibility alias; the canonical name is `ID`.
+pub type DestinyId = ID;
 
 /// Canonical C++ Key declaration lives with Partition, as in Partition.h.
 /// `BoxKey` is a temporary compatibility alias.
 pub use crate::partition::Key;
 pub type BoxKey = Key;
+
+/// Canonical C++ `SortedSetOfBoxes` (SortedSets.h). This represents the
+/// same ordered set membership using key-indexed Bevy entity identities.
+/// The original std::set<Box*, BoxSortComparer> cannot be used directly
+/// without C++ pointers; BTreeMap uses the corresponding Box::mKey order.
+pub type SortedSetOfBoxes = BTreeMap<BoxKey, Entity>;
 
 /// Native Bevy component corresponding to the shared C++ `Partitionable` state.
 ///
@@ -37,7 +46,7 @@ pub struct Partitionable {
     pub mOldBubble: i32,
     pub isInteractive: bool,
     /// Spatial key -> Bevy entity. Deterministic key order, not entity order.
-    mBoxes: BTreeMap<BoxKey, Entity>,
+    pub mBoxes: SortedSetOfBoxes,
     pub mMyBox: Option<Entity>,
     /// Reserved association with the owning Ballpark entity once ported.
     pub mPark: Option<Entity>,
@@ -47,6 +56,15 @@ pub struct Partitionable {
 
 impl Default for Partitionable {
     fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Partitionable {
+    /// Original C++ `Partitionable::Partitionable()` constructor, including
+    /// inherited Vector3d zero construction and empty SortedSetOfBoxes.
+    #[must_use]
+    pub fn new() -> Self {
         Self {
             mId: 0,
             mHandled: false,
@@ -55,7 +73,7 @@ impl Default for Partitionable {
             mNewBubble: -1,
             mOldBubble: -1,
             isInteractive: false,
-            mBoxes: BTreeMap::new(),
+            mBoxes: SortedSetOfBoxes::new(),
             mMyBox: None,
             mPark: None,
             mEffectStamp: 0,
@@ -102,25 +120,72 @@ impl Partitionable {
     }
 }
 
-/// Explicit contract corresponding to Partitionable's seven pure virtual methods.
+/// The seven C++ *pure virtual* methods have no bodies in Partitionable.cpp.
+/// Rust traits are the language-required abstract dispatch boundary. These
+/// exact names preserve the original abstract method identities and owners.
+/// Each concrete derived implementation must satisfy all seven operations.
 ///
-/// Implement this for the concrete Ball and StaticCollidable partition policies,
-/// not for `Partitionable` itself: the original abstract class has NO
-/// implementations of these methods. Passing Bevy's World and object Entity
-/// makes reciprocal box/ballpark updates possible without unsafe C++ pointers.
-/// `Option<Entity>` preserves nullable C++ Box pointers.
+/// The explicit World + Entity parameters replace the original implicit C++
+/// `this` and nullable pointers. Unlike the original class, Rust cannot
+/// attach abstract virtual methods directly to a concrete ECS component.
+#[allow(non_snake_case)]
 pub trait PartitionableBehavior {
-    fn clear_boxes(world: &mut World, object: Entity);
-    fn delete_from_boxes(world: &mut World, object: Entity);
-    fn insert_in_box(world: &mut World, object: Entity, box_entity: Option<Entity>);
-    fn get_bounding_radius(world: &World, object: Entity) -> f32;
-    fn get_inflated_radius(world: &World, object: Entity, dt: f64) -> f64;
-    fn set_box_active(world: &mut World, object: Entity, box_id: i32, active: bool);
-    fn insert_in_boxes(
-        world: &mut World,
-        object: Entity,
-        first: Option<Entity>,
-        top: Option<Entity>,
-        new_bubble_id: i32,
+    /// `virtual void ClearBoxes() = 0;`
+    fn ClearBoxes(world: &mut World, object: Entity);
+    /// `virtual void DeleteFromBoxes() = 0;`
+    fn DeleteFromBoxes(world: &mut World, object: Entity);
+    /// `virtual void InsertInBox(Box* box) = 0;`
+    fn InsertInBox(world: &mut World, object: Entity, box_entity: Option<Entity>);
+    /// `virtual float GetBoundingRadius() = 0;`
+    fn GetBoundingRadius(world: &World, object: Entity) -> f32;
+    /// `virtual double GetInflatedRadius(double dt) = 0;`
+    fn GetInflatedRadius(world: &World, object: Entity, dt: f64) -> f64;
+    /// `virtual void SetBoxActive(int boxId, bool isActive) = 0;`
+    fn SetBoxActive(world: &mut World, object: Entity, box_id: i32, isActive: bool);
+    /// `virtual void InsertInBoxes(Box*, Box*, long) = 0;`
+    fn InsertInBoxes(
+        world: &mut World, object: Entity, box1: Option<Entity>,
+        top: Option<Entity>, newBubbleId: i32,
     );
+}
+
+// Pure-virtual method entry points keep their original owner, Partitionable,
+// while Rust's trait implements the virtual dispatch policy. No fake Ball
+// methods are provided while the concrete Ball class remains incomplete.
+// T supplies the dynamic concrete policy that is normally selected by a C++
+// vtable; these methods do not implement any original pure-virtual bodies.
+#[allow(non_snake_case)]
+impl Partitionable {
+    pub fn ClearBoxes<T: PartitionableBehavior>(world: &mut World, object: Entity) {
+        T::ClearBoxes(world, object);
+    }
+    pub fn DeleteFromBoxes<T: PartitionableBehavior>(world: &mut World, object: Entity) {
+        T::DeleteFromBoxes(world, object);
+    }
+    pub fn InsertInBox<T: PartitionableBehavior>(
+        world: &mut World, object: Entity, box_entity: Option<Entity>,
+    ) {
+        T::InsertInBox(world, object, box_entity);
+    }
+    #[must_use]
+    pub fn GetBoundingRadius<T: PartitionableBehavior>(world: &World, object: Entity) -> f32 {
+        T::GetBoundingRadius(world, object)
+    }
+    #[must_use]
+    pub fn GetInflatedRadius<T: PartitionableBehavior>(
+        world: &World, object: Entity, dt: f64,
+    ) -> f64 {
+        T::GetInflatedRadius(world, object, dt)
+    }
+    pub fn SetBoxActive<T: PartitionableBehavior>(
+        world: &mut World, object: Entity, box_id: i32, isActive: bool,
+    ) {
+        T::SetBoxActive(world, object, box_id, isActive);
+    }
+    pub fn InsertInBoxes<T: PartitionableBehavior>(
+        world: &mut World, object: Entity, box1: Option<Entity>,
+        top: Option<Entity>, newBubbleId: i32,
+    ) {
+        T::InsertInBoxes(world, object, box1, top, newBubbleId);
+    }
 }

@@ -28,7 +28,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Partitionable fields now use the exact C++ names mId, mHandled, mNewPos, mOldPos, mNewBubble, mOldBubble, isInteractive, mBoxes, mMyBox, mPark, mEffectStamp, isMoribund. Virtual behavior remains in a separate trait; formal/behavioral parity is unproven."
+      "notes": "All 12 original fields, ID and SortedSetOfBoxes type names, original constructor and seven PascalCase pure-virtual method names are represented, with explicit generic ECS dispatch facades on Partitionable. Original std::set<Box*,BoxSortComparer> maps to key-indexed BTreeMap<Key,Entity>; Box* and Ballpark* map to Option<Entity>; C++ vtable and concrete derived classes remain Bevy/trait boundaries. End-to-end behavior and bitwise C++ ABI equivalence are unproven."
     },
     {
       "cpp_type": "Key",

@@ -77,3 +77,77 @@ fn clear_only_forgets_own_references() {
     assert_eq!(p.mMyBox, None);
     assert!(p.mPark.is_some(), "C++ ClearBoxes does not clear the park");
 }
+
+
+#[test]
+fn original_cpp_names_and_single_authoritative_membership_set() {
+    use destiny_rs::{ID, SortedSetOfBoxes};
+    let original_id: ID = -123;
+    let mut p = Partitionable::new();
+    p.mId = original_id;
+    let mut world = World::new();
+    let one = world.spawn_empty().id();
+    let two = world.spawn_empty().id();
+    let a = BoxKey::new(4, 3, 2, 16);
+    let b = BoxKey::new(7, 3, 2, 16);
+    assert!(p.track_box(b, one));
+    assert!(p.track_box(a, two));
+    let set: &SortedSetOfBoxes = &p.mBoxes;
+    assert_eq!(set.values().copied().collect::<Vec<_>>(), vec![two, one]);
+    assert_eq!(p.boxes().map(|(_, e)| e).collect::<Vec<_>>(), vec![two, one]);
+    assert_eq!(p.mId, -123);
+}
+
+#[test]
+fn abstract_cpp_method_dispatch_is_original_named_on_partitionable() {
+    use destiny_rs::PartitionableBehavior;
+
+    struct ExampleDerived;
+
+    #[allow(non_snake_case)]
+    impl PartitionableBehavior for ExampleDerived {
+        fn ClearBoxes(world: &mut World, object: Entity) {
+            world.get_mut::<Partitionable>(object).unwrap().forget_box_references();
+        }
+        fn DeleteFromBoxes(world: &mut World, object: Entity) {
+            Self::ClearBoxes(world, object);
+        }
+        fn InsertInBox(world: &mut World, object: Entity, box_entity: Option<Entity>) {
+            if let Some(bx) = box_entity {
+                let key = world.get::<destiny_rs::Box>(bx).unwrap().mKey;
+                world.get_mut::<Partitionable>(object).unwrap().track_box(key, bx);
+            }
+        }
+        fn GetBoundingRadius(_world: &World, _object: Entity) -> f32 { 6.25 }
+        fn GetInflatedRadius(_world: &World, _object: Entity, dt: f64) -> f64 {
+            6.25 + dt
+        }
+        fn SetBoxActive(world: &mut World, object: Entity, box_id: i32, isActive: bool) {
+            let _ = (world, object, box_id, isActive);
+        }
+        fn InsertInBoxes(
+            world: &mut World, object: Entity, box1: Option<Entity>,
+            top: Option<Entity>, newBubbleId: i32,
+        ) {
+            let _ = (top, newBubbleId);
+            Self::InsertInBox(world, object, box1);
+        }
+    }
+
+    let mut app = App::new();
+    app.init_resource::<destiny_rs::Partition>();
+    let object = app.world_mut().spawn(Partitionable::new()).id();
+    let bx = app.world_mut().resource_scope(|world, mut partition: Mut<'_, destiny_rs::Partition>| {
+        partition.get_box(world, 3, 2, 1, 7).unwrap()
+    });
+    Partitionable::InsertInBox::<ExampleDerived>(app.world_mut(), object, Some(bx));
+    assert_eq!(app.world().get::<Partitionable>(object).unwrap().mBoxes.len(), 1);
+    assert_eq!(Partitionable::GetBoundingRadius::<ExampleDerived>(app.world(), object), 6.25);
+    assert_eq!(Partitionable::GetInflatedRadius::<ExampleDerived>(app.world(), object, 1.5), 7.75);
+    Partitionable::SetBoxActive::<ExampleDerived>(app.world_mut(), object, 8, true);
+    Partitionable::ClearBoxes::<ExampleDerived>(app.world_mut(), object);
+    assert_eq!(app.world().get::<Partitionable>(object).unwrap().mBoxes.len(), 0);
+    Partitionable::InsertInBoxes::<ExampleDerived>(app.world_mut(), object, Some(bx), None, 9);
+    Partitionable::DeleteFromBoxes::<ExampleDerived>(app.world_mut(), object);
+    assert!(app.world().get::<Partitionable>(object).unwrap().mBoxes.is_empty());
+}
