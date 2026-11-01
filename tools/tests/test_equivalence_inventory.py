@@ -22,6 +22,17 @@ class InventoryTests(unittest.TestCase):
         body = audit_module.balanced_body(text, classes[0].end() - 1)
         self.assertEqual(set(audit_module.class_methods(body)), {"Advance", "Value"})
 
+    def test_rust_field_parser_recognizes_comma_delimited_structs(self):
+        source = """pub struct Box {
+    pub mKey: Key,
+    #[doc = "preserved"]
+    pub mObject: Option<Py<PyAny>>,
+    mParent: Option<Entity>,
+}
+"""
+        actual = audit_module.rust_struct_fields(source)["Box"]
+        self.assertEqual(actual, ["mKey", "mObject", "mParent"])
+
     def test_missing_source_and_missing_methods_are_detected(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

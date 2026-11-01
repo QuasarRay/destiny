@@ -106,17 +106,26 @@ def class_fields(body: str) -> list[str]:
 
 
 def rust_struct_fields(source: str) -> dict[str, list[str]]:
+    """Read named Rust struct fields, which are COMMA-delimited, unlike C++.
+
+    The supported declaration subset is intentionally narrow. This is still
+    a lexical diagnostic rather than a Rust AST / HIR parser.
+    """
     found = {}
     for match in RUST_STRUCTS.finditer(source):
         body = balanced_body(source, match.end() - 1)
         if body is None:
             continue
         fields = []
-        for item in class_members(body):
-            item = re.sub(r"#\[[^]]*\]\s*", "", item).strip()
-            name = re.match(r"(?:pub(?:\([^)]*\))?\s+)?([A-Za-z_]\w*)\s*:", item)
-            if name:
-                fields.append(name.group(1))
+        for line in body.splitlines():
+            line = line.split("//", 1)[0].strip()
+            # Each named field in the current port starts on its own line.
+            field = re.match(
+                r"(?:pub(?:\([^)]*\))?\s+)?([A-Za-z_]\w*)\s*:",
+                line,
+            )
+            if field:
+                fields.append(field.group(1))
         found[match.group(1)] = sorted(set(fields))
     return found
 
