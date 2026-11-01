@@ -1,0 +1,15 @@
+[package]
+name = "destiny-settings"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+bevy.workspace = true
+cgp.workspace = true
+blue = { path = "../blue" }
+blueexposure = { path = "../blueexposure" }
+pyo3.workspace = true
+
+[lints]
+workspace = true

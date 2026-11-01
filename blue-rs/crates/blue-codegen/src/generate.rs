@@ -88,7 +88,7 @@ fn render_tests(tests: &[LegacyTest]) -> Result<String, genco::fmt::Error> {
             None => quote! { None },
         };
         quote_in! { body =>
-            registry.register_legacy_test($register {
+            registry.register_legacy_test($&register {
                 source: $(quoted(source)).to_owned(),
                 legacy_name: $(quoted(legacy)).to_owned(),
                 rust_test: $rust_test,

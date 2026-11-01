@@ -155,6 +155,7 @@ struct FieldFlags {
     write: bool,
     persist: bool,
     skip: bool,
+    name: Option<String>,
 }
 
 fn field_flags(attrs: &[Attribute]) -> syn::Result<FieldFlags> {
@@ -169,6 +170,10 @@ fn field_flags(attrs: &[Attribute]) -> syn::Result<FieldFlags> {
                 flags.persist = true;
             } else if meta.path.is_ident("skip") {
                 flags.skip = true;
+            } else if meta.path.is_ident("name") {
+                flags.name = Some(meta.value()?.parse::<LitStr>()?.value());
+            } else {
+                return Err(meta.error("unsupported Blue field option"));
             }
             Ok(())
         })?;
@@ -230,12 +235,17 @@ fn expand_blue_class(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStrea
                     if flags.skip {
                         return Ok(None);
                     }
-                    let field_name = LitStr::new(&field_ident.to_string(), field_ident.span());
+                    let field_name = LitStr::new(
+                        flags.name.as_deref().unwrap_or(&field_ident.to_string()),
+                        field_ident.span(),
+                    );
+                    let field_doc = LitStr::new(&doc_string(&field.attrs), field_ident.span());
                     let read = flags.read;
                     let write = flags.write;
                     let persist = flags.persist;
                     Ok(Some(quote! {
                         ::blueexposure::BlueFieldInfo::new(#field_name, #read, #write, #persist)
+                            .with_doc(#field_doc)
                     }))
                 })
                 .collect::<syn::Result<Vec<_>>>()?
@@ -251,12 +261,17 @@ fn expand_blue_class(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStrea
                     if flags.skip {
                         return Ok(None);
                     }
-                    let field_name = LitStr::new(&format!("_{index}"), field.span());
+                    let field_name = LitStr::new(
+                        flags.name.as_deref().unwrap_or(&format!("_{index}")),
+                        field.span(),
+                    );
+                    let field_doc = LitStr::new(&doc_string(&field.attrs), field.span());
                     let read = flags.read;
                     let write = flags.write;
                     let persist = flags.persist;
                     Ok(Some(quote! {
                         ::blueexposure::BlueFieldInfo::new(#field_name, #read, #write, #persist)
+                            .with_doc(#field_doc)
                     }))
                 })
                 .collect::<syn::Result<Vec<_>>>()?
@@ -313,12 +328,22 @@ pub fn blue_pyclass(attr: TokenStream, item: TokenStream) -> TokenStream {
     );
 
     for field in item.fields.iter_mut() {
-        match field_flags(&field.attrs) {
-            Ok(flags) if flags.read && flags.write => field.attrs.push(parse_quote!(#[pyo3(get, set)])),
-            Ok(flags) if flags.read => field.attrs.push(parse_quote!(#[pyo3(get)])),
-            Ok(flags) if flags.write => field.attrs.push(parse_quote!(#[pyo3(set)])),
-            Ok(_) => {}
+        let flags = match field_flags(&field.attrs) {
+            Ok(flags) => flags,
             Err(error) => return error.into_compile_error().into(),
+        };
+        if !flags.read && !flags.write {
+            continue;
+        }
+        let py_name = flags.name.as_deref().map(|name| LitStr::new(name, field.span()));
+        match (flags.read, flags.write, py_name) {
+            (true, true, Some(name)) => field.attrs.push(parse_quote!(#[pyo3(get, set, name = #name)])),
+            (true, false, Some(name)) => field.attrs.push(parse_quote!(#[pyo3(get, name = #name)])),
+            (false, true, Some(name)) => field.attrs.push(parse_quote!(#[pyo3(set, name = #name)])),
+            (true, true, None) => field.attrs.push(parse_quote!(#[pyo3(get, set)])),
+            (true, false, None) => field.attrs.push(parse_quote!(#[pyo3(get)])),
+            (false, true, None) => field.attrs.push(parse_quote!(#[pyo3(set)])),
+            _ => {}
         }
     }
 

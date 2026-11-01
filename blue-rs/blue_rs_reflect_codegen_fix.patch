@@ -1,0 +1,143 @@
+diff --git a/crates/blue-codegen/src/generate.rs b/crates/blue-codegen/src/generate.rs
+index 41a6c7f..8ab1a64 100644
+--- a/crates/blue-codegen/src/generate.rs
++++ b/crates/blue-codegen/src/generate.rs
+@@ -88,7 +88,7 @@ fn render_tests(tests: &[LegacyTest]) -> Result<String, genco::fmt::Error> {
+             None => quote! { None },
+         };
+         quote_in! { body =>
+-            registry.register_legacy_test($&register {
++            registry.register_legacy_test($(&register) {
+                 source: $(quoted(source)).to_owned(),
+                 legacy_name: $(quoted(legacy)).to_owned(),
+                 rust_test: $rust_test,
+@@ -212,3 +212,33 @@ fn sanitize_ident(value: &str) -> String {
+     }
+     out
+ }
++
++#[cfg(test)]
++mod regression_tests {
++    use super::*;
++
++    #[test]
++    fn genco_reuses_legacy_test_info_import_in_multiple_iterations() {
++        let tests = vec![
++            LegacyTest {
++                source: "first.cpp".to_owned(),
++                legacy_name: "First".to_owned(),
++                line: None,
++                discovery: "regression".to_owned(),
++                rust_test: None,
++            },
++            LegacyTest {
++                source: "second.cpp".to_owned(),
++                legacy_name: "Second".to_owned(),
++                line: None,
++                discovery: "regression".to_owned(),
++                rust_test: None,
++            },
++        ];
++        let rendered = render_tests(&tests).expect("Genco rendering must succeed");
++        assert!(rendered.contains("BlueLegacyTestInfo"));
++        assert!(rendered.contains("First"));
++        assert!(rendered.contains("Second"));
++        assert!(!rendered.contains("$&register"));
++    }
++}
+diff --git a/crates/blue/src/clock.rs b/crates/blue/src/clock.rs
+index 0311587..dbd5128 100644
+--- a/crates/blue/src/clock.rs
++++ b/crates/blue/src/clock.rs
+@@ -1,3 +1,4 @@
++use bevy::prelude::ReflectResource;
+ use blueexposure::{blue_methods, blue_pyclass};
+ 
+ #[blue_pyclass(module = "blue", name = "BlueClock", kind = "resource")]
+diff --git a/crates/blue/src/lifecycle.rs b/crates/blue/src/lifecycle.rs
+index 849e45a..4f007ea 100644
+--- a/crates/blue/src/lifecycle.rs
++++ b/crates/blue/src/lifecycle.rs
+@@ -1,4 +1,4 @@
+-use bevy::prelude::{Reflect, Resource};
++use bevy::prelude::{Reflect, ReflectResource, Resource};
+ use derive_more::Display;
+ 
+ #[derive(Clone, Copy, Debug, Default, Display, Eq, PartialEq, Reflect)]
+diff --git a/crates/blue/src/object.rs b/crates/blue/src/object.rs
+index 0494b1c..f49df0d 100644
+--- a/crates/blue/src/object.rs
++++ b/crates/blue/src/object.rs
+@@ -1,3 +1,4 @@
++use bevy::prelude::ReflectComponent;
+ use blueexposure::{blue_methods, blue_pyclass};
+ 
+ #[blue_pyclass(module = "blue", name = "BlueObjectMetadata", kind = "component")]
+diff --git a/crates/blue/src/paths.rs b/crates/blue/src/paths.rs
+index edcce17..99f6159 100644
+--- a/crates/blue/src/paths.rs
++++ b/crates/blue/src/paths.rs
+@@ -3,6 +3,7 @@ use std::{
+     path::{Path, PathBuf},
+ };
+ 
++use bevy::prelude::ReflectResource;
+ use blueexposure::{blue_methods, blue_pyclass};
+ use thiserror::Error;
+ 
+diff --git a/crates/blue/src/startup.rs b/crates/blue/src/startup.rs
+index 7e8c26e..2a13b48 100644
+--- a/crates/blue/src/startup.rs
++++ b/crates/blue/src/startup.rs
+@@ -1,3 +1,4 @@
++use bevy::prelude::ReflectResource;
+ use blueexposure::{blue_methods, blue_pyclass};
+ use delegate::delegate;
+ 
+diff --git a/crates/blueexposure/src/callback.rs b/crates/blueexposure/src/callback.rs
+index 6da46b1..6cef45a 100644
+--- a/crates/blueexposure/src/callback.rs
++++ b/crates/blueexposure/src/callback.rs
+@@ -1,3 +1,4 @@
++use bevy::prelude::ReflectComponent;
+ use pyo3::{prelude::*, types::PyAny};
+ 
+ use crate::{blue_methods, blue_pyclass};
+diff --git a/crates/blueexposure/src/metadata.rs b/crates/blueexposure/src/metadata.rs
+index d59e91f..816814a 100644
+--- a/crates/blueexposure/src/metadata.rs
++++ b/crates/blueexposure/src/metadata.rs
+@@ -8,7 +8,7 @@ pub trait BlueMetadataShape {
+     fn rust_field_names() -> &'static [&'static str];
+ }
+ 
+-/// Generate metadata schemas from Rust fields, without a second list.
++// Generate metadata schemas from Rust fields, without a second list.
+ define_derive_deftly! {
+     BlueMetadataShape:
+     impl crate::metadata::BlueMetadataShape for $ttype {
+diff --git a/crates/blueexposure/src/registry.rs b/crates/blueexposure/src/registry.rs
+index da20a5f..8eb6002 100644
+--- a/crates/blueexposure/src/registry.rs
++++ b/crates/blueexposure/src/registry.rs
+@@ -1,6 +1,6 @@
+ use std::collections::BTreeMap;
+ 
+-use bevy::prelude::{Reflect, Resource};
++use bevy::prelude::{Reflect, ReflectResource, Resource};
+ use delegate::delegate;
+ use cgp::prelude::*;
+ 
+diff --git a/crates/destiny-settings/src/settings.rs b/crates/destiny-settings/src/settings.rs
+index 0f545e0..986eb95 100644
+--- a/crates/destiny-settings/src/settings.rs
++++ b/crates/destiny-settings/src/settings.rs
+@@ -3,7 +3,7 @@
+ 
+ use std::sync::{Arc, Mutex};
+ 
+-use bevy::prelude::{App, First, Last, Plugin, Res, ResMut, World};
++use bevy::prelude::{App, First, Last, Plugin, ReflectResource, Res, ResMut, World};
+ use blueexposure::{blue_methods, blue_pyclass, BlueAppExt, BlueModule};
+ use cgp::prelude::*;
+ use pyo3::{exceptions::PyRuntimeError, prelude::*, types::PyModuleMethods};

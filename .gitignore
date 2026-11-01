@@ -38,3 +38,10 @@ cmake-build*
 /tools/benchmark/bin
 /destiny-rs/target
 /target
+/blue-rs/target
+
+# Added by cargo
+#
+# already existing elements were commented out
+
+#/target

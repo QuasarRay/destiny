@@ -13,7 +13,7 @@ fn derive_deftly_schema_is_generated_from_metadata_fields() {
     );
     assert_eq!(
         BlueFieldInfo::rust_field_names(),
-        &["name", "readable", "writable", "persisted"]
+        &["name", "doc", "readable", "writable", "persisted"]
     );
 }
 

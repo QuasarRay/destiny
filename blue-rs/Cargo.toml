@@ -6,6 +6,7 @@ members = [
     "crates/blue",
     "crates/blue-codegen",
     "crates/bluepycore",
+    "crates/destiny-settings",
 ]
 
 [workspace.package]

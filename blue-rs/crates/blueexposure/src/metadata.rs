@@ -30,6 +30,9 @@ pub enum BlueClassKind {
 #[derive_deftly(BlueMetadataShape)]
 pub struct BlueFieldInfo {
     pub name: String,
+    /// Human-facing Blue field documentation, sourced from Rust doc comments.
+    #[serde(default)]
+    pub doc: String,
     pub readable: bool,
     pub writable: bool,
     pub persisted: bool,
@@ -40,10 +43,17 @@ impl BlueFieldInfo {
     pub fn new(name: impl Into<String>, readable: bool, writable: bool, persisted: bool) -> Self {
         Self {
             name: name.into(),
+            doc: String::new(),
             readable,
             writable,
             persisted,
         }
+    }
+
+    #[must_use]
+    pub fn with_doc(mut self, doc: impl Into<String>) -> Self {
+        self.doc = doc.into();
+        self
     }
 }
 
