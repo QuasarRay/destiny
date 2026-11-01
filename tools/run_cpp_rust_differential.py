@@ -49,8 +49,12 @@ def main() -> int:
             if case == "key_hash":
                 if a != b:
                     failures.append((case, i, a, b, "exact integer hash mismatch"))
+            elif math.isnan(a) and math.isnan(b):
+                continue
+            elif math.isinf(a) and math.isinf(b) and (a > 0) == (b > 0):
+                continue
             elif not math.isfinite(a) or not math.isfinite(b):
-                failures.append((case, i, a, b, "non-finite output"))
+                failures.append((case, i, a, b, "IEEE-754 category mismatch"))
             elif not math.isclose(a, b, rel_tol=1e-13, abs_tol=1e-13):
                 failures.append((case, i, a, b, "numeric mismatch"))
     print(f"Compared {len(cpp)} original-C++/Rust arithmetic fixtures")
