@@ -112,7 +112,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Original LengthSq and RotateVector names now exist on QuaternionD; multiplication matches C++ explicit scalar formulas, but proof and all edge cases remain unverified."
+      "notes": "Complete original Quaternion.h API mapped: four constructors (Default/new/from_axis_angle/from_scalar_vector), two fields, += -= unary - binary / * + -, == !=, LengthSq and RotateVector. Exact source arithmetic written explicitly and C++ source-level method ownership restored. DVec3 and DQuat adapters are Bevy boundary substitutions; no source ECS entity exists. Nonfinite, FP/libm, cross-platform and universal behavioral equivalence still need verification."
     },
     {
       "cpp_type": "StaticCollidable",

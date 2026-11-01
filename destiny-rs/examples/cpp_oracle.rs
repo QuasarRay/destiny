@@ -16,7 +16,7 @@ fn main() {
     output_q("sum", a + b);
     output_q("difference", a - b);
     output("length", a.LengthSq(), 0.0, 0.0, 0.0);
-    let rotated = a.RotateVector(DVec3::new(4.0, 5.0, -1.0));
+    let rotated = a.RotateVector(&DVec3::new(4.0, 5.0, -1.0));
     output("rotate", rotated.x, rotated.y, rotated.z, 0.0);
     output_q("zero_axis", QuaternionD::from_axis_angle(DVec3::ZERO, 1.5));
     output_q("nonunit_axis", QuaternionD::from_axis_angle(DVec3::new(3.0, 4.0, 0.0), 1.5));
