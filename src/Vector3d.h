@@ -1,5 +1,3 @@
-// Copyright © 2014 CCP ehf.
-
 #pragma once
 #ifndef Vector3d_H
 #define Vector3d_H

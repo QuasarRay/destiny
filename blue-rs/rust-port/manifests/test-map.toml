@@ -1,0 +1,10 @@
+# Doxygen/source-discovered legacy tests are matched by fully qualified legacy name.
+# Mappings are only added when the Rust semantic test checks the same contract.
+
+[[test]]
+legacy = "tests/python/bluetests/test/test_paths.py::TestPaths::testGetAndSetSearchPath"
+rust = "blue::runtime::search_paths_match_blue_set_get_and_clear_semantics"
+
+[[test]]
+legacy = "tests/python/bluetests/test/test_paths.py::TestPaths::testSettingCircularSearchPathFails"
+rust = "blue::runtime::circular_search_paths_are_rejected_without_committing_candidate"
