@@ -4,18 +4,18 @@ use destiny_rs::partitionable::{BoxKey, Partitionable};
 #[test]
 fn cpp_constructor_defaults_match() {
     let p = Partitionable::default();
-    assert_eq!(p.id, 0);
-    assert!(!p.handled);
-    assert_eq!(p.new_pos, DVec3::ZERO);
-    assert_eq!(p.old_pos, DVec3::ZERO);
-    assert_eq!(p.new_bubble, -1);
-    assert_eq!(p.old_bubble, -1);
-    assert!(!p.is_interactive);
+    assert_eq!(p.mId, 0);
+    assert!(!p.mHandled);
+    assert_eq!(p.mNewPos, DVec3::ZERO);
+    assert_eq!(p.mOldPos, DVec3::ZERO);
+    assert_eq!(p.mNewBubble, -1);
+    assert_eq!(p.mOldBubble, -1);
+    assert!(!p.isInteractive);
     assert_eq!(p.boxes().count(), 0);
-    assert_eq!(p.my_box, None);
-    assert_eq!(p.ballpark, None);
-    assert_eq!(p.effect_stamp, 0);
-    assert!(!p.is_moribund);
+    assert_eq!(p.mMyBox, None);
+    assert_eq!(p.mPark, None);
+    assert_eq!(p.mEffectStamp, 0);
+    assert!(!p.isMoribund);
 }
 
 #[test]
@@ -23,8 +23,8 @@ fn entity_component_uses_bevy_world_storage() {
     let mut world = World::new();
     let entity = world.spawn(Partitionable::default()).id();
     let pos = DVec3::new(1e10, -2.5, 0.125);
-    world.get_mut::<Partitionable>(entity).unwrap().new_pos = pos;
-    assert_eq!(world.get::<Partitionable>(entity).unwrap().new_pos, pos);
+    world.get_mut::<Partitionable>(entity).unwrap().mNewPos = pos;
+    assert_eq!(world.get::<Partitionable>(entity).unwrap().mNewPos, pos);
 }
 
 #[test]
@@ -70,10 +70,10 @@ fn clear_only_forgets_own_references() {
     let box_entity = world.spawn_empty().id();
     let mut p = Partitionable::default();
     p.track_box(BoxKey::new(1, 2, 3, 8), box_entity);
-    p.my_box = Some(box_entity);
-    p.ballpark = Some(world.spawn_empty().id());
+    p.mMyBox = Some(box_entity);
+    p.mPark = Some(world.spawn_empty().id());
     p.forget_box_references();
     assert_eq!(p.boxes().count(), 0);
-    assert_eq!(p.my_box, None);
-    assert!(p.ballpark.is_some(), "C++ ClearBoxes does not clear the park");
+    assert_eq!(p.mMyBox, None);
+    assert!(p.mPark.is_some(), "C++ ClearBoxes does not clear the park");
 }

@@ -8,7 +8,7 @@ use pyo3::types::PyAnyMethods;
 
 fn partitionable_with_id(id: i64) -> Partitionable {
     let mut p = Partitionable::default();
-    p.id = id;
+    p.mId = id;
     p
 }
 

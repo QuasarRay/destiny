@@ -9,7 +9,7 @@ fn app() -> App {
 }
 fn with_id(id: i64) -> Partitionable {
     let mut p = Partitionable::default();
-    p.id = id;
+    p.mId = id;
     p
 }
 #[test]

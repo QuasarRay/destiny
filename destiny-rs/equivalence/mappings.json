@@ -28,7 +28,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "C++ base virtual methods are expressed by separate Rust trait; field names and representation differ."
+      "notes": "Partitionable fields now use the exact C++ names mId, mHandled, mNewPos, mOldPos, mNewBubble, mOldBubble, isInteractive, mBoxes, mMyBox, mPark, mEffectStamp, isMoribund. Virtual behavior remains in a separate trait; formal/behavioral parity is unproven."
     },
     {
       "cpp_type": "Key",

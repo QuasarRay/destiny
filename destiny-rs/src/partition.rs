@@ -397,7 +397,7 @@ impl Partition {
         let key = b.mKey;
         let Some(p) = world.get::<Partitionable>(ball) else {return false};
         let Some(meta) = world.get::<PartitionBall>(ball) else {return false};
-        let order = ball_order(p.id, meta.owner_id);
+        let order = ball_order(p.mId, meta.owner_id);
         let inserted = {
             use std::collections::btree_map::Entry;
             match world.get_mut::<PartitionBox>(box_entity).unwrap().balls.entry(order) {
@@ -417,7 +417,7 @@ impl Partition {
         let key=b.mKey;
         let Some(p)=world.get::<Partitionable>(object) else{return false};
         let Some(meta)=world.get::<PartitionStatic>(object) else{return false};
-        let order=(meta.parent_ball_id,p.id);
+        let order=(meta.parent_ball_id,p.mId);
         let inserted={
             use std::collections::btree_map::Entry;
             match world.get_mut::<PartitionBox>(box_entity).unwrap().mStaticCollidables.entry(order) {
@@ -537,12 +537,12 @@ impl Partition {
                     world.get::<Partitionable>(other),
                     world.get::<PartitionBall>(other),
                 ) else {continue};
-                if p.is_moribund {continue;}
+                if p.isMoribund {continue;}
                 if filter.exclude_cloaked && (info.cloaked || !info.massive) {continue;}
                 if filter.exclude_inert_balls {
-                    if !p.is_interactive {continue;}
+                    if !p.isInteractive {continue;}
                 } else {
-                    if is_master && p.new_bubble != source_p.new_bubble && !info.global {continue;}
+                    if is_master && p.mNewBubble != source_p.mNewBubble && !info.global {continue;}
                     if filter.exclude_fixed_balls && !info.free {continue;}
                     if info.mode == BallMode::Field && !filter.exclude_harmonics_test {
                         if source_b.harmonic == -2 {continue;}
@@ -558,7 +558,7 @@ impl Partition {
                 for other in b.mStaticCollidables.values().copied() {
                     if !seen_statics.insert(other) {continue;}
                     let Some(p)=world.get::<Partitionable>(other) else {continue};
-                    if is_master && p.new_bubble != source_p.new_bubble {continue;}
+                    if is_master && p.mNewBubble != source_p.mNewBubble {continue;}
                     result.static_collidables.push(other);
                 }
             }
@@ -594,7 +594,7 @@ impl Partition {
             } else {
                 let mut found=NearbyCandidates::default();
                 if let Some(target)=meta.followed {
-                    if world.get::<Partitionable>(target).is_some_and(|t|t.new_bubble==p.new_bubble) {
+                    if world.get::<Partitionable>(target).is_some_and(|t|t.mNewBubble==p.mNewBubble) {
                         found.balls.push(target);
                     }
                 }

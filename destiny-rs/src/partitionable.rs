@@ -26,39 +26,40 @@ pub type BoxKey = Key;
 /// despawn. The concrete Ball/StaticCollidable providers are responsible for
 /// maintaining both sides of membership when their ports are implemented.
 #[derive(Component, Debug, Clone)]
+#[allow(non_snake_case)] // Canonical C++ Partitionable field names
 pub struct Partitionable {
-    pub id: DestinyId,
-    pub handled: bool,
-    pub new_pos: DVec3,
-    pub old_pos: DVec3,
+    pub mId: DestinyId,
+    pub mHandled: bool,
+    pub mNewPos: DVec3,
+    pub mOldPos: DVec3,
     /// MSVC `long` (C++ Destiny's target ABI) is signed 32-bit.
-    pub new_bubble: i32,
-    pub old_bubble: i32,
-    pub is_interactive: bool,
+    pub mNewBubble: i32,
+    pub mOldBubble: i32,
+    pub isInteractive: bool,
     /// Spatial key -> Bevy entity. Deterministic key order, not entity order.
-    boxes: BTreeMap<BoxKey, Entity>,
-    pub my_box: Option<Entity>,
+    mBoxes: BTreeMap<BoxKey, Entity>,
+    pub mMyBox: Option<Entity>,
     /// Reserved association with the owning Ballpark entity once ported.
-    pub ballpark: Option<Entity>,
-    pub effect_stamp: i32,
-    pub is_moribund: bool,
+    pub mPark: Option<Entity>,
+    pub mEffectStamp: i32,
+    pub isMoribund: bool,
 }
 
 impl Default for Partitionable {
     fn default() -> Self {
         Self {
-            id: 0,
-            handled: false,
-            new_pos: DVec3::ZERO,
-            old_pos: DVec3::ZERO,
-            new_bubble: -1,
-            old_bubble: -1,
-            is_interactive: false,
-            boxes: BTreeMap::new(),
-            my_box: None,
-            ballpark: None,
-            effect_stamp: 0,
-            is_moribund: false,
+            mId: 0,
+            mHandled: false,
+            mNewPos: DVec3::ZERO,
+            mOldPos: DVec3::ZERO,
+            mNewBubble: -1,
+            mOldBubble: -1,
+            isInteractive: false,
+            mBoxes: BTreeMap::new(),
+            mMyBox: None,
+            mPark: None,
+            mEffectStamp: 0,
+            isMoribund: false,
         }
     }
 }
@@ -66,7 +67,7 @@ impl Default for Partitionable {
 impl Partitionable {
     /// Iterator ordered exactly as the C++ `BoxSortComparer` orders keys.
     pub fn boxes(&self) -> impl Iterator<Item = (BoxKey, Entity)> + '_ {
-        self.boxes.iter().map(|(key, entity)| (*key, *entity))
+        self.mBoxes.iter().map(|(key, entity)| (*key, *entity))
     }
 
     /// Record an already-established box relationship on this side only.
@@ -76,7 +77,7 @@ impl Partitionable {
     /// The concrete behavior provider must update the Box's reciprocal set.
     pub fn track_box(&mut self, key: BoxKey, box_entity: Entity) -> bool {
         use std::collections::btree_map::Entry;
-        match self.boxes.entry(key) {
+        match self.mBoxes.entry(key) {
             Entry::Vacant(v) => {
                 v.insert(box_entity);
                 true
@@ -87,7 +88,7 @@ impl Partitionable {
 
     /// Remove this side of an already-removed box relationship.
     pub fn untrack_box(&mut self, key: &BoxKey) -> Option<Entity> {
-        self.boxes.remove(key)
+        self.mBoxes.remove(key)
     }
 
     /// Common *local-only* part of C++ `ClearBoxes()`.
@@ -96,8 +97,8 @@ impl Partitionable {
     /// membership set. Ball::ClearBoxes additionally clears Ball-specific
     /// active-box caches; those are not part of Partitionable.
     pub fn forget_box_references(&mut self) {
-        self.boxes.clear();
-        self.my_box = None;
+        self.mBoxes.clear();
+        self.mMyBox = None;
     }
 }
 
