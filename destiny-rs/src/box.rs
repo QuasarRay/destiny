@@ -129,13 +129,7 @@ impl Box {
     #[allow(non_snake_case)]
     pub fn AddBall(world: &mut World, box_entity: Entity, ball: Option<Entity>) -> bool {
         let Some(ball) = ball else { return false };
-        let Some(state) = world.get::<crate::partitionable::Partitionable>(ball) else { return false };
-        let Some(info) = world.get::<crate::partition::PartitionBall>(ball) else { return false };
-        let order = if state.mId < 0 {
-            (0, info.owner_id, state.mId)
-        } else {
-            (1, 0, state.mId)
-        };
+        let Some(order) = crate::ball::BallSortComparer::key(world, ball) else { return false };
         let Some(mut bx) = world.get_mut::<Self>(box_entity) else { return false };
         use std::collections::btree_map::Entry;
         match bx.balls.entry(order) {
@@ -283,6 +277,19 @@ impl Box {
     #[must_use]
     pub fn same_key(&self, other: &Self) -> bool {
         self.mKey == other.mKey
+    }
+}
+
+
+/// Original BoxSortComparer, declared in SortedSets.h and defined in Box.cpp.
+/// The order depends on Box::mKey, not the Bevy Entity identifier.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct BoxSortComparer;
+impl BoxSortComparer {
+    pub fn less(&self, world: &World, lhs: Entity, rhs: Entity) -> Option<bool> {
+        let a = world.get::<Box>(lhs)?;
+        let b = world.get::<Box>(rhs)?;
+        Some(a.mKey < b.mKey)
     }
 }
 

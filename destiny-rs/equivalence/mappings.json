@@ -141,6 +141,34 @@
       "verified_structure": false,
       "verified_internals": false,
       "notes": "C++ parent-ball-ID then object-ID ordering is implemented, with Bevy Entity lookups substituting C++ pointers."
+    },
+    {
+      "cpp_type": "BoxSortComparer",
+      "cpp_header": "src/SortedSets.h",
+      "cpp_files": [
+        "src/SortedSets.h",
+        "src/Box.cpp"
+      ],
+      "rust_type": "BoxSortComparer",
+      "rust_file": "destiny-rs/src/box.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Key-ordered Box comparator; Bevy entity dereference boundary. Formal equivalence unproven."
+    },
+    {
+      "cpp_type": "BallSortComparer",
+      "cpp_header": "src/SortedSets.h",
+      "cpp_files": [
+        "src/SortedSets.h",
+        "src/Ball.cpp"
+      ],
+      "rust_type": "BallSortComparer",
+      "rust_file": "destiny-rs/src/ball.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Original Ball.cpp comparator branches ported against temporary PartitionBall metadata; full Ball type not yet implemented."
     }
   ],
   "test_mappings": []

@@ -1,6 +1,7 @@
 //! Native Bevy Destiny port. Blue supplies reusable Python/CGP infrastructure.
 #[path = "box.rs"]
 pub mod spatial_box;
+pub mod ball;
 pub mod partition;
 pub mod partitionable;
 pub mod static_collidable;
@@ -23,3 +24,6 @@ pub use settings::{
 };
 
 pub use static_collidable::{StaticCollidable, StaticCollidableSortComparer, StaticCollidableGeometry};
+
+pub use ball::BallSortComparer;
+pub use spatial_box::BoxSortComparer;
