@@ -22,6 +22,12 @@ CPP_TYPES = re.compile(
 )
 RUST_TYPES = re.compile(r"\b(?:pub(?:\([^)]*\))?\s+)?(?:struct|enum|trait)\s+([A-Za-z_]\w*)\b")
 RUST_METHODS = re.compile(r"\bfn\s+([A-Za-z_]\w*)\s*(?:<[^()]*>)?\s*\(")
+RUST_IMPLS = re.compile(
+    r"\bimpl\s+(?:<[^{}]*>\s*)?(?:(?:[\w:<>]+)\s+for\s+)?([A-Za-z_]\w*)\s*\{"
+)
+RUST_STRUCTS = re.compile(
+    r"\b(?:pub\s+)?struct\s+([A-Za-z_]\w*)\b[^;{}]*\{"
+)
 CPP_METHODS = re.compile(r"(~?[A-Za-z_]\w*|operator\s*(?:\(\)|[-+/*=<>!]+))\s*\(")
 IGNORED = {"if", "for", "while", "switch", "return", "sizeof", "alignof", "decltype", "static_assert"}
 
@@ -83,6 +89,47 @@ def class_methods(body: str) -> list[str]:
     return found
 
 
+
+def class_fields(body: str) -> list[str]:
+    """Conservative direct-member scanner; ignores macro-generated fields."""
+    fields = []
+    for item in class_members(body):
+        item = re.sub(r"\b(?:public|private|protected)\s*:\s*", " ", item)
+        item = item.strip()
+        if "(" in item or item.startswith(("#", "friend", "typedef", "using", "enum", "class", "struct")):
+            continue
+        before = item.split("=", 1)[0].split(":", 1)[0].strip()
+        m = re.search(r"\b([A-Za-z_]\w*)\s*$", before)
+        if m:
+            fields.append(m.group(1))
+    return fields
+
+
+def rust_struct_fields(source: str) -> dict[str, list[str]]:
+    found = {}
+    for match in RUST_STRUCTS.finditer(source):
+        body = balanced_body(source, match.end() - 1)
+        if body is None:
+            continue
+        fields = []
+        for item in class_members(body):
+            item = re.sub(r"#\[[^]]*\]\s*", "", item).strip()
+            name = re.match(r"(?:pub(?:\([^)]*\))?\s+)?([A-Za-z_]\w*)\s*:", item)
+            if name:
+                fields.append(name.group(1))
+        found[match.group(1)] = sorted(set(fields))
+    return found
+
+
+def rust_impl_methods(source: str) -> dict[str, list[str]]:
+    found = {}
+    for match in RUST_IMPLS.finditer(source):
+        body = balanced_body(source, match.end() - 1)
+        if body is not None:
+            found.setdefault(match.group(1), []).extend(RUST_METHODS.findall(body))
+    return {k: sorted(set(v)) for k, v in found.items()}
+
+
 def source_inventory(root: Path) -> dict:
     cpp_dir = root / "src"
     files = sorted([p.relative_to(root).as_posix() for p in cpp_dir.glob("*")
@@ -100,6 +147,7 @@ def source_inventory(root: Path) -> dict:
             declarations.setdefault(name, []).append({
                 "file": rel,
                 "methods": class_methods(body),
+                "fields": class_fields(body),
             })
     return {"files": files, "types": declarations}
 
@@ -112,6 +160,8 @@ def rust_inventory(root: Path) -> dict:
         results[file.relative_to(root).as_posix()] = {
             "types": sorted(set(RUST_TYPES.findall(text))),
             "functions": sorted(set(RUST_METHODS.findall(text))),
+            "methods_by_type": rust_impl_methods(text),
+            "fields_by_type": rust_struct_fields(text),
         }
     return results
 
@@ -140,15 +190,22 @@ def audit(root: Path, registry: dict) -> dict:
         if missing_cpp_files:
             raise ValueError(f"Missing declared C++ files: {missing_cpp_files}")
         declared = sorted(set(m for d in declarations for m in d["methods"]))
-        rust_fns = set(rust[path]["functions"])
+        declared_fields = sorted(set(field for d in declarations for field in d["fields"]))
+        rust_fns = set(rust[path]["methods_by_type"].get(target, []))
+        rust_fields = set(rust[path]["fields_by_type"].get(target, []))
         candidates = sorted(set(declared) & rust_fns)
         missing = sorted(set(declared) - rust_fns)
+        candidate_fields = sorted(set(declared_fields) & rust_fields)
+        missing_fields = sorted(set(declared_fields) - rust_fields)
         records.append({
             "cpp_type": original,
             "cpp_header": header,
             "rust_type": target,
             "rust_file": path,
             "cpp_methods_detected": declared,
+            "cpp_fields_detected": declared_fields,
+            "exact_field_name_candidates": candidate_fields,
+            "missing_exact_field_names": missing_fields,
             "exact_name_candidates": candidates,
             "missing_exact_method_names": missing,
             "exact_type_name": original == target and target in rust[path]["types"],
@@ -168,6 +225,8 @@ def audit(root: Path, registry: dict) -> dict:
         name = record["cpp_type"]
         if not record["exact_type_name"]:
             blockers.append(f"{name}: type name not preserved")
+        if record["missing_exact_field_names"]:
+            blockers.append(f"{name}: {len(record['missing_exact_field_names'])} C++ field names absent from target type")
         if record["missing_exact_method_names"]:
             blockers.append(f"{name}: {len(record['missing_exact_method_names'])} declared method names absent from target file")
         if not all(record[k] for k in ("verified_behavior", "verified_structure", "verified_internals")):
@@ -192,7 +251,7 @@ def markdown(report: dict) -> str:
     lines = [
         "## Destiny C++ ↔ Rust correspondence audit",
         "",
-        "**This is NOT a proof of equivalence.** The scanner is lexical and",
+        "**This is NOT a proof of equivalence.** The scanner compares direct field names and method *ownership* lexically, and",
         "does not compare semantics, field layouts, concurrency or compiler expansions.",
         "",
         f"- Original C++ files: **{report['cpp_file_count']}** "
@@ -204,8 +263,8 @@ def markdown(report: dict) -> str:
         f"- Unregistered C++ types: **{len(report['unregistered_cpp_types'])}**",
         f"- Strict equivalence gate: **{'PASS' if report['strict_equivalence_passed'] else 'FAIL'}**",
         "",
-        "| C++ type | Rust type | Same type name? | Exact-name method candidates | Missing exact names | Semantics proven? |",
-        "|---|---|---|---:|---:|---|",
+        "| C++ type | Rust type | Same type name? | Matched methods | Missing methods | Matched fields | Missing fields | Semantics proven? |",
+        "|---|---|---|---:|---:|---:|---:|---|",
     ]
     for r in report["mappings"]:
         lines.append(
@@ -213,6 +272,8 @@ def markdown(report: dict) -> str:
             f"{'Yes' if r['exact_type_name'] else 'No'} | "
             f"{len(r['exact_name_candidates'])} | "
             f"{len(r['missing_exact_method_names'])} | "
+            f"{len(r['exact_field_name_candidates'])} | "
+            f"{len(r['missing_exact_field_names'])} | "
             f"{'Yes' if r['verified_behavior'] else 'No'} |"
         )
     if report["unregistered_cpp_files"]:
