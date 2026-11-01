@@ -174,3 +174,41 @@ fn original_box_addchildren_uses_key_uniqueness() {
     destiny_rs::Box::AddChildren(app.world_mut(), parent, None);
     assert_eq!(app.world().get::<PartitionBox>(parent).unwrap().mChildren.len(), 1);
 }
+
+
+#[test]
+fn cpp_box_add_operations_preserve_unique_sort_keys_and_null_guards() {
+    let mut app = app();
+    let bx = get_or_create_box(app.world_mut(), 25, 25, 25, 7).unwrap();
+    let first = app.world_mut().spawn((with_id(44), PartitionBall::default())).id();
+    let equivalent = app.world_mut().spawn((with_id(44), PartitionBall::default())).id();
+    assert!(!destiny_rs::Box::AddBall(app.world_mut(), bx, None));
+    assert!(destiny_rs::Box::AddBall(app.world_mut(), bx, Some(first)));
+    assert!(!destiny_rs::Box::AddBall(app.world_mut(), bx, Some(equivalent)));
+    let b = app.world().get::<PartitionBox>(bx).unwrap();
+    assert_eq!(b.balls.values().copied().collect::<Vec<_>>(), vec![first]);
+    let one = app.world_mut().spawn((with_id(-3),
+        destiny_rs::StaticCollidable { mParentBallId: 12 })).id();
+    let duplicate = app.world_mut().spawn((with_id(-3),
+        destiny_rs::StaticCollidable { mParentBallId: 12 })).id();
+    assert!(!destiny_rs::Box::AddStaticCollidable(app.world_mut(), bx, None));
+    assert!(destiny_rs::Box::AddStaticCollidable(app.world_mut(), bx, Some(one)));
+    assert!(!destiny_rs::Box::AddStaticCollidable(app.world_mut(), bx, Some(duplicate)));
+    assert_eq!(app.world().get::<PartitionBox>(bx).unwrap().mStaticCollidables.len(), 1);
+}
+
+#[test]
+fn cpp_box_remove_operations_are_box_owned_and_prune_via_partition() {
+    let mut app = app();
+    let bx = get_or_create_box(app.world_mut(), 35, 35, 35, 7).unwrap();
+    let ball = app.world_mut().spawn((with_id(100), PartitionBall::default())).id();
+    app.world_mut().resource_scope(|world, p: Mut<'_, Partition>| {
+        assert!(p.insert_ball(world, bx, ball));
+    });
+    app.world_mut().resource_scope(|world, mut p: Mut<'_, Partition>| {
+        destiny_rs::Box::RemoveBall(&mut p, world, bx, ball);
+    });
+    assert!(app.world().get::<PartitionBox>(bx).is_none());
+    assert_eq!(app.world().get::<Partitionable>(ball).unwrap().boxes().count(), 0);
+    assert_eq!(app.world().resource::<Partition>().size(), 0);
+}

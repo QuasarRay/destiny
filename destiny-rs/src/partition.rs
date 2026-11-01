@@ -80,7 +80,6 @@ impl KeyHash {
     }
 }
 
-type BallSortKey = (u8, i64, i64);
 
 /// Box membership metadata only: eventually supplied by the Rust Ball port.
 /// The remaining common state lives in the existing Partitionable component.
@@ -387,65 +386,40 @@ impl Partition {
         result
     }
 
-    /// Add a concrete Ball reference, including the reciprocal Partitionable link.
-    /// A separate future Ball port owns physics and any cached active-box flags.
+    /// Boundary adapter for C++ Box::AddBall; Box owns the insertion logic.
+    /// The extra reciprocal mBoxes update is the Bevy replacement for Ball's
+    /// C++ member-reference ownership.
     pub fn insert_ball(&self, world: &mut World, box_entity: Entity, ball: Entity) -> bool {
-        let Some(b) = world.get::<PartitionBox>(box_entity) else {return false};
-        let key = b.mKey;
-        let Some(p) = world.get::<Partitionable>(ball) else {return false};
-        let Some(meta) = world.get::<PartitionBall>(ball) else {return false};
-        let order = ball_order(p.mId, meta.owner_id);
-        let inserted = {
-            use std::collections::btree_map::Entry;
-            match world.get_mut::<PartitionBox>(box_entity).unwrap().balls.entry(order) {
-                Entry::Vacant(slot) => { slot.insert(ball); true }
-                Entry::Occupied(_) => false,
+        let Some(key) = world.get::<PartitionBox>(box_entity).map(|b| b.mKey) else { return false };
+        if PartitionBox::AddBall(world, box_entity, Some(ball)) {
+            if let Some(mut state) = world.get_mut::<Partitionable>(ball) {
+                state.track_box(key, box_entity);
             }
-        };
-        if inserted {
-            world.get_mut::<Partitionable>(ball).unwrap().track_box(key, box_entity);
-        }
-        inserted
+            true
+        } else { false }
     }
 
-    /// Add a static collider reference with the C++ (parent ID, local ID) order.
+    /// Boundary adapter for C++ Box::AddStaticCollidable.
     pub fn insert_static(&self, world: &mut World, box_entity: Entity, object: Entity) -> bool {
-        let Some(b) = world.get::<PartitionBox>(box_entity) else {return false};
-        let key=b.mKey;
-        let Some(p)=world.get::<Partitionable>(object) else{return false};
-        let Some(meta)=world.get::<PartitionStatic>(object) else{return false};
-        let order=(meta.mParentBallId,p.mId);
-        let inserted={
-            use std::collections::btree_map::Entry;
-            match world.get_mut::<PartitionBox>(box_entity).unwrap().mStaticCollidables.entry(order) {
-                Entry::Vacant(slot) => { slot.insert(object); true }
-                Entry::Occupied(_) => false,
+        let Some(key) = world.get::<PartitionBox>(box_entity).map(|b| b.mKey) else { return false };
+        if PartitionBox::AddStaticCollidable(world, box_entity, Some(object)) {
+            if let Some(mut state) = world.get_mut::<Partitionable>(object) {
+                state.track_box(key, box_entity);
             }
-        };
-        if inserted {
-            world.get_mut::<Partitionable>(object).unwrap().track_box(key,box_entity);
-        }
-        inserted
+            true
+        } else { false }
     }
 
-    /// Like Box::RemoveBall / RemoveStaticCollidable, prune an empty box and
-    /// then its empty ancestors. Live collidables must be detached before despawn.
+    /// Compatibility entrypoint. The canonical implementation belongs to Box.
     pub fn remove_ball(&mut self, world: &mut World, box_entity: Entity, ball: Entity) {
-        if let Some(mut b)=world.get_mut::<PartitionBox>(box_entity) {
-            b.balls.retain(|_,e| *e != ball);
-            let key=b.mKey;
-            if let Some(mut p)=world.get_mut::<Partitionable>(ball) {p.untrack_box(&key);}
-        }
-        self.prune_empty(world,box_entity);
+        PartitionBox::RemoveBall(self, world, box_entity, ball);
     }
+
+    /// Compatibility entrypoint. The canonical implementation belongs to Box.
     pub fn remove_static(&mut self, world: &mut World, box_entity: Entity, object: Entity) {
-        if let Some(mut b)=world.get_mut::<PartitionBox>(box_entity) {
-            b.mStaticCollidables.retain(|_,e| *e != object);
-            let key=b.mKey;
-            if let Some(mut p)=world.get_mut::<Partitionable>(object) {p.untrack_box(&key);}
-        }
-        self.prune_empty(world,box_entity);
+        PartitionBox::RemoveStaticCollidable(self, world, box_entity, object);
     }
+
     /// C++ Box::ReleaseBox / destructor. A nonempty Box cannot be released:
     /// doing so would leave dangling child, Ball, and StaticCollidable links.
     ///
@@ -628,9 +602,7 @@ pub struct NearbyCandidates {
     pub balls: Vec<Entity>,
     pub static_collidables: Vec<Entity>,
 }
-fn ball_order(id:i64,owner:i64)->BallSortKey {
-    if id<0 {(0,owner,id)} else {(1,0,id)}
-}
+
 
 /// Use Resource Scope because Bevy World must own both the index and its boxes.
 pub fn get_or_create_box(

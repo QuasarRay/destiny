@@ -77,6 +77,91 @@ impl Box {
         }
     }
 
+    /// Original Box::AddBall: insert a Ball into the key-ordered Box set.
+    /// Its reciprocal Partitionable::mBoxes link is maintained by the Ball
+    /// adapter at the Bevy ECS boundary, not by this Box operation.
+    #[allow(non_snake_case)]
+    pub fn AddBall(world: &mut World, box_entity: Entity, ball: Option<Entity>) -> bool {
+        let Some(ball) = ball else { return false };
+        let Some(state) = world.get::<crate::partitionable::Partitionable>(ball) else { return false };
+        let Some(info) = world.get::<crate::partition::PartitionBall>(ball) else { return false };
+        let order = if state.mId < 0 {
+            (0, info.owner_id, state.mId)
+        } else {
+            (1, 0, state.mId)
+        };
+        let Some(mut bx) = world.get_mut::<Self>(box_entity) else { return false };
+        use std::collections::btree_map::Entry;
+        match bx.balls.entry(order) {
+            Entry::Vacant(entry) => { entry.insert(ball); true }
+            Entry::Occupied(_) => false,
+        }
+    }
+
+    /// Original Box::AddStaticCollidable, with C++ comparator key
+    /// (mParentBallId, mId) and no replacement on equivalent keys.
+    #[allow(non_snake_case)]
+    pub fn AddStaticCollidable(
+        world: &mut World, box_entity: Entity, object: Option<Entity>,
+    ) -> bool {
+        let Some(object) = object else { return false };
+        let Some(base) = world.get::<crate::partitionable::Partitionable>(object) else { return false };
+        let Some(info) = world.get::<crate::static_collidable::StaticCollidable>(object) else { return false };
+        let order = (info.mParentBallId, base.mId);
+        let Some(mut bx) = world.get_mut::<Self>(box_entity) else { return false };
+        use std::collections::btree_map::Entry;
+        match bx.mStaticCollidables.entry(order) {
+            Entry::Vacant(entry) => { entry.insert(object); true }
+            Entry::Occupied(_) => false,
+        }
+    }
+
+    /// Original Box::RemoveBall. Bevy tracks both sides of membership and
+    /// reclaims an empty Box through Partition's world-local allocator.
+    #[allow(non_snake_case)]
+    pub fn RemoveBall(
+        partition: &mut Partition, world: &mut World, box_entity: Entity, ball: Entity,
+    ) {
+        let Some(mut bx) = world.get_mut::<Self>(box_entity) else { return };
+        let before = bx.balls.len();
+        bx.balls.retain(|_, member| *member != ball);
+        let removed = bx.balls.len() != before;
+        let key = bx.mKey;
+        if removed {
+            if let Some(mut state) = world.get_mut::<crate::partitionable::Partitionable>(ball) {
+                state.untrack_box(&key);
+            }
+        }
+        Self::ReleaseBox(partition, world, box_entity);
+    }
+
+    /// Original Box::RemoveStaticCollidable, with the same reciprocal cleanup.
+    #[allow(non_snake_case)]
+    pub fn RemoveStaticCollidable(
+        partition: &mut Partition, world: &mut World, box_entity: Entity, object: Entity,
+    ) {
+        let Some(mut bx) = world.get_mut::<Self>(box_entity) else { return };
+        let before = bx.mStaticCollidables.len();
+        bx.mStaticCollidables.retain(|_, member| *member != object);
+        let removed = bx.mStaticCollidables.len() != before;
+        let key = bx.mKey;
+        if removed {
+            if let Some(mut state) = world.get_mut::<crate::partitionable::Partitionable>(object) {
+                state.untrack_box(&key);
+            }
+        }
+        Self::ReleaseBox(partition, world, box_entity);
+    }
+
+    /// Original private Box::ReleaseBox, using Bevy's entity allocator and
+    /// Partition's spatial index instead of the original C++ BoxAllocator.
+    #[allow(non_snake_case)]
+    pub(crate) fn ReleaseBox(
+        partition: &mut Partition, world: &mut World, box_entity: Entity,
+    ) -> bool {
+        partition.release_box(world, box_entity)
+    }
+
     /// C++ Box::Traverse, with the partition index retrieved from Bevy World.
     #[allow(non_snake_case)]
     pub fn Traverse(world: &mut World, entity: Entity, seed: i32) {

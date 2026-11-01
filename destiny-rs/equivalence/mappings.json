@@ -14,7 +14,7 @@
       "verified_behavior": false,
       "verified_structure": false,
       "verified_internals": false,
-      "notes": "Canonical Box now directly owns C++-named mKey, mLevel, mParent, mChildren, mStaticCollidables, mBubble, mHandled, mObject, lo, hi and balls; SetObject, AddChildren, Traverse and NearbyBubbles are Box-owned; other methods and proof remain pending."
+      "notes": "Box now owns canonical AddChildren, AddBall, AddStaticCollidable, RemoveBall, RemoveStaticCollidable, ReleaseBox, SetObject, Traverse and NearbyBubbles entrypoints. Partition provides Bevy boundary adapters and spatial index. All equivalence obligations remain unverified."
     },
     {
       "cpp_type": "Partitionable",
