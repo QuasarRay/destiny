@@ -64,3 +64,14 @@ Doxygen/Clang AST + Rust HIR catalog, map source method and field identities
 (including overload signatures), and attach executable differential fixtures
 and verified invariants to every mapping. Do not change any `verified_*`
 flag without documented, reproducible evidence.
+
+## Original tests
+
+The audit also enumerates Python `test_*.py` modules under
+`python/destiny/test/` and the original C++ `Test*.cpp` binaries under
+`tests/`. Add a `test_mappings` entry for each with both source and Rust test
+file, plus differential evidence, when the harness is actually ported. An
+unmapped original test is a strict-gate blocker, not a passing test.
+
+The original test corpus is not replaced by the existing Rust unit tests
+merely because both suites have successful exit codes.

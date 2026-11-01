@@ -101,5 +101,6 @@
       "verified_internals": false,
       "notes": "Rust operators can correspond semantically through traits, but cannot retain C++ operator spellings or overload syntax."
     }
-  ]
+  ],
+  "test_mappings": []
 }

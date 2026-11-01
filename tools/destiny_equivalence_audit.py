@@ -166,10 +166,29 @@ def rust_inventory(root: Path) -> dict:
     return results
 
 
+def original_test_sources(root: Path) -> list[str]:
+    python = sorted((root / "python/destiny/test").rglob("test_*.py"))
+    cpp = sorted((root / "tests").glob("Test*.cpp"))
+    if (root / "tests/destinyTest.cpp").exists():
+        cpp.append(root / "tests/destinyTest.cpp")
+    return sorted(p.relative_to(root).as_posix() for p in python + cpp)
+
+
 def audit(root: Path, registry: dict) -> dict:
     cpp = source_inventory(root)
     rust = rust_inventory(root)
     records = []
+    source_tests = original_test_sources(root)
+    test_mappings = registry.get("test_mappings", [])
+    registered_tests = set()
+    for mapping in test_mappings:
+        original = mapping["cpp_or_python_test"]
+        if original not in source_tests:
+            raise ValueError(f"Unknown original test file: {original}")
+        if not (root / mapping["rust_test"]).is_file():
+            raise ValueError(f"Missing Rust counterpart test file: {mapping['rust_test']}")
+        registered_tests.add(original)
+    missing_test_files = sorted(set(source_tests) - registered_tests)
     covered_files = set()
     registered_types = set()
     for mapping in registry["mappings"]:
@@ -217,6 +236,8 @@ def audit(root: Path, registry: dict) -> dict:
     missing_files = sorted(set(cpp["files"]) - covered_files)
     missing_types = sorted(set(cpp["types"]) - registered_types)
     blockers = []
+    if missing_test_files:
+        blockers.append(f"{len(missing_test_files)} original test files lack correspondence records")
     if missing_files:
         blockers.append(f"{len(missing_files)} C++ source/header files not registered")
     if missing_types:
@@ -235,6 +256,8 @@ def audit(root: Path, registry: dict) -> dict:
         "schema": 1,
         "warning": "Lexical source inventory, not an AST or semantic equivalence proof.",
         "cpp_file_count": len(cpp["files"]),
+        "original_test_files": source_tests,
+        "unregistered_original_test_files": missing_test_files,
         "cpp_header_count": sum(p.endswith(".h") for p in cpp["files"]),
         "cpp_implementation_count": sum(p.endswith(".cpp") for p in cpp["files"]),
         "rust_source_count": len(rust),
@@ -261,6 +284,7 @@ def markdown(report: dict) -> str:
         f"- Explicitly registered type mappings: **{report['registered_mappings']}**",
         f"- Unregistered C++ files: **{len(report['unregistered_cpp_files'])}**",
         f"- Unregistered C++ types: **{len(report['unregistered_cpp_types'])}**",
+        f"- Original test files needing verified correspondence: **{len(report['unregistered_original_test_files'])}**",
         f"- Strict equivalence gate: **{'PASS' if report['strict_equivalence_passed'] else 'FAIL'}**",
         "",
         "| C++ type | Rust type | Same type name? | Matched methods | Missing methods | Matched fields | Missing fields | Semantics proven? |",
@@ -276,9 +300,12 @@ def markdown(report: dict) -> str:
             f"{len(r['missing_exact_field_names'])} | "
             f"{'Yes' if r['verified_behavior'] else 'No'} |"
         )
+    if report["unregistered_original_test_files"]:
+        lines.extend(["", "### Unregistered original test files", "",
+                      ", ".join("`" + p + "`" for p in report["unregistered_original_test_files"])])
     if report["unregistered_cpp_files"]:
         lines.extend(["", "### Unregistered C++ files", "",
-                      ", ".join(f"\`{p}\`" for p in report["unregistered_cpp_files"])])
+                      ", ".join("`" + p + "`" for p in report["unregistered_cpp_files"])])
     if report["blockers"]:
         lines.extend(["", "### Equivalence blockers", ""])
         lines.extend(f"- {item}" for item in report["blockers"])
