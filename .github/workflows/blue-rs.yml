@@ -9,6 +9,9 @@ on:
       - 'rust-toolchain.toml'
       - '.cargo/**'
       - 'destiny-rs/**'
+      - 'src/**'
+      - 'tools/destiny_equivalence_audit.py'
+      - 'tools/tests/**'
       - 'blue-rs/crates/**'
       - '.github/workflows/blue-rs.yml'
   pull_request:
@@ -28,6 +31,11 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: 1.98.1
+      - name: Inventory C++ to Rust equivalence gaps
+        run: |
+          python3 -m unittest discover -s tools/tests -p 'test_*.py'
+          python3 tools/destiny_equivalence_audit.py --json-out target/equivalence.json --markdown-out target/equivalence.md
+          cat target/equivalence.md >> "$GITHUB_STEP_SUMMARY"
       - name: Compile all workspace targets from the repository root
         run: cargo check --locked --workspace --all-targets
       - name: Test all workspace members
