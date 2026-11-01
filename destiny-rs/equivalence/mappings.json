@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "policy": "Source authoritative. A naming match is not semantic proof. No entry is verified without differential test and formal evidence; compiler success is insufficient.",
+  "mappings": [
+    {
+      "cpp_type": "Box",
+      "cpp_header": "src/Box.h",
+      "cpp_files": [
+        "src/Box.h",
+        "src/Box.cpp"
+      ],
+      "rust_type": "Box",
+      "rust_file": "destiny-rs/src/box.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Canonical Box restored; Python object split into BoxObject, methods owned by Partition; internal mismatch."
+    },
+    {
+      "cpp_type": "Partitionable",
+      "cpp_header": "src/Partitionable.h",
+      "cpp_files": [
+        "src/Partitionable.h",
+        "src/Partitionable.cpp"
+      ],
+      "rust_type": "Partitionable",
+      "rust_file": "destiny-rs/src/partitionable.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "C++ base virtual methods are expressed by separate Rust trait; field names and representation differ."
+    },
+    {
+      "cpp_type": "Key",
+      "cpp_header": "src/Partition.h",
+      "cpp_files": [
+        "src/Partition.h"
+      ],
+      "rust_type": "Key",
+      "rust_file": "destiny-rs/src/partitionable.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Canonical Key name restored; Rust derives Ord instead of C++ operators; declaration moved across source files."
+    },
+    {
+      "cpp_type": "Partition",
+      "cpp_header": "src/Partition.h",
+      "cpp_files": [
+        "src/Partition.h",
+        "src/Partition.cpp",
+        "src/Partition_Blue.cpp"
+      ],
+      "rust_type": "Partition",
+      "rust_file": "destiny-rs/src/partition.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Resource semantics and method ownership differ; BoxAllocator and full Ball integration absent."
+    },
+    {
+      "cpp_type": "SettingsConfiguration",
+      "cpp_header": "src/Settings.h",
+      "cpp_files": [
+        "src/Settings.h",
+        "src/Settings.cpp",
+        "src/Settings_Blue.cpp"
+      ],
+      "rust_type": "SettingsConfiguration",
+      "rust_file": "destiny-rs/src/settings.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Per-Bevy-World settings differ from original process-global state and original internal field names."
+    },
+    {
+      "cpp_type": "GlobalSettings",
+      "cpp_header": "src/Settings.h",
+      "cpp_files": [
+        "src/Settings.h",
+        "src/Settings.cpp",
+        "src/Settings_Blue.cpp"
+      ],
+      "rust_type": "GlobalSettings",
+      "rust_file": "destiny-rs/src/settings.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "CGP providers, bridge and deferred updates introduce additional objects and behavior."
+    },
+    {
+      "cpp_type": "QuaternionD",
+      "cpp_header": "src/Quaternion.h",
+      "cpp_files": [
+        "src/Quaternion.h"
+      ],
+      "rust_type": "QuaternionD",
+      "rust_file": "destiny-rs/src/quaternion.rs",
+      "verified_behavior": false,
+      "verified_structure": false,
+      "verified_internals": false,
+      "notes": "Rust operators can correspond semantically through traits, but cannot retain C++ operator spellings or overload syntax."
+    }
+  ]
+}
